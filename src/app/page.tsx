@@ -4,6 +4,7 @@ import { useState } from "react";
 import ProjectBoard from "@/components/ProjectBoard";
 import IntelInbox from "@/components/IntelInbox";
 import FinanceView from "@/components/FinanceView";
+import MetadataGenerator from "@/components/MetadataGenerator";
 
 type Tab = "kirbai" | "factory";
 
@@ -45,6 +46,7 @@ export default function Home() {
         <div className="lg:col-span-2 flex flex-col gap-8">
           <ProjectBoard activeTab={activeTab} />
           <FinanceView activeTab={activeTab} />
+          {activeTab === "factory" && <MetadataGenerator />}
         </div>
         <div className="lg:col-span-1 border-l border-border pl-8">
           <IntelInbox />

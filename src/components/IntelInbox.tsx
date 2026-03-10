@@ -1,70 +1,90 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Loader2 } from "@/components/Icons";
+
 export default function IntelInbox() {
+    const [intel, setIntel] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchIntel = async () => {
+            try {
+                const res = await fetch("/api/youtube-intel");
+                const data = await res.json();
+                setIntel(data.intel || []);
+            } catch (err) {
+                console.error("Failed to fetch intel", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchIntel();
+    }, []);
+
     return (
-        <div className="flex flex-col gap-6 h-full">
-            <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold tracking-tight flex items-center gap-2">
-                    Intel Inbox
-                    <span className="flex h-2 w-2 relative">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-                    </span>
-                </h2>
+        <div className="flex flex-col h-full pl-0">
+            <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center justify-between border-b border-border pb-4 mb-6">
+                Intel Aggregator
+                <span className="text-xs font-mono text-neutral-500 bg-surface px-2 py-1 rounded-sm border border-border">Live Feed</span>
+            </h2>
+
+            {/* Quick Access Utility Bar */}
+            <div className="flex flex-col gap-2 mb-8 bg-surface/50 border border-border/50 p-3 rounded-sm">
+                <h3 className="text-[10px] uppercase tracking-widest text-neutral-500 font-semibold mb-1">Quick Access Command</h3>
+                <div className="grid grid-cols-2 gap-2">
+                    <a href="https://skool.com" target="_blank" rel="noopener noreferrer" className="bg-black/40 hover:bg-black border border-border/40 hover:border-accent/30 text-xs text-neutral-300 py-2 text-center rounded-sm transition-all focus:outline-none">
+                        Skool Community
+                    </a>
+                    <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="bg-black/40 hover:bg-black border border-border/40 hover:border-accent/30 text-xs text-neutral-300 py-2 text-center rounded-sm transition-all focus:outline-none">
+                        YouTube Channels
+                    </a>
+                    <button className="col-span-2 bg-black/40 hover:bg-black border border-border/40 hover:border-neutral-500 text-[10px] text-neutral-500 py-1.5 text-center transition-all focus:outline-none uppercase tracking-widest">
+                        Configure Gmail Webhook (V2)
+                    </button>
+                </div>
             </div>
 
-            <div className="flex flex-col gap-6">
-                {/* Item 1 */}
-                <div className="flex gap-4">
-                    <div className="w-0.5 bg-accent/30 mt-1"></div>
-                    <div>
-                        <div className="flex justify-between text-xs text-neutral-500 mb-1 font-mono items-center">
-                            <span className="flex items-center gap-2">
-                                <span className="text-[10px] font-bold text-accent border border-accent/30 px-1 py-0.5 bg-accent/10">[KIRBAI]</span>
-                                SYS_AGENT_01
-                            </span>
-                            <span>10m ago</span>
-                        </div>
-                        <h4 className="font-medium text-sm text-foreground mb-1 hover:text-accent transition-colors cursor-pointer">Pokémon VGC Meta Shift</h4>
-                        <p className="text-xs text-neutral-400 leading-relaxed">
-                            Ogerpon usage rate dropping by 12% in recent regionals. Strong pivot to Incineroar + Raging Bolt core. Recommend content addressing this shift immediately.
-                        </p>
+            {/* Dynamic Intel Feed */}
+            <div className="flex flex-col gap-6 overflow-y-auto pb-20 pr-4">
+                {isLoading ? (
+                    <div className="flex items-center justify-center py-10 text-neutral-500 gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span className="text-xs uppercase tracking-wider font-semibold">Syncing Feeds...</span>
                     </div>
-                </div>
+                ) : intel.length === 0 ? (
+                    <p className="text-sm text-neutral-500 italic">Inbox is empty. All intel processed.</p>
+                ) : (
+                    intel.map((item) => (
+                        <div key={item.id} className="flex flex-col gap-3 group">
+                            <div className="flex justify-between items-center">
+                                <span className={`text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-sm uppercase ${item.tag === "KIRBAI" ? "bg-accent/10 border border-accent/20 text-accent" : "bg-neutral-800 border border-neutral-700 text-neutral-300"}`}>
+                                    [{item.tag}]
+                                </span>
+                                <span className="text-[10px] font-mono text-neutral-600">{item.date}</span>
+                            </div>
 
-                {/* Item 2 */}
-                <div className="flex gap-4">
-                    <div className="w-0.5 bg-border mt-1"></div>
-                    <div>
-                        <div className="flex justify-between text-xs text-neutral-500 mb-1 font-mono items-center">
-                            <span className="flex items-center gap-2">
-                                <span className="text-[10px] font-bold text-neutral-400 border border-neutral-600 px-1 py-0.5">[FACTORY]</span>
-                                GUERRILLA_AI
-                            </span>
-                            <span>2h ago</span>
-                        </div>
-                        <h4 className="font-medium text-sm text-foreground mb-1 hover:text-accent transition-colors cursor-pointer">Competitor Vid Analysis</h4>
-                        <p className="text-xs text-neutral-400 leading-relaxed">
-                            "Why Gen 5 is actually terrible" reaching 150k views in 4 hours. Hook structure relies heavily on emotional contradiction. Focus AELOW keyword farming around Gen 5 nostalgia.
-                        </p>
-                    </div>
-                </div>
+                            <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-white group-hover:text-accent transition-colors leading-tight">
+                                {item.title}
+                            </a>
 
-                {/* Item 3 */}
-                <div className="flex gap-4">
-                    <div className="w-0.5 bg-border mt-1"></div>
-                    <div>
-                        <div className="flex justify-between text-xs text-neutral-500 mb-1 font-mono items-center">
-                            <span className="flex items-center gap-2">
-                                <span className="text-[10px] font-bold text-neutral-400 border border-neutral-600 px-1 py-0.5">[FACTORY]</span>
-                                ALBUM_SYNC
-                            </span>
-                            <span>12h ago</span>
+                            <p className="text-xs text-neutral-400 leading-relaxed">
+                                {item.summary}
+                            </p>
+
+                            <div className="bg-black/50 border border-accent/20 border-l-2 border-l-accent p-3 mt-1 flex flex-col gap-2">
+                                <span className="text-[10px] uppercase font-bold text-accent tracking-widest">Action Items:</span>
+                                <ul className="list-disc pl-4 flex flex-col gap-1">
+                                    {item.actionItems.map((action: string, idx: number) => (
+                                        <li key={idx} className="text-xs text-neutral-300 font-medium">{action}</li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <div className="w-full h-px bg-border/50 mt-2 line-last-hidden"></div>
                         </div>
-                        <h4 className="font-medium text-sm text-foreground mb-1 hover:text-accent transition-colors cursor-pointer">Platform Playlist Added</h4>
-                        <p className="text-xs text-neutral-400 leading-relaxed">
-                            New KURAO release caught by algorithmic curated playlist "Midnight Drives". Impressions up 45%.
-                        </p>
-                    </div>
-                </div>
+                    ))
+                )}
             </div>
         </div>
     );
