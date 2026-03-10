@@ -1,0 +1,23 @@
+{
+    "_comment": "This file is a placeholder for your manual metadata entries. The Finance View will cross-reference this data to power deeper AI insights.",
+    "songs": {
+        "Cyber Heart": {
+            "genre": "Acoustic Pop",
+            "keywords": [
+                "chill",
+                "acoustic",
+                "lo-fi"
+            ],
+            "release_date": "2023-11-15"
+        },
+        "Neon Nights": {
+            "genre": "Synthwave",
+            "keywords": [
+                "cyberpunk",
+                "driving",
+                "retro"
+            ],
+            "release_date": "2024-02-01"
+        }
+    }
+}
