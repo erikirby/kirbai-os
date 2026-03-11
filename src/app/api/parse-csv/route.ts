@@ -48,7 +48,7 @@ export async function POST(req: Request) {
         `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-lite",
+            model: "gemini-1.5-flash",
             contents: `Parse this raw ${platform} CSV:\n\n${csvText}`,
             config: {
                 systemInstruction: systemInstruction,
@@ -61,6 +61,7 @@ export async function POST(req: Request) {
         }
 
         if (!response.text) {
+            console.error("Gemini Response Empty:", response);
             throw new Error("No response from Gemini");
         }
 

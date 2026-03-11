@@ -21,6 +21,10 @@ export async function GET() {
                 });
                 const data = await res.json();
 
+                if (data.error) {
+                    console.error(`YouTube API Error for ${channel.handle}:`, data.error);
+                }
+
                 if (data.items && data.items.length > 0) {
                     const item = data.items[0];
                     return {

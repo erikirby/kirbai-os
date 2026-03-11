@@ -22,7 +22,7 @@ export async function POST(req: Request) {
         `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-lite",
+            model: "gemini-1.5-flash",
             contents: `Analyze these cross-platform stats:
             YouTube: ${JSON.stringify(youtubeStats)}
             TikTok: ${JSON.stringify(tiktokStats)}
