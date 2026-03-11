@@ -1,14 +1,16 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react';
-import { Send, Loader2, Sparkles, Undo2, ImagePlus, Link as LinkIcon, Trash2 } from 'lucide-react';
+import { Send, Loader2, Sparkles, Undo2, ImagePlus, Link as LinkIcon, Trash2, Edit2, Check, X } from 'lucide-react';
 
 interface LoreNode {
     id: string;
     type: 'character' | 'location' | 'event' | 'artifact' | 'organization';
+    position?: { x: number; y: number };
     data: {
         label: string;
         description: string;
+        traits?: string;
         imagePath?: string;
     };
 }
@@ -30,6 +32,9 @@ export default function LoreMatrix() {
     const [prompt, setPrompt] = useState("");
     const [isGenerating, setIsGenerating] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
+    const [editForm, setEditForm] = useState({ label: '', description: '', traits: '' });
+    const [aiStatus, setAiStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
     const loadState = async () => {
         try {
@@ -65,6 +70,7 @@ export default function LoreMatrix() {
     const handlePromptSubmit = async () => {
         if (!prompt.trim() || isGenerating) return;
         setIsGenerating(true);
+        setAiStatus(null);
         const currentPrompt = prompt;
         setPrompt("");
 
@@ -72,40 +78,68 @@ export default function LoreMatrix() {
             const res = await fetch('/api/generate-lore-action', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: currentPrompt })
+                body: JSON.stringify({
+                    prompt: currentPrompt,
+                    currentState: { nodes: state.nodes, edges: state.edges }
+                })
             });
             const actionPlan = await res.json();
 
-            // Save history
+            if (actionPlan.error) {
+                setAiStatus({ type: 'error', message: `AI error: ${actionPlan.error}` });
+                return;
+            }
+
+            const actions: any[] = actionPlan.actions || [];
+            if (actions.length === 0) {
+                setAiStatus({ type: 'error', message: 'AI returned no actions. Try rephrasing.' });
+                return;
+            }
+
+            // Save history for undo
             const newHistory = [...state.history, { nodes: [...state.nodes], edges: [...state.edges] }];
             
             let newNodes = [...state.nodes];
             let newEdges = [...state.edges];
+            let nodeOffset = 0;
 
-            // Apply Nodes
-            if (actionPlan.addNodes && Array.isArray(actionPlan.addNodes)) {
-                actionPlan.addNodes.forEach((n: any) => {
+            actions.forEach((action: any) => {
+                if (action.action === 'ADD_NODE' && action.node) {
+                    const n = action.node;
                     if (!newNodes.find(en => en.id === n.id)) {
+                        const baseX = n.position?.x ?? (300 + (nodeOffset % 4) * 200);
+                        const baseY = n.position?.y ?? (200 + Math.floor(nodeOffset / 4) * 180);
+                        nodeOffset++;
                         newNodes.push({
                             id: n.id,
                             type: n.type || 'character',
-                            data: { label: n.label, description: n.description }
+                            position: { x: baseX, y: baseY },
+                            data: { label: n.data?.label || n.id, description: n.data?.description || '', traits: n.data?.traits }
                         });
                     }
-                });
-            }
-
-            // Apply Edges
-            if (actionPlan.addEdges && Array.isArray(actionPlan.addEdges)) {
-                actionPlan.addEdges.forEach((e: any) => {
-                    newEdges.push({ source: e.source, target: e.target, label: e.label });
-                });
-            }
+                } else if (action.action === 'UPDATE_NODE' && action.nodeId) {
+                    newNodes = newNodes.map(n =>
+                        n.id === action.nodeId
+                            ? { ...n, data: { ...n.data, ...action.updates } }
+                            : n
+                    );
+                } else if (action.action === 'DELETE_NODE' && action.nodeId) {
+                    newNodes = newNodes.filter(n => n.id !== action.nodeId);
+                    newEdges = newEdges.filter(e => e.source !== action.nodeId && e.target !== action.nodeId);
+                } else if (action.action === 'ADD_EDGE' && action.edge) {
+                    const e = action.edge;
+                    // Avoid duplicate edges
+                    const exists = newEdges.find(ex => ex.source === e.source && ex.target === e.target && ex.label === e.label);
+                    if (!exists) newEdges.push({ source: e.source, target: e.target, label: e.label || '' });
+                }
+            });
 
             saveState({ nodes: newNodes, edges: newEdges, history: newHistory });
+            setAiStatus({ type: 'success', message: `✓ ${actions.length} action${actions.length !== 1 ? 's' : ''} applied` });
+            setTimeout(() => setAiStatus(null), 3000);
 
-        } catch (e) {
-            console.error("Generation error", e);
+        } catch (e: any) {
+            setAiStatus({ type: 'error', message: e.message || 'Request failed' });
         } finally {
             setIsGenerating(false);
         }
@@ -145,6 +179,21 @@ export default function LoreMatrix() {
         const newNodes = state.nodes.filter(n => n.id !== nodeId);
         const newEdges = state.edges.filter(e => e.source !== nodeId && e.target !== nodeId);
         saveState({ nodes: newNodes, edges: newEdges, history: newHistory });
+    };
+
+    const startEditNode = (node: LoreNode) => {
+        setEditingNodeId(node.id);
+        setEditForm({ label: node.data.label, description: node.data.description, traits: node.data.traits || '' });
+    };
+
+    const saveEditNode = () => {
+        if (!editingNodeId) return;
+        const newHistory = [...state.history, { nodes: [...state.nodes], edges: [...state.edges] }];
+        const newNodes = state.nodes.map(n =>
+            n.id === editingNodeId ? { ...n, data: { ...n.data, ...editForm } } : n
+        );
+        saveState({ nodes: newNodes, edges: state.edges, history: newHistory });
+        setEditingNodeId(null);
     };
 
     // Helper to find connections for a specific node
@@ -210,45 +259,96 @@ export default function LoreMatrix() {
                             const styleClass = typeColors[node.type] || typeColors.character;
 
                             return (
-                                <div key={node.id} className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col group hover:bg-white/10 transition-colors shadow-xl">
-                                    
-                                    {/* Header: Icon, Type, Delete */}
-                                    <div className="flex justify-between items-start mb-4">
-                                        
-                                        <div className="flex gap-4 items-center">
-                                            {/* Minimalist 32x32 Icon Upload Area */}
-                                            <div className="relative w-12 h-12 shrink-0 rounded-full border border-white/20 overflow-hidden bg-black/40 flex items-center justify-center group/icon">
-                                                {node.data.imagePath ? (
-                                                    <img src={node.data.imagePath} alt={node.data.label} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <span className="text-white/20 text-xs font-bold font-serif">{node.data.label.charAt(0)}</span>
-                                                )}
-                                                <label className="absolute inset-0 bg-black/60 opacity-0 group-hover/icon:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
-                                                    <ImagePlus className="w-4 h-4 text-white" />
-                                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, node.id)} />
-                                                </label>
-                                            </div>
+                                <div key={node.id} className="relative bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col group hover:bg-white/10 transition-colors shadow-xl">
 
-                                            <div>
-                                                <div className={`text-[9px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-full inline-block border mb-1 ${styleClass}`}>
-                                                    {node.type}
-                                                </div>
-                                                <h3 className="text-xl font-bold text-white leading-tight">{node.data.label}</h3>
-                                            </div>
-                                        </div>
-
-                                        <button 
+                                    {/* Action buttons — absolutely positioned, zero layout impact */}
+                                    <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                        <button
+                                            onClick={() => startEditNode(node)}
+                                            className="text-white/30 hover:text-white transition-colors p-1"
+                                            title="Edit"
+                                        >
+                                            <Edit2 className="w-4 h-4" />
+                                        </button>
+                                        <button
                                             onClick={() => handleDeleteNode(node.id)}
-                                            className="opacity-0 group-hover:opacity-100 text-red-500/50 hover:text-red-400 transition-opacity p-1"
+                                            className="text-red-500/50 hover:text-red-400 transition-colors p-1"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
 
-                                    {/* Description */}
-                                    <p className="text-sm text-foreground/70 leading-relaxed mb-6 flex-1">
-                                        {node.data.description}
-                                    </p>
+                                    {/* Header: Avatar top-left, type badge + full name — no truncation */}
+                                    <div className="flex gap-4 items-start mb-4 pr-12">
+                                        {/* Avatar */}
+                                        <div className="relative w-12 h-12 shrink-0 rounded-full border border-white/20 overflow-hidden bg-black/40 flex items-center justify-center group/icon">
+                                            {node.data.imagePath ? (
+                                                <img src={node.data.imagePath} alt={node.data.label} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <span className="text-white/20 text-xs font-bold font-serif">{node.data.label.charAt(0)}</span>
+                                            )}
+                                            <label className="absolute inset-0 bg-black/60 opacity-0 group-hover/icon:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+                                                <ImagePlus className="w-4 h-4 text-white" />
+                                                <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, node.id)} />
+                                            </label>
+                                        </div>
+
+                                        <div>
+                                            <div className={`text-[9px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-full inline-block border mb-1 ${styleClass}`}>
+                                                {node.type}
+                                            </div>
+                                            <h3 className="text-xl font-bold text-white leading-tight">{node.data.label}</h3>
+                                        </div>
+                                    </div>
+
+
+                                    {/* Inline Edit Form */}
+                                    {editingNodeId === node.id ? (
+                                        <div className="flex flex-col gap-2 mb-4">
+                                            <input
+                                                value={editForm.label}
+                                                onChange={e => setEditForm(f => ({ ...f, label: e.target.value }))}
+                                                className="px-3 py-2 bg-black/40 border border-white/20 rounded-lg text-sm font-bold text-white focus:outline-none"
+                                                placeholder="Name"
+                                            />
+                                            <textarea
+                                                value={editForm.description}
+                                                onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
+                                                rows={3}
+                                                className="px-3 py-2 bg-black/40 border border-white/20 rounded-lg text-sm text-white/80 focus:outline-none resize-none font-mono"
+                                                placeholder="Description..."
+                                            />
+                                            <textarea
+                                                value={editForm.traits}
+                                                onChange={e => setEditForm(f => ({ ...f, traits: e.target.value }))}
+                                                rows={2}
+                                                className="px-3 py-2 bg-purple-400/5 border border-purple-400/20 rounded-lg text-sm text-purple-200/80 focus:outline-none resize-none font-mono"
+                                                placeholder="Traits / psychological profile..."
+                                            />
+                                            <div className="flex gap-2">
+                                                <button onClick={saveEditNode} className="flex items-center gap-1 px-3 py-1.5 bg-accent/20 border border-accent/30 rounded-lg text-accent text-xs font-black hover:bg-accent/40 transition-colors">
+                                                    <Check className="w-3 h-3" /> Save
+                                                </button>
+                                                <button onClick={() => setEditingNodeId(null)} className="flex items-center gap-1 px-3 py-1.5 text-white/30 text-xs font-black hover:text-white transition-colors">
+                                                    <X className="w-3 h-3" /> Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {/* Description */}
+                                            <p className="text-sm text-foreground/70 leading-relaxed mb-3 flex-1">
+                                                {node.data.description}
+                                            </p>
+                                            {/* Traits */}
+                                            {node.data.traits && (
+                                                <div className="mb-4 p-3 bg-purple-400/5 border border-purple-400/10 rounded-xl">
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-purple-400/60 mb-1">Profile</p>
+                                                    <p className="text-xs text-purple-200/70 leading-relaxed font-mono">{node.data.traits}</p>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
 
                                     {/* Connection Pills */}
                                     {connections.length > 0 && (
@@ -283,6 +383,16 @@ export default function LoreMatrix() {
 
             {/* Generative Command Bar */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-3xl px-6 z-50">
+                {/* AI Status Feedback */}
+                {aiStatus && (
+                    <div className={`mb-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-center border ${
+                        aiStatus.type === 'success'
+                            ? 'bg-green-500/10 border-green-500/20 text-green-400'
+                            : 'bg-red-500/10 border-red-500/20 text-red-400'
+                    }`}>
+                        {aiStatus.message}
+                    </div>
+                )}
                 <div className="bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl p-2 flex gap-2 shadow-2xl items-center relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-r from-accent/0 via-accent/10 to-accent/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out pointer-events-none"></div>
                     
@@ -293,8 +403,8 @@ export default function LoreMatrix() {
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') handlePromptSubmit(); }}
-                        placeholder="Type a command to build the lore (e.g. 'Add a character named Kirbai')"
-                        className="flex-1 bg-transparent border-none text-white focus:outline-none focus:ring-0 px-2 placeholder:text-foreground/30 font-sans"
+                        placeholder="Add Ditto. Delete Sailor Venus. Update Pheromosa's description to say she is the lead dancer."
+                        className="flex-1 bg-transparent border-none text-white focus:outline-none focus:ring-0 px-2 placeholder:text-foreground/30 font-sans text-sm"
                         disabled={isGenerating}
                     />
 
@@ -310,3 +420,4 @@ export default function LoreMatrix() {
         </div>
     );
 }
+

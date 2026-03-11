@@ -250,6 +250,23 @@ export default function VaultManager({ theme = "dark" }: VaultManagerProps) {
         updateActiveProject('tracklist', (activeProject.tracklist || []).filter((_, i) => i !== index));
     };
 
+    const moveTrack = (index: number, direction: 'up' | 'down') => {
+        if (!activeProject) return;
+        const currentList = [...(activeProject.tracklist || [])];
+        if (direction === 'up' && index > 0) {
+            const temp = currentList[index - 1];
+            currentList[index - 1] = currentList[index];
+            currentList[index] = temp;
+        } else if (direction === 'down' && index < currentList.length - 1) {
+            const temp = currentList[index + 1];
+            currentList[index + 1] = currentList[index];
+            currentList[index] = temp;
+        } else {
+            return;
+        }
+        updateActiveProject('tracklist', currentList);
+    };
+
     // --- DistroKid Tracklist Parser (pure regex, no AI needed) ---
     const parseDistrokid = () => {
         if (!activeProject || !distrokidText.trim()) return;
@@ -727,10 +744,24 @@ export default function VaultManager({ theme = "dark" }: VaultManagerProps) {
                                                                 {isExpanded ? 'Collapse' : lyric ? 'View / Edit' : '+ Add Lyrics'}
                                                             </button>
                                                             <button
-                                                                onClick={() => removeTrack(i)}
-                                                                className="text-foreground/20 hover:text-red-400 transition-colors"
+                                                                onClick={() => moveTrack(i, 'up')}
+                                                                disabled={i === 0}
+                                                                className="text-foreground/20 hover:text-cyan-400 transition-colors disabled:opacity-30 disabled:hover:text-foreground/20 p-1"
                                                             >
-                                                                <Trash2 className="w-3 h-3" />
+                                                                <ChevronUp className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => moveTrack(i, 'down')}
+                                                                disabled={i === (activeProject.tracklist || []).length - 1}
+                                                                className="text-foreground/20 hover:text-cyan-400 transition-colors disabled:opacity-30 disabled:hover:text-foreground/20 p-1"
+                                                            >
+                                                                <ChevronDown className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => removeTrack(i)}
+                                                                className="text-foreground/20 hover:text-red-400 transition-colors ml-1 p-1"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
                                                             </button>
                                                         </div>
                                                     </div>

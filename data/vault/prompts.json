@@ -1,0 +1,55 @@
+{
+  "universal": [
+    "Models stay consistent and do not morph. No music, only sound effects.",
+    "No text overlays or watermarks.",
+    "Cinematic lighting, film grain, ultra-realistic detail."
+  ],
+  "categories": {
+    "Video — Grok": [
+      {
+        "id": "grok-strut",
+        "name": "Strut Walk",
+        "text": "The character performs a slow, confident runway strut walk toward the camera. Each step is deliberate and exaggerated, weight shifting side to side. The camera is low angle, slowly dolly-zooming in. The character does not look at the camera. Background is blurred bokeh."
+      },
+      {
+        "id": "grok-pose",
+        "name": "Diva Pose / Vogue Beat",
+        "text": "The character strikes a sharp, angular vogue-style pose. Limbs are fully extended or at extreme angles. Motion is frozen on the beat, then immediately transitions to the next movement. The energy is fierce and controlled."
+      },
+      {
+        "id": "grok-glitch",
+        "name": "Subliminal Glitch Cut",
+        "text": "A rapid, subliminal flash cut (2–4 frames) of a disturbing or revealing image. Heavy chromatic aberration and VHS scan lines overlay. The image feels like it accidentally escaped the film."
+      }
+    ],
+    "Art Style": [
+      {
+        "id": "style-base",
+        "name": "Base Kirbai Art Style",
+        "text": "Realistic animal textures, highly detailed fur/scales/skin. Faithful to the original Pokémon silhouette and proportions. The character is rendered in a physically-based dark studio environment. No anime or cartoon shading."
+      },
+      {
+        "id": "style-pink",
+        "name": "Shiny Pink Override",
+        "text": "Apply a full iridescent bubblegum-to-hot-pink gradient across all body surfaces. Skin/fur retains realistic texture but shifts to the pink palette. Reflective sheen is stronger than the base version."
+      },
+      {
+        "id": "style-lighting",
+        "name": "Standard Lighting Setup",
+        "text": "Three-point studio lighting. Key light from upper right, cool-toned fill from left. Strong rim light separates subject from background. Background is pure black or very deep navy."
+      }
+    ],
+    "Suno": [
+      {
+        "id": "suno-lady-gaga",
+        "name": "Lady Gaga Style Reference",
+        "text": "hyperpop, dark pop, aggressive synths, spoken-word bridge, dramatic key change, four-on-the-floor kick, theatrical, bold hooks"
+      },
+      {
+        "id": "suno-diva-pop",
+        "name": "Diva Pop Energy",
+        "text": "glossy production, punchy 808s, vogue house influence, sharp staccato vocals, power ballad pre-chorus, gay anthem energy"
+      }
+    ]
+  }
+}

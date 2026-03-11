@@ -1,8 +1,85 @@
 {
-  "lifetimeInputTokens": 83670,
-  "lifetimeOutputTokens": 42872,
-  "lifetimeCost": 0.0255158,
+  "lifetimeInputTokens": 105126,
+  "lifetimeOutputTokens": 49097,
+  "lifetimeCost": 0.030151400000000005,
   "logs": [
+    {
+      "timestamp": 1773209742466,
+      "route": "/api/parse-roadmap",
+      "inputTokens": 4612,
+      "outputTokens": 672,
+      "estimatedCost": 0.00073
+    },
+    {
+      "timestamp": 1773209724094,
+      "route": "/api/parse-roadmap",
+      "inputTokens": 1014,
+      "outputTokens": 220,
+      "estimatedCost": 0.0001894
+    },
+    {
+      "timestamp": 1773209706795,
+      "route": "/api/parse-roadmap",
+      "inputTokens": 1067,
+      "outputTokens": 512,
+      "estimatedCost": 0.0003115
+    },
+    {
+      "timestamp": 1773209407930,
+      "route": "/api/parse-roadmap",
+      "inputTokens": 4612,
+      "outputTokens": 512,
+      "estimatedCost": 0.0006659999999999999
+    },
+    {
+      "timestamp": 1773209386387,
+      "route": "/api/parse-roadmap",
+      "inputTokens": 1017,
+      "outputTokens": 33,
+      "estimatedCost": 0.0001149
+    },
+    {
+      "timestamp": 1773209193765,
+      "route": "/api/parse-roadmap",
+      "inputTokens": 4907,
+      "outputTokens": 1268,
+      "estimatedCost": 0.0009979000000000001
+    },
+    {
+      "timestamp": 1773205246096,
+      "route": "/api/format-lyric",
+      "inputTokens": 749,
+      "outputTokens": 481,
+      "estimatedCost": 0.00026730000000000005
+    },
+    {
+      "timestamp": 1773205190301,
+      "route": "/api/format-lyric",
+      "inputTokens": 786,
+      "outputTokens": 610,
+      "estimatedCost": 0.00032260000000000004
+    },
+    {
+      "timestamp": 1773205140277,
+      "route": "/api/format-lyric",
+      "inputTokens": 865,
+      "outputTokens": 606,
+      "estimatedCost": 0.0003289
+    },
+    {
+      "timestamp": 1773205097644,
+      "route": "/api/format-lyric",
+      "inputTokens": 912,
+      "outputTokens": 658,
+      "estimatedCost": 0.0003544
+    },
+    {
+      "timestamp": 1773204883586,
+      "route": "/api/format-lyric",
+      "inputTokens": 915,
+      "outputTokens": 653,
+      "estimatedCost": 0.0003527
+    },
     {
       "timestamp": 1773184167807,
       "route": "/api/parse-csv",

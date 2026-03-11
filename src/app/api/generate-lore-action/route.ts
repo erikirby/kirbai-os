@@ -11,42 +11,86 @@ export async function POST(req: NextRequest) {
 
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
+        // Only pass a slim summary of nodes/edges to the AI — no positions, no history
+        // This prevents the context from getting bloated and the AI losing focus
+        const slimContext = {
+            nodes: (currentState?.nodes || []).map((n: any) => ({
+                id: n.id,
+                type: n.type,
+                label: n.data?.label || n.id,
+                description: n.data?.description || '',
+                traits: n.data?.traits || ''
+            })),
+            edges: (currentState?.edges || []).map((e: any) => ({
+                source: e.source,
+                target: e.target,
+                label: e.label
+            }))
+        };
+
         const systemInstruction = `
-            You are the continuity and worldbuilding engine for Kirbai OS.
-            The user will give you a short narrative prompt. Your job is to translate that prompt into structured graph modifications (nodes and edges) for a visual Figma-style Lore Board.
-            
-            Current Lore Board State:
-            ${JSON.stringify(currentState, null, 2)}
+You are an expert lore database manager for Kirbai OS, a Pokémon-themed music universe.
+The user will give you instructions to modify a lore board. Your job is to output a JSON array of actions.
 
-            Output a strict JSON array of 'actions'. 
-            Valid actions: 'ADD_NODE' and 'ADD_EDGE'.
-            
-            When adding a node:
-            Provide a unique lowercase 'id' (no spaces), 'type' (character, artifact, location, event), 'data' object with 'label' (capitalized name) and 'description' (short 1-2 sentence lore).
-            'position' should be loosely scattered around x: 400, y: 300 to start, staggered so they don't exactly overlap.
+CURRENT LORE BOARD STATE:
+${JSON.stringify(slimContext, null, 2)}
 
-            When adding an edge:
-            Provide 'source' (node id), 'target' (node id), and a short 'label' (e.g., 'created', 'corrupted by', 'owns').
-            
-            Example output format:
-            [
-               { "action": "ADD_NODE", "node": { "id": "meloetta", "type": "character", "position": { "x": 400, "y": 300 }, "data": { "label": "Meloetta", "description": "An innocent idol." } } },
-               { "action": "ADD_EDGE", "edge": { "id": "mel-knot", "source": "meloetta", "target": "destiny_knot", "label": "corrupted by" } }
-            ]
-        `;
+OUTPUT: A JSON array of action objects. Supported actions:
+
+1. ADD_NODE — create a new node
+   { "action": "ADD_NODE", "node": { "id": "snake_case_id", "type": "character|organization|artifact|location|event", "position": { "x": 400, "y": 300 }, "data": { "label": "Display Name", "description": "1-2 sentence lore.", "traits": "Only if user provides trait info." } } }
+
+2. UPDATE_NODE — edit an existing node's data  
+   { "action": "UPDATE_NODE", "nodeId": "existing_id", "updates": { "label"?: "...", "description"?: "...", "traits"?: "..." } }
+
+3. DELETE_NODE — remove a node and its connections
+   { "action": "DELETE_NODE", "nodeId": "existing_id" }
+
+4. ADD_EDGE — link two nodes
+   { "action": "ADD_EDGE", "edge": { "source": "node_id", "target": "node_id", "label": "verb phrase" } }
+
+RULES (follow all of them):
+- EXECUTE EVERY INSTRUCTION. Never skip any request. If user says "add X and also add Y", output actions for both X and Y.
+- Check existing node IDs before using ADD_NODE. If a node already exists (check by id), use UPDATE_NODE instead.
+- For groups/teams: one "organization" node + "member of" edge for each member.
+- Stagger node positions: space each new node ~200px apart so they don't overlap.
+- For traits: ONLY include if the user explicitly tells you what the trait is. Do NOT invent or guess. If none provided, omit "traits" entirely.
+- For descriptions: brief, factual, lore-appropriate. Do not repeat info from traits.
+- IDs must be snake_case (no spaces, no capitals).
+
+EXAMPLE — adding two characters and an edge:
+[
+  { "action": "ADD_NODE", "node": { "id": "ditto", "type": "character", "position": { "x": 300, "y": 400 }, "data": { "label": "Ditto", "description": "A shapeshifting Pokémon with a mysterious role in the universe." } } },
+  { "action": "ADD_NODE", "node": { "id": "meowscarada", "type": "character", "position": { "x": 500, "y": 400 }, "data": { "label": "Meowscarada", "description": "A captivating Pokémon known for her flair and agility." } } },
+  { "action": "ADD_EDGE", "edge": { "source": "ditto", "target": "meowscarada", "label": "allied with" } }
+]`;
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: prompt,
             config: {
-                systemInstruction: systemInstruction,
+                systemInstruction,
                 responseMimeType: "application/json",
-                temperature: 0.2, // Low temp for reliable JSON formatting
+                temperature: 0.1,
+                thinkingConfig: { thinkingBudget: 5000 }
             }
         });
 
-        const actions = JSON.parse(response.text || "[]");
-        return NextResponse.json({ actions });
+        const rawText = response.text || "[]";
+        let actions;
+        try {
+            actions = JSON.parse(rawText);
+        } catch (parseErr) {
+            // Try to extract JSON array from response if it has extra text
+            const match = rawText.match(/\[[\s\S]*\]/);
+            actions = match ? JSON.parse(match[0]) : [];
+        }
+
+        if (!Array.isArray(actions)) {
+            throw new Error(`AI returned unexpected format: ${rawText.slice(0, 200)}`);
+        }
+
+        return NextResponse.json({ actions, count: actions.length });
 
     } catch (error: any) {
         console.error('Error in generate-lore-action:', error);

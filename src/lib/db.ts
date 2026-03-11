@@ -22,25 +22,44 @@ export interface IntelItem {
     url: string;
 }
 
+export interface RoadmapPhase {
+    id: string;
+    title: string;
+    description: string;
+    status: "Current Objective" | "Pending Trajectory" | "Completed" | "Archived";
+}
+
+export interface RoadmapTask {
+    id: string;
+    text: string;
+    status: "todo" | "wip" | "done";
+}
+
 interface DatabaseSchema {
     metadataHistory: MetadataPack[];
     intelCache: IntelItem[];
     pokemonNews: any[];
     financeAnalysis: any | null;
+    roadmap: {
+        phases: RoadmapPhase[];
+        tasks: RoadmapTask[];
+    };
 }
 
 export function getDb(): DatabaseSchema {
     try {
         if (!fs.existsSync(DB_PATH)) {
-            const initial: DatabaseSchema = { metadataHistory: [], intelCache: [], pokemonNews: [], financeAnalysis: null };
+            const initial: DatabaseSchema = { metadataHistory: [], intelCache: [], pokemonNews: [], financeAnalysis: null, roadmap: { phases: [], tasks: [] } };
             saveDb(initial);
             return initial;
         }
         const data = fs.readFileSync(DB_PATH, 'utf-8');
-        return JSON.parse(data);
+        const parsed = JSON.parse(data);
+        if (!parsed.roadmap) parsed.roadmap = { phases: [], tasks: [] };
+        return parsed;
     } catch (error) {
         console.error('Failed to read database:', error);
-        return { metadataHistory: [], intelCache: [], pokemonNews: [], financeAnalysis: null };
+        return { metadataHistory: [], intelCache: [], pokemonNews: [], financeAnalysis: null, roadmap: { phases: [], tasks: [] } };
     }
 }
 
@@ -82,6 +101,17 @@ export function setFinanceAnalysis(analysis: any) {
 export function getFinanceAnalysis() {
     const db = getDb();
     return db.financeAnalysis;
+}
+
+export function saveRoadmap(roadmapData: { phases: RoadmapPhase[], tasks: RoadmapTask[] }) {
+    const db = getDb();
+    db.roadmap = roadmapData;
+    saveDb(db);
+}
+
+export function getRoadmap() {
+    const db = getDb();
+    return db.roadmap;
 }
 
 // --- TELEMETRY SYSTEM ---

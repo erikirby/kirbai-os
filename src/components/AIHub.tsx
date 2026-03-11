@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { Settings, Send, Bot, Loader2, Sparkles, Check, Copy } from 'lucide-react';
+import { Settings, Send, Bot, Loader2, Sparkles, Check, Copy, Trash2, Download } from 'lucide-react';
 
 // Basic zero-dependency markdown parser for AI Responses
 const MarkdownRenderer = ({ content }: { content: string }) => {
@@ -95,6 +95,48 @@ export default function AIHub({ theme }: { theme: string }) {
     const [isGenerating, setIsGenerating] = useState(false);
     const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
     const [isListening, setIsListening] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    // Load Chat Memory on mount
+    useEffect(() => {
+        setIsMounted(true);
+        const stored = localStorage.getItem('kirbai_chat_v1');
+        const lastActive = localStorage.getItem('kirbai_chat_last_active');
+        
+        if (stored && lastActive) {
+            const now = Date.now();
+            const then = parseInt(lastActive, 10);
+            const hoursSince = (now - then) / (1000 * 60 * 60);
+            
+            // Expiration: 24 hours
+            if (hoursSince > 24) {
+                localStorage.removeItem('kirbai_chat_v1');
+                localStorage.removeItem('kirbai_chat_last_active');
+            } else {
+                try {
+                    setMessages(JSON.parse(stored));
+                } catch (e) {
+                    console.error("Failed to parse chat memory");
+                }
+            }
+        }
+    }, []);
+
+    // Save Chat Memory on change
+    useEffect(() => {
+        if (!isMounted) return;
+        if (messages.length > 0) {
+            localStorage.setItem('kirbai_chat_v1', JSON.stringify(messages));
+            localStorage.setItem('kirbai_chat_last_active', Date.now().toString());
+        }
+    }, [messages, isMounted]);
+
+    const handleClearMemory = () => {
+        setMessages([]);
+        localStorage.removeItem('kirbai_chat_v1');
+        localStorage.removeItem('kirbai_chat_last_active');
+        setPrompt("");
+    };
 
     // Initialize Speech Recognition
     let recognition: any = null;
@@ -191,6 +233,31 @@ export default function AIHub({ theme }: { theme: string }) {
                                 {isListening ? "Audio Input Active..." : "Progressive Memory Active"}
                             </p>
                         </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                        <button
+                            onClick={async () => {
+                                const res = await fetch('/api/export-context');
+                                const blob = await res.blob();
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `kirbai_context_${new Date().toISOString().slice(0,10)}.txt`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                            }}
+                            className="text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-full border border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/10 transition-colors flex items-center gap-2 h-fit"
+                        >
+                            <Download className="w-3 h-3" /> Export .txt
+                        </button>
+                        {messages.length > 0 && (
+                            <button 
+                                onClick={handleClearMemory}
+                                className="text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-full border border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-colors flex items-center gap-2 h-fit"
+                            >
+                                <Trash2 className="w-3 h-3" /> Clear Memory
+                            </button>
+                        )}
                     </div>
                 </div>
 

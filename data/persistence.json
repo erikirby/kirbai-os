@@ -860,5 +860,58 @@
     ],
     "advice": "<ul>\n  <li><strong>Overall Performance Snapshot:</strong> Kirbai OS has generated a total revenue of $527.17 from 77,019 streams as of 2026-03-10.</li>\n  <li><strong>Platform Revenue Dominance:</strong>\n    <ul>\n      <li><strong>YouTube (Red):</strong> $247.01 (46.85% of total revenue) from 25,415 streams, yielding a robust rate of $0.0097 per stream. Streams accounted for through 2026-01 (reported on 2026-02-24), indicating a 2-month reporting lag.</li>\n      <li><strong>Apple Music:</strong> $172.07 (32.64% of total revenue) from 26,183 streams, with a rate of $0.0066 per stream. Streams accounted for through 2026-01 (reported on 2026-02-26), indicating a 2-month reporting lag.</li>\n      <li><strong>iTunes Songs:</strong> $55.92 (10.61% of total revenue) from only 90 units, showcasing an exceptionally high rate of $0.6213 per unit, reflecting direct sales. Sales accounted for through 2026-01 (reported on 2026-02-26), indicating a 2-month reporting lag.</li>\n      <li><strong>YouTube (Ads):</strong> $34.01 (6.45% of total revenue) from 14,091 streams, at a low rate of $0.0024 per stream. Streams accounted for through 2026-01 (reported on 2026-02-24), indicating a 2-month reporting lag.</li>\n      <li><strong>Spotify:</strong> $16.02 (3.04% of total revenue) from 4,692 streams, with a rate of $0.0034 per stream. Streams accounted for through 2025-12 (reported on 2026-02-27), indicating a 3-month reporting lag.</li>\n    </ul>\n  </li>\n  <li><strong>Data Recency:</strong>\n    <ul>\n      <li>The most recent data is from YouTube (Red & Ads), Apple Music, and iTunes Songs, covering sales through January 2026.</li>\n      <li>The oldest data is from Spotify, covering sales through December 2025.</li>\n    </ul>\n  </li>\n  <li><strong>Top Performing Tracks:</strong>\n    <ul>\n      <li>\"Mean Look (Gothitelle Cut)\": Leading with $98.13 from 13,130 streams.</li>\n      <li>\"Power Whip (Tsareena Step)\": Contributing $62.42 from 7,512 streams.</li>\n      <li>\"Lovely Kiss (Jynx Anthem)\": Generating $59.42 from 7,631 streams.</li>\n    </ul>\n  </li>\n  <li><strong>Reporting Lag Protocol:</strong> It is critical to understand that the displayed figures represent finalized data up to the stated 'saleMonth'. The inherent reporting latency, particularly with platforms like Spotify showing a 3-month lag, means these aggregates will consistently appear lower than real-time analytical dashboards. This is due to the sequential process of data aggregation, validation, and payment processing by digital service providers before official reporting to distributors.</li>\n</ul>",
     "persistedAt": "2026-03-10T21:24:05.791Z"
+  },
+  "roadmap": {
+    "phases": [
+      {
+        "id": "phase-1",
+        "title": "Sterile Lore Drop",
+        "description": "Efficiently deliver high-impact Pheromosa lore video.",
+        "status": "Current Objective"
+      },
+      {
+        "id": "phase-2",
+        "title": "Algorithm Priming",
+        "description": "Optimize release cadence, leverage data insights.",
+        "status": "Pending Trajectory"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "task-1773209742467-0",
+        "text": "Release Bye Bye Butterfree single",
+        "status": "wip"
+      },
+      {
+        "id": "task-1773209742467-1",
+        "text": "Produce Pheromosa Lore Video",
+        "status": "todo"
+      },
+      {
+        "id": "task-1773209742467-2",
+        "text": "Create Lopunny Tsareena mashup",
+        "status": "todo"
+      },
+      {
+        "id": "task-1773209742467-3",
+        "text": "Release Lopunny Tsareena audio",
+        "status": "todo"
+      },
+      {
+        "id": "task-1773209742467-4",
+        "text": "Produce Lopunny Tsareena video",
+        "status": "todo"
+      },
+      {
+        "id": "task-1773209742467-5",
+        "text": "Release Pink Bois audio EP",
+        "status": "wip"
+      },
+      {
+        "id": "task-1773209742467-6",
+        "text": "Produce Meloetta visualizer video",
+        "status": "todo"
+      }
+    ]
   }
 }

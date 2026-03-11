@@ -11,10 +11,11 @@ import APIHealth from "@/components/APIHealth";
 import AIHub from "@/components/AIHub";
 import ConsultantSettings from "@/components/ConsultantSettings";
 import LoreMatrix from "@/components/LoreMatrix";
+import PromptBank from "@/components/PromptBank";
 import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Share2 } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
-type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore";
+type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts";
 type Theme = "dark" | "light" | "pink" | "snes" | "gbc";
 
 export default function Home() {
@@ -109,6 +110,7 @@ export default function Home() {
           { id: "pulse", label: "Pulse" },
           { id: "lore", label: "Lore" },
           { id: "chat", label: "Chat" },
+          { id: "prompts", label: "Prompts" },
           { id: "finance", label: "Finance" },
           { id: "api-health", label: "API Health" },
           { id: "core", label: "Core" },
@@ -137,6 +139,7 @@ export default function Home() {
             {activeModule === "chat" && <AIHub theme={theme} />}
             {activeModule === "core" && <ConsultantSettings theme={theme} />}
             {activeModule === "lore" && <LoreMatrix theme={theme} />}
+            {activeModule === "prompts" && <PromptBank />}
           </div>
         </div>
 
