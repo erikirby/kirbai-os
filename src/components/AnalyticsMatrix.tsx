@@ -328,33 +328,55 @@ export default function AnalyticsMatrix({ theme = "dark" }: AnalyticsMatrixProps
                                         <span className="text-sm font-black text-accent">{trends.optimalLengthRange}</span>
                                         <span className="text-[7px] uppercase font-bold text-foreground/30">Target Video Length</span>
                                     </div>
-                                    <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-2">
-                                        <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Window</span>
-                                        <span className="text-sm font-black text-accent">{trends.peakPostingWindows}</span>
-                                        <span className="text-[7px] uppercase font-bold text-foreground/30">Peak Virality Timing</span>
-                                    </div>
                                     <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-3 min-w-[200px]">
-                                        <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Magnets (Top 3)</span>
+                                        <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Windows (Top 3)</span>
                                         <div className="flex flex-col gap-2">
-                                            {(trends.topMagnets || [{ text: trends.followerMagnet, rate: 0 }]).slice(0, 3).map((m: any, i: number) => (
+                                            {(trends.topWindows || [{ time: trends.peakPostingWindows, reach: 0 }]).slice(0, 3).map((w: any, i: number) => (
                                                 <div key={i} className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
-                                                    <span className="text-[7px] font-bold text-foreground/80 leading-tight line-clamp-2 italic">"{m.text}"</span>
-                                                    <span className="text-[9px] font-black text-accent mt-0.5">{m.rate ? m.rate.toFixed(1) : "N/A"} <span className="text-[6px] opacity-50">Follows / 1k</span></span>
+                                                    <span className="text-[9px] font-black text-accent">{w.time}</span>
+                                                    {w.reach > 0 && <span className="text-[7px] font-bold text-foreground/40 uppercase">{formatNumber(w.reach)} Reach</span>}
                                                 </div>
                                             ))}
+                                        </div>
+                                        <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Peak Virality Timing</span>
+                                    </div>
+
+                                    <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-3 min-w-[240px]">
+                                        <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Magnets (Top 3)</span>
+                                        <div className="flex flex-col gap-2">
+                                            {(trends.topMagnets || []).length > 0 ? (
+                                                trends.topMagnets.slice(0, 3).map((m: any, i: number) => (
+                                                    <div key={i} className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
+                                                        <span className="text-[7px] font-bold text-foreground/80 leading-tight line-clamp-2 italic">"{m.text}"</span>
+                                                        <span className="text-[9px] font-black text-accent mt-0.5">{m.rate ? m.rate.toFixed(1) : "N/A"} <span className="text-[6px] opacity-50">Follows / 1k</span></span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
+                                                    <span className="text-[7px] font-bold text-foreground/80 leading-tight italic">"{trends.followerMagnet || 'No data'}"</span>
+                                                    <span className="text-[9px] font-black text-accent mt-0.5">N/A <span className="text-[6px] opacity-50">Follows / 1k</span></span>
+                                                </div>
+                                            )}
                                         </div>
                                         <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Peak Follower Conversion</span>
                                     </div>
 
-                                    <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-3 min-w-[200px]">
+                                    <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-3 min-w-[240px]">
                                         <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Anchors (Top 3)</span>
                                         <div className="flex flex-col gap-2">
-                                            {(trends.topAnchors || [{ text: trends.engagementLeader, rate: 0 }]).slice(0, 3).map((m: any, i: number) => (
-                                                <div key={i} className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
-                                                    <span className="text-[7px] font-bold text-foreground/80 leading-tight line-clamp-2 italic">"{m.text}"</span>
-                                                    <span className="text-[9px] font-black text-pink-400 mt-0.5">{m.rate ? m.rate.toFixed(1) : "N/A"} <span className="text-[6px] opacity-50">Hits / 1k</span></span>
+                                            {(trends.topAnchors || []).length > 0 ? (
+                                                trends.topAnchors.slice(0, 3).map((m: any, i: number) => (
+                                                    <div key={i} className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
+                                                        <span className="text-[7px] font-bold text-foreground/80 leading-tight line-clamp-2 italic">"{m.text}"</span>
+                                                        <span className="text-[9px] font-black text-pink-400 mt-0.5">{m.rate ? m.rate.toFixed(1) : "N/A"} <span className="text-[6px] opacity-50">Hits / 1k</span></span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
+                                                    <span className="text-[7px] font-bold text-foreground/80 leading-tight italic">"{trends.engagementLeader || 'No data'}"</span>
+                                                    <span className="text-[9px] font-black text-pink-400 mt-0.5">N/A <span className="text-[6px] opacity-50">Hits / 1k</span></span>
                                                 </div>
-                                            ))}
+                                            )}
                                         </div>
                                         <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Total Interaction Leaders</span>
                                     </div>

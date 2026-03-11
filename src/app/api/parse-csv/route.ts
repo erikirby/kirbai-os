@@ -20,25 +20,23 @@ export async function POST(req: Request) {
             USER GOAL: 
             1. Total Metrics: Sum Reach, Follows, Likes, and Shares across all rows.
             2. Strategic Sweet Spots:
-               - Identify the specific second-range (e.g., '15-20s') that correlates with highest Reach.
-               - Detect 'The Window': Identify the general peak Virality Window (Specific Day of the Week + General Time, e.g., 'Sunday Evenings'). DO NOT return a list of dates.
-               - Detect 'The Magnet': Which post had the highest follows-per-reach ratio? (Return a 40-character snippet of the 'Description' column).
-               - Detect 'The Anchor': Which post had the most overall interactions (Likes + Shares + Comments)? (Return a 40-character snippet of the 'Description' column).
+               - Detect 'Top 3 Windows': Identify the 3 specific Day/Time combinations (e.g., 'Sunday 6PM-8PM') that correlate with highest Reach.
+               - Detect 'Top 3 Magnets': The 3 posts with highest follows-per-1k-reach. 
+               - Detect 'Top 3 Anchors': The 3 posts with most interactions per 1k reach.
                - Stylistic DNA: Identify common keywords, emojis, or tones across high-performing descriptions.
             3. Style Mapping: Create a list of all unique descriptions.
 
             CRITICAL: If no 'Total' row is present, YOU MUST SUM THE COLUMNS MANUALLY for every single post row provided.
-            IMPORTANT: For both 'followerMagnet' and 'engagementLeader', DO NOT use IDs. Use the actual text from the 'Description' column.
             
             Return exactly a JSON object:
             {
                 "totals": { "reach": number, "followers": number, "likes": number, "shares": number },
                 "trends": { 
                     "optimalLengthRange": string, 
-                    "peakPostingWindows": string, 
+                    "topWindows": Array<{ "time": string, "reach": number }>, 
                     "topKeywords": string[], 
                     "topMagnets": Array<{ "text": string, "rate": number }>, // Follows per 1k reach
-                    "topAnchors": Array<{ "text": string, "rate": number }>  // (Likes+Shares+Comments) per 1k reach
+                    "topAnchors": Array<{ "text": string, "rate": number }>  // Interactions per 1k reach
                 },
                 "descriptions": string[],
                 "narrative": string (2-sentence tactical recommendation)
