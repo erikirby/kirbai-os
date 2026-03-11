@@ -63,7 +63,7 @@ export async function getRow(key: string): Promise<any> {
         .from('persistence')
         .select('value')
         .eq('key', key)
-        .single();
+        .maybeSingle();
     return data?.value ?? null;
 }
 

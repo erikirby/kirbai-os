@@ -22,7 +22,7 @@ export async function POST(req: Request) {
         `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-1.5-flash",
+            model: "gemini-2.5-flash",
             contents: `Analyze these cross-platform stats:
             YouTube: ${JSON.stringify(youtubeStats)}
             TikTok: ${JSON.stringify(tiktokStats)}
@@ -48,11 +48,14 @@ export async function POST(req: Request) {
             logApiUsage("/api/synthesize-analytics", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
-        if (!response.text) {
+        // Use robust text extraction
+        const text = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
+
+        if (!text) {
             throw new Error("No response from Gemini");
         }
 
-        const parsed = JSON.parse(response.text);
+        const parsed = JSON.parse(text.replace(/\`\`\`(json)?/g, '').trim());
 
         return NextResponse.json({ analysis: parsed, success: true });
     } catch (e: any) {

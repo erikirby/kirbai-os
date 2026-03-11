@@ -46,7 +46,7 @@ export async function POST(req: Request) {
         `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
+            model: "gemini-2.5-flash",
             contents: `Parse this raw ${platform} CSV:\n\n${csvText}`,
             config: {
                 systemInstruction: systemInstruction,
@@ -58,13 +58,26 @@ export async function POST(req: Request) {
             logApiUsage("/api/parse-csv", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
-        if (!response.text) {
+        // Use robust text extraction
+        const text = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
+
+        if (!text) {
             console.error("Gemini Response Empty:", response);
             throw new Error("No response from Gemini");
         }
 
-        const text = response.text;
-        const parsed = JSON.parse(text);
+        let parsed;
+        try {
+            // Strip markdown if AI ignored the JSON-only instruction
+            const targetJson = text.replace(/\`\`\`(json)?/g, '').trim();
+            parsed = JSON.parse(targetJson);
+        } catch (parseErr) {
+            console.error("Failed to parse Gemini JSON:", text);
+            return NextResponse.json({ 
+                error: "AI returned invalid format", 
+                details: text.slice(0, 100) + "..." 
+            }, { status: 500 });
+        }
 
         // --- Persistent Style Persistence (Supabase) ---
         if (platform === 'instagram' && parsed.descriptions) {
