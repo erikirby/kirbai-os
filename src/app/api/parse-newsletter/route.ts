@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-lite",
+            model: "gemini-1.5-flash",
             contents: `Analyze this raw newsletter text and extract music/marketing/IP insights:
             
             Raw Text:

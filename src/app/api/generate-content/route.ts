@@ -1,33 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import fs from 'fs';
-import path from 'path';
+import { getRow } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 
 // Load Context Files
-const getContext = (filename: string, dir: string = 'analytics') => {
+// Helper to pull context from Supabase persistence
+const getSupabaseContext = async (key: string) => {
     try {
-        const filePath = path.join(process.cwd(), 'data', 'vault', dir, filename);
-        if (fs.existsSync(filePath)) {
-            const rawData = fs.readFileSync(filePath, 'utf8');
-            // If it's the projects file, we MUST strip out the massive base64 coverArt images
-            if (filename === 'projects.json') {
-                try {
-                    const parsed = JSON.parse(rawData);
-                    const slimmed = parsed.map((p: any) => ({
-                        ...p,
-                        coverArt: p.coverArt ? "[IMAGE_DATA_STRIPPED_FOR_TOKENS]" : null
-                    }));
-                    return JSON.stringify(slimmed);
-                } catch (parseError) {
-                    return rawData; // fallback if not valid JSON
-                }
-            }
-            return rawData;
+        const data = await getRow(key);
+        if (!data) return null;
+
+        // If it's projects, we MUST strip out the massive base64 coverArt images
+        if (key === 'vault_projects' && Array.isArray(data)) {
+            const slimmed = data.map((p: any) => ({
+                ...p,
+                coverArt: p.coverArt ? "[IMAGE_DATA_STRIPPED_FOR_TOKENS]" : null
+            }));
+            return JSON.stringify(slimmed);
         }
-        return null;
+        return typeof data === 'string' ? data : JSON.stringify(data);
     } catch (e) {
         return null;
     }
+};
+
+// Specialized Lore Fetcher
+const getLoreContext = async () => {
+    try {
+        const [nodesRes, edgesRes] = await Promise.all([
+            supabase.from('lore_nodes').select('*'),
+            supabase.from('lore_edges').select('*')
+        ]);
+        
+        if (nodesRes.data && nodesRes.data.length > 0) {
+            const loreNodesStr = nodesRes.data.map((n: any) => `- [${n.type.toUpperCase()}] ${n.label}: ${n.description}`).join('\n');
+            const loreEdgesStr = (edgesRes.data || []).map((e: any) => {
+                const sourceLabel = nodesRes.data?.find((n: any) => n.id === e.source)?.label || e.source;
+                const targetLabel = nodesRes.data?.find((n: any) => n.id === e.target)?.label || e.target;
+                return `- ${sourceLabel} -> [${e.label}] -> ${targetLabel}`;
+            }).join('\n');
+            return `Entities:\n${loreNodesStr}\n\nRelationships:\n${loreEdgesStr}`;
+        }
+    } catch (e) {
+        console.error("Lore Context Fetch Error:", e);
+    }
+    return "No lore continuity defined.";
 };
 
 export async function POST(req: NextRequest) {
@@ -40,30 +57,13 @@ export async function POST(req: NextRequest) {
 
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-        // Gather all native OS context
-        const identityData = getContext('identity.json', 'brand') || "No specific brand identity defined.";
-        const styleBaseData = getContext('style_base.json') || "No historical style data available.";
-        // Get latest projects to know what's WIP
-        const projectsData = getContext('projects.json', '') || "No project data available.";
-        
-        let loreContext = "No lore continuity defined.";
-        const loreDataRaw = getContext('lore.json', 'lore');
-        if (loreDataRaw) {
-            try {
-                const loreGraph = JSON.parse(loreDataRaw);
-                if (loreGraph.nodes && loreGraph.nodes.length > 0) {
-                    const loreNodesStr = loreGraph.nodes.map((n: any) => `- [${n.type.toUpperCase()}] ${n.data.label}: ${n.data.description}`).join('\n');
-                    const loreEdgesStr = (loreGraph.edges || []).map((e: any) => {
-                        const sourceLabel = loreGraph.nodes.find((n: any) => n.id === e.source)?.data?.label || e.source;
-                        const targetLabel = loreGraph.nodes.find((n: any) => n.id === e.target)?.data?.label || e.target;
-                        return `- ${sourceLabel} -> [${e.label}] -> ${targetLabel}`;
-                    }).join('\n');
-                    loreContext = `Entities:\n${loreNodesStr}\n\nRelationships:\n${loreEdgesStr}`;
-                }
-            } catch (e) {
-                // Ignore parse errors safely
-            }
-        }
+        // Gather all native OS context from Supabase
+        const [identityData, styleBaseData, projectsData, loreContext] = await Promise.all([
+            getSupabaseContext('brand_identity').then(d => d || "No specific brand identity defined."),
+            getSupabaseContext('instagram_style_base').then(d => d || "No historical style data available."),
+            getSupabaseContext('vault_projects').then(d => d || "No project data available."),
+            getLoreContext()
+        ]);
 
         const systemInstruction = `
             You are the core intelligence engine for 'Kirbai OS', a specialized dashboard for managing a music and content brand.
