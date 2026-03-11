@@ -133,6 +133,7 @@ export default function AnalyticsMatrix({ theme = "dark" }: AnalyticsMatrixProps
 
                 if (platform === 'tiktok') {
                     if (followers) updateAndSave(setTtFollowers, "tt_followers", followers.toString());
+                    if (reach) updateAndSave(setTtViews, "tt_views", reach.toString());
                     setTtLastUpdated(now);
                     localStorage.setItem("tt_last_updated", now);
                 } else {
