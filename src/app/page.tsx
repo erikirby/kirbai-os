@@ -46,7 +46,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col">
             <h1 className="text-xl font-bold tracking-tighter text-gradient leading-none">KIRBAI OS</h1>
-            <span className="text-[10px] text-neutral-500 font-mono tracking-widest uppercase mt-0.5">V3.2.0_EVO</span>
+            <span className="text-[10px] text-neutral-500 font-mono tracking-widest uppercase mt-0.5">V3.2.1_EVO</span>
           </div>
         </div>
 
