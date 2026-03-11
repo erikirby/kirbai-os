@@ -1,44 +1,86 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const DB_PATH = path.join(process.cwd(), 'data', 'vault', 'lore', 'lore.json');
-
-// Ensure DB exists
-const ensureLoreDB = () => {
-    try {
-        if (!fs.existsSync(DB_PATH)) {
-            const dir = path.dirname(DB_PATH);
-            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-            fs.writeFileSync(DB_PATH, JSON.stringify({ nodes: [], edges: [], history: [] }, null, 2));
-        }
-    } catch (e) {
-        console.error("Lore DB init error:", e);
-    }
-};
+import { supabase } from '@/lib/supabase';
 
 export async function GET() {
-    ensureLoreDB();
     try {
-        const data = fs.readFileSync(DB_PATH, 'utf-8');
-        return NextResponse.json(JSON.parse(data));
+        const [nodesRes, edgesRes] = await Promise.all([
+            supabase.from('lore_nodes').select('*'),
+            supabase.from('lore_edges').select('*')
+        ]);
+
+        if (nodesRes.error) throw nodesRes.error;
+        if (edgesRes.error) throw edgesRes.error;
+
+        // Reshape to match the format the frontend expects
+        const nodes = (nodesRes.data || []).map(n => ({
+            id: n.id,
+            type: n.type,
+            position: { x: n.pos_x, y: n.pos_y },
+            data: {
+                label: n.label,
+                description: n.description,
+                traits: n.traits || undefined,
+                imagePath: n.image_path || undefined
+            }
+        }));
+
+        const edges = (edgesRes.data || []).map(e => ({
+            source: e.source,
+            target: e.target,
+            label: e.label
+        }));
+
+        return NextResponse.json({ nodes, edges, history: [] });
     } catch (e: any) {
+        console.error('Lore GET error:', e);
         return NextResponse.json({ nodes: [], edges: [], history: [] });
     }
 }
 
 export async function POST(req: Request) {
-    ensureLoreDB();
     try {
         const body = await req.json();
-        
-        // We expect the frontend to send the full updated state: { nodes, edges, history }
-        if (!body.nodes || !body.edges) throw new Error("Missing nodes or edges");
+        if (!body.nodes || !body.edges) throw new Error('Missing nodes or edges');
 
-        fs.writeFileSync(DB_PATH, JSON.stringify(body, null, 2));
-        
+        // Upsert all nodes
+        const nodeRows = body.nodes.map((n: any) => ({
+            id: n.id,
+            type: n.type || 'character',
+            label: n.data?.label || n.id,
+            description: n.data?.description || '',
+            traits: n.data?.traits || '',
+            image_path: n.data?.imagePath || '',
+            pos_x: n.position?.x ?? 0,
+            pos_y: n.position?.y ?? 0
+        }));
+
+        // Clear and reinsert edges (simplest approach for sync)
+        const { error: nodeErr } = await supabase
+            .from('lore_nodes')
+            .upsert(nodeRows, { onConflict: 'id' });
+        if (nodeErr) throw nodeErr;
+
+        // Delete nodes that no longer exist
+        const currentIds = nodeRows.map((n: any) => n.id);
+        if (currentIds.length > 0) {
+            await supabase.from('lore_nodes').delete().not('id', 'in', `(${currentIds.map((id: string) => `"${id}"`).join(',')})`);
+        }
+
+        // Replace all edges
+        await supabase.from('lore_edges').delete().neq('id', 0);
+        if (body.edges.length > 0) {
+            const edgeRows = body.edges.map((e: any) => ({
+                source: e.source,
+                target: e.target,
+                label: e.label || ''
+            }));
+            const { error: edgeErr } = await supabase.from('lore_edges').insert(edgeRows);
+            if (edgeErr) throw edgeErr;
+        }
+
         return NextResponse.json({ success: true, updated: true });
     } catch (e: any) {
-        return NextResponse.json({ error: e.message || "Failed to save lore graph" }, { status: 500 });
+        console.error('Lore POST error:', e);
+        return NextResponse.json({ error: e.message || 'Failed to save lore graph' }, { status: 500 });
     }
 }

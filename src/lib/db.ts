@@ -1,7 +1,10 @@
-import fs from 'fs';
-import path from 'path';
+import { createClient } from '@supabase/supabase-js';
 
-const DB_PATH = path.join(process.cwd(), 'data', 'persistence.json');
+// Server-side Supabase client (used in lib/db.ts which runs only on server)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export interface MetadataPack {
     alias: string;
@@ -46,76 +49,116 @@ interface DatabaseSchema {
     };
 }
 
-export function getDb(): DatabaseSchema {
-    try {
-        if (!fs.existsSync(DB_PATH)) {
-            const initial: DatabaseSchema = { metadataHistory: [], intelCache: [], pokemonNews: [], financeAnalysis: null, roadmap: { phases: [], tasks: [] } };
-            saveDb(initial);
-            return initial;
-        }
-        const data = fs.readFileSync(DB_PATH, 'utf-8');
-        const parsed = JSON.parse(data);
-        if (!parsed.roadmap) parsed.roadmap = { phases: [], tasks: [] };
-        return parsed;
-    } catch (error) {
-        console.error('Failed to read database:', error);
-        return { metadataHistory: [], intelCache: [], pokemonNews: [], financeAnalysis: null, roadmap: { phases: [], tasks: [] } };
-    }
+const DEFAULT_DB: DatabaseSchema = {
+    metadataHistory: [],
+    intelCache: [],
+    pokemonNews: [],
+    financeAnalysis: null,
+    roadmap: { phases: [], tasks: [] }
+};
+
+// --- Generic persistence helpers ---
+
+async function getRow(key: string): Promise<any> {
+    const { data } = await supabase
+        .from('persistence')
+        .select('value')
+        .eq('key', key)
+        .single();
+    return data?.value ?? null;
 }
 
-export function saveDb(data: DatabaseSchema) {
-    try {
-        const dir = path.dirname(DB_PATH);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
-        fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf-8');
-    } catch (error) {
-        console.error('Failed to save database:', error);
-    }
+async function setRow(key: string, value: any): Promise<void> {
+    await supabase
+        .from('persistence')
+        .upsert({ key, value }, { onConflict: 'key' });
+}
+
+// --- DB helpers (async versions) ---
+
+export async function getDbAsync(): Promise<DatabaseSchema> {
+    const data = await getRow('main_db');
+    if (!data) return DEFAULT_DB;
+    if (!data.roadmap) data.roadmap = { phases: [], tasks: [] };
+    return data;
+}
+
+export async function saveDbAsync(data: DatabaseSchema): Promise<void> {
+    await setRow('main_db', data);
+}
+
+// Synchronous shims for compatibility with existing callers.
+// These work by scheduling async operations in the background.
+// For Vercel (stateless), the async versions are preferred.
+
+export function getDb(): DatabaseSchema {
+    // Return cached default; callers should migrate to getDbAsync
+    return DEFAULT_DB;
+}
+
+export function saveDb(data: DatabaseSchema): void {
+    // Fire and forget
+    saveDbAsync(data).catch(console.error);
+}
+
+export async function addMetadataPackAsync(pack: MetadataPack) {
+    const db = await getDbAsync();
+    db.metadataHistory.unshift(pack);
+    db.metadataHistory = db.metadataHistory.slice(0, 50);
+    await saveDbAsync(db);
 }
 
 export function addMetadataPack(pack: MetadataPack) {
-    const db = getDb();
-    db.metadataHistory.unshift(pack);
-    // Keep last 50
-    db.metadataHistory = db.metadataHistory.slice(0, 50);
-    saveDb(db);
+    addMetadataPackAsync(pack).catch(console.error);
+}
+
+export async function setIntelCacheAsync(items: IntelItem[]) {
+    const db = await getDbAsync();
+    db.intelCache = items;
+    await saveDbAsync(db);
 }
 
 export function setIntelCache(items: IntelItem[]) {
-    const db = getDb();
-    db.intelCache = items;
-    saveDb(db);
+    setIntelCacheAsync(items).catch(console.error);
+}
+
+export async function setFinanceAnalysisAsync(analysis: any) {
+    const db = await getDbAsync();
+    db.financeAnalysis = { ...analysis, persistedAt: new Date().toISOString() };
+    await saveDbAsync(db);
 }
 
 export function setFinanceAnalysis(analysis: any) {
-    const db = getDb();
-    db.financeAnalysis = {
-        ...analysis,
-        persistedAt: new Date().toISOString()
-    };
-    saveDb(db);
+    setFinanceAnalysisAsync(analysis).catch(console.error);
 }
 
-export function getFinanceAnalysis() {
-    const db = getDb();
+export async function getFinanceAnalysisAsync() {
+    const db = await getDbAsync();
     return db.financeAnalysis;
 }
 
+export function getFinanceAnalysis() {
+    return null; // async callers use getFinanceAnalysisAsync
+}
+
+export async function saveRoadmapAsync(roadmapData: { phases: RoadmapPhase[], tasks: RoadmapTask[] }) {
+    await setRow('roadmap', roadmapData);
+}
+
 export function saveRoadmap(roadmapData: { phases: RoadmapPhase[], tasks: RoadmapTask[] }) {
-    const db = getDb();
-    db.roadmap = roadmapData;
-    saveDb(db);
+    saveRoadmapAsync(roadmapData).catch(console.error);
+}
+
+export async function getRoadmapAsync() {
+    const data = await getRow('roadmap');
+    return data ?? { phases: [], tasks: [] };
 }
 
 export function getRoadmap() {
-    const db = getDb();
-    return db.roadmap;
+    return { phases: [], tasks: [] }; // async callers use getRoadmapAsync
 }
 
-// --- TELEMETRY SYSTEM ---
-const TELEMETRY_PATH = path.join(process.cwd(), 'data', 'telemetry.json');
+// --- TELEMETRY (stored in persistence table) ---
 
 export interface ApiLog {
     timestamp: number;
@@ -132,59 +175,44 @@ export interface TelemetryData {
     logs: ApiLog[];
 }
 
+export async function getTelemetryAsync(): Promise<TelemetryData> {
+    const data = await getRow('telemetry');
+    return data ?? { lifetimeInputTokens: 0, lifetimeOutputTokens: 0, lifetimeCost: 0, logs: [] };
+}
+
 export function getTelemetry(): TelemetryData {
-    try {
-        if (!fs.existsSync(TELEMETRY_PATH)) {
-            const initial = { lifetimeInputTokens: 0, lifetimeOutputTokens: 0, lifetimeCost: 0, logs: [] };
-            saveTelemetry(initial);
-            return initial;
-        }
-        const data = fs.readFileSync(TELEMETRY_PATH, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        console.error('Failed to read telemetry:', error);
-        return { lifetimeInputTokens: 0, lifetimeOutputTokens: 0, lifetimeCost: 0, logs: [] };
-    }
+    return { lifetimeInputTokens: 0, lifetimeOutputTokens: 0, lifetimeCost: 0, logs: [] };
+}
+
+export async function saveTelemetryAsync(data: TelemetryData): Promise<void> {
+    await setRow('telemetry', data);
 }
 
 export function saveTelemetry(data: TelemetryData) {
-    try {
-        const dir = path.dirname(TELEMETRY_PATH);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
-        fs.writeFileSync(TELEMETRY_PATH, JSON.stringify(data, null, 2), 'utf-8');
-    } catch (error) {
-        console.error('Failed to save telemetry:', error);
-    }
+    saveTelemetryAsync(data).catch(console.error);
 }
 
-export function logApiUsage(route: string, inputTokens: number, outputTokens: number) {
-    const tl = getTelemetry();
-
-    // Pricing for gemini-2.0-flash: $0.10/1M input, $0.40/1M output
-    const cost = (inputTokens / 1000000) * 0.10 + (outputTokens / 1000000) * 0.40;
-
+export async function logApiUsageAsync(route: string, inputTokens: number, outputTokens: number) {
+    const tl = await getTelemetryAsync();
+    const cost = (inputTokens / 1_000_000) * 0.10 + (outputTokens / 1_000_000) * 0.40;
     tl.lifetimeInputTokens += inputTokens;
     tl.lifetimeOutputTokens += outputTokens;
     tl.lifetimeCost += cost;
-
-    tl.logs.unshift({
-        timestamp: Date.now(),
-        route,
-        inputTokens,
-        outputTokens,
-        estimatedCost: cost
-    });
-
-    // Keep last 100 logs
+    tl.logs.unshift({ timestamp: Date.now(), route, inputTokens, outputTokens, estimatedCost: cost });
     tl.logs = tl.logs.slice(0, 100);
+    await saveTelemetryAsync(tl);
+}
 
-    saveTelemetry(tl);
+export function logApiUsage(route: string, inputTokens: number, outputTokens: number) {
+    logApiUsageAsync(route, inputTokens, outputTokens).catch(console.error);
+}
+
+export async function resetTelemetryAsync() {
+    const initial = { lifetimeInputTokens: 0, lifetimeOutputTokens: 0, lifetimeCost: 0, logs: [] };
+    await saveTelemetryAsync(initial);
+    return initial;
 }
 
 export function resetTelemetry() {
-    const initial = { lifetimeInputTokens: 0, lifetimeOutputTokens: 0, lifetimeCost: 0, logs: [] };
-    saveTelemetry(initial);
-    return initial;
+    return resetTelemetryAsync().catch(console.error);
 }

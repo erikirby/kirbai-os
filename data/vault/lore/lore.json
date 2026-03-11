@@ -256,6 +256,18 @@
         "label": "Meowscarada",
         "description": "A captivating Pokémon known for her flair and agility."
       }
+    },
+    {
+      "id": "cloning_machine",
+      "type": "artifact",
+      "position": {
+        "x": 600,
+        "y": 100
+      },
+      "data": {
+        "label": "Cloning Machine",
+        "description": "The same machine Mewtwo used in the Pokemon First Movie, now repurposed by Gholdengo to create perfect Dittos."
+      }
     }
   ],
   "edges": [
@@ -328,6 +340,21 @@
       "source": "meowscarada",
       "target": "heart_scales_group",
       "label": "member of"
+    },
+    {
+      "source": "gholdengo",
+      "target": "cloning_machine",
+      "label": "found and uses"
+    },
+    {
+      "source": "cloning_machine",
+      "target": "ditto",
+      "label": "creates"
+    },
+    {
+      "source": "gholdengo",
+      "target": "ditto",
+      "label": "profits from"
     }
   ],
   "history": [
@@ -683,6 +710,339 @@
           "data": {
             "label": "Heart Scales Girl Group",
             "description": "A musical group formed by Gholdengo, likely with a unique, perhaps unsettling, charm."
+          }
+        },
+        {
+          "id": "lopunny",
+          "type": "character",
+          "position": {
+            "x": 600,
+            "y": 250
+          },
+          "data": {
+            "label": "Lopunny",
+            "description": "A graceful Pokémon, now a member of the Heart Scales Girl Group.",
+            "traits": "Graceful, charming, and a natural performer, often taking the lead in dance routines."
+          }
+        },
+        {
+          "id": "meloetta",
+          "type": "character",
+          "position": {
+            "x": 650,
+            "y": 350
+          },
+          "data": {
+            "label": "Meloetta",
+            "description": "A melodic Pokémon, now a member of the Heart Scales Girl Group.",
+            "traits": "Melodic, soulful, and the primary vocalist, capable of moving audiences with her voice."
+          }
+        },
+        {
+          "id": "pheromosa",
+          "type": "character",
+          "position": {
+            "x": 751.5943131434774,
+            "y": 511.21480459107426
+          },
+          "data": {
+            "label": "Pheromosa",
+            "description": "An elegant Ultra Beast, now a member of the Heart Scales Girl Group.",
+            "traits": "Elegant, precise, and strikingly beautiful, she brings a unique, almost alien, allure to the group's aesthetic."
+          }
+        },
+        {
+          "id": "baddie_4",
+          "type": "organization",
+          "position": {
+            "x": 1000,
+            "y": 300
+          },
+          "data": {
+            "label": "Baddie 4",
+            "description": "A group of villains who defeated the Elite 4 and took their place."
+          }
+        },
+        {
+          "id": "gothitelle",
+          "type": "character",
+          "position": {
+            "x": 820,
+            "y": 150
+          },
+          "data": {
+            "label": "Gothitelle",
+            "description": "A cunning Psychic-type Pokémon and member of the Baddie 4."
+          }
+        },
+        {
+          "id": "jynx",
+          "type": "character",
+          "position": {
+            "x": 820,
+            "y": 450
+          },
+          "data": {
+            "label": "Jynx",
+            "description": "An Ice/Psychic-type Pokémon and member of the Baddie 4."
+          }
+        },
+        {
+          "id": "tsareena",
+          "type": "character",
+          "position": {
+            "x": 1180,
+            "y": 150
+          },
+          "data": {
+            "label": "Tsareena",
+            "description": "A regal Grass-type Pokémon and member of the Baddie 4."
+          }
+        },
+        {
+          "id": "hatterene",
+          "type": "character",
+          "position": {
+            "x": 1180,
+            "y": 450
+          },
+          "data": {
+            "label": "Hatterene",
+            "description": "A mysterious Psychic/Fairy-type Pokémon and member of the Baddie 4."
+          }
+        },
+        {
+          "id": "mega_sailor_gardevoir",
+          "type": "character",
+          "position": {
+            "x": 820,
+            "y": 650
+          },
+          "data": {
+            "label": "Mega Sailor Gardevoir",
+            "description": "Gardevoir in her powerful Mega Sailor form, leading the Sailor Pokemon."
+          }
+        },
+        {
+          "id": "sailor_pokemon",
+          "type": "organization",
+          "position": {
+            "x": 1000,
+            "y": 800
+          },
+          "data": {
+            "label": "Sailor Pokemon",
+            "description": "A heroic group of Pokémon recruited by Mega Sailor Gardevoir to combat threats."
+          }
+        },
+        {
+          "id": "alolan_ninetales",
+          "type": "character",
+          "position": {
+            "x": 820,
+            "y": 950
+          },
+          "data": {
+            "label": "Alolan Ninetales",
+            "description": "An elegant Ice/Fairy-type Pokémon, a member of the Sailor Pokemon."
+          }
+        },
+        {
+          "id": "mega_starmie",
+          "type": "character",
+          "position": {
+            "x": 1180,
+            "y": 650
+          },
+          "data": {
+            "label": "Mega Starmie",
+            "description": "Starmie in its powerful Mega form, a member of the Sailor Pokemon."
+          }
+        },
+        {
+          "id": "machoke",
+          "type": "character",
+          "position": {
+            "x": 1180,
+            "y": 950
+          },
+          "data": {
+            "label": "Machoke",
+            "description": "A strong Fighting-type Pokémon, a member of the Sailor Pokemon."
+          }
+        },
+        {
+          "id": "braixen",
+          "type": "character",
+          "position": {
+            "x": 1360,
+            "y": 800
+          },
+          "data": {
+            "label": "Braixen",
+            "description": "A Fire-type Pokémon, a member of the Sailor Pokemon."
+          }
+        },
+        {
+          "id": "defeat_baddie_4_event",
+          "type": "event",
+          "position": {
+            "x": 1000,
+            "y": 550
+          },
+          "data": {
+            "label": "Defeat of Baddie 4",
+            "description": "The climactic battle where the Sailor Pokemon defeated the Baddie 4."
+          }
+        },
+        {
+          "id": "ditto",
+          "type": "character",
+          "position": {
+            "x": 300,
+            "y": 400
+          },
+          "data": {
+            "label": "Ditto",
+            "description": "A shapeshifting Pokémon with a mysterious role in the universe."
+          }
+        },
+        {
+          "id": "meowscarada",
+          "type": "character",
+          "position": {
+            "x": 500,
+            "y": 400
+          },
+          "data": {
+            "label": "Meowscarada",
+            "description": "A captivating Pokémon known for her flair and agility."
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "gholdengo",
+          "target": "heart_scale",
+          "label": "corrupted"
+        },
+        {
+          "source": "gothitelle",
+          "target": "baddie_4",
+          "label": "member of"
+        },
+        {
+          "source": "jynx",
+          "target": "baddie_4",
+          "label": "member of"
+        },
+        {
+          "source": "tsareena",
+          "target": "baddie_4",
+          "label": "member of"
+        },
+        {
+          "source": "hatterene",
+          "target": "baddie_4",
+          "label": "member of"
+        },
+        {
+          "source": "mega_sailor_gardevoir",
+          "target": "sailor_pokemon",
+          "label": "leads"
+        },
+        {
+          "source": "alolan_ninetales",
+          "target": "sailor_pokemon",
+          "label": "member of"
+        },
+        {
+          "source": "mega_starmie",
+          "target": "sailor_pokemon",
+          "label": "member of"
+        },
+        {
+          "source": "machoke",
+          "target": "sailor_pokemon",
+          "label": "member of"
+        },
+        {
+          "source": "braixen",
+          "target": "sailor_pokemon",
+          "label": "member of"
+        },
+        {
+          "source": "sailor_pokemon",
+          "target": "defeat_baddie_4_event",
+          "label": "participated in"
+        },
+        {
+          "source": "baddie_4",
+          "target": "defeat_baddie_4_event",
+          "label": "participated in"
+        },
+        {
+          "source": "sailor_pokemon",
+          "target": "baddie_4",
+          "label": "defeated"
+        },
+        {
+          "source": "meowscarada",
+          "target": "heart_scales_group",
+          "label": "member of"
+        }
+      ]
+    },
+    {
+      "nodes": [
+        {
+          "id": "gholdengo",
+          "type": "character",
+          "position": {
+            "x": 496.4963776293607,
+            "y": 613.3204922278411
+          },
+          "data": {
+            "label": "Gholdengo",
+            "description": "A mischievous entity known for its golden form and corrupting influence."
+          }
+        },
+        {
+          "id": "heart_scale",
+          "type": "artifact",
+          "position": {
+            "x": 133.1589225880466,
+            "y": 383.3160278076572
+          },
+          "data": {
+            "label": "Heart Scale",
+            "description": "A rare scale said to hold sentimental value, now potentially tainted.",
+            "traits": ""
+          }
+        },
+        {
+          "id": "destiny_knot",
+          "type": "artifact",
+          "position": {
+            "x": 112.26557625445885,
+            "y": 630.8363284837578
+          },
+          "data": {
+            "label": "Destiny Knot",
+            "description": "A mystical item that binds fates, now under a corrupting influence."
+          }
+        },
+        {
+          "id": "heart_scales_group",
+          "type": "organization",
+          "position": {
+            "x": 777.2532916690222,
+            "y": 460.74669905802824
+          },
+          "data": {
+            "label": "Heart Scales Girl Group",
+            "description": "A musical group formed by Gholdengo, likely with a unique, perhaps unsettling, charm.",
+            "traits": ""
           }
         },
         {

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { supabase } from '@/lib/supabase';
+import { getRoadmapAsync } from '@/lib/db';
 
 export async function GET() {
     try {
@@ -12,11 +12,14 @@ export async function GET() {
 
         // --- Brand Identity ---
         try {
-            const identityPath = path.join(process.cwd(), 'data', 'vault', 'brand', 'identity.json');
-            if (fs.existsSync(identityPath)) {
-                const identity = JSON.parse(fs.readFileSync(identityPath, 'utf-8'));
+            const { data } = await supabase
+                .from('brand_identity')
+                .select('value')
+                .eq('key', 'brand_identity')
+                .single();
+            if (data?.value) {
                 lines.push('--- BRAND IDENTITY ---');
-                for (const [key, val] of Object.entries(identity)) {
+                for (const [key, val] of Object.entries(data.value)) {
                     if (val && typeof val === 'string') {
                         lines.push(`[${key.toUpperCase()}]`);
                         lines.push(val as string);
@@ -28,117 +31,98 @@ export async function GET() {
 
         // --- Roadmap ---
         try {
-            const dbPath = path.join(process.cwd(), 'data', 'persistence.json');
-            if (fs.existsSync(dbPath)) {
-                const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
-                if (db.roadmap) {
-                    lines.push('--- MASTER ROADMAP ---');
-                    if (db.roadmap.phases?.length) {
-                        lines.push('PHASES:');
-                        db.roadmap.phases.forEach((p: any) => {
-                            lines.push(`  [${p.status}] ${p.title}: ${p.description}`);
-                        });
-                        lines.push('');
-                    }
-                    if (db.roadmap.tasks?.length) {
-                        lines.push('TASKS:');
-                        db.roadmap.tasks.forEach((t: any) => {
-                            const text = typeof t === 'string' ? t : t.text;
-                            const status = typeof t === 'string' ? 'todo' : t.status;
-                            lines.push(`  [${status.toUpperCase()}] ${text}`);
-                        });
-                        lines.push('');
-                    }
-                }
-            }
-        } catch (e) {}
-
-        // --- Vault Projects ---
-        try {
-            const projectsPath = path.join(process.cwd(), 'data', 'vault', 'projects.json');
-            if (fs.existsSync(projectsPath)) {
-                const projects = JSON.parse(fs.readFileSync(projectsPath, 'utf-8'));
-                if (projects?.length) {
-                    lines.push('--- VAULT PROJECTS ---');
-                    projects.forEach((proj: any) => {
-                        lines.push(`PROJECT: ${proj.name} [${proj.status || 'active'}]`);
-                        if (proj.pokemon) lines.push(`  Pokemon: ${proj.pokemon}`);
-                        if (proj.tracklist?.length) {
-                            lines.push('  Tracklist:');
-                            proj.tracklist.forEach((t: any, i: number) => {
-                                const hasLyrics = !!t.lyrics;
-                                lines.push(`    ${i + 1}. ${t.title}${hasLyrics ? ' [lyrics saved]' : ''}`);
-                            });
-                        }
-                        lines.push('');
+            const roadmap = await getRoadmapAsync();
+            if (roadmap.phases?.length || roadmap.tasks?.length) {
+                lines.push('--- MASTER ROADMAP ---');
+                if (roadmap.phases?.length) {
+                    lines.push('PHASES:');
+                    roadmap.phases.forEach((p: any) => {
+                        lines.push(`  [${p.status}] ${p.title}: ${p.description}`);
                     });
+                    lines.push('');
+                }
+                if (roadmap.tasks?.length) {
+                    lines.push('TASKS:');
+                    roadmap.tasks.forEach((t: any) => {
+                        const text = typeof t === 'string' ? t : t.text;
+                        const status = typeof t === 'string' ? 'todo' : t.status;
+                        lines.push(`  [${status.toUpperCase()}] ${text}`);
+                    });
+                    lines.push('');
                 }
             }
         } catch (e) {}
 
         // --- Lore / Characters ---
         try {
-            const lorePath = path.join(process.cwd(), 'data', 'vault', 'lore', 'lore.json');
-            if (fs.existsSync(lorePath)) {
-                const lore = JSON.parse(fs.readFileSync(lorePath, 'utf-8'));
-                if (lore.nodes?.length) {
-                    lines.push('--- LORE / CHARACTERS & UNIVERSE ---');
-                    // Characters and other nodes
-                    const characters = lore.nodes.filter((n: any) => n.type === 'character');
-                    const others = lore.nodes.filter((n: any) => n.type !== 'character');
-                    if (characters.length) {
-                        lines.push('CHARACTERS:');
-                        characters.forEach((node: any) => {
-                            lines.push(`  ${node.data?.label || node.id} [character]`);
-                            if (node.data?.description) lines.push(`    ${node.data.description}`);
-                        });
-                        lines.push('');
-                    }
-                    if (others.length) {
-                        lines.push('OTHER ENTITIES (artifacts, groups, etc.):');
-                        others.forEach((node: any) => {
-                            lines.push(`  ${node.data?.label || node.id} [${node.type}]`);
-                            if (node.data?.description) lines.push(`    ${node.data.description}`);
-                        });
-                        lines.push('');
-                    }
-                    // Relationships / edges
-                    if (lore.edges?.length) {
-                        lines.push('RELATIONSHIPS:');
-                        lore.edges.forEach((edge: any) => {
-                            const srcNode = lore.nodes.find((n: any) => n.id === edge.source);
-                            const tgtNode = lore.nodes.find((n: any) => n.id === edge.target);
-                            const src = srcNode?.data?.label || edge.source;
-                            const tgt = tgtNode?.data?.label || edge.target;
-                            lines.push(`  ${src} → ${edge.label || 'connected to'} → ${tgt}`);
-                        });
-                        lines.push('');
-                    }
+            const [nodesRes, edgesRes] = await Promise.all([
+                supabase.from('lore_nodes').select('*'),
+                supabase.from('lore_edges').select('*')
+            ]);
+            const nodes = nodesRes.data || [];
+            const edges = edgesRes.data || [];
+
+            if (nodes.length) {
+                lines.push('--- LORE / CHARACTERS & UNIVERSE ---');
+                const characters = nodes.filter(n => n.type === 'character');
+                const others = nodes.filter(n => n.type !== 'character');
+                if (characters.length) {
+                    lines.push('CHARACTERS:');
+                    characters.forEach(n => {
+                        lines.push(`  ${n.label} [character]`);
+                        if (n.description) lines.push(`    ${n.description}`);
+                        if (n.traits) lines.push(`    Profile: ${n.traits}`);
+                    });
+                    lines.push('');
+                }
+                if (others.length) {
+                    lines.push('OTHER ENTITIES (artifacts, groups, etc.):');
+                    others.forEach(n => {
+                        lines.push(`  ${n.label} [${n.type}]`);
+                        if (n.description) lines.push(`    ${n.description}`);
+                        if (n.traits) lines.push(`    Profile: ${n.traits}`);
+                    });
+                    lines.push('');
+                }
+                if (edges.length) {
+                    lines.push('RELATIONSHIPS:');
+                    edges.forEach(e => {
+                        const src = nodes.find(n => n.id === e.source)?.label || e.source;
+                        const tgt = nodes.find(n => n.id === e.target)?.label || e.target;
+                        lines.push(`  ${src} → ${e.label || 'connected to'} → ${tgt}`);
+                    });
+                    lines.push('');
                 }
             }
         } catch (e) {}
 
         // --- Prompt Bank ---
         try {
-            const promptsPath = path.join(process.cwd(), 'data', 'vault', 'prompts.json');
-            if (fs.existsSync(promptsPath)) {
-                const prompts = JSON.parse(fs.readFileSync(promptsPath, 'utf-8'));
-                lines.push('--- PROMPT BANK ---');
-                if (prompts.universal?.length) {
-                    lines.push('UNIVERSAL RULES (apply to all video prompts):');
-                    prompts.universal.forEach((r: string) => lines.push(`  - ${r}`));
+            const [promptsRes, rulesRes] = await Promise.all([
+                supabase.from('prompts').select('*'),
+                supabase.from('prompt_rules').select('*')
+            ]);
+            const promptRows = promptsRes.data || [];
+            const ruleRows = rulesRes.data || [];
+
+            lines.push('--- PROMPT BANK ---');
+            if (ruleRows.length) {
+                lines.push('UNIVERSAL RULES (apply to all video prompts):');
+                ruleRows.forEach(r => lines.push(`  - ${r.content}`));
+                lines.push('');
+            }
+            const categories: Record<string, any[]> = {};
+            for (const p of promptRows) {
+                if (!categories[p.category]) categories[p.category] = [];
+                categories[p.category].push(p);
+            }
+            for (const [cat, entries] of Object.entries(categories)) {
+                lines.push(`CATEGORY: ${cat}`);
+                entries.forEach(p => {
+                    lines.push(`  [${p.label}]`);
+                    lines.push(`  ${p.content}`);
                     lines.push('');
-                }
-                if (prompts.categories) {
-                    for (const [cat, entries] of Object.entries(prompts.categories)) {
-                        lines.push(`CATEGORY: ${cat}`);
-                        (entries as any[]).forEach((p: any) => {
-                            lines.push(`  [${p.name}]`);
-                            lines.push(`  ${p.text}`);
-                            lines.push('');
-                        });
-                    }
-                }
+                });
             }
         } catch (e) {}
 

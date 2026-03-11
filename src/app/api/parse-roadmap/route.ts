@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { saveRoadmap, getRoadmap, logApiUsage } from '@/lib/db';
+import { saveRoadmapAsync, getRoadmapAsync, logApiUsage } from '@/lib/db';
 
 export async function POST(request: Request) {
     try {
@@ -10,10 +10,7 @@ export async function POST(request: Request) {
         }
 
         const existingContext = (currentPhases?.length || currentTasks?.length)
-            ? `CURRENT ROADMAP STATE (you may modify, reorder, add to, or remove items based on the new input):
-${JSON.stringify({ phases: currentPhases, tasks: currentTasks }, null, 2)}
-
-`
+            ? `CURRENT ROADMAP STATE (you may modify, reorder, add to, or remove items based on the new input):\n${JSON.stringify({ phases: currentPhases, tasks: currentTasks }, null, 2)}\n\n`
             : '';
 
         const systemPrompt = `You are a ruthlessly concise roadmap parser.
@@ -43,7 +40,6 @@ Schema:
   ]
 }`;
 
-        // We use gemini-2.5-flash for complex structural parsing
         const { GoogleGenAI } = await import('@google/genai');
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -53,36 +49,30 @@ Schema:
                 { role: 'user', parts: [{ text: systemPrompt }] },
                 { role: 'user', parts: [{ text: `${existingContext}NEW INPUT:\n\n${rawText}` }] }
             ],
-            config: {
-                responseMimeType: "application/json",
-            }
+            config: { responseMimeType: "application/json" }
         });
 
         const textOutput = response.text || "";
-        
+
         try {
-            // Log telemetry
-            const inputTokens = systemPrompt.length + rawText.length; // rough estimate
+            const inputTokens = systemPrompt.length + rawText.length;
             const outputTokens = textOutput.length;
             logApiUsage('/api/parse-roadmap', inputTokens, outputTokens);
-            
+
             const structuredData = JSON.parse(textOutput);
-            
-            // Validate the parsed data loosely
+
             if (!structuredData.phases || !Array.isArray(structuredData.phases)) {
-                 throw new Error("Invalid schema returned: Missing phases array");
+                throw new Error("Invalid schema returned: Missing phases array");
             }
             if (!structuredData.tasks || !Array.isArray(structuredData.tasks)) {
-                 throw new Error("Invalid schema returned: Missing tasks array");
+                throw new Error("Invalid schema returned: Missing tasks array");
             }
 
-            // Build a lookup of existing task statuses so re-parsed tasks preserve their status
             const existingStatusMap = new Map<string, string>();
             (currentTasks || []).forEach((t: any) => {
                 if (t?.text) existingStatusMap.set(t.text.toLowerCase(), t.status || 'todo');
             });
 
-            // Convert string tasks -> RoadmapTask objects, preserving existing statuses where text matches
             const taskObjects = structuredData.tasks.map((t: any, i: number) => {
                 const text = typeof t === 'string' ? t : t.text;
                 const existing = existingStatusMap.get(text.toLowerCase());
@@ -91,15 +81,15 @@ Schema:
 
             const finalData = { phases: structuredData.phases, tasks: taskObjects };
 
-            // Save the data persistently
-            saveRoadmap(finalData);
+            // Use async save so it actually persists on Vercel
+            await saveRoadmapAsync(finalData);
 
             return NextResponse.json({ success: true, data: finalData });
         } catch (parseError) {
-             console.error("Failed to parse Gemini JSON output:", textOutput);
-             return NextResponse.json({ success: false, error: "Failed to parse roadmap logic. AI returned invalid JSON." }, { status: 500 });
+            console.error("Failed to parse Gemini JSON output:", textOutput);
+            return NextResponse.json({ success: false, error: "Failed to parse roadmap logic. AI returned invalid JSON." }, { status: 500 });
         }
-        
+
     } catch (error: any) {
         console.error("Roadmap parsing error:", error);
         return NextResponse.json({ success: false, error: error.message || "Failed to parse roadmap" }, { status: 500 });
@@ -108,22 +98,22 @@ Schema:
 
 export async function GET() {
     try {
-        const roadmap = getRoadmap();
+        const roadmap = await getRoadmapAsync();
         return NextResponse.json({ success: true, data: roadmap });
     } catch (error: any) {
-         return NextResponse.json({ success: false, error: "Failed to load roadmap" }, { status: 500 });
+        return NextResponse.json({ success: false, error: "Failed to load roadmap" }, { status: 500 });
     }
 }
 
 export async function PATCH(request: Request) {
     try {
         const { taskId, status } = await request.json();
-        const roadmap = getRoadmap();
+        const roadmap = await getRoadmapAsync();
         const tasks = roadmap.tasks as any[];
         const idx = tasks.findIndex((t: any) => t.id === taskId);
         if (idx === -1) return NextResponse.json({ success: false, error: "Task not found" }, { status: 404 });
         tasks[idx].status = status;
-        saveRoadmap({ phases: roadmap.phases, tasks });
+        await saveRoadmapAsync({ phases: roadmap.phases, tasks });
         return NextResponse.json({ success: true });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: "Failed to update task status" }, { status: 500 });

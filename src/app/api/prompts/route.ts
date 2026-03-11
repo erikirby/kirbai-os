@@ -1,35 +1,68 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const PROMPTS_PATH = path.join(process.cwd(), 'data', 'vault', 'prompts.json');
-
-function getPrompts() {
-    try {
-        if (!fs.existsSync(PROMPTS_PATH)) {
-            const initial = { universal: [], categories: {} };
-            fs.writeFileSync(PROMPTS_PATH, JSON.stringify(initial, null, 2));
-            return initial;
-        }
-        return JSON.parse(fs.readFileSync(PROMPTS_PATH, 'utf-8'));
-    } catch (e) {
-        return { universal: [], categories: {} };
-    }
-}
+import { supabase } from '@/lib/supabase';
 
 export async function GET() {
-    const data = getPrompts();
-    return NextResponse.json({ success: true, data });
+    try {
+        const [promptsRes, rulesRes] = await Promise.all([
+            supabase.from('prompts').select('*'),
+            supabase.from('prompt_rules').select('*')
+        ]);
+
+        if (promptsRes.error) throw promptsRes.error;
+        if (rulesRes.error) throw rulesRes.error;
+
+        // Reshape to match the frontend's { universal: [], categories: {} } format
+        const universal = (rulesRes.data || []).map(r => r.content);
+        const categories: Record<string, any[]> = {};
+        for (const p of (promptsRes.data || [])) {
+            if (!categories[p.category]) categories[p.category] = [];
+            categories[p.category].push({ name: p.label, text: p.content });
+        }
+
+        return NextResponse.json({ success: true, data: { universal, categories } });
+    } catch (e: any) {
+        console.error('Prompts GET error:', e);
+        return NextResponse.json({ success: true, data: { universal: [], categories: {} } });
+    }
 }
 
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const dir = path.dirname(PROMPTS_PATH);
-        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        fs.writeFileSync(PROMPTS_PATH, JSON.stringify(body, null, 2));
+        // body = { universal: string[], categories: { [cat]: [{name, text}] } }
+
+        // Replace all rules
+        await supabase.from('prompt_rules').delete().neq('id', '');
+        if (body.universal?.length) {
+            const ruleRows = body.universal.map((content: string, i: number) => ({
+                id: `rule_${i}`,
+                content
+            }));
+            await supabase.from('prompt_rules').insert(ruleRows);
+        }
+
+        // Replace all prompts
+        await supabase.from('prompts').delete().neq('id', '');
+        if (body.categories) {
+            const promptRows: any[] = [];
+            for (const [category, entries] of Object.entries(body.categories)) {
+                (entries as any[]).forEach((p: any, i: number) => {
+                    promptRows.push({
+                        id: `${category}_${i}_${Date.now()}`,
+                        category,
+                        label: p.name,
+                        content: p.text
+                    });
+                });
+            }
+            if (promptRows.length > 0) {
+                await supabase.from('prompts').insert(promptRows);
+            }
+        }
+
         return NextResponse.json({ success: true });
     } catch (e: any) {
+        console.error('Prompts POST error:', e);
         return NextResponse.json({ success: false, error: e.message }, { status: 500 });
     }
 }
