@@ -16,13 +16,23 @@ export async function GET() {
         const stats = await Promise.all(CHANNELS.map(async (channel) => {
             try {
                 // Official Google YouTube Data API v3 fetch
-                const res = await fetch(`https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2Cstatistics&forHandle=${channel.handle}&key=${apiKey}`, {
+                let res = await fetch(`https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2Cstatistics&forHandle=${channel.handle}&key=${apiKey}`, {
                     cache: 'no-store'
                 });
-                const data = await res.json();
+                let data = await res.json();
 
                 if (data.error) {
                     console.error(`YouTube API Error for ${channel.handle}:`, data.error);
+                }
+
+                // Retry without @ if no results
+                if ((!data.items || data.items.length === 0) && channel.handle.startsWith('@')) {
+                    const handleNoAt = channel.handle.substring(1);
+                    console.log(`No results for ${channel.handle}, retrying with ${handleNoAt}`);
+                    res = await fetch(`https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2Cstatistics&forHandle=${handleNoAt}&key=${apiKey}`, {
+                        cache: 'no-store'
+                    });
+                    data = await res.json();
                 }
 
                 if (data.items && data.items.length > 0) {

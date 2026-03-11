@@ -48,7 +48,7 @@ export async function POST(req: Request) {
         `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-1.5-flash",
+            model: "gemini-2.0-flash",
             contents: `Parse this raw ${platform} CSV:\n\n${csvText}`,
             config: {
                 systemInstruction: systemInstruction,

@@ -236,13 +236,13 @@ export default function AnalyticsMatrix({ theme = "dark" }: AnalyticsMatrixProps
                             </div>
                         </div>
                         <div className="mt-2 text-center flex flex-col gap-1">
-                            <label className="cursor-pointer text-[9px] font-black tracking-[0.2em] uppercase text-foreground/50 hover:text-accent transition-colors flex items-center justify-center gap-2">
+                            <label htmlFor="tiktok-csv" className="cursor-pointer text-[9px] font-black tracking-[0.2em] uppercase text-foreground/50 hover:text-accent transition-colors flex items-center justify-center gap-2">
                                 {isUploadingCSV === 'tiktok' ? (
                                     <><Loader2 className="w-3 h-3 animate-spin" /> AI Analyzing Data...</>
                                 ) : (
                                     <>[ Drop Followers or Views CSV ]</>
                                 )}
-                                <input type="file" accept=".csv" className="hidden" disabled={!!isUploadingCSV} onChange={(e) => handleCSVUpload('tiktok', e)} />
+                                <input id="tiktok-csv" type="file" accept=".csv" className="hidden" disabled={!!isUploadingCSV} onChange={(e) => handleCSVUpload('tiktok', e)} />
                             </label>
                             <span className="text-[7px] uppercase tracking-widest text-foreground/30 font-bold block">AI extracts available stats • Drop multiple files</span>
                         </div>
@@ -279,13 +279,13 @@ export default function AnalyticsMatrix({ theme = "dark" }: AnalyticsMatrixProps
                             </div>
                         </div>
                         <div className="mt-2 text-center flex flex-col gap-1">
-                            <label className="cursor-pointer px-4 py-3 border border-pink-500/20 bg-pink-500/10 rounded-xl text-[9px] font-black tracking-[0.2em] uppercase text-pink-500 hover:text-white hover:bg-pink-500/30 transition-all flex items-center justify-center gap-2">
+                            <label htmlFor="instagram-csv" className="cursor-pointer px-4 py-3 border border-pink-500/20 bg-pink-500/10 rounded-xl text-[9px] font-black tracking-[0.2em] uppercase text-pink-500 hover:text-white hover:bg-pink-500/30 transition-all flex items-center justify-center gap-2">
                                 {isUploadingCSV === 'instagram' ? (
                                     <><Loader2 className="w-3 h-3 animate-spin" /> Deep Parsing Meta CSV...</>
                                 ) : (
                                     <>[ Sync Meta Business Suite CSV ]</>
                                 )}
-                                <input type="file" accept=".csv" className="hidden" disabled={!!isUploadingCSV} onChange={(e) => handleCSVUpload('instagram', e)} />
+                                <input id="instagram-csv" type="file" accept=".csv" className="hidden" disabled={!!isUploadingCSV} onChange={(e) => handleCSVUpload('instagram', e)} />
                             </label>
                             <span className="text-[7px] uppercase tracking-widest text-foreground/30 font-bold block">Overrides manual input • Saves raw copy</span>
                         </div>
