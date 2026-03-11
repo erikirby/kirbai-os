@@ -12,10 +12,11 @@ import AIHub from "@/components/AIHub";
 import ConsultantSettings from "@/components/ConsultantSettings";
 import LoreMatrix from "@/components/LoreMatrix";
 import PromptBank from "@/components/PromptBank";
+import CreativeHub from "@/components/CreativeHub";
 import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Share2 } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
-type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts";
+type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative";
 type Theme = "dark" | "light" | "pink" | "snes" | "gbc";
 
 export default function Home() {
@@ -105,14 +106,15 @@ export default function Home() {
       <nav className="w-full max-w-screen-2xl px-6 mt-6 flex gap-10 border-b border-border/10 overflow-x-auto scrollbar-hide">
         {[
           { id: "roadmap", label: "Roadmap" },
-          { id: "vault", label: "The Vault" },
+          { id: "vault", label: "Vault" },
           { id: "intel", label: "Intel" },
           { id: "pulse", label: "Pulse" },
           { id: "lore", label: "Lore" },
+          { id: "creative", label: "Creative" },
           { id: "chat", label: "Chat" },
           { id: "prompts", label: "Prompts" },
-          { id: "finance", label: "Finance" },
-          { id: "api-health", label: "API Health" },
+          { id: "finance", label: "Money" },
+          { id: "api-health", label: "API" },
           { id: "core", label: "Core" },
         ].map((mod) => (
           <button
@@ -139,6 +141,7 @@ export default function Home() {
             {activeModule === "chat" && <AIHub theme={theme} />}
             {activeModule === "core" && <ConsultantSettings theme={theme} />}
             {activeModule === "lore" && <LoreMatrix theme={theme} />}
+            {activeModule === "creative" && <CreativeHub theme={theme} />}
             {activeModule === "prompts" && <PromptBank />}
           </div>
         </div>

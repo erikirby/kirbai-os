@@ -27,7 +27,7 @@ interface LoreState {
     history: { nodes: LoreNode[]; edges: LoreEdge[] }[];
 }
 
-export default function LoreMatrix() {
+export default function LoreMatrix({ theme }: { theme?: string } = {}) {
     const [state, setState] = useState<LoreState>({ nodes: [], edges: [], history: [] });
     const [prompt, setPrompt] = useState("");
     const [isGenerating, setIsGenerating] = useState(false);
