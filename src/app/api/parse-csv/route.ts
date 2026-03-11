@@ -37,8 +37,8 @@ export async function POST(req: Request) {
                     "optimalLengthRange": string, 
                     "peakPostingWindows": string, 
                     "topKeywords": string[], 
-                    "followerMagnet": string,
-                    "engagementLeader": string 
+                    "topMagnets": Array<{ "text": string, "rate": number }>, // Follows per 1k reach
+                    "topAnchors": Array<{ "text": string, "rate": number }>  // (Likes+Shares+Comments) per 1k reach
                 },
                 "descriptions": string[],
                 "narrative": string (2-sentence tactical recommendation)
