@@ -144,6 +144,7 @@ export default function AnalyticsMatrix({ theme = "dark" }: AnalyticsMatrixProps
                 }
             } else {
                 console.error("AI Parser Failed:", json.error);
+                alert(`Analysis Failed: ${json.error || 'Check console for details'}`);
             }
         } catch (e) {
             console.error("CSV Parse Request Error:", e);
