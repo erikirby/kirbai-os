@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
-import { logApiUsage } from "@/lib/db";
-import fs from 'fs';
-import path from 'path';
+import { logApiUsage, getRow, setRow } from "@/lib/db";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -65,22 +63,15 @@ export async function POST(req: Request) {
             throw new Error("No response from Gemini");
         }
 
-        const parsed = JSON.parse(response.text);
+        const text = response.text;
+        const parsed = JSON.parse(text);
 
-        // --- Persistent Style Persistence ---
+        // --- Persistent Style Persistence (Supabase) ---
         if (platform === 'instagram' && parsed.descriptions) {
-            const stylePath = path.join(process.cwd(), 'data', 'vault', 'analytics', 'style_base.json');
-            let existingStyle: string[] = [];
-            if (fs.existsSync(stylePath)) {
-                try {
-                    existingStyle = JSON.parse(fs.readFileSync(stylePath, 'utf-8'));
-                } catch (e) {
-                    existingStyle = [];
-                }
-            }
+            const existingStyle = await getRow('instagram_style_base') || [];
             // Merge unique descriptions
             const newDescriptions = [...new Set([...existingStyle, ...parsed.descriptions])];
-            fs.writeFileSync(stylePath, JSON.stringify(newDescriptions, null, 2));
+            await setRow('instagram_style_base', newDescriptions);
         }
 
         return NextResponse.json({ 

@@ -58,8 +58,7 @@ const DEFAULT_DB: DatabaseSchema = {
 };
 
 // --- Generic persistence helpers ---
-
-async function getRow(key: string): Promise<any> {
+export async function getRow(key: string): Promise<any> {
     const { data } = await supabase
         .from('persistence')
         .select('value')
@@ -68,7 +67,7 @@ async function getRow(key: string): Promise<any> {
     return data?.value ?? null;
 }
 
-async function setRow(key: string, value: any): Promise<void> {
+export async function setRow(key: string, value: any): Promise<void> {
     await supabase
         .from('persistence')
         .upsert({ key, value }, { onConflict: 'key' });
