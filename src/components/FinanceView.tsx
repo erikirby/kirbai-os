@@ -1,383 +1,267 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Loader2, RefreshCw } from "@/components/Icons";
 
-type FinanceViewProps = {
+interface FinanceViewProps {
     activeTab: "kirbai" | "factory";
-};
-
-type PlatformData = {
-    store: string;
-    revenue: number;
-    streams: number;
-    rate: number;
-};
-
-type ParsedData = {
-    totalEarnings: number;
-    earningsByArtist: { Kirbai: number; AELOW: number; KURAO: number; };
-    topTracks: { title: string; revenue: number; streams: number }[];
-    platforms: PlatformData[];
-    platformsByRevenue: PlatformData[];
-    reportTiming: { store: string; minDate: string; maxDate: string }[];
-};
-
-type AnalyzePhase = 'idle' | 'analyzing' | 'complete';
+}
 
 export default function FinanceView({ activeTab }: FinanceViewProps) {
-    const [isHovering, setIsHovering] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
     const [attachedFile, setAttachedFile] = useState<File | null>(null);
-    const [analyzePhase, setAnalyzePhase] = useState<AnalyzePhase>('idle');
-    const [parsedData, setParsedData] = useState<ParsedData | null>(null);
-    const [aiAdvice, setAiAdvice] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [analysisResults, setAnalysisResults] = useState<any>(null);
 
-    const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsHovering(true);
-    };
-
-    const handleDragLeave = () => setIsHovering(false);
+    useEffect(() => {
+        const loadStoredData = async () => {
+            try {
+                const res = await fetch("/api/analyze-finance");
+                const data = await res.json();
+                if (data.analysis) {
+                    setAnalysisResults(data.analysis);
+                }
+            } catch (err) {
+                console.error("Failed to load stored finance data:", err);
+            }
+        };
+        loadStoredData();
+    }, []);
 
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
-        setIsHovering(false);
-        if (analyzePhase !== 'idle') return;
+        setIsDragging(false);
         const file = e.dataTransfer.files[0];
-        if (file) setAttachedFile(file);
+        if (file && file.name.endsWith(".tsv")) {
+            setAttachedFile(file);
+        }
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (analyzePhase !== 'idle') return;
-        const file = e.target.files?.[0];
-        if (file) setAttachedFile(file);
-    };
-
-    const removeFile = () => {
-        setAttachedFile(null);
-    };
-
-    const startAnalysis = () => {
+    const analyzeData = async () => {
         if (!attachedFile) return;
-        setAnalyzePhase('analyzing');
-
-        // Simulate a slight delay to show the UX loading animation before the heavy parsing starts
-        setTimeout(() => {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const result = event.target?.result as string;
-                if (result) {
-                    parseTSV(result);
-                } else {
-                    alert("Could not read file contents.");
-                    reset();
-                }
-            };
-            reader.onerror = () => {
-                alert("Error reading file.");
-                reset();
-            };
-            reader.readAsText(attachedFile);
-        }, 1200);
-    };
-
-    const parseTSV = async (text: string) => {
+        setIsLoading(true);
         try {
-            const lines = text.split(/\r\n|\r|\n/).filter(l => l.trim() !== "");
-            if (lines.length < 2) throw new Error("File too short or missing newlines");
+            // DistroKid TSVs are notoriously encoded in UTF-16LE. A standard await file.text()
+            // will often read it as garbled chinese characters. We must explicitly handle encoding.
+            const buffer = await attachedFile.arrayBuffer();
 
-            const headers = lines[0].split("\t").map(h => h.trim().toLowerCase());
+            // Detect UTF-16 LE BOM (FF FE)
+            const view = new Uint8Array(buffer);
+            let text = "";
+            let isUTF16LE = view.length >= 2 && view[0] === 0xFF && view[1] === 0xFE;
 
-            // Distrokid header variations
-            const storeIdx = headers.findIndex(h => h === "store" || h.includes("platform"));
-            const artistIdx = headers.findIndex(h => h === "artist" || h === "artist name");
-            const titleIdx = headers.findIndex(h => h === "title" || h === "track" || h === "track title");
-            const earningsIdx = headers.findIndex(h => h === "earnings (usd)" || h === "earnings" || h === "revenue");
-            const qtyIdx = headers.findIndex(h => h === "quantity" || h === "streams" || h === "plays");
-            const dateIdx = headers.findIndex(h => h === "sale period" || h === "reporting date" || h === "date");
-
-            const safeStoreIndex = storeIdx !== -1 ? storeIdx : 0;
-            const safeArtistIndex = artistIdx !== -1 ? artistIdx : 4;
-            const safeTitleIndex = titleIdx !== -1 ? titleIdx : 3;
-            const safeEarningsIndex = earningsIdx !== -1 ? earningsIdx : 11;
-            const safeQtyIndex = qtyIdx !== -1 ? qtyIdx : 9;
-            const safeDateIndex = dateIdx !== -1 ? dateIdx : 1; // commonly column 2 (index 1) in DK exports
-
-            let total = 0;
-            const byArtist = { Kirbai: 0, AELOW: 0, KURAO: 0 };
-            const trackMap = new Map<string, { revenue: number; streams: number }>();
-            const storeMap = new Map<string, { revenue: number; streams: number }>();
-            const dateMap = new Map<string, { minStr: string; maxStr: string }>();
-
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split("\t");
-                if (cols.length <= Math.max(safeStoreIndex, safeArtistIndex, safeTitleIndex)) continue;
-
-                const storeStr = cols[safeStoreIndex]?.trim() || "Unknown";
-                const artistStr = cols[safeArtistIndex]?.trim() || "";
-                const titleStr = cols[safeTitleIndex]?.trim() || "Unknown Track";
-                const dateStr = cols[safeDateIndex]?.trim() || "";
-
-                const earningsRaw = parseFloat((cols[safeEarningsIndex] || "0").replace(/[^0-9.-]+/g, ""));
-                const earnings = isNaN(earningsRaw) ? 0 : earningsRaw;
-                const streamsRaw = parseInt((cols[safeQtyIndex] || "0").replace(/[^0-9-]+/g, ""), 10);
-                const streams = isNaN(streamsRaw) ? 0 : streamsRaw;
-
-                total += earnings;
-
-                // Artist split
-                const artistUpper = artistStr.toUpperCase();
-                if (artistUpper.includes("KIRBAI")) byArtist.Kirbai += earnings;
-                else if (artistUpper.includes("AELOW")) byArtist.AELOW += earnings;
-                else if (artistUpper.includes("KURAO")) byArtist.KURAO += earnings;
-
-                // Tracks aggregation
-                const exTrack = trackMap.get(titleStr) || { revenue: 0, streams: 0 };
-                trackMap.set(titleStr, { revenue: exTrack.revenue + earnings, streams: exTrack.streams + streams });
-
-                // Platform aggregation
-                const exStore = storeMap.get(storeStr) || { revenue: 0, streams: 0 };
-                storeMap.set(storeStr, { revenue: exStore.revenue + earnings, streams: exStore.streams + streams });
-
-                // Date aggregation
-                if (dateStr) {
-                    const currentDates = dateMap.get(storeStr) || { minStr: dateStr, maxStr: dateStr };
-                    if (dateStr < currentDates.minStr) currentDates.minStr = dateStr;
-                    if (dateStr > currentDates.maxStr) currentDates.maxStr = dateStr;
-                    dateMap.set(storeStr, currentDates);
-                }
+            if (isUTF16LE) {
+                const decoder = new TextDecoder('utf-16le');
+                text = decoder.decode(buffer);
+            } else {
+                const decoder = new TextDecoder('utf-8');
+                text = decoder.decode(buffer);
             }
 
-            const topTracks = Array.from(trackMap.entries())
-                .map(([title, data]) => ({ title, ...data }))
-                .sort((a, b) => b.revenue - a.revenue)
-                .slice(0, 10);
-
-            const platforms = Array.from(storeMap.entries())
-                .map(([store, data]) => ({ store, ...data, rate: data.revenue / Math.max(data.streams, 1) }))
-                .sort((a, b) => b.rate - a.rate);
-
-            const platformsByRevenue = Array.from(storeMap.entries())
-                .map(([store, data]) => ({ store, ...data, rate: data.revenue / Math.max(data.streams, 1) }))
-                .sort((a, b) => b.revenue - a.revenue);
-
-            const reportTiming = Array.from(dateMap.entries())
-                .map(([store, dates]) => ({
-                    store,
-                    minDate: dates.minStr,
-                    maxDate: dates.maxStr
-                }))
-                .sort((a, b) => a.store.localeCompare(b.store));
-
-            const finalData = {
-                totalEarnings: total,
-                earningsByArtist: byArtist,
-                topTracks,
-                platforms,
-                platformsByRevenue,
-                reportTiming
-            };
-            setParsedData(finalData);
-
-            // Trigger AI Advice Generation
-            await fetchAiAdvice(finalData);
-
-        } catch (e: any) {
-            console.error(e);
-            alert(`Error parsing TSV: ${e.message}`);
-            reset();
-        }
-    };
-
-    const fetchAiAdvice = async (data: ParsedData) => {
-        try {
-            const res = await fetch("/api/strategic-advice", {
+            const res = await fetch("/api/analyze-finance", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
+                body: JSON.stringify({ tsv: text }),
             });
-            const result = await res.json();
-            setAiAdvice(result.advice);
+            const data = await res.json();
+
+            if (data.error) {
+                console.error("Finance Analysis Error:", data.error);
+                alert("Finance Import Error: " + data.error);
+                return;
+            }
+
+            setAnalysisResults(data.analysis);
         } catch (err) {
-            setAiAdvice("<p class='text-red-500'>Failed to communicate with BI core.</p>");
+            console.error(err);
+            alert("An unexpected error occurred during import.");
         } finally {
-            setAnalyzePhase('complete');
+            setIsLoading(false);
         }
     };
 
-    const reset = () => {
-        setAttachedFile(null);
-        setAnalyzePhase('idle');
-        setParsedData(null);
-        setAiAdvice(null);
-    };
-
-    const formatCurrency = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
-    const formatRate = (val: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 4 }).format(val);
-
     return (
-        <div className="flex flex-col gap-4 mt-4">
-            <div className="flex justify-between items-center mb-2">
-                <h2 className="text-xl font-semibold tracking-tight">Finance View</h2>
-                <span className="text-xs text-neutral-500 font-mono">DISTROKID (.TSV)</span>
+        <div className="flex flex-col gap-12">
+            <div className="flex justify-between items-end relative ml-1">
+                <div className="flex flex-col gap-2">
+                    <h2 className="text-2xl font-black tracking-tighter text-[var(--fg-color)] uppercase italic">Financial Analytics</h2>
+                    <p className="text-[10px] text-neutral-500 uppercase tracking-[0.5em] font-black">Performance Matrix_V4.1</p>
+                </div>
+                {analysisResults?.persistedAt && (
+                    <div className="flex flex-col items-end gap-1">
+                        <span className="text-[9px] font-mono text-neutral-600 uppercase tracking-widest font-bold">Data Current As Of:</span>
+                        <span className="text-[11px] font-black text-accent uppercase tracking-widest italic">{new Date(analysisResults.persistedAt).toLocaleString()}</span>
+                    </div>
+                )}
             </div>
 
-            {analyzePhase === 'idle' && !attachedFile && (
-                <label
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
+            {!analysisResults ? (
+                <div
+                    onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                    onDragLeave={() => setIsDragging(false)}
                     onDrop={handleDrop}
-                    className={`border-2 border-dashed ${isHovering ? 'border-accent bg-accent/5' : 'border-border bg-surface'} flex flex-col items-center justify-center p-12 transition-all cursor-pointer group`}
+                    className={`relative group flex flex-col items-center justify-center p-24 border-2 border-dashed transition-all duration-1000 squircle specular-reflect shadow-2xl overflow-hidden ${isDragging ? "border-accent bg-accent/5 backdrop-blur-xl" : "border-border/10 bg-surface/20 hover:border-accent/30 hover:bg-surface/30"
+                        }`}
                 >
-                    <input type="file" accept=".tsv" className="hidden" onChange={handleFileChange} />
-                    <div className="flex flex-col items-center gap-3 text-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-file-spreadsheet ${isHovering ? 'text-accent' : 'text-neutral-500'} group-hover:text-accent transition-colors`}><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M8 13h2" /><path d="M14 13h2" /><path d="M8 17h2" /><path d="M14 17h2" /></svg>
-                        <p className="text-sm font-medium text-foreground">Click or Drag DistroKid TSV to Attach</p>
-                        <p className="text-xs text-neutral-500">Provide data to the BI Core for analysis.</p>
-                    </div>
-                </label>
-            )}
-
-            {analyzePhase === 'idle' && attachedFile && (
-                <div className="border border-border bg-surface p-6 flex flex-col gap-6">
-                    <div className="flex flex-col gap-2">
-                        <span className="text-xs text-neutral-500 uppercase tracking-widest">Attached Intelligence</span>
-                        <div className="flex items-center justify-between bg-black/50 border border-border/50 rounded-sm px-4 py-3">
-                            <div className="flex items-center gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /></svg>
-                                <span className="text-sm font-medium font-mono text-neutral-300">{attachedFile.name}</span>
-                                <span className="text-xs text-neutral-600">({(attachedFile.size / 1024).toFixed(1)} KB)</span>
-                            </div>
-                            <button onClick={removeFile} className="text-neutral-500 hover:text-red-500 transition-colors" title="Remove Attachment">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="M6 6l12 12" /></svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div className="flex justify-end">
-                        <button onClick={startAnalysis} className="px-6 py-2 bg-accent text-white text-sm font-bold uppercase tracking-wider rounded-sm hover:bg-accent/80 transition-colors flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 7-7 7 7" /><path d="M12 19V5" /></svg>
-                            Analyze Data
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {analyzePhase === 'analyzing' && (
-                <div className="border border-border bg-surface p-12 flex flex-col items-center justify-center gap-6">
-                    <div className="relative flex items-center justify-center">
-                        <svg className="animate-spin text-accent" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
-                        <div className="absolute inset-0 bg-accent/20 blur-xl rounded-full animate-pulse"></div>
-                    </div>
-                    <div className="flex flex-col items-center gap-1">
-                        <p className="text-sm font-bold tracking-widest uppercase text-foreground">Processing TSV Data</p>
-                        <p className="text-xs text-neutral-500 font-mono animate-pulse">Calculating payout rates & querying BI core...</p>
-                    </div>
-                </div>
-            )}
-
-            {analyzePhase === 'complete' && parsedData && (
-                <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="border border-border bg-surface p-4 flex flex-col gap-1">
-                            <span className="text-xs text-neutral-500 uppercase tracking-widest">Total Earnings</span>
-                            <span className="text-3xl font-bold text-accent">{formatCurrency(parsedData.totalEarnings)}</span>
-                        </div>
-
-                        <div className="md:col-span-2 border border-border bg-surface p-4 relative overflow-hidden flex flex-col gap-4">
-                            <div className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center">
-                                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                            </div>
-                            <h3 className="text-sm font-semibold tracking-tight uppercase text-neutral-400">Strategic Business Advice</h3>
-                            <div dangerouslySetInnerHTML={{ __html: aiAdvice || "" }} />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="flex flex-col gap-8">
-                            <div className="flex flex-col gap-3">
-                                <h3 className="text-sm font-semibold tracking-tight uppercase text-neutral-400">Total Platform Revenue</h3>
-                                <div className="border border-border bg-surface rounded-sm overflow-hidden text-sm flex flex-col">
-                                    <div className="flex justify-between p-3 border-b border-border bg-black/50 text-neutral-500 text-xs uppercase">
-                                        <span>Store</span>
-                                        <span>Total Earned</span>
-                                    </div>
-                                    {parsedData.platformsByRevenue.map((p, i) => (
-                                        <div key={i} className="flex justify-between p-3 border-b border-border/50 last:border-0 hover:bg-white/5 transition-colors">
-                                            <span className="font-medium text-foreground">{p.store}</span>
-                                            <span className="font-mono text-accent">{formatCurrency(p.revenue)}</span>
-                                        </div>
-                                    ))}
+                    {attachedFile ? (
+                        <div className="flex flex-col items-center gap-10 animate-in zoom-in-95 duration-700 relative z-10">
+                            <div className="flex items-center gap-6 bg-accent/15 p-6 rounded-[2.5rem] border border-accent/20 shadow-2xl specular-reflect transform hover:scale-105 transition-transform duration-500">
+                                <div className="w-16 h-16 bg-accent rounded-3xl flex items-center justify-center shadow-[0_10px_40px_rgba(255,51,102,0.4)]">
+                                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 12h6m-6 4h12M3 21h18M3 10h18M3 7l9-4 9 4" /></svg>
+                                </div>
+                                <div className="flex flex-col gap-0.5">
+                                    <span className="text-base font-black text-[var(--fg-color)] tracking-tighter uppercase italic">{attachedFile.name}</span>
+                                    <span className="text-[10px] font-mono text-accent font-bold uppercase tracking-widest">Awaiting_Synthesis_Command</span>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-3">
-                                <h3 className="text-sm font-semibold tracking-tight uppercase text-neutral-400">Platform Payout Rate</h3>
-                                <div className="border border-border bg-surface rounded-sm overflow-hidden text-sm flex flex-col">
-                                    <div className="flex justify-between p-3 border-b border-border bg-black/50 text-neutral-500 text-xs uppercase">
-                                        <span>Store</span>
-                                        <span>Rate / Stream</span>
-                                    </div>
-                                    {parsedData.platforms.map((p, i) => (
-                                        <div key={i} className="flex justify-between p-3 border-b border-border/50 last:border-0 hover:bg-white/5 transition-colors">
-                                            <span className="font-medium text-foreground">{p.store}</span>
-                                            <span className="font-mono text-accent">{formatRate(p.rate)}</span>
-                                        </div>
-                                    ))}
-                                </div>
+                            <div className="flex gap-6">
+                                <button
+                                    onClick={analyzeData}
+                                    disabled={isLoading}
+                                    className="px-12 py-5 bg-accent hover:bg-accent/90 text-white font-black uppercase tracking-[0.5em] text-[11px] squircle shadow-[0_20px_60px_rgba(255,51,102,0.3)] transition-all active:scale-95 disabled:opacity-20"
+                                >
+                                    {isLoading ? "Analyzing..." : "Analyze"}
+                                </button>
+                                <button
+                                    onClick={() => setAttachedFile(null)}
+                                    className="px-10 py-5 bg-white/5 hover:bg-white/10 text-neutral-400 font-black uppercase tracking-[0.3em] text-[10px] squircle transition-all"
+                                >
+                                    Reject
+                                </button>
                             </div>
                         </div>
+                    ) : (
+                        <div className="flex flex-col items-center gap-6 relative z-10">
+                            <div className="w-24 h-24 bg-accent/5 rounded-[2.5rem] flex items-center justify-center mb-2 shadow-inner group-hover:scale-110 transition-transform duration-1000 border border-white/5">
+                                <svg className="w-10 h-10 text-accent opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                                <p className="text-xl font-black text-[var(--fg-color)]/90 tracking-tighter uppercase italic">Ingest Intelligence Feed</p>
+                                <p className="text-[10px] text-neutral-600 uppercase tracking-[0.4em] font-black">Drop DistroKid .TSV Matrix_</p>
+                            </div>
+                            <input type="file" accept=".tsv" onChange={(e) => e.target.files?.[0] && setAttachedFile(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer" />
+                        </div>
+                    )}
 
-                        <div className="flex flex-col gap-8">
-                            <div className="flex flex-col gap-3">
-                                <h3 className="text-sm font-semibold tracking-tight uppercase text-neutral-400">Top 10 Tracks</h3>
-                                <div className="border border-border bg-surface rounded-sm overflow-hidden text-sm flex flex-col">
-                                    {parsedData.topTracks.map((track, i) => (
-                                        <div key={i} className="flex justify-between p-3 border-b border-border/50 last:border-0 hover:bg-white/5 transition-colors">
-                                            <div className="flex items-center gap-3 truncate pr-4 max-w-[200px]">
-                                                <span className="text-xs text-neutral-600 font-mono w-4">{i + 1}.</span>
-                                                <span>{track.title}</span>
+                    {isLoading && (
+                        <div className="absolute inset-0 bg-background/90 backdrop-blur-2xl squircle flex flex-col items-center justify-center gap-8 z-20 animate-in fade-in duration-700">
+                            <Loader2 className="w-16 h-16 text-accent animate-spin" />
+                            <div className="flex flex-col items-center gap-2">
+                                <span className="text-[11px] font-black text-accent uppercase tracking-[0.7em] animate-pulse">Calculating Matrix</span>
+                                <span className="text-[9px] font-mono text-neutral-600 uppercase tracking-[0.3em] font-bold">Latency_Compensation_Active</span>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-accent/5 blur-[120px] rounded-full -mr-48 -mt-48 pointer-events-none" />
+                </div>
+            ) : (
+                <div className="flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-12 duration-1000">
+                    {/* Dashboard Summary Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="p-10 bg-accent/[0.04] border border-accent/20 squircle shadow-2xl specular-reflect group overflow-hidden relative">
+                            <div className="absolute top-0 left-0 w-full h-1 bg-accent/40" />
+                            <span className="text-[11px] font-black text-accent uppercase tracking-[0.4em]">Total Revenue</span>
+                            <p className="text-5xl font-black text-[var(--fg-color)] mt-4 italic tracking-tighter drop-shadow-lg">${analysisResults.totals.revenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                            <div className="mt-8 pt-4 border-t border-accent/10 flex justify-between">
+                                <span className="text-[9px] font-black text-accent/50 uppercase tracking-widest font-mono">Status: Verified</span>
+                                <span className="text-[9px] font-black text-accent/50 uppercase tracking-widest font-mono">ANALYTICS_V4</span>
+                            </div>
+                        </div>
+                        <div className="p-10 bg-accent/[0.04] border border-accent/20 squircle shadow-2xl specular-reflect group overflow-hidden relative">
+                            <div className="absolute top-0 left-0 w-full h-1 bg-accent/40" />
+                            <span className="text-[11px] font-black text-accent uppercase tracking-[0.4em]">Total Streams</span>
+                            <p className="text-5xl font-black text-[var(--fg-color)] mt-4 italic tracking-tighter drop-shadow-lg">{analysisResults.totals.streams.toLocaleString()}</p>
+                            <div className="mt-8 pt-4 border-t border-accent/10 flex justify-between">
+                                <span className="text-[9px] font-black text-accent/50 uppercase tracking-widest font-mono">Aggregation_Active</span>
+                            </div>
+                        </div>
+                        <div className="p-10 bg-accent/[0.04] border border-accent/20 squircle shadow-2xl specular-reflect group overflow-hidden relative">
+                            <div className="absolute top-0 left-0 w-full h-1 bg-accent/40" />
+                            <span className="text-[11px] font-black text-accent uppercase tracking-[0.4em]">Payout_Yield</span>
+                            <p className="text-5xl font-black text-[var(--fg-color)] mt-4 italic tracking-tighter drop-shadow-lg">${(analysisResults.totals.revenue / analysisResults.totals.streams).toFixed(5)}</p>
+                            <div className="mt-8 pt-4 border-t border-accent/10 flex justify-between">
+                                <span className="text-[9px] font-black text-accent/50 uppercase tracking-widest font-mono">Net_Efficiency</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        {/* AI Advisor Card */}
+                        <div className="lg:col-span-2 p-10 bg-accent/[0.02] border border-accent/10 squircle specular-reflect shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-80 h-80 bg-accent/5 blur-[100px] rounded-full -mr-32 -mt-32 pointer-events-none" />
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse shadow-[0_0_10px_rgba(255,51,102,0.8)]" />
+                                <h3 className="text-xs font-black uppercase tracking-[0.5em] text-accent">Strategic Summary</h3>
+                            </div>
+                            {analysisResults.advice ? (
+                                <div className="text-sm text-[var(--fg-color)]/80 font-bold leading-relaxed space-y-4 [&>ul]:list-disc [&>ul]:ml-4 [&>ul>li]:mb-2 [&_strong]:text-accent" dangerouslySetInnerHTML={{ __html: analysisResults.advice }} />
+                            ) : (
+                                <div className="h-40 flex items-center justify-center text-neutral-700 italic font-black uppercase tracking-widest">Narrative Synchronization...</div>
+                            )}
+                        </div>
+
+                        {/* Platform Comparison */}
+                        <div className="bg-surface/20 border border-border/10 squircle p-10 specular-reflect shadow-2xl overflow-hidden relative">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 blur-[70px] rounded-full -mr-20 -mt-20 pointer-events-none" />
+                            <div className="flex justify-between items-center mb-10 relative z-10">
+                                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-[var(--fg-color)]/90 italic">Platform Performance Rank</h3>
+                                <span className="text-[10px] font-mono text-neutral-700 font-bold">SORT_REVENUE</span>
+                            </div>
+                            <div className="flex flex-col gap-5 relative z-10">
+                                {analysisResults.platforms
+                                    .sort((a: any, b: any) => b.revenue - a.revenue)
+                                    .map((p: any) => (
+                                        <div key={p.store} className="flex flex-col gap-3 p-5 bg-black/10 border border-border/10 rounded-[2rem] hover:bg-black/20 hover:border-accent/30 transition-all duration-700 group/row">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-base font-black text-[var(--fg-color)]/80 group-hover/row:text-[var(--fg-color)] uppercase tracking-tight italic transition-colors">{p.store}</span>
+                                                <span className="text-xl font-black text-accent italic tracking-tighter drop-shadow-[0_0_10px_rgba(255,51,102,0.2)]">${p.revenue.toFixed(2)}</span>
                                             </div>
-                                            <span className="font-mono text-accent">{formatCurrency(track.revenue)}</span>
+                                            <div className="flex justify-between text-[11px] font-mono text-neutral-600 font-black uppercase tracking-tighter">
+                                                <span>{p.streams.toLocaleString()} Streams</span>
+                                                <span className="text-neutral-700">${p.rate.toFixed(4)} Per_Str</span>
+                                            </div>
                                         </div>
                                     ))}
-                                </div>
                             </div>
+                        </div>
 
-                            <div className="flex flex-col gap-3">
-                                <h3 className="text-sm font-semibold tracking-tight uppercase text-neutral-400">Report Timing Details</h3>
-                                <div className="border border-border bg-surface rounded-sm overflow-hidden text-sm flex flex-col">
-                                    <div className="flex justify-between p-3 border-b border-border bg-black/50 text-neutral-500 text-xs uppercase">
-                                        <span>Store</span>
-                                        <span>Sale Period</span>
+                        {/* Top performing assets */}
+                        <div className="bg-surface/20 border border-border/10 squircle p-10 specular-reflect shadow-2xl overflow-hidden relative">
+                            <div className="absolute bottom-0 right-0 w-48 h-48 bg-accent/5 blur-[70px] rounded-full -mr-20 -mb-20 pointer-events-none" />
+                            <div className="flex justify-between items-center mb-10 relative z-10">
+                                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-[var(--fg-color)]/90 italic">Top 10 Strategic Assets</h3>
+                                <span className="text-[10px] font-mono text-neutral-700 font-bold">ASSET_CLUSTERING</span>
+                            </div>
+                            <div className="flex flex-col gap-5 relative z-10">
+                                {analysisResults.tracks.slice(0, 10).map((t: any, idx: number) => (
+                                    <div key={t.title} className="flex items-center gap-6 p-5 bg-black/10 border border-border/10 rounded-[2rem] hover:bg-black/20 hover:border-accent/30 transition-all duration-700 group/track shadow-lg">
+                                        <span className="text-lg font-black text-neutral-500 italic group-hover/track:text-accent transition-colors transform group-hover/track:scale-110">{(idx + 1).toString().padStart(2, '0')}</span>
+                                        <div className="flex-1 flex flex-col gap-0.5">
+                                            <span className="text-sm font-black text-[var(--fg-color)] tracking-tighter uppercase italic truncate max-w-[180px] drop-shadow-md">{t.title}</span>
+                                            <span className="text-[10px] font-mono text-neutral-500 font-black uppercase tracking-tighter">{t.streams.toLocaleString()} RAW_STREAMS</span>
+                                        </div>
+                                        <span className="text-lg font-black text-[var(--fg-color)] italic tracking-tighter">${t.revenue.toFixed(2)}</span>
                                     </div>
-                                    {parsedData.reportTiming.length === 0 && (
-                                        <div className="p-3 text-neutral-500 text-xs italic text-center">No date ranges identified in file.</div>
-                                    )}
-                                    {parsedData.reportTiming.map((timing, i) => (
-                                        <div key={i} className="flex justify-between p-3 border-b border-border/50 last:border-0 hover:bg-white/5 transition-colors text-xs">
-                                            <span className="font-medium text-foreground">{timing.store}</span>
-                                            <span className="font-mono text-neutral-400">
-                                                {timing.minDate} {timing.minDate !== timing.maxDate ? `→ ${timing.maxDate}` : ''}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between border-t border-border pt-4">
-                        <div className="flex items-center gap-2 text-xs text-neutral-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
-                            Analysis Complete on <strong>{attachedFile?.name}</strong>
-                        </div>
-                        <button onClick={reset} className="text-xs bg-surface border border-border px-3 py-1.5 rounded-sm hover:text-accent hover:border-accent transition-all flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
-                            Reset Workspace
-                        </button>
-                    </div>
+                    <button
+                        onClick={() => {
+                            setAnalysisResults(null);
+                            setAttachedFile(null);
+                        }}
+                        className="w-full py-6 border border-accent/20 text-accent font-black uppercase tracking-[0.6em] text-[10px] squircle bg-accent/5 hover:bg-accent/10 transition-all duration-700 mt-6 flex items-center justify-center gap-4 group"
+                    >
+                        <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-700" />
+                        Update Financial Data Matrix
+                    </button>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }

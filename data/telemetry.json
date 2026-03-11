@@ -1,0 +1,196 @@
+{
+  "lifetimeInputTokens": 83670,
+  "lifetimeOutputTokens": 42872,
+  "lifetimeCost": 0.0255158,
+  "logs": [
+    {
+      "timestamp": 1773184167807,
+      "route": "/api/parse-csv",
+      "inputTokens": 11824,
+      "outputTokens": 6526,
+      "estimatedCost": 0.0037928000000000003
+    },
+    {
+      "timestamp": 1773184047856,
+      "route": "/api/parse-csv",
+      "inputTokens": 11805,
+      "outputTokens": 7170,
+      "estimatedCost": 0.0040485
+    },
+    {
+      "timestamp": 1773183802295,
+      "route": "/api/parse-csv",
+      "inputTokens": 11770,
+      "outputTokens": 6600,
+      "estimatedCost": 0.003817
+    },
+    {
+      "timestamp": 1773183168904,
+      "route": "/api/parse-csv",
+      "inputTokens": 11719,
+      "outputTokens": 6599,
+      "estimatedCost": 0.0038115000000000002
+    },
+    {
+      "timestamp": 1773181318163,
+      "route": "/api/parse-csv",
+      "inputTokens": 11594,
+      "outputTokens": 24,
+      "estimatedCost": 0.0011690000000000001
+    },
+    {
+      "timestamp": 1773177845789,
+      "route": "/api/analyze-finance",
+      "inputTokens": 1100,
+      "outputTokens": 777,
+      "estimatedCost": 0.00042080000000000004
+    },
+    {
+      "timestamp": 1773177545635,
+      "route": "/api/analyze-finance",
+      "inputTokens": 1100,
+      "outputTokens": 739,
+      "estimatedCost": 0.00040560000000000005
+    },
+    {
+      "timestamp": 1773177348605,
+      "route": "/api/analyze-finance",
+      "inputTokens": 662,
+      "outputTokens": 292,
+      "estimatedCost": 0.000183
+    },
+    {
+      "timestamp": 1773177079283,
+      "route": "/api/analyze-finance",
+      "inputTokens": 456,
+      "outputTokens": 509,
+      "estimatedCost": 0.00024920000000000004
+    },
+    {
+      "timestamp": 1773175573757,
+      "route": "/api/analyze-finance",
+      "inputTokens": 340,
+      "outputTokens": 489,
+      "estimatedCost": 0.0002296
+    },
+    {
+      "timestamp": 1773175552484,
+      "route": "/api/analyze-finance",
+      "inputTokens": 340,
+      "outputTokens": 442,
+      "estimatedCost": 0.00021080000000000003
+    },
+    {
+      "timestamp": 1773173771403,
+      "route": "/api/analyze-finance",
+      "inputTokens": 301,
+      "outputTokens": 468,
+      "estimatedCost": 0.0002173
+    },
+    {
+      "timestamp": 1773173617792,
+      "route": "/api/analyze-finance",
+      "inputTokens": 301,
+      "outputTokens": 368,
+      "estimatedCost": 0.0001773
+    },
+    {
+      "timestamp": 1773173044983,
+      "route": "/api/analyze-finance",
+      "inputTokens": 281,
+      "outputTokens": 413,
+      "estimatedCost": 0.0001933
+    },
+    {
+      "timestamp": 1773172972905,
+      "route": "/api/analyze-finance",
+      "inputTokens": 479,
+      "outputTokens": 438,
+      "estimatedCost": 0.00022310000000000003
+    },
+    {
+      "timestamp": 1773169056510,
+      "route": "/api/format-lyric",
+      "inputTokens": 1240,
+      "outputTokens": 703,
+      "estimatedCost": 0.0004052
+    },
+    {
+      "timestamp": 1773168888891,
+      "route": "/api/format-lyric",
+      "inputTokens": 1508,
+      "outputTokens": 821,
+      "estimatedCost": 0.00047920000000000005
+    },
+    {
+      "timestamp": 1773168794487,
+      "route": "/api/format-lyric",
+      "inputTokens": 1463,
+      "outputTokens": 791,
+      "estimatedCost": 0.0004627
+    },
+    {
+      "timestamp": 1773168745733,
+      "route": "/api/format-lyric",
+      "inputTokens": 2557,
+      "outputTokens": 848,
+      "estimatedCost": 0.0005949
+    },
+    {
+      "timestamp": 1773167966971,
+      "route": "/api/batch-lyrics",
+      "inputTokens": 1381,
+      "outputTokens": 848,
+      "estimatedCost": 0.00047730000000000005
+    },
+    {
+      "timestamp": 1773167889248,
+      "route": "/api/batch-lyrics",
+      "inputTokens": 1381,
+      "outputTokens": 722,
+      "estimatedCost": 0.0004269
+    },
+    {
+      "timestamp": 1773167417850,
+      "route": "/api/batch-lyrics",
+      "inputTokens": 1569,
+      "outputTokens": 766,
+      "estimatedCost": 0.00046330000000000004
+    },
+    {
+      "timestamp": 1773167356533,
+      "route": "/api/batch-lyrics",
+      "inputTokens": 1381,
+      "outputTokens": 660,
+      "estimatedCost": 0.00040210000000000007
+    },
+    {
+      "timestamp": 1773166987966,
+      "route": "/api/batch-lyrics",
+      "inputTokens": 2745,
+      "outputTokens": 1311,
+      "estimatedCost": 0.0007989000000000001
+    },
+    {
+      "timestamp": 1773166944815,
+      "route": "/api/batch-lyrics",
+      "inputTokens": 1466,
+      "outputTokens": 792,
+      "estimatedCost": 0.0004634
+    },
+    {
+      "timestamp": 1773166812727,
+      "route": "/api/batch-lyrics",
+      "inputTokens": 1466,
+      "outputTokens": 1521,
+      "estimatedCost": 0.000755
+    },
+    {
+      "timestamp": 1773166621613,
+      "route": "/api/batch-lyrics",
+      "inputTokens": 1441,
+      "outputTokens": 1235,
+      "estimatedCost": 0.0006381
+    }
+  ]
+}

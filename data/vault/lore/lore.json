@@ -1,0 +1,204 @@
+{
+  "nodes": [
+    {
+      "id": "gholdengo",
+      "type": "character",
+      "position": {
+        "x": 496.4963776293607,
+        "y": 613.3204922278411
+      },
+      "data": {
+        "label": "Gholdengo",
+        "description": "A mischievous entity known for its golden form and corrupting influence."
+      }
+    },
+    {
+      "id": "heart_scale",
+      "type": "artifact",
+      "position": {
+        "x": 133.1589225880466,
+        "y": 383.3160278076572
+      },
+      "data": {
+        "label": "Heart Scale",
+        "description": "A rare scale said to hold sentimental value, now potentially tainted."
+      }
+    },
+    {
+      "id": "destiny_knot",
+      "type": "artifact",
+      "position": {
+        "x": 112.26557625445885,
+        "y": 630.8363284837578
+      },
+      "data": {
+        "label": "Destiny Knot",
+        "description": "A mystical item that binds fates, now under a corrupting influence."
+      }
+    },
+    {
+      "id": "heart_scales_group",
+      "type": "organization",
+      "position": {
+        "x": 777.2532916690222,
+        "y": 460.74669905802824
+      },
+      "data": {
+        "label": "Heart Scales Girl Group",
+        "description": "A musical group formed by Gholdengo, likely with a unique, perhaps unsettling, charm."
+      }
+    },
+    {
+      "id": "lopunny",
+      "type": "character",
+      "position": {
+        "x": 600,
+        "y": 250
+      },
+      "data": {
+        "label": "Lopunny",
+        "description": "A graceful Pokémon, now a member of the Heart Scales Girl Group."
+      }
+    },
+    {
+      "id": "meloetta",
+      "type": "character",
+      "position": {
+        "x": 650,
+        "y": 350
+      },
+      "data": {
+        "label": "Meloetta",
+        "description": "A melodic Pokémon, now a member of the Heart Scales Girl Group."
+      }
+    },
+    {
+      "id": "pheromosa",
+      "type": "character",
+      "position": {
+        "x": 751.5943131434774,
+        "y": 511.21480459107426
+      },
+      "data": {
+        "label": "Pheromosa",
+        "description": "An elegant Ultra Beast, now a member of the Heart Scales Girl Group."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "gholdengo",
+      "target": "heart_scale",
+      "label": "corrupted"
+    }
+  ],
+  "history": [
+    {
+      "nodes": [
+        {
+          "id": "gholdengo",
+          "type": "character",
+          "position": {
+            "x": 496.4963776293607,
+            "y": 613.3204922278411
+          },
+          "data": {
+            "label": "Gholdengo",
+            "description": "A mischievous entity known for its golden form and corrupting influence."
+          }
+        },
+        {
+          "id": "heart_scale",
+          "type": "artifact",
+          "position": {
+            "x": 133.1589225880466,
+            "y": 383.3160278076572
+          },
+          "data": {
+            "label": "Heart Scale",
+            "description": "A rare scale said to hold sentimental value, now potentially tainted."
+          }
+        },
+        {
+          "id": "destiny_knot",
+          "type": "artifact",
+          "position": {
+            "x": 112.26557625445885,
+            "y": 630.8363284837578
+          },
+          "data": {
+            "label": "Destiny Knot",
+            "description": "A mystical item that binds fates, now under a corrupting influence."
+          }
+        },
+        {
+          "id": "heart_scales_group",
+          "type": "organization",
+          "position": {
+            "x": 777.2532916690222,
+            "y": 460.74669905802824
+          },
+          "data": {
+            "label": "Heart Scales Girl Group",
+            "description": "A musical group formed by Gholdengo, likely with a unique, perhaps unsettling, charm."
+          }
+        },
+        {
+          "id": "lopunny",
+          "type": "character",
+          "position": {
+            "x": 600,
+            "y": 250
+          },
+          "data": {
+            "label": "Lopunny",
+            "description": "A graceful Pokémon, now a member of the Heart Scales Girl Group."
+          }
+        },
+        {
+          "id": "meloetta",
+          "type": "character",
+          "position": {
+            "x": 650,
+            "y": 350
+          },
+          "data": {
+            "label": "Meloetta",
+            "description": "A melodic Pokémon, now a member of the Heart Scales Girl Group."
+          }
+        },
+        {
+          "id": "meowscarada",
+          "type": "character",
+          "position": {
+            "x": 700,
+            "y": 200
+          },
+          "data": {
+            "label": "Meowscarada",
+            "description": "A captivating Pokémon, now a member of the Heart Scales Girl Group."
+          }
+        },
+        {
+          "id": "pheromosa",
+          "type": "character",
+          "position": {
+            "x": 751.5943131434774,
+            "y": 511.21480459107426
+          },
+          "data": {
+            "label": "Pheromosa",
+            "description": "An elegant Ultra Beast, now a member of the Heart Scales Girl Group."
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "gholdengo",
+          "target": "heart_scale",
+          "label": "corrupted"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,864 @@
+{
+  "metadataHistory": [],
+  "intelCache": [
+    {
+      "id": "trend-1",
+      "tag": "KIRBAI",
+      "date": "Trending",
+      "title": "CRITICAL: Platform Compliance Shift Detected",
+      "summary": "Multiple independent artists report sudden 'editorial discretion' takedowns from DistroKid impacting high-volume AI creators without warning.",
+      "actionItems": [
+        "Audit all pending KURAO and AELOW releases for potentially flagged metadata or controversial lyrics immediately.",
+        "Throttle daily release volume to human-passing limits (max 1-2 tracks per alias per week) to evade automated spam detection algorithms."
+      ],
+      "url": "https://x.com/search?q=distrokid+ban"
+    },
+    {
+      "id": "2ZxjXqgrpto",
+      "tag": "FACTORY",
+      "date": "Today",
+      "title": "AIGuerrilla: How To Get So Rich With AI You Should Be Purged",
+      "summary": "AI skipped this video due to rate limits. Try refreshing in a minute.",
+      "actionItems": [
+        "Review the video manually for insights."
+      ],
+      "url": "https://www.youtube.com/watch?v=2ZxjXqgrpto"
+    },
+    {
+      "id": "fsVTrJHUZFM",
+      "tag": "FACTORY",
+      "date": "Yesterday",
+      "title": "AIGuerrilla: The AI Opportunity Everyone Over 35 Is Missing Right Now | Perplexity Computer Chrome Extension",
+      "summary": "AI skipped this video due to rate limits. Try refreshing in a minute.",
+      "actionItems": [
+        "Review the video manually for insights."
+      ],
+      "url": "https://www.youtube.com/watch?v=fsVTrJHUZFM"
+    }
+  ],
+  "pokemonNews": [
+    {
+      "title": "🛡️ PLATFORM INTEL: As AI Music Floods the Zone, Bandcamp Takes a Stand",
+      "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNVUJBNWdiUUZ6N0tvTnVEVGh6SFBOTFl3WUVicVlab1Ztcy1IRDhrUm50UXZfQWlFZFB6MHdMZHBpZVF4NG5taFVtbXYxS042UHBGRkpfVXVxbkQ3WExCYmZORXdlNXZhSE10ZHlmMFNPOHByYlhMcUFyUXFjMkpBWFFoajlUaW5jQ1pENTBHTFlFX0RKTW80UzBjYmhLOWEyUU9vc3JwenFJQQ?oc=5",
+      "isViral": true,
+      "source": "Social Pulse",
+      "date": "Wed, 14 Jan 2026 08:00:00 GMT"
+    },
+    {
+      "title": "🛡️ PLATFORM INTEL: Bandcamp Announces Ban on AI Music",
+      "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5UOUFsS0U4MFpsLUhHck5HTkVvQ2o0OTRJWnp0NWpOdHhEcWdKZHhtUmNCaGZEb01mLTBkYkJrN0o0MXlrSFJ6MktQa1BXbS0yV2VWVnhpaGljZl9QdlJ2NFZ5UXJWanNnR3RnMXFuQQ?oc=5",
+      "isViral": true,
+      "source": "Social Pulse",
+      "date": "Thu, 15 Jan 2026 08:00:00 GMT"
+    },
+    {
+      "title": "🛡️ PLATFORM INTEL: Bandcamp Bans AI Music",
+      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE9lODZyT1cxdzdXSlJaSUJ1U01ubGZFV3l0Xy1zYi1UUG1pam9pU2NoVDRsUVg1TkNVWmFsZEQza2NUSU95LWkzS2cybVpxY0E3dGVnOV9fM2RJTkFKdmZpRlpJNTAyZzRI?oc=5",
+      "isViral": true,
+      "source": "Social Pulse",
+      "date": "Tue, 13 Jan 2026 08:00:00 GMT"
+    }
+  ],
+  "financeAnalysis": {
+    "totals": {
+      "revenue": 527.1702014800029,
+      "streams": 77019
+    },
+    "platforms": [
+      {
+        "store": "YouTube (Red)",
+        "revenue": 247.00925342999932,
+        "streams": 25415,
+        "rate": 0.009719034169978333,
+        "reportingLatency": {
+          "reportDate": "2026-02-24",
+          "saleMonth": "2026-01"
+        }
+      },
+      {
+        "store": "Apple Music",
+        "revenue": 172.06840560000066,
+        "streams": 26183,
+        "rate": 0.006571760516365606,
+        "reportingLatency": {
+          "reportDate": "2026-02-26",
+          "saleMonth": "2026-01"
+        }
+      },
+      {
+        "store": "iTunes Songs",
+        "revenue": 55.918281260000015,
+        "streams": 90,
+        "rate": 0.6213142362222224,
+        "reportingLatency": {
+          "reportDate": "2026-02-26",
+          "saleMonth": "2026-01"
+        }
+      },
+      {
+        "store": "YouTube (Ads)",
+        "revenue": 34.01391020000004,
+        "streams": 14091,
+        "rate": 0.002413874827904339,
+        "reportingLatency": {
+          "reportDate": "2026-02-24",
+          "saleMonth": "2026-01"
+        }
+      },
+      {
+        "store": "Spotify",
+        "revenue": 16.016262410000003,
+        "streams": 4692,
+        "rate": 0.0034135256628303502,
+        "reportingLatency": {
+          "reportDate": "2026-02-27",
+          "saleMonth": "2025-12"
+        }
+      },
+      {
+        "store": "Deezer",
+        "revenue": 0.5354798399999999,
+        "streams": 210,
+        "rate": 0.0025499039999999995,
+        "reportingLatency": {
+          "reportDate": "2026-03-04",
+          "saleMonth": "2025-11"
+        }
+      },
+      {
+        "store": "Amazon Prime (Streaming)",
+        "revenue": 0.5137481200000003,
+        "streams": 231,
+        "rate": 0.0022240178354978367,
+        "reportingLatency": {
+          "reportDate": "2026-02-20",
+          "saleMonth": "2025-12"
+        }
+      },
+      {
+        "store": "Facebook",
+        "revenue": 0.3322411999999999,
+        "streams": 5801,
+        "rate": 0.000057273090846405775,
+        "reportingLatency": {
+          "reportDate": "2025-12-07",
+          "saleMonth": "2025-09"
+        }
+      },
+      {
+        "store": "Amazon Unlimited (Streaming)",
+        "revenue": 0.30225927,
+        "streams": 32,
+        "rate": 0.0094456021875,
+        "reportingLatency": {
+          "reportDate": "2025-04-17",
+          "saleMonth": "2025-02"
+        }
+      },
+      {
+        "store": "Tidal",
+        "revenue": 0.14614925,
+        "streams": 18,
+        "rate": 0.008119402777777777,
+        "reportingLatency": {
+          "reportDate": "2026-02-06",
+          "saleMonth": "2025-12"
+        }
+      },
+      {
+        "store": "YouTube (Audio)",
+        "revenue": 0.10060114000000005,
+        "streams": 47,
+        "rate": 0.0021404497872340436,
+        "reportingLatency": {
+          "reportDate": "2026-02-24",
+          "saleMonth": "2026-01"
+        }
+      },
+      {
+        "store": "TikTok",
+        "revenue": 0.06471831999999994,
+        "streams": 65,
+        "rate": 0.0009956664615384605,
+        "reportingLatency": {
+          "reportDate": "2026-02-19",
+          "saleMonth": "2025-12"
+        }
+      },
+      {
+        "store": "Pandora",
+        "revenue": 0.062350960000000004,
+        "streams": 14,
+        "rate": 0.00445364,
+        "reportingLatency": {
+          "reportDate": "2026-02-11",
+          "saleMonth": "2025-12"
+        }
+      },
+      {
+        "store": "iTunes Match",
+        "revenue": 0.040131660000000006,
+        "streams": 62,
+        "rate": 0.0006472848387096775,
+        "reportingLatency": {
+          "reportDate": "2026-02-26",
+          "saleMonth": "2026-01"
+        }
+      },
+      {
+        "store": "TikTok (Social Media Pack)",
+        "revenue": 0.028243559999999994,
+        "streams": 34,
+        "rate": 0.0008306929411764704,
+        "reportingLatency": {
+          "reportDate": "2026-02-19",
+          "saleMonth": "2025-12"
+        }
+      },
+      {
+        "store": "NetEase",
+        "revenue": 0.0076454900000000004,
+        "streams": 18,
+        "rate": 0.00042474944444444445,
+        "reportingLatency": {
+          "reportDate": "2025-12-30",
+          "saleMonth": "2025-09"
+        }
+      },
+      {
+        "store": "Snap",
+        "revenue": 0.0062108300000000005,
+        "streams": 2,
+        "rate": 0.0031054150000000003,
+        "reportingLatency": {
+          "reportDate": "2025-08-29",
+          "saleMonth": "2025-07"
+        }
+      },
+      {
+        "store": "Tencent Direct Deal",
+        "revenue": 0.00300349,
+        "streams": 6,
+        "rate": 0.0005005816666666667,
+        "reportingLatency": {
+          "reportDate": "2026-02-07",
+          "saleMonth": "2025-09"
+        }
+      },
+      {
+        "store": "Luna",
+        "revenue": 0.00073365,
+        "streams": 6,
+        "rate": 0.000122275,
+        "reportingLatency": {
+          "reportDate": "2026-01-26",
+          "saleMonth": "2025-06"
+        }
+      },
+      {
+        "store": "Anghami",
+        "revenue": 0.00052427,
+        "streams": 1,
+        "rate": 0.00052427,
+        "reportingLatency": {
+          "reportDate": "2025-12-07",
+          "saleMonth": "2024-12"
+        }
+      },
+      {
+        "store": "BoomplayCMS",
+        "revenue": 0.00004753,
+        "streams": 1,
+        "rate": 0.00004753,
+        "reportingLatency": {
+          "reportDate": "2025-08-01",
+          "saleMonth": "2024-10"
+        }
+      }
+    ],
+    "tracks": [
+      {
+        "title": "Mean Look (Gothitelle Cut)",
+        "revenue": 98.13040948000004,
+        "streams": 13130
+      },
+      {
+        "title": "Power Whip (Tsareena Step)",
+        "revenue": 62.423135439999974,
+        "streams": 7512
+      },
+      {
+        "title": "Lovely Kiss (Jynx Anthem)",
+        "revenue": 59.41691632000003,
+        "streams": 7631
+      },
+      {
+        "title": "Jigglypuff's Song (Uproar Ver.)",
+        "revenue": 34.911975339999984,
+        "streams": 5369
+      },
+      {
+        "title": "Magic Bounce (Hatterene Master)",
+        "revenue": 25.69156768,
+        "streams": 3085
+      },
+      {
+        "title": "Your Boyfriend is So Shady (Energy Upgrade)",
+        "revenue": 22.72113521999999,
+        "streams": 4352
+      },
+      {
+        "title": "Pixilate (Gardevoir Dub)",
+        "revenue": 19.443000989999994,
+        "streams": 1966
+      },
+      {
+        "title": "Banned Badge (Intro)",
+        "revenue": 13.441194070000002,
+        "streams": 1300
+      },
+      {
+        "title": "Jigglypuff’s Song (Rock Slide Version)",
+        "revenue": 11.399896459999999,
+        "streams": 1738
+      },
+      {
+        "title": "Still Typing...",
+        "revenue": 9.212360709999997,
+        "streams": 1590
+      },
+      {
+        "title": "Not Your Dragon",
+        "revenue": 8.832652490000001,
+        "streams": 950
+      },
+      {
+        "title": "Clefairy Clefairy",
+        "revenue": 8.55447877,
+        "streams": 2303
+      },
+      {
+        "title": "Lavender's a Death Game (Gengar Version)",
+        "revenue": 8.23409454,
+        "streams": 719
+      },
+      {
+        "title": "プリンのうた (エコーボイスVer.)",
+        "revenue": 8.227679290000005,
+        "streams": 1900
+      },
+      {
+        "title": "Staryu Starmie (Aqua Jet Ver.)",
+        "revenue": 6.060120429999999,
+        "streams": 565
+      },
+      {
+        "title": "Gameboy at the Beach",
+        "revenue": 5.369495370000002,
+        "streams": 534
+      },
+      {
+        "title": "Everything Is Fine (Regen v2.0)",
+        "revenue": 5.359554890000001,
+        "streams": 768
+      },
+      {
+        "title": "Staryu Starmie",
+        "revenue": 5.12182238,
+        "streams": 397
+      },
+      {
+        "title": "VanSham Inc.",
+        "revenue": 5.109446240000001,
+        "streams": 408
+      },
+      {
+        "title": "Dragonite My Fallen Star (Dragon Dance Ver.)",
+        "revenue": 4.84076939,
+        "streams": 1058
+      },
+      {
+        "title": "Jigglypuff's Song (Teeter Dance Ver.)",
+        "revenue": 4.77533713,
+        "streams": 491
+      },
+      {
+        "title": "Your Boyfriend is So Shady",
+        "revenue": 4.650149880000001,
+        "streams": 503
+      },
+      {
+        "title": "Jigglypuff’s Song (Sweet Kiss Version)",
+        "revenue": 4.639309109999998,
+        "streams": 925
+      },
+      {
+        "title": "Lavender's a Death Game (Haunter Version)",
+        "revenue": 4.257728299999999,
+        "streams": 371
+      },
+      {
+        "title": "Staryu Starmie (Cosmic Power Ver.)",
+        "revenue": 4.25585764,
+        "streams": 592
+      },
+      {
+        "title": "Clefairy Clefairy (Moonlight Ver.)",
+        "revenue": 4.2360985300000005,
+        "streams": 603
+      },
+      {
+        "title": "Just a Ditto",
+        "revenue": 3.7300462599999995,
+        "streams": 534
+      },
+      {
+        "title": "Smear Campaign",
+        "revenue": 3.339706840000001,
+        "streams": 4403
+      },
+      {
+        "title": "Guys Who Don’t Like Me",
+        "revenue": 3.1124585999999996,
+        "streams": 276
+      },
+      {
+        "title": "Never With Teeth",
+        "revenue": 2.995891659999999,
+        "streams": 1587
+      },
+      {
+        "title": "Jigglypuff’s Song (Echoed Voice Version)",
+        "revenue": 2.8103802300000003,
+        "streams": 585
+      },
+      {
+        "title": "Dragonite, My Fallen Star",
+        "revenue": 2.81033366,
+        "streams": 331
+      },
+      {
+        "title": "Fix Me (8‑Bit Build)",
+        "revenue": 2.7957890899999995,
+        "streams": 402
+      },
+      {
+        "title": "Sorry My Hands Are So Cold",
+        "revenue": 2.5082071600000004,
+        "streams": 348
+      },
+      {
+        "title": "Shiny Addiction",
+        "revenue": 2.2471155400000002,
+        "streams": 206
+      },
+      {
+        "title": "Jigglypuff’s Song (Hyper Voice Version)",
+        "revenue": 2.014131730000001,
+        "streams": 365
+      },
+      {
+        "title": "All the Gays Go to the Gym (v2.0)",
+        "revenue": 2.0106445699999997,
+        "streams": 278
+      },
+      {
+        "title": "Evolution (Everstone Ver.)",
+        "revenue": 1.90163283,
+        "streams": 448
+      },
+      {
+        "title": "Version of Events",
+        "revenue": 1.8432157699999994,
+        "streams": 245
+      },
+      {
+        "title": "I Don’t Need Your Speed (Dreamrock Build)",
+        "revenue": 1.8204332500000002,
+        "streams": 293
+      },
+      {
+        "title": "Version of Events (Mainstage Build)",
+        "revenue": 1.7955733700000003,
+        "streams": 225
+      },
+      {
+        "title": "My Malamar",
+        "revenue": 1.50873478,
+        "streams": 229
+      },
+      {
+        "title": "So Electrical",
+        "revenue": 1.5040245899999998,
+        "streams": 264
+      },
+      {
+        "title": "Evolution (Thunder Stone Ver.)",
+        "revenue": 1.4425249600000003,
+        "streams": 240
+      },
+      {
+        "title": "Evolution (Kawarazu no Ishi Ver.)",
+        "revenue": 1.4298391599999993,
+        "streams": 221
+      },
+      {
+        "title": "Pure Projection",
+        "revenue": 1.41461412,
+        "streams": 79
+      },
+      {
+        "title": "Ghosted on Leg Day",
+        "revenue": 1.41367748,
+        "streams": 191
+      },
+      {
+        "title": "Try Better",
+        "revenue": 1.3477963499999999,
+        "streams": 163
+      },
+      {
+        "title": "Don't Call Me Ridiculous",
+        "revenue": 1.3065042100000004,
+        "streams": 134
+      },
+      {
+        "title": "All the Gays Go to the Gym",
+        "revenue": 1.3033236799999997,
+        "streams": 238
+      },
+      {
+        "title": "Purin no Uta (Encore Ver.)",
+        "revenue": 1.24101409,
+        "streams": 222
+      },
+      {
+        "title": "Word Salad",
+        "revenue": 1.1696140299999997,
+        "streams": 99
+      },
+      {
+        "title": "Remind Me Tomorrow (8‑Bit Build)",
+        "revenue": 0.9824049200000002,
+        "streams": 159
+      },
+      {
+        "title": "Can I Use Your Pool?",
+        "revenue": 0.9654588599999998,
+        "streams": 148
+      },
+      {
+        "title": "Pure Projection (Stripped Build)",
+        "revenue": 0.9530265900000002,
+        "streams": 63
+      },
+      {
+        "title": "Blueberry Tub",
+        "revenue": 0.8345544099999999,
+        "streams": 115
+      },
+      {
+        "title": "Placebo Flex",
+        "revenue": 0.7819462499999998,
+        "streams": 85
+      },
+      {
+        "title": "Jigglypuff’s Song (Perish Song Version)",
+        "revenue": 0.73253185,
+        "streams": 275
+      },
+      {
+        "title": "Shiny Addiction (Charm Ver.)",
+        "revenue": 0.727914,
+        "streams": 38
+      },
+      {
+        "title": "I Want to Want to",
+        "revenue": 0.6439159999999999,
+        "streams": 72
+      },
+      {
+        "title": "Clefairy Clefairy (Tsuki no Hikari Ver.)",
+        "revenue": 0.6350651500000002,
+        "streams": 108
+      },
+      {
+        "title": "Call Me Anytime",
+        "revenue": 0.605761,
+        "streams": 92
+      },
+      {
+        "title": "Opposition Research (Orchestra Patch)",
+        "revenue": 0.59962682,
+        "streams": 83
+      },
+      {
+        "title": "Goodbye Hello",
+        "revenue": 0.5869932700000001,
+        "streams": 66
+      },
+      {
+        "title": "We Have Telepathy",
+        "revenue": 0.5741692700000001,
+        "streams": 69
+      },
+      {
+        "title": "Flake on Me (v2.0)",
+        "revenue": 0.5557149400000001,
+        "streams": 75
+      },
+      {
+        "title": "Gameboy at the Beach (Dreamboy Build)",
+        "revenue": 0.55339959,
+        "streams": 109
+      },
+      {
+        "title": "Chimecho Chiriin (Haipaa Boisu Ver.)",
+        "revenue": 0.53297141,
+        "streams": 52
+      },
+      {
+        "title": "Pokemon Center Joy (Kaifuku Ver.)",
+        "revenue": 0.5316069700000001,
+        "streams": 60
+      },
+      {
+        "title": "Evolution (Kaminari no Ishi Ver.)",
+        "revenue": 0.5233834300000002,
+        "streams": 111
+      },
+      {
+        "title": "Hypnotize It Away (Regen v2.0)",
+        "revenue": 0.51700282,
+        "streams": 65
+      },
+      {
+        "title": "Cheat Codes On (8-Bit Build)",
+        "revenue": 0.48408254999999994,
+        "streams": 84
+      },
+      {
+        "title": "But You're Gone",
+        "revenue": 0.4561894,
+        "streams": 52
+      },
+      {
+        "title": "Post‑Logic",
+        "revenue": 0.4452449199999999,
+        "streams": 55
+      },
+      {
+        "title": "Just to Be Sure",
+        "revenue": 0.44318875,
+        "streams": 58
+      },
+      {
+        "title": "Too Many Moves",
+        "revenue": 0.44068032999999995,
+        "streams": 67
+      },
+      {
+        "title": "Crimescene Getaway (Regen v2.0)",
+        "revenue": 0.44003057,
+        "streams": 58
+      },
+      {
+        "title": "Just a Ditto (Foreign Metamon Ver.)",
+        "revenue": 0.4203035000000001,
+        "streams": 68
+      },
+      {
+        "title": "Kimi ni",
+        "revenue": 0.40937871,
+        "streams": 83
+      },
+      {
+        "title": "Kioku Soushitsu",
+        "revenue": 0.39782301,
+        "streams": 75
+      },
+      {
+        "title": "Fix Me",
+        "revenue": 0.3963611500000001,
+        "streams": 64
+      },
+      {
+        "title": "Useless Feeling",
+        "revenue": 0.3877442,
+        "streams": 57
+      },
+      {
+        "title": "Your Boyfriend is So Shady (Orchestra Patch)",
+        "revenue": 0.38584088000000005,
+        "streams": 57
+      },
+      {
+        "title": "Red Flags and Fireworks",
+        "revenue": 0.36484604000000004,
+        "streams": 38
+      },
+      {
+        "title": "Looking for K",
+        "revenue": 0.36241994000000005,
+        "streams": 63
+      },
+      {
+        "title": "If I Were You",
+        "revenue": 0.35459938,
+        "streams": 51
+      },
+      {
+        "title": "Cognitive Dissonance",
+        "revenue": 0.3532610800000001,
+        "streams": 49
+      },
+      {
+        "title": "Fuck!… I Did It Again",
+        "revenue": 0.34960495999999996,
+        "streams": 38
+      },
+      {
+        "title": "I Don’t Wanna Do Anything",
+        "revenue": 0.34390173,
+        "streams": 56
+      },
+      {
+        "title": "Crime Scene Getaway (Country Ver.)",
+        "revenue": 0.32362095,
+        "streams": 42
+      },
+      {
+        "title": "Flake on Me",
+        "revenue": 0.30714622,
+        "streams": 65
+      },
+      {
+        "title": "People Change",
+        "revenue": 0.29825309,
+        "streams": 53
+      },
+      {
+        "title": "I Don't Need Your Speed",
+        "revenue": 0.26402256999999996,
+        "streams": 23
+      },
+      {
+        "title": "Opposition Research",
+        "revenue": 0.26019073,
+        "streams": 28
+      },
+      {
+        "title": "I’m Hooked (Energy Upgrade)",
+        "revenue": 0.25850327,
+        "streams": 32
+      },
+      {
+        "title": "Too Much",
+        "revenue": 0.25467183,
+        "streams": 30
+      },
+      {
+        "title": "Spin With Me (Staryu Starmie)",
+        "revenue": 0.23269059,
+        "streams": 39
+      },
+      {
+        "title": "Yes You Can’t",
+        "revenue": 0.23079327000000005,
+        "streams": 37
+      },
+      {
+        "title": "Remind Me Tomorrow",
+        "revenue": 0.22448056,
+        "streams": 29
+      },
+      {
+        "title": "Cognitive Dissonance (v1.1)",
+        "revenue": 0.21805245999999998,
+        "streams": 30
+      },
+      {
+        "title": "I Don't Need Your Speed (Country Ver.)",
+        "revenue": 0.21640267000000005,
+        "streams": 25
+      },
+      {
+        "title": "Cheat Codes On",
+        "revenue": 0.20305581,
+        "streams": 28
+      },
+      {
+        "title": "My Lawyer Said No",
+        "revenue": 0.20256709999999994,
+        "streams": 27
+      },
+      {
+        "title": "Bideo Game",
+        "revenue": 0.17230291,
+        "streams": 22
+      },
+      {
+        "title": "Nothing in This World",
+        "revenue": 0.17157995,
+        "streams": 24
+      },
+      {
+        "title": "Pallet Town Dreaming (Masara Town Ver.)",
+        "revenue": 0.16675647000000002,
+        "streams": 26
+      },
+      {
+        "title": "Want to Fly Away",
+        "revenue": 0.16548307,
+        "streams": 25
+      },
+      {
+        "title": "Shiny Addiction (Irochigai Ver.)",
+        "revenue": 0.15734106000000003,
+        "streams": 26
+      },
+      {
+        "title": "In the Gray",
+        "revenue": 0.15443144000000003,
+        "streams": 17
+      },
+      {
+        "title": "Crime Scene Getaway",
+        "revenue": 0.14888762,
+        "streams": 18
+      },
+      {
+        "title": "Back to One",
+        "revenue": 0.11746569000000001,
+        "streams": 33
+      },
+      {
+        "title": "Word Salad (Unburdened ver.)",
+        "revenue": 0.08391694000000001,
+        "streams": 34
+      },
+      {
+        "title": "Crime Scene Getaway (Lounge Ver.)",
+        "revenue": 0.03940354,
+        "streams": 6
+      },
+      {
+        "title": "I Don't Need Your Speed (Piano Ver.)",
+        "revenue": 0.038335310000000004,
+        "streams": 11
+      },
+      {
+        "title": "Crime Scene Getaway (Rock Ver.)",
+        "revenue": 0.03433426,
+        "streams": 4
+      },
+      {
+        "title": "I Don't Need Your Speed (A Cappella Ver.)",
+        "revenue": 0.01914935,
+        "streams": 1
+      }
+    ],
+    "advice": "<ul>\n  <li><strong>Overall Performance Snapshot:</strong> Kirbai OS has generated a total revenue of $527.17 from 77,019 streams as of 2026-03-10.</li>\n  <li><strong>Platform Revenue Dominance:</strong>\n    <ul>\n      <li><strong>YouTube (Red):</strong> $247.01 (46.85% of total revenue) from 25,415 streams, yielding a robust rate of $0.0097 per stream. Streams accounted for through 2026-01 (reported on 2026-02-24), indicating a 2-month reporting lag.</li>\n      <li><strong>Apple Music:</strong> $172.07 (32.64% of total revenue) from 26,183 streams, with a rate of $0.0066 per stream. Streams accounted for through 2026-01 (reported on 2026-02-26), indicating a 2-month reporting lag.</li>\n      <li><strong>iTunes Songs:</strong> $55.92 (10.61% of total revenue) from only 90 units, showcasing an exceptionally high rate of $0.6213 per unit, reflecting direct sales. Sales accounted for through 2026-01 (reported on 2026-02-26), indicating a 2-month reporting lag.</li>\n      <li><strong>YouTube (Ads):</strong> $34.01 (6.45% of total revenue) from 14,091 streams, at a low rate of $0.0024 per stream. Streams accounted for through 2026-01 (reported on 2026-02-24), indicating a 2-month reporting lag.</li>\n      <li><strong>Spotify:</strong> $16.02 (3.04% of total revenue) from 4,692 streams, with a rate of $0.0034 per stream. Streams accounted for through 2025-12 (reported on 2026-02-27), indicating a 3-month reporting lag.</li>\n    </ul>\n  </li>\n  <li><strong>Data Recency:</strong>\n    <ul>\n      <li>The most recent data is from YouTube (Red & Ads), Apple Music, and iTunes Songs, covering sales through January 2026.</li>\n      <li>The oldest data is from Spotify, covering sales through December 2025.</li>\n    </ul>\n  </li>\n  <li><strong>Top Performing Tracks:</strong>\n    <ul>\n      <li>\"Mean Look (Gothitelle Cut)\": Leading with $98.13 from 13,130 streams.</li>\n      <li>\"Power Whip (Tsareena Step)\": Contributing $62.42 from 7,512 streams.</li>\n      <li>\"Lovely Kiss (Jynx Anthem)\": Generating $59.42 from 7,631 streams.</li>\n    </ul>\n  </li>\n  <li><strong>Reporting Lag Protocol:</strong> It is critical to understand that the displayed figures represent finalized data up to the stated 'saleMonth'. The inherent reporting latency, particularly with platforms like Spotify showing a 3-month lag, means these aggregates will consistently appear lower than real-time analytical dashboards. This is due to the sequential process of data aggregation, validation, and payment processing by digital service providers before official reporting to distributors.</li>\n</ul>",
+    "persistedAt": "2026-03-10T21:24:05.791Z"
+  }
+}

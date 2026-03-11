@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
+import { addMetadataPack, getDb, logApiUsage } from "@/lib/db";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
         `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
+            model: "gemini-2.5-flash-lite",
             contents: `Core Keyword: ${keyword}\nAlias: ${alias}`,
             config: {
                 systemInstruction: systemInstruction,
@@ -51,8 +52,23 @@ export async function POST(req: Request) {
             }
         });
 
+        if (response.usageMetadata) {
+            logApiUsage("/api/generate-metadata", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+        }
+
         if (response.text) {
             const generatedData = JSON.parse(response.text);
+
+            // Save to persistence
+            addMetadataPack({
+                alias,
+                keyword,
+                titles: generatedData.map((d: any) => d.title),
+                descriptions: generatedData.map((d: any) => d.description),
+                tags: [], // Tags are currently embedded in descriptions or can be extracted
+                timestamp: new Date().toISOString()
+            });
+
             return NextResponse.json({ metadata: generatedData });
         }
 
@@ -61,5 +77,14 @@ export async function POST(req: Request) {
     } catch (e: any) {
         console.error("Metadata Generation Error:", e);
         return NextResponse.json({ error: "Failed to generate metadata", details: e.message }, { status: 500 });
+    }
+}
+
+export async function GET() {
+    try {
+        const db = getDb();
+        return NextResponse.json({ history: db.metadataHistory });
+    } catch (e: any) {
+        return NextResponse.json({ error: "Failed to fetch history" }, { status: 500 });
     }
 }

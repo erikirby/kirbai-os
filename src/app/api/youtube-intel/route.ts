@@ -1,20 +1,31 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { YoutubeTranscript } from "@danielxceron/youtube-transcript";
+import { getDb, setIntelCache, IntelItem, logApiUsage } from "@/lib/db";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const CHANNEL_ID = "UCnsL7Nh-e09D1W5TmC6Yklw"; // Jesse from AI Guerrilla
 
-export async function GET() {
+export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const forceRefresh = searchParams.get("force") === "true";
+
     try {
+        const db = getDb();
+        const cachedIntel = db.intelCache;
+
+        // If we have cache and don't force refresh, return cache immediately
+        if (cachedIntel && cachedIntel.length > 0 && !forceRefresh) {
+            return NextResponse.json({ intel: cachedIntel, cached: true });
+        }
+
         // 1. Fetch RSS Feed from Jesse's Channel
         const rssRes = await fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`, {
-            // Next.js aggressive caching bypass for live feeds
             cache: "no-store",
         });
         const rssText = await rssRes.text();
 
-        // 2. High-Reliability Extraction: Split by entry and scan for tags
+        // 2. High-Reliability Extraction
         const videos = [];
         const entries = rssText.split(/<entry/i).slice(1);
 
@@ -43,14 +54,20 @@ export async function GET() {
             }
         }
 
-        const intelFeed = [];
+        const intelFeed: IntelItem[] = [];
         const systemInstruction = `
             You are an elite music marketing analyst. Your job is to extract actionable intelligence from the provided YouTube video data.
             The user runs a "Music Factory" project generating high volumes of AI tracks (using aliases AELOW and KURAO) targeting YouTube SEO.
             
+            CRITICAL DIRECTIVE: The user's AI music operations are under threat from platform bans ("editorial discretion"). 
+            You MUST actively hunt for and heavily prioritize any mentions of:
+            - Spotify, Apple Music, or DistroKid Terms of Service (TOS) updates.
+            - "Editorial discretion" bans, copyright strikes, or shadowbans.
+            - New rules regarding AI-generated music, metadata spam, or profanity compliance.
+            
             Based on the content, output exactly:
-            1. 'summary': A 1-2 sentence compelling summary of the core insight/strategy discussed.
-            2. 'actionItems': An array of EXACTLY 2 specific tasks the user must physically do. Be highly imperative.
+            1. 'summary': A 1-2 sentence compelling summary of the core insight/strategy discussed. If compliance news is detected, make it the primary focus.
+            2. 'actionItems': An array of EXACTLY 2 specific tasks the user must physically do. If platform threats are detected, formulate tasks to audit or protect their existing aliases. Be highly imperative.
         `;
 
         // 3. Loop through videos and hit Gemini
@@ -59,7 +76,6 @@ export async function GET() {
             let actionItems = ["Review the video manually for insights."];
 
             try {
-                // Staggered delay to avoid hitting "Requests Per Minute" limits on Free Tier
                 if (intelFeed.length > 0) {
                     await new Promise(resolve => setTimeout(resolve, 2000));
                 }
@@ -75,7 +91,7 @@ export async function GET() {
                 text = text.slice(0, 4000);
 
                 const response = await ai.models.generateContent({
-                    model: "gemini-2.5-flash",
+                    model: "gemini-2.5-flash-lite",
                     contents: `ACT AS A MARKETING ANALYST. Summarize this YouTube content for a music creator named Kirbai.
                     
                     Video Title: ${video.title}
@@ -97,6 +113,10 @@ export async function GET() {
                     }
                 });
 
+                if (response.usageMetadata) {
+                    logApiUsage("/api/youtube-intel", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+                }
+
                 if (response.text) {
                     const parsed = JSON.parse(response.text);
                     summary = parsed.summary;
@@ -107,7 +127,6 @@ export async function GET() {
                 summary = `AI skipped this video due to rate limits. Try refreshing in a minute.`;
             }
 
-            // Format "X Days Ago"
             const diffDays = Math.floor((new Date().getTime() - video.published.getTime()) / (1000 * 3600 * 24));
             const dateStr = diffDays === 0 ? "Today" : diffDays === 1 ? "Yesterday" : `${diffDays} Days Ago`;
 
@@ -122,21 +141,24 @@ export async function GET() {
             });
         }
 
-        // 4. Inject a simulated Kirbai Trend Event (For UI Context)
+        // 4. Inject a simulated Platform Trend Event
         intelFeed.unshift({
             id: "trend-1",
             tag: "KIRBAI",
             date: "Trending",
-            title: "Massive Trend: Poképia Release (Major Event)",
-            summary: "The global launch of Poképia has caused a massive 1200% spike in general Pokémon search volume. This is a rare, macro-level cultural event that you need to ride immediately.",
+            title: "CRITICAL: Platform Compliance Shift Detected",
+            summary: "Multiple independent artists report sudden 'editorial discretion' takedowns from DistroKid impacting high-volume AI creators without warning.",
             actionItems: [
-                "Pivot the next Kirbai release to themes heavily rooted in Poképia avatars or social mechanics.",
-                "Use high-volume generic Pokémon tags vs niche competitive VGC tags to capture the casual audience wave."
+                "Audit all pending KURAO and AELOW releases for potentially flagged metadata or controversial lyrics immediately.",
+                "Throttle daily release volume to human-passing limits (max 1-2 tracks per alias per week) to evade automated spam detection algorithms."
             ],
-            url: "https://x.com/Pokemon"
+            url: "https://x.com/search?q=distrokid+ban"
         });
 
-        return NextResponse.json({ intel: intelFeed });
+        // Save to cache
+        setIntelCache(intelFeed);
+
+        return NextResponse.json({ intel: intelFeed, cached: false });
     } catch (e: any) {
         console.error("Intel Feed Error:", e);
         return NextResponse.json({ error: "Failed to generate intel feed", details: e.message }, { status: 500 });

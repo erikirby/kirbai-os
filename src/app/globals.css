@@ -1,21 +1,243 @@
 @import "tailwindcss";
 
 @theme {
-  --color-accent: #FF3366;
-  --color-background: #000000;
-  --color-foreground: #FFFFFF;
-  --color-surface: #111111;
-  --color-border: #333333;
+  --color-accent: var(--accent-color, #FF3366);
+  --color-accent-sunset: var(--accent-sunset, #FF8C42);
+  --color-background: var(--bg-color, #121212);
+  --color-foreground: var(--fg-color, #FFFFFF);
+  --color-surface: var(--surface-color, #1A1A1A);
+  --color-border: var(--border-color, #2A2A2A);
+
+  --animate-pulse-slow: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
 
 :root {
-  color-scheme: dark;
+  /* Soft Dark (Default) */
+  --bg-color: #121212;
+  --fg-color: #F8F8F8;
+  --surface-color: #1A1A1A;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --accent-color: #FF3366;
+  --accent-sunset: #FF8C42;
+  --panel-blur: 24px;
 }
 
+html[data-theme='light'] {
+  /* Warm Sunset / Sand Palette */
+  --bg-color: #F4EBD0;
+  --fg-color: #2D1E2F;
+  --surface-color: #EAE0C5;
+  --border-color: rgba(45, 30, 47, 0.15);
+  --accent-color: #FF8C42;
+  --accent-sunset: #D84315;
+  --panel-blur: 16px;
+}
+
+html[data-theme='pink'] {
+  /* True Pastel Pink with High Contrast Text */
+  --bg-color: #FFF0F5;
+  /* Lavender Blush - very light pastel pink */
+  --fg-color: #880E4F;
+  /* Deep Magenta - high contrast for readability */
+  --surface-color: #FCE4EC;
+  /* Slightly darker pastel for cards */
+  --border-color: rgba(136, 14, 79, 0.15);
+  /* Subtle deep magenta border */
+  --accent-color: #D81B60;
+  /* Vibrant Pink */
+  --accent-sunset: #AD1457;
+  /* Rich Dark Pink */
+  --panel-blur: 20px;
+}
+
+html[data-theme='pink'] body {
+  background-color: #FFF0F5 !important;
+}
+
+html[data-theme='snes'] {
+  /* Classic SNES Hardware UI mapped to exact palette */
+  --bg-color: #b5b6e4;
+  /* Light Periwinkle */
+  --fg-color: #211a21;
+  /* Almost Black (High contrast text) */
+  --surface-color: #cec9cc;
+  /* Light Gray cards */
+  --border-color: #908a99;
+  /* Medium Gray */
+  --accent-color: #4f43ae;
+  /* Indigo */
+  --accent-sunset: #4f43ae;
+  --panel-blur: 0px;
+}
+
+html[data-theme='gbc'] {
+  /* Gameboy DMG Classic */
+  --bg-color: #c2c0bc;
+  /* Grey Shell */
+  --fg-color: #081820;
+  /* Dark Black/Green Text */
+  --surface-color: #e0f8d0;
+  /* Classic Green LCD Screen */
+  --border-color: #081820;
+  /* Dark outlines for LCD frames */
+  --accent-color: #9b2256;
+  /* Burgundy (A/B Buttons) */
+  --accent-sunset: #484686;
+  /* Dark Blue (D-Pad/Select/Start) */
+  --panel-blur: 0px;
+}
+
+html[data-theme='gbc'] body {
+  background-color: var(--bg-color) !important;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1.5px, transparent 1.5px) !important;
+  background-size: 6px 6px !important;
+}
+
+/* GBC specific box shadows and borders (pixel look) */
+html[data-theme='gbc'] .squircle {
+  border-radius: 0 !important;
+  /* Sharp corners for pixel look */
+  border: 2px solid var(--border-color) !important;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15) !important;
+}
+
+html[data-theme='gbc'] .glass,
+html[data-theme='gbc'] .glass-accent {
+  backdrop-filter: none !important;
+  background: var(--surface-color) !important;
+  border: 2px solid var(--border-color) !important;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15) !important;
+}
+
+
+
 body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
+  background-color: var(--bg-color);
+  color: var(--fg-color);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
+  background-image:
+    radial-gradient(circle at 15% 15%, color-mix(in srgb, var(--accent-color) 4%, transparent) 0%, transparent 35%),
+    radial-gradient(circle at 85% 85%, color-mix(in srgb, var(--accent-sunset) 3%, transparent) 0%, transparent 35%);
+  background-attachment: fixed;
+  transition: background-color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 2026 Modern: Squircles (Continuous Corners) */
+.squircle {
+  border-radius: 2rem;
+  overflow: hidden;
+}
+
+/* 2026 Modern: Specular Reflections (Inner Gloss) */
+.specular-reflect {
+  position: relative;
+  overflow: hidden;
+}
+
+.specular-reflect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  pointer-events: none;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: color-mix(in srgb, var(--surface-color) 70%, transparent);
+  backdrop-filter: blur(var(--panel-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--panel-blur)) saturate(160%);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+}
+
+.glass-accent {
+  background: color-mix(in srgb, var(--accent-color) 5%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--accent-color) 15%, transparent);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-sunset) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* SFC (Super Famicom) Controller Button Styles */
+[data-theme='snes'] .snes-btn-blue {
+  background: #0067B1 !important;
+  border: 2px solid #004a80 !important;
+  border-bottom: 6px solid #003a66 !important;
+  color: white !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='snes'] .snes-btn-green {
+  background: #009E3D !important;
+  border: 2px solid #00702b !important;
+  border-bottom: 6px solid #005621 !important;
+  color: white !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='snes'] .snes-btn-red {
+  background: #FF3F3F !important;
+  border: 2px solid #cc3232 !important;
+  border-bottom: 6px solid #a32828 !important;
+  color: white !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='snes'] .snes-btn-yellow {
+  background: #FFCE00 !important;
+  border: 2px solid #cca500 !important;
+  border-bottom: 6px solid #a38400 !important;
+  color: #211551 !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='snes'] .glass {
+  background: #E0E0E0 !important;
+  border: 2px solid #FFFFFF !important;
+  border-right-color: #A0A0A0 !important;
+  border-bottom-color: #A0A0A0 !important;
+  box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.8), 4px 4px 15px rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: none !important;
+}
+
+[data-theme='snes'] .squircle {
+  border-radius: 0.5rem !important;
+  /* SNES is blocky */
+}
+
+[data-theme='snes'] button:active,
+[data-theme='snes'] .snes-btn-active {
+  transform: translateY(4px) !important;
+  border-bottom-width: 2px !important;
+  box-shadow: none !important;
+}
+
+/* Gamification: XP Progress Bar */
+.xp-bar-inner {
+  background: linear-gradient(90deg, var(--accent-color), var(--accent-sunset));
+  box-shadow: 0 0 10px var(--accent-color);
+  transition: width 1s ease-in-out;
 }
