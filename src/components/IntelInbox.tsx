@@ -255,7 +255,13 @@ export default function IntelInbox({ mode = "full", theme = "dark", activeTab = 
                     {intel.map((item: any) => (
                         <div key={item.id} className="flex flex-col gap-6 p-10 bg-surface/20 border border-border/10 squircle hover:bg-surface/30 hover:border-accent/40 transition-all duration-1000 specular-reflect shadow-2xl overflow-hidden group">
                             <div className="flex justify-between items-center relative z-10">
-                                <span className={`text-[10px] font-black tracking-[0.3em] px-4 py-1.5 rounded-full uppercase ${item.tag === "KIRBAI" ? "bg-accent/15 text-accent" : "bg-black/40 text-foreground/40 border border-border/10"}`}>
+                                <span className={`text-[10px] font-black tracking-[0.3em] px-4 py-1.5 rounded-full uppercase ${
+                                    item.tag === "KIRBAI" 
+                                        ? "bg-accent/15 text-accent" 
+                                        : item.tag === "NEWSLETTER"
+                                            ? "bg-pink-500/10 text-pink-400 border border-pink-500/20"
+                                            : "bg-black/40 text-foreground/40 border border-border/10"
+                                }`}>
                                     {item.tag}
                                 </span>
                                 <span className="text-[10px] font-mono text-foreground/40 font-bold">{item.date}</span>

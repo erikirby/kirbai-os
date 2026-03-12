@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { YoutubeTranscript } from "@danielxceron/youtube-transcript";
-import { getDb, setIntelCache, IntelItem, logApiUsage } from "@/lib/db";
+import { getDbAsync, setIntelCacheAsync, IntelItem, logApiUsageAsync } from "@/lib/db";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const CHANNEL_ID = "UCnsL7Nh-e09D1W5TmC6Yklw"; // Jesse from AI Guerrilla
@@ -11,11 +11,15 @@ export async function GET(req: Request) {
     const forceRefresh = searchParams.get("force") === "true";
 
     try {
-        const db = getDb();
+        const db = await getDbAsync();
         const cachedIntel = db.intelCache;
 
-        // If we have cache and don't force refresh, return cache immediately
-        if (cachedIntel && cachedIntel.length > 0 && !forceRefresh) {
+        // Check for 24-hour cache expiration
+        const lastUpdated = (db as any).intelLastUpdated || 0;
+        const now = Date.now();
+        const isExpired = now - lastUpdated > 24 * 60 * 60 * 1000;
+
+        if (cachedIntel && cachedIntel.length > 0 && !forceRefresh && !isExpired) {
             return NextResponse.json({ intel: cachedIntel, cached: true });
         }
 
@@ -114,7 +118,7 @@ export async function GET(req: Request) {
                 });
 
                 if (response.usageMetadata) {
-                    logApiUsage("/api/youtube-intel", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+                    await logApiUsageAsync("/api/youtube-intel", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
                 }
 
                 if (response.text) {
@@ -141,7 +145,19 @@ export async function GET(req: Request) {
             });
         }
 
-        // 4. Inject a simulated Platform Trend Event
+        // 4. Sync Newsletter Intel
+        try {
+            const origin = new URL(req.url).origin;
+            const newsRes = await fetch(`${origin}/api/sync-newsletter`, { cache: 'no-store' });
+            const newsData = await newsRes.json();
+            if (newsData.success && newsData.intel) {
+                intelFeed.push(...newsData.intel);
+            }
+        } catch (newsErr) {
+            console.error("Newsletter integration failed:", newsErr);
+        }
+
+        // 5. Inject a simulated Platform Trend Event
         intelFeed.unshift({
             id: "trend-1",
             tag: "KIRBAI",
@@ -155,8 +171,14 @@ export async function GET(req: Request) {
             url: "https://x.com/search?q=distrokid+ban"
         });
 
-        // Save to cache
-        setIntelCache(intelFeed);
+        // Save to cache with timestamp
+        const updatedDb = await getDbAsync();
+        updatedDb.intelCache = intelFeed;
+        (updatedDb as any).intelLastUpdated = Date.now();
+        await setIntelCacheAsync(intelFeed);
+        // Note: setIntelCacheAsync only sets intelCache, we might need a dedicated db.setRow for the timestamp if we want it clean
+        const { setRow } = await import("@/lib/db");
+        await setRow('intel_last_updated', Date.now());
 
         return NextResponse.json({ intel: intelFeed, cached: false });
     } catch (e: any) {
