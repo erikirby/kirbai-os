@@ -864,8 +864,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                         <div className="grid grid-cols-1 gap-4">
                                             {activeMission.shots.map((shot, idx) => (
                                                 <div key={shot.id} className={`p-6 rounded-3xl flex flex-col gap-4 border transition-all ${shot.isProduced ? 'bg-accent/[0.03] border-accent/20 opacity-80' : 'bg-black/40 border-white/5'}`}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
+                                                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                                                        <div className="flex items-center gap-3 flex-wrap">
                                                             <div className={`px-2 py-1 rounded-md text-[10px] font-mono font-black border ${shot.isProduced ? 'bg-accent/20 border-accent/40 text-accent' : 'bg-accent/5 border-white/5 text-accent'}`}>
                                                                 {shot.timestamp}
                                                             </div>
@@ -877,7 +877,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                 {shot.isProduced ? "Produced" : "Mark Finished"}
                                                             </button>
                                                         </div>
-                                                        <div className="flex gap-2 items-center">
+                                                        <div className="flex gap-2 items-center flex-wrap">
                                                             <button 
                                                                 onClick={() => copyPrompt(shot.bananaPromptV2 || shot.bananaPrompt || "", `${shot.id}-banana`)}
                                                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all ${copiedId === `${shot.id}-banana` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-surface/40 border-border/10 hover:border-accent'}`}
@@ -893,7 +893,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                 Grok
                                                             </button>
                                                             {shot.refLabels && shot.refLabels.map((lbl, li) => (
-                                                                <div key={li} className="ml-2 px-3 py-1.5 bg-accent/5 border border-accent/20 rounded-xl flex items-center gap-2">
+                                                                <div key={li} className="px-3 py-1.5 bg-accent/5 border border-accent/20 rounded-xl flex items-center gap-2">
                                                                     <Camera className="w-3 h-3 text-accent" />
                                                                     <span className="text-[9px] font-black uppercase tracking-widest text-accent/60">USE: {lbl}</span>
                                                                 </div>
