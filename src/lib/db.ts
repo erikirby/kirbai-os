@@ -183,18 +183,29 @@ export function getFinanceAnalysis() {
     return null; // async callers use getFinanceAnalysisAsync
 }
 
-export async function saveRoadmapAsync(roadmapData: { phases: RoadmapPhase[], tasks: RoadmapTask[] }, mode?: string) {
-    const key = mode === 'factory' ? 'roadmap_factory' : 'roadmap';
-    await setRow(key, roadmapData);
-export async function saveRoadmapAsync(mode: string, roadmap: RoadmapData) {
+export interface RoadmapData {
+    phases: {
+        id: string;
+        title: string;
+        description: string;
+        status: "Current Objective" | "Pending Trajectory" | "Completed" | "Archived";
+        tasks?: {
+            id: string;
+            title: string;
+            description: string;
+            status: "Todo" | "In Progress" | "Done";
+            priority: "Low" | "Medium" | "High";
+        }[];
+    }[];
+}
+
+export async function saveRoadmapAsync(mode: string, roadmap: RoadmapData | { phases: RoadmapPhase[], tasks: RoadmapTask[] }) {
     const key = mode === 'factory' ? 'roadmap_factory' : 'roadmap_kirbai';
     await setRow(key, roadmap);
 }
 
-export function saveRoadmap(roadmapData: { phases: RoadmapPhase[], tasks: RoadmapTask[] }) {
-    // This sync version is now deprecated due to the new async signature
-    // For compatibility, it calls the new async version with a default mode and converts the data
-    saveRoadmapAsync('kirbai', { phases: roadmapData.phases }).catch(console.error);
+export function saveRoadmap(roadmapData: { phases: RoadmapPhase[], tasks: RoadmapTask[] }, mode: string = 'kirbai') {
+    saveRoadmapAsync(mode, roadmapData).catch(console.error);
 }
 
 export async function getRoadmapAsync(mode: string): Promise<RoadmapData> {
@@ -205,7 +216,7 @@ export async function getRoadmapAsync(mode: string): Promise<RoadmapData> {
 
 export async function addRoadmapTaskAsync(mode: string, title: string, description: string) {
     const roadmap = await getRoadmapAsync(mode);
-    const currentPhase = roadmap.phases.find(p => p.status === 'Current Objective') || roadmap.phases[0];
+    const currentPhase = (roadmap.phases as any[]).find(p => p.status === 'Current Objective') || roadmap.phases[0];
     
     if (currentPhase) {
         if (!currentPhase.tasks) currentPhase.tasks = [];

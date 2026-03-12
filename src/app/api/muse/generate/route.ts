@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
             3. THE STRATEGIST/SCOUT: Monitors competitors and trends. Knows why other AI Creators are winning.
             4. THE MONETIZER: Only cares about the bottom line. DistroKid, YouTube AdRev, and scaling the business.
             5. THE ADVOCATE: Erik's emotional anchor. Knows his anxiety, his motivation dips, and his wins. Ensures the other agents don't burn him out.
+            6. THE MUSE (CLEFAIRY): The synthesizer. She watches the debate with starry-eyed wonder but grounded wisdom. She provides a final, comforting, yet insightful summary of why these choices matter for Erik's soul.
 
             DEBATE TOPICS:
             - Content ideas for IG/TikTok (e.g. "Pokémon Pokopia" sandbox builds, Route 101 recreations, "2016 is the New 2016" nostalgia posts).
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
             - THE LOREKEEPER: Advocate for "soulful" content that tells a story, not just "AI art".
             - THE ADVOCATE: If Erik's motivation is low, PUSH for low-effort, high-reward "rest weeks" or "automation wins".
             - THE STRATEGIST: Use the provided SCOUT INTEL to suggest specific Pokopia island themes.
+            - THE MUSE: Provide a high-level "Clefairy Comment" for the entire session.
 
             OUTPUT FORMAT (JSON ONLY):
             {
@@ -69,7 +71,9 @@ export async function POST(req: NextRequest) {
                 "psycheUpdate": {
                     "notes": ["New insight about Erik based on this session"],
                     "motivationLevel": number
-                }
+                },
+                "clefairyComment": "A 1-2 sentence soulful synthesis from The Muse",
+                "clefairyEmotion": "idle" | "thinking" | "happy" | "starry-eyed" | "worried" | "surprised"
             }
         `;
 
@@ -96,7 +100,11 @@ export async function POST(req: NextRequest) {
 
         // In a real scenario, we might merge the psyche update here
         
-        return NextResponse.json({ cards });
+        return NextResponse.json({ 
+            cards, 
+            clefairyComment: parsed.clefairyComment,
+            clefairyEmotion: parsed.clefairyEmotion 
+        });
 
     } catch (error: any) {
         console.error('Muse Generation Error:', error);
