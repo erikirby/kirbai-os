@@ -14,7 +14,7 @@ import LoreMatrix from "@/components/LoreMatrix";
 import PromptBank from "@/components/PromptBank";
 import CreativeHub from "@/components/CreativeHub";
 import DirectorSuite from "@/components/DirectorSuite"; // Added import
-import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Share2 } from 'lucide-react';
+import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Share2, Menu, X, Home as HomeIcon, Clapperboard, Layers } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
 type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director"; // Added 'director'
@@ -24,6 +24,8 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("kirbai");
   const [activeModule, setActiveModule] = useState<Module>("roadmap");
   const [theme, setTheme] = useState<Theme>("dark");
+  const [showLauncher, setShowLauncher] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -51,8 +53,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Theme Switcher */}
-        <div className="flex items-center gap-4">
+        {/* Theme Switcher - Desktop Only */}
+        <div className="hidden lg:flex items-center gap-4">
           <div className="flex bg-surface/40 p-1 rounded-full border border-border/10 shadow-inner">
             {themes.map((t) => (
               <button
@@ -87,6 +89,57 @@ export default function Home() {
             </button>
           </div>
         </div>
+
+        {/* Mobile Settings Trigger */}
+        <button 
+          onClick={() => setShowSettings(!showSettings)}
+          className="lg:hidden p-3 bg-surface/40 border border-border/10 rounded-2xl text-accent shadow-lg"
+        >
+          <Settings2 className="w-5 h-5" />
+        </button>
+
+        {/* Mobile Settings Overlay */}
+        {showSettings && (
+          <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl p-10 flex flex-col gap-8 animate-in fade-in duration-300">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-black uppercase tracking-widest">Settings</h2>
+              <button onClick={() => setShowSettings(false)} className="p-2 bg-white/5 rounded-full"><X className="w-6 h-6" /></button>
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Theme</span>
+              <div className="grid grid-cols-2 gap-2">
+                {themes.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => { setTheme(t.id); setShowSettings(false); }}
+                    className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${theme === t.id ? "bg-accent border-accent text-white" : "bg-white/5 border-white/10 text-foreground/40"}`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Brand / Ecosystem</span>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => { setActiveTab("kirbai"); setShowSettings(false); }}
+                  className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${activeTab === "kirbai" ? "bg-accent border-accent text-white" : "bg-white/5 border-white/10 text-foreground/40"}`}
+                >
+                  Kirbai
+                </button>
+                <button
+                  onClick={() => { setActiveTab("factory"); setShowSettings(false); }}
+                  className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${activeTab === "factory" ? "bg-accent border-accent text-white" : "bg-white/5 border-white/10 text-foreground/40"}`}
+                >
+                  Factory
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* 2. Hero Banner Section */}
@@ -103,8 +156,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Sub-Navigation (Module Switcher with Categories) */}
-      <nav className="w-full max-w-screen-2xl px-6 mt-6 flex flex-wrap items-end gap-1 border-b border-border/10 pb-0 shadow-[0_4px_10px_-5px_rgba(0,0,0,0.3)]">
+      {/* 3. Sub-Navigation - Desktop Only */}
+      <nav className="hide-on-mobile w-full max-w-screen-2xl px-6 mt-6 flex flex-wrap items-end gap-1 border-b border-border/10 pb-0 shadow-[0_4px_10px_-5px_rgba(0,0,0,0.3)]">
         
         {/* MASTER CONTROL */}
         <div className="flex flex-col gap-2 pb-4 mr-10">
@@ -206,6 +259,75 @@ export default function Home() {
           </div>
         </div>
       </nav>
+
+      {/* MOBILE BOTTOM DOCK */}
+      <div className="show-on-mobile-only mobile-bottom-dock">
+        <button 
+          onClick={() => setActiveModule("chat")}
+          className={`mobile-dock-item ${activeModule === 'chat' ? 'active' : ''}`}
+        >
+          <MessageSquare className="w-6 h-6" />
+          <span>Chat</span>
+        </button>
+        <button 
+          onClick={() => setActiveModule("roadmap")}
+          className={`mobile-dock-item ${activeModule === 'roadmap' ? 'active' : ''}`}
+        >
+          <HomeIcon className="w-6 h-6" />
+          <span>Home</span>
+        </button>
+        <button 
+          onClick={() => setActiveModule("director")}
+          className={`mobile-dock-item ${activeModule === 'director' ? 'active' : ''}`}
+        >
+          <Clapperboard className="w-6 h-6" />
+          <span>Director</span>
+        </button>
+        <button 
+          onClick={() => setShowLauncher(true)}
+          className={`mobile-dock-item ${showLauncher ? 'active' : ''}`}
+        >
+          <Layers className="w-6 h-6" />
+          <span>More</span>
+        </button>
+      </div>
+
+      {/* MOBILE LAUNCHER OVERLAY */}
+      {showLauncher && (
+        <div className="mobile-launcher-overlay animate-in fade-in slide-in-from-bottom-10 duration-500">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-black uppercase tracking-widest text-accent">Strategic Suite</h2>
+            <button onClick={() => setShowLauncher(false)} className="p-3 bg-white/10 rounded-full"><X className="w-6 h-6" /></button>
+          </div>
+
+          <div className="launcher-grid">
+            {[
+              { id: "intel", label: "Intel", icon: MessageSquare, group: "Command" },
+              { id: "creative", label: "Brainstorm", icon: Sparkles, group: "Pipeline" },
+              { id: "lore", label: "Lore Matrix", icon: Network, group: "Archive" },
+              { id: "vault", label: "Vault", icon: Database, group: "Archive" },
+              { id: "pulse", label: "Pulse", icon: LineChart, group: "Stats" },
+              { id: "finance", label: "Money", icon: LineChart, group: "Stats" },
+              { id: "prompts", label: "Prompt Bank", icon: MessageSquare, group: "Archive" },
+              { id: "core", label: "Core Config", icon: Settings2, group: "Admin" },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => { setActiveModule(item.id as Module); setShowLauncher(false); }}
+                className={`mobile-launcher-btn ${activeModule === item.id ? 'active' : ''}`}
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-[7px] font-black uppercase tracking-[0.3em] opacity-40">{item.group}</span>
+                  <item.icon className={`w-8 h-8 ${activeModule === item.id ? 'text-accent' : 'text-white/40'}`} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2">{item.label}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <p className="text-center text-[9px] font-black uppercase tracking-[0.5em] text-foreground/20 mt-auto pb-10">KIRBAI OS MOBILE SUIT V3.2.1</p>
+        </div>
+      )}
 
       {/* 4. Modular Content Area */}
       <div className="w-full max-w-screen-2xl px-6 mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
