@@ -5,9 +5,10 @@ import { Loader2 } from "@/components/Icons";
 
 interface AnalyticsMatrixProps {
     theme?: string;
+    mode?: 'kirbai' | 'factory';
 }
 
-export default function AnalyticsMatrix({ theme = "dark" }: AnalyticsMatrixProps) {
+export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: AnalyticsMatrixProps) {
     const [ytStats, setYtStats] = useState<any[]>([]);
     const [igFollowers, setIgFollowers] = useState<string>("0");
     const [igReach, setIgReach] = useState<string>("0");
@@ -28,28 +29,33 @@ export default function AnalyticsMatrix({ theme = "dark" }: AnalyticsMatrixProps
     const [pendingIgFollowers, setPendingIgFollowers] = useState<string>("");
 
     useEffect(() => {
+        const prefix = mode === 'factory' ? 'factory_' : 'kirbai_';
         // Load persistent manual stats
-        const savedIGFollowers = localStorage.getItem("ig_followers");
-        const savedIGReach = localStorage.getItem("ig_reach");
-        const savedTTFollowers = localStorage.getItem("tt_followers");
-        const savedTTViews = localStorage.getItem("tt_views");
-        const savedTTDate = localStorage.getItem("tt_last_updated");
-        const savedIGDate = localStorage.getItem("ig_last_updated");
+        const savedIGFollowers = localStorage.getItem(`${prefix}ig_followers`);
+        const savedIGReach = localStorage.getItem(`${prefix}ig_reach`);
+        const savedTTFollowers = localStorage.getItem(`${prefix}tt_followers`);
+        const savedTTViews = localStorage.getItem(`${prefix}tt_views`);
+        const savedTTDate = localStorage.getItem(`${prefix}tt_last_updated`);
+        const savedIGDate = localStorage.getItem(`${prefix}ig_last_updated`);
 
-        if (savedIGFollowers) setIgFollowers(savedIGFollowers);
-        if (savedTTFollowers) setTtFollowers(savedTTFollowers);
-        if (savedTTDate) setTtLastUpdated(savedTTDate);
-        if (savedIGDate) setIgLastUpdated(savedIGDate);
+        setIgFollowers(savedIGFollowers || "0");
+        setIgReach(savedIGReach || "0");
+        setTtFollowers(savedTTFollowers || "0");
+        setTtViews(savedTTViews || "0");
+        setTtLastUpdated(savedTTDate || "");
+        setIgLastUpdated(savedIGDate || "");
 
-        const savedTrends = localStorage.getItem("pulse_trends");
-        const savedNarrative = localStorage.getItem("pulse_narrative");
+        const savedTrends = localStorage.getItem(`${prefix}pulse_trends`);
+        const savedNarrative = localStorage.getItem(`${prefix}pulse_narrative`);
         if (savedTrends) setTrends(JSON.parse(savedTrends));
+        else setTrends(null);
         if (savedNarrative) setNarrative(savedNarrative);
+        else setNarrative("");
 
         // Fetch YT Stats
         const fetchYT = async () => {
             try {
-                const res = await fetch("/api/youtube-stats");
+                const res = await fetch(`/api/youtube-stats?mode=${mode}`);
                 const data = await res.json();
                 if (data.stats) setYtStats(data.stats);
             } catch (e) {
@@ -59,7 +65,7 @@ export default function AnalyticsMatrix({ theme = "dark" }: AnalyticsMatrixProps
             }
         };
         fetchYT();
-    }, []);
+    }, [mode]);
 
     // Sync pending states when persistence loads
     useEffect(() => {
@@ -91,13 +97,14 @@ export default function AnalyticsMatrix({ theme = "dark" }: AnalyticsMatrixProps
     };
 
     const updateAndSave = (setter: any, key: string, value: string, dateSetter?: any, dateKey?: string) => {
+        const prefix = mode === 'factory' ? 'factory_' : 'kirbai_';
         setter(value);
-        localStorage.setItem(key, value);
+        localStorage.setItem(`${prefix}${key}`, value);
 
         if (dateSetter && dateKey) {
             const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             dateSetter(now);
-            localStorage.setItem(dateKey, now);
+            localStorage.setItem(`${prefix}${dateKey}`, now);
         }
     };
 
@@ -122,13 +129,14 @@ export default function AnalyticsMatrix({ theme = "dark" }: AnalyticsMatrixProps
                 const { followers, reach, trends: newTrends, narrative: newNarrative } = json.data;
                 const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
+                const prefix = mode === 'factory' ? 'factory_' : 'kirbai_';
                 if (newTrends) {
                     setTrends(newTrends);
-                    localStorage.setItem("pulse_trends", JSON.stringify(newTrends));
+                    localStorage.setItem(`${prefix}pulse_trends`, JSON.stringify(newTrends));
                 }
                 if (newNarrative) {
                     setNarrative(newNarrative);
-                    localStorage.setItem("pulse_narrative", newNarrative);
+                    localStorage.setItem(`${prefix}pulse_narrative`, newNarrative);
                 }
 
                 if (platform === 'tiktok') {

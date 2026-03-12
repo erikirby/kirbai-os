@@ -6,14 +6,24 @@ import { aiTools, save_to_vault, save_to_lore, save_to_concepts } from "@/lib/ai
 
 // Load Context Files
 // Helper to pull context from Supabase persistence
-const getSupabaseContext = async (key: string) => {
+const getSupabaseContext = async (key: string, mode?: string) => {
     try {
-        const data = await getRow(key);
+        // Handle partitioning for keys that need it
+        let effectiveKey = key;
+        if (key === 'concepts' && mode === 'factory') effectiveKey = 'concepts_factory';
+        if (key === 'roadmap' && mode === 'factory') effectiveKey = 'roadmap_factory';
+        // Lore is handled by getLoreContext separately
+
+        const data = await getRow(effectiveKey);
         if (!data) return null;
 
-        // If it's projects, we MUST strip out the massive base64 coverArt images
         if (key === 'vault_projects' && Array.isArray(data)) {
-            const slimmed = data.map((p: any) => ({
+            // Filter projects by alias based on mode
+            const filtered = data.filter((p: any) => {
+                if (mode === 'factory') return p.alias === 'AELOW' || p.alias === 'KURAO';
+                return p.alias === 'Kirbai';
+            });
+            const slimmed = filtered.map((p: any) => ({
                 ...p,
                 coverArt: p.coverArt ? "[IMAGE_DATA_STRIPPED_FOR_TOKENS]" : null
             }));
@@ -26,18 +36,16 @@ const getSupabaseContext = async (key: string) => {
 };
 
 // Specialized Lore Fetcher
-const getLoreContext = async () => {
+const getLoreContext = async (mode: string) => {
     try {
-        const [nodesRes, edgesRes] = await Promise.all([
-            supabase.from('lore_nodes').select('*'),
-            supabase.from('lore_edges').select('*')
-        ]);
+        const key = mode === 'factory' ? 'lore_factory' : 'lore_kirbai';
+        const data = await getRow(key);
         
-        if (nodesRes.data && nodesRes.data.length > 0) {
-            const loreNodesStr = nodesRes.data.map((n: any) => `- [${n.type.toUpperCase()}] ${n.label}: ${n.description}`).join('\n');
-            const loreEdgesStr = (edgesRes.data || []).map((e: any) => {
-                const sourceLabel = nodesRes.data?.find((n: any) => n.id === e.source)?.label || e.source;
-                const targetLabel = nodesRes.data?.find((n: any) => n.id === e.target)?.label || e.target;
+        if (data && data.nodes && data.nodes.length > 0) {
+            const loreNodesStr = data.nodes.map((n: any) => `- [${n.type?.toUpperCase() || 'NODE'}] ${n.data?.label || n.id}: ${n.data?.description || ''}`).join('\n');
+            const loreEdgesStr = (data.edges || []).map((e: any) => {
+                const sourceLabel = data.nodes.find((n: any) => n.id === e.source)?.data?.label || e.source;
+                const targetLabel = data.nodes.find((n: any) => n.id === e.target)?.data?.label || e.target;
                 return `- ${sourceLabel} -> [${e.label}] -> ${targetLabel}`;
             }).join('\n');
             return `Entities:\n${loreNodesStr}\n\nRelationships:\n${loreEdgesStr}`;
@@ -50,7 +58,7 @@ const getLoreContext = async () => {
 
 export async function POST(req: NextRequest) {
     try {
-        const { messages } = await req.json();
+        const { messages, activeTab = 'kirbai' } = await req.json();
 
         if (!process.env.GEMINI_API_KEY) {
             throw new Error("GEMINI_API_KEY is not set");
@@ -58,17 +66,19 @@ export async function POST(req: NextRequest) {
 
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-        // Gather all native OS context from Supabase
+        // Gather all native OS context from Supabase (mode-aware)
         const [identityData, styleBaseData, projectsData, loreContext] = await Promise.all([
-            getSupabaseContext('brand_identity').then(d => d || "No specific brand identity defined."),
-            getSupabaseContext('instagram_style_base').then(d => d || "No historical style data available."),
-            getSupabaseContext('vault_projects').then(d => d || "No project data available."),
-            getLoreContext()
+            getSupabaseContext('brand_identity', activeTab).then(d => d || "No specific brand identity defined."),
+            getSupabaseContext('instagram_style_base', activeTab).then(d => d || "No historical style data available."),
+            getSupabaseContext('vault_projects', activeTab).then(d => d || "No project data available."),
+            getLoreContext(activeTab)
         ]);
 
         const systemInstruction = `
             You are the core intelligence engine for 'Kirbai OS', a specialized dashboard for managing a music and content brand.
             Your role is to act as an expert consultant, copywriter, and strategist. 
+            
+            CURRENT MODE: ${activeTab === 'kirbai' ? 'KIRBAI (Main Brand Lore)' : 'MUSIC FACTORY (SEO & Utility monetization)'}
             
             CRITICAL CONTEXT INJECTION - You must use the following data to inform your responses. Never ask the user for this information if it is provided here.
 
@@ -120,9 +130,9 @@ export async function POST(req: NextRequest) {
                 console.log(`🤖 AI Triggering Tool: ${name}`, args);
                 
                 let result;
-                if (name === 'save_to_vault') result = await save_to_vault(args);
-                else if (name === 'save_to_lore') result = await save_to_lore(args);
-                else if (name === 'save_to_concepts') result = await save_to_concepts(args);
+                if (name === 'save_to_vault') result = await save_to_vault(args, activeTab);
+                else if (name === 'save_to_lore') result = await save_to_lore(args, activeTab);
+                else if (name === 'save_to_concepts') result = await save_to_concepts(args, activeTab);
                 
                 toolResults.push({
                     functionResponse: {

@@ -6,14 +6,22 @@ const CHANNELS = [
     { id: "aelow", handle: "@AelowMusic", name: "AELOW" }
 ];
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
+        const { searchParams } = new URL(req.url);
+        const mode = searchParams.get('mode') || 'kirbai';
+
+        const filteredChannels = CHANNELS.filter(channel => {
+            if (mode === 'kirbai') return channel.id === 'kirbai';
+            return channel.id === 'kurao' || channel.id === 'aelow';
+        });
+
         const apiKey = process.env.YOUTUBE_API_KEY;
         if (!apiKey) {
             throw new Error("Missing YOUTUBE_API_KEY in environment variables.");
         }
 
-        const stats = await Promise.all(CHANNELS.map(async (channel) => {
+        const stats = await Promise.all(filteredChannels.map(async (channel) => {
             try {
                 // Official Google YouTube Data API v3 fetch
                 let res = await fetch(`https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2Cstatistics&forHandle=${channel.handle}&key=${apiKey}`, {

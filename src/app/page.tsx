@@ -132,17 +132,17 @@ export default function Home() {
       <div className="w-full max-w-screen-2xl px-6 mt-12 grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3 flex flex-col gap-12">
           <div key={`${activeTab}-${activeModule}`} className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {activeModule === "roadmap" && <Roadmap />}
-            {activeModule === "vault" && <VaultManager theme={theme} />}
-            {activeModule === "intel" && <IntelInbox mode="full" theme={theme} />}
-            {activeModule === "pulse" && <AnalyticsMatrix theme={theme} />}
-            {activeModule === "finance" && <FinanceView activeTab={activeTab} />}
+            {activeModule === "roadmap" && <Roadmap mode={activeTab} />}
+            {activeModule === "vault" && <VaultManager theme={theme} mode={activeTab} />}
+            {activeModule === "intel" && <IntelInbox mode="full" theme={theme} activeTab={activeTab} />}
+            {activeModule === "pulse" && <AnalyticsMatrix theme={theme} mode={activeTab} />}
+            {activeModule === "finance" && <FinanceView mode={activeTab} />}
             {activeModule === "api-health" && <APIHealth theme={theme} />}
             {activeModule === "chat" && <AIHub theme={theme} />}
             {activeModule === "core" && <ConsultantSettings theme={theme} />}
-            {activeModule === "lore" && <LoreMatrix theme={theme} />}
-            {activeModule === "creative" && <CreativeHub theme={theme} />}
-            {activeModule === "prompts" && <PromptBank />}
+            {activeModule === "lore" && <LoreMatrix theme={theme} mode={activeTab} />}
+            {activeModule === "creative" && <CreativeHub theme={theme} mode={activeTab} />}
+            {activeModule === "prompts" && <PromptBank mode={activeTab} />}
           </div>
         </div>
 

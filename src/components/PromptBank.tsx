@@ -16,7 +16,7 @@ interface PromptsData {
 
 const CATEGORY_ORDER = ["Video — Grok", "Art Style", "Suno"];
 
-export default function PromptBank({ theme }: { theme?: string } = {}) {
+export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string; mode?: 'kirbai' | 'factory' } = {}) {
     const [data, setData] = useState<PromptsData>({ universal: [], categories: {} });
     const [isLoading, setIsLoading] = useState(true);
     const [copiedId, setCopiedId] = useState<string | null>(null);

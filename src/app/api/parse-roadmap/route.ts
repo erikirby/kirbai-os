@@ -3,6 +3,8 @@ import { saveRoadmapAsync, getRoadmapAsync, logApiUsage } from '@/lib/db';
 
 export async function POST(request: Request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const mode = searchParams.get('mode') || undefined;
         const { rawText, currentPhases, currentTasks } = await request.json();
 
         if (!rawText) {
@@ -82,7 +84,7 @@ Schema:
             const finalData = { phases: structuredData.phases, tasks: taskObjects };
 
             // Use async save so it actually persists on Vercel
-            await saveRoadmapAsync(finalData);
+            await saveRoadmapAsync(finalData, mode);
 
             return NextResponse.json({ success: true, data: finalData });
         } catch (parseError) {
@@ -95,10 +97,11 @@ Schema:
         return NextResponse.json({ success: false, error: error.message || "Failed to parse roadmap" }, { status: 500 });
     }
 }
-
-export async function GET() {
+export async function GET(request: Request) {
     try {
-        const roadmap = await getRoadmapAsync();
+        const { searchParams } = new URL(request.url);
+        const mode = searchParams.get('mode') || undefined;
+        const roadmap = await getRoadmapAsync(mode);
         return NextResponse.json({ success: true, data: roadmap });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: "Failed to load roadmap" }, { status: 500 });
@@ -107,13 +110,15 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const mode = searchParams.get('mode') || undefined;
         const { taskId, status } = await request.json();
-        const roadmap = await getRoadmapAsync();
+        const roadmap = await getRoadmapAsync(mode);
         const tasks = roadmap.tasks as any[];
         const idx = tasks.findIndex((t: any) => t.id === taskId);
         if (idx === -1) return NextResponse.json({ success: false, error: "Task not found" }, { status: 404 });
         tasks[idx].status = status;
-        await saveRoadmapAsync({ phases: roadmap.phases, tasks });
+        await saveRoadmapAsync({ phases: roadmap.phases, tasks }, mode);
         return NextResponse.json({ success: true });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: "Failed to update task status" }, { status: 500 });

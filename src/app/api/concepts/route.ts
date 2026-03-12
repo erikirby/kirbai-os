@@ -12,24 +12,28 @@ export interface Concept {
     updated_at: string;
 }
 
-async function getConcepts(): Promise<Concept[]> {
+async function getConcepts(mode?: string): Promise<Concept[]> {
+    const key = mode === 'factory' ? 'concepts_factory' : 'concepts';
     const { data } = await supabase
         .from('persistence')
         .select('value')
-        .eq('key', 'concepts')
+        .eq('key', key)
         .single();
     return (data?.value as Concept[]) ?? [];
 }
 
-async function saveConcepts(concepts: Concept[]): Promise<void> {
+async function saveConcepts(concepts: Concept[], mode?: string): Promise<void> {
+    const key = mode === 'factory' ? 'concepts_factory' : 'concepts';
     await supabase
         .from('persistence')
-        .upsert({ key: 'concepts', value: concepts }, { onConflict: 'key' });
+        .upsert({ key, value: concepts }, { onConflict: 'key' });
 }
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
-        const concepts = await getConcepts();
+        const { searchParams } = new URL(req.url);
+        const mode = searchParams.get('mode') || undefined;
+        const concepts = await getConcepts(mode);
         // Sort by updated_at desc
         concepts.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
         return NextResponse.json({ success: true, concepts });
@@ -45,7 +49,10 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: 'title and body are required' }, { status: 400 });
         }
 
-        const concepts = await getConcepts();
+        const { searchParams } = new URL(req.url);
+        const mode = searchParams.get('mode') || undefined;
+
+        const concepts = await getConcepts(mode);
         const now = new Date().toISOString();
 
         const existing = concepts.findIndex(c => c.id === body.id);
@@ -67,7 +74,7 @@ export async function POST(req: Request) {
             concepts.unshift(newConcept);
         }
 
-        await saveConcepts(concepts);
+        await saveConcepts(concepts, mode);
         return NextResponse.json({ success: true });
     } catch (e: any) {
         return NextResponse.json({ success: false, error: e.message }, { status: 500 });
@@ -78,11 +85,12 @@ export async function DELETE(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
+        const mode = searchParams.get('mode') || undefined;
         if (!id) return NextResponse.json({ success: false, error: 'id required' }, { status: 400 });
 
-        const concepts = await getConcepts();
+        const concepts = await getConcepts(mode);
         const filtered = concepts.filter(c => c.id !== id);
-        await saveConcepts(filtered);
+        await saveConcepts(filtered, mode);
         return NextResponse.json({ success: true });
     } catch (e: any) {
         return NextResponse.json({ success: false, error: e.message }, { status: 500 });

@@ -73,7 +73,7 @@ Dark, psychological, dripping with diva energy. She's not just an escapee; she's
 
 const BLANK_FORM = { title: '', type: 'general' as ConceptType, status: 'concept' as ConceptStatus, body: '', character: '' };
 
-export default function CreativeHub({ theme }: { theme?: string }) {
+export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string; mode?: 'kirbai' | 'factory' }) {
     const [concepts, setConcepts] = useState<Concept[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -87,7 +87,7 @@ export default function CreativeHub({ theme }: { theme?: string }) {
 
     const load = async () => {
         try {
-            const res = await fetch('/api/concepts');
+            const res = await fetch(`/api/concepts?mode=${mode}`);
             const data = await res.json();
             let loaded: Concept[] = data.concepts || [];
 
@@ -110,12 +110,12 @@ export default function CreativeHub({ theme }: { theme?: string }) {
         }
     };
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => { load(); }, [mode]);
 
     const saveConcept = async (concept: Partial<Concept> & { id?: string }) => {
         setIsSaving(true);
         try {
-            await fetch('/api/concepts', {
+            await fetch(`/api/concepts?mode=${mode}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(concept),
@@ -127,7 +127,7 @@ export default function CreativeHub({ theme }: { theme?: string }) {
     };
 
     const deleteConcept = async (id: string) => {
-        await fetch(`/api/concepts?id=${id}`, { method: 'DELETE' });
+        await fetch(`/api/concepts?id=${id}&mode=${mode}`, { method: 'DELETE' });
         setConcepts(prev => prev.filter(c => c.id !== id));
     };
 

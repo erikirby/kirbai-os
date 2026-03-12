@@ -5,10 +5,15 @@ import { Type } from '@google/genai';
 /**
  * AI Tool: Save or update a project in The Vault.
  */
-export async function save_to_vault(params: { project: any }) {
+export async function save_to_vault(params: { project: any }, mode?: string) {
     try {
         const { project } = params;
         if (!project.title) throw new Error("Project title is required.");
+
+        // If AI didn't provide an alias, default based on mode
+        if (!project.alias) {
+            project.alias = mode === 'factory' ? 'AELOW' : 'Kirbai';
+        }
 
         const projects = await getRow('vault_projects') || [];
         
@@ -35,36 +40,48 @@ export async function save_to_vault(params: { project: any }) {
 /**
  * AI Tool: Save nodes/edges to the Lore Matrix.
  */
-export async function save_to_lore(params: { nodes?: any[], edges?: any[] }) {
+export async function save_to_lore(params: { nodes?: any[], edges?: any[] }, mode?: string) {
     try {
         const { nodes = [], edges = [] } = params;
+        const key = mode === 'factory' ? 'lore_factory' : 'lore_kirbai';
+
+        const currentLore = await getRow(key) || { nodes: [], edges: [], history: [] };
 
         if (nodes.length > 0) {
-            const nodeRows = nodes.map(n => ({
-                id: n.id,
-                type: n.type || 'character',
-                label: n.label || n.id,
-                description: n.description || '',
-                traits: n.traits || '',
-                image_path: n.imagePath || '',
-                pos_x: n.x ?? Math.random() * 400,
-                pos_y: n.y ?? Math.random() * 400
-            }));
-            const { error } = await supabase.from('lore_nodes').upsert(nodeRows, { onConflict: 'id' });
-            if (error) throw error;
+            nodes.forEach(n => {
+                const idx = currentLore.nodes.findIndex((node: any) => node.id === n.id);
+                const newNode = {
+                    id: n.id,
+                    type: n.type || 'character',
+                    position: n.position || { x: Math.random() * 400, y: Math.random() * 400 },
+                    data: {
+                        label: n.label || n.id,
+                        description: n.description || '',
+                        traits: n.traits || '',
+                        imagePath: n.imagePath || ''
+                    }
+                };
+                if (idx !== -1) currentLore.nodes[idx] = { ...currentLore.nodes[idx], ...newNode };
+                else currentLore.nodes.push(newNode);
+            });
         }
 
         if (edges.length > 0) {
-            const edgeRows = edges.map(e => ({
-                source: e.source,
-                target: e.target,
-                label: e.label || ''
-            }));
-            const { error } = await supabase.from('lore_edges').insert(edgeRows);
-            if (error) throw error;
+            edges.forEach(e => {
+                const newEdge = {
+                    id: `edge-${e.source}-${e.target}`,
+                    source: e.source,
+                    target: e.target,
+                    label: e.label || ''
+                };
+                const idx = currentLore.edges.findIndex((edge: any) => edge.source === e.source && edge.target === e.target);
+                if (idx !== -1) currentLore.edges[idx] = newEdge;
+                else currentLore.edges.push(newEdge);
+            });
         }
 
-        return { success: true, message: `Successfully added ${nodes.length} nodes and ${edges.length} relationships to Lore.` };
+        await setRow(key, currentLore);
+        return { success: true, message: `Successfully updated Lore Matrix (${mode}). Added/Updated ${nodes.length} nodes and ${edges.length} relationships.` };
     } catch (e: any) {
         return { success: false, error: e.message };
     }
@@ -73,12 +90,13 @@ export async function save_to_lore(params: { nodes?: any[], edges?: any[] }) {
 /**
  * AI Tool: Save a brainstorm, reel, or post idea to the Creative Concepts hub.
  */
-export async function save_to_concepts(params: { concept: any }) {
+export async function save_to_concepts(params: { concept: any }, mode?: string) {
     try {
         const { concept } = params;
         if (!concept.title || !concept.body) throw new Error("Title and Body are required.");
 
-        const concepts = await getRow('concepts') || [];
+        const key = mode === 'factory' ? 'concepts_factory' : 'concepts';
+        const concepts = await getRow(key) || [];
         const now = new Date().toISOString();
 
         // Check if updating existing
@@ -100,8 +118,8 @@ export async function save_to_concepts(params: { concept: any }) {
             concepts.unshift(newConcept);
         }
 
-        await setRow('concepts', concepts);
-        return { success: true, message: `Idea '${concept.title}' filed in the Creative Hub.` };
+        await setRow(key, concepts);
+        return { success: true, message: `Idea '${concept.title}' filed in the Creative Hub (${mode}).` };
     } catch (e: any) {
         return { success: false, error: e.message };
     }

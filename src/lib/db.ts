@@ -140,16 +140,18 @@ export function getFinanceAnalysis() {
     return null; // async callers use getFinanceAnalysisAsync
 }
 
-export async function saveRoadmapAsync(roadmapData: { phases: RoadmapPhase[], tasks: RoadmapTask[] }) {
-    await setRow('roadmap', roadmapData);
+export async function saveRoadmapAsync(roadmapData: { phases: RoadmapPhase[], tasks: RoadmapTask[] }, mode?: string) {
+    const key = mode === 'factory' ? 'roadmap_factory' : 'roadmap';
+    await setRow(key, roadmapData);
 }
 
 export function saveRoadmap(roadmapData: { phases: RoadmapPhase[], tasks: RoadmapTask[] }) {
     saveRoadmapAsync(roadmapData).catch(console.error);
 }
 
-export async function getRoadmapAsync() {
-    const data = await getRow('roadmap');
+export async function getRoadmapAsync(mode?: string) {
+    const key = mode === 'factory' ? 'roadmap_factory' : 'roadmap';
+    const data = await getRow(key);
     return data ?? { phases: [], tasks: [] };
 }
 

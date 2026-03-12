@@ -89,7 +89,7 @@ const parseInlineLinks = (text: string) => {
     });
 };
 
-export default function AIHub({ theme }: { theme: string }) {
+export default function AIHub({ theme }: { theme?: string }) {
     const [prompt, setPrompt] = useState("");
     const [messages, setMessages] = useState<{role: 'user' | 'ai', text: string}[]>([]);
     const [isGenerating, setIsGenerating] = useState(false);

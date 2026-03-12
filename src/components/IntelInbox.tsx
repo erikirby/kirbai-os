@@ -6,9 +6,10 @@ import { Loader2 } from "@/components/Icons";
 interface IntelInboxProps {
     mode?: "compact" | "full";
     theme?: string;
+    activeTab?: "kirbai" | "factory";
 }
 
-export default function IntelInbox({ mode = "full", theme = "dark" }: IntelInboxProps) {
+export default function IntelInbox({ mode = "full", theme = "dark", activeTab = "kirbai" }: IntelInboxProps) {
     const [intel, setIntel] = useState<any[]>([]);
     const [news, setNews] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);

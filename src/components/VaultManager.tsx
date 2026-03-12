@@ -37,6 +37,7 @@ interface Lyric {
 
 interface VaultManagerProps {
     theme?: string;
+    mode?: "kirbai" | "factory";
 }
 
 // --- Sub-component: Collapsible Section ---
@@ -71,7 +72,7 @@ function Section({ title, icon, defaultOpen = false, children }: {
     );
 }
 
-export default function VaultManager({ theme = "dark" }: VaultManagerProps) {
+export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultManagerProps) {
     const [projects, setProjects] = useState<Project[]>([]);
     const [lyrics, setLyrics] = useState<Lyric[]>([]);
     const [activeProject, setActiveProject] = useState<Project | null>(null);
@@ -188,7 +189,7 @@ export default function VaultManager({ theme = "dark" }: VaultManagerProps) {
         const p: Project = {
             id: crypto.randomUUID(),
             title: "New Transmission",
-            alias: "Kirbai",
+            alias: mode === "kirbai" ? "Kirbai" : "AELOW",
             status: "Draft",
             lore: "",
             visualVibe: "",
@@ -499,7 +500,9 @@ export default function VaultManager({ theme = "dark" }: VaultManagerProps) {
                     </button>
 
                     <div className="flex flex-col gap-2">
-                        {projects.map((p, pIndex) => {
+                        {projects
+                            .filter(p => mode === "kirbai" ? p.alias === "Kirbai" : (p.alias === "AELOW" || p.alias === "KURAO"))
+                            .map((p, pIndex) => {
                             const trackCount = (p.tracklist || []).length;
                             const lyricCount = lyrics.filter(l => l.projectId === p.id).length;
                             return (

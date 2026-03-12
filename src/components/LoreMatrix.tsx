@@ -27,7 +27,7 @@ interface LoreState {
     history: { nodes: LoreNode[]; edges: LoreEdge[] }[];
 }
 
-export default function LoreMatrix({ theme }: { theme?: string } = {}) {
+export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string; mode?: 'kirbai' | 'factory' }) {
     const [state, setState] = useState<LoreState>({ nodes: [], edges: [], history: [] });
     const [prompt, setPrompt] = useState("");
     const [isGenerating, setIsGenerating] = useState(false);
@@ -36,9 +36,10 @@ export default function LoreMatrix({ theme }: { theme?: string } = {}) {
     const [editForm, setEditForm] = useState({ label: '', description: '', traits: '' });
     const [aiStatus, setAiStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-    const loadState = async () => {
+    const fetchLore = async () => {
+        setIsLoading(true);
         try {
-            const res = await fetch('/api/lore');
+            const res = await fetch(`/api/lore?mode=${mode}`);
             if (res.ok) {
                 const data = await res.json();
                 setState(prev => ({ ...prev, nodes: data.nodes || [], edges: data.edges || [] }));
@@ -51,16 +52,16 @@ export default function LoreMatrix({ theme }: { theme?: string } = {}) {
     };
 
     useEffect(() => {
-        loadState();
-    }, []);
+        fetchLore();
+    }, [mode]);
 
     const saveState = async (newState: LoreState) => {
         setState(newState);
         try {
-            await fetch('/api/lore', {
+            const res = await fetch(`/api/lore?mode=${mode}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nodes: newState.nodes, edges: newState.edges, history: newState.history })
+                body: JSON.stringify({ nodes: newState.nodes, edges: newState.edges })
             });
         } catch (e) {
             console.error("Failed to save lore", e);

@@ -16,7 +16,7 @@ interface RoadmapTask {
     status: "todo" | "wip" | "done";
 }
 
-export default function Roadmap() {
+export default function Roadmap({ mode = 'kirbai' }: { mode?: 'kirbai' | 'factory' }) {
     const [phases, setPhases] = useState<RoadmapPhase[]>([]);
     const [tasks, setTasks] = useState<RoadmapTask[]>([]);
     const [rawInput, setRawInput] = useState("");
@@ -35,7 +35,7 @@ export default function Roadmap() {
     useEffect(() => {
         const fetchRoadmap = async () => {
             try {
-                const res = await fetch('/api/parse-roadmap');
+                const res = await fetch(`/api/parse-roadmap?mode=${mode}`);
                 const json = await res.json();
                 if (json.success && json.data) {
                     setPhases(json.data.phases || []);
@@ -48,13 +48,13 @@ export default function Roadmap() {
             }
         };
         fetchRoadmap();
-    }, []);
+    }, [mode]);
 
     const handleParse = async () => {
         if (!rawInput.trim()) return;
         setIsParsing(true);
         try {
-            const res = await fetch('/api/parse-roadmap', {
+            const res = await fetch(`/api/parse-roadmap?mode=${mode}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ rawText: rawInput, currentPhases: phases, currentTasks: tasks })
@@ -187,7 +187,7 @@ export default function Roadmap() {
 
                                     const cycleStatus = async () => {
                                         setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: nextStatus } : t));
-                                        await fetch('/api/parse-roadmap', {
+                                        await fetch(`/api/parse-roadmap?mode=${mode}`, {
                                             method: 'PATCH',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({ taskId: task.id, status: nextStatus })

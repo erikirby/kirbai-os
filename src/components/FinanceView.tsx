@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { Loader2, RefreshCw } from "@/components/Icons";
 
 interface FinanceViewProps {
-    activeTab: "kirbai" | "factory";
+    mode: "kirbai" | "factory";
 }
 
-export default function FinanceView({ activeTab }: FinanceViewProps) {
+export default function FinanceView({ mode }: FinanceViewProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [attachedFile, setAttachedFile] = useState<File | null>(null);
     const [isLoading, setIsLoading] = useState(false);
