@@ -46,19 +46,35 @@ export interface Shot {
     personaCritiques?: {
         director?: string;
         strategist?: string;
+        audience?: string;
     };
     bananaPrompt?: string;
     grokTrigger?: string;
-    status: "draft" | "planned" | "rendereded" | "final";
+    bananaPromptV2?: string;
+    grokPromptV2?: string;
+    refLabels?: string[]; // Array of reference labels
+    isProduced?: boolean; // Progress tracking
+    status: "draft" | "planned" | "rendered" | "final";
 }
 
 export interface Mission {
     id: string;
     conceptId: string;
     title: string;
+    conceptDescription?: string;
     alias: string;
     mode: "kirbai" | "factory";
+    targetRuntime?: string; // in seconds
     shots: Shot[];
+    references?: string[]; // Array of Base64 strings (compressed)
+    requiredReferences?: { 
+        label: string; 
+        description: string; 
+        category: "Character" | "Location" | "Object";
+        uploadedIndex?: number;
+        manualCheck?: boolean; // For manual tracking without upload
+    }[]; 
+    cameos?: string[];     // Array of secondary pokemon names
     createdAt: string;
     updatedAt: string;
 }
@@ -202,6 +218,18 @@ export async function saveMissionAsync(mission: Mission) {
 export async function getMissionsAsync(mode: string): Promise<Mission[]> {
     const key = mode === 'factory' ? 'missions_factory' : 'missions_kirbai';
     return await getRow(key) || [];
+}
+
+export async function deleteMissionAsync(id: string) {
+    // We don't know the mode for sure, so we check both tables
+    const keys = ['missions_kirbai', 'missions_factory'];
+    for (const key of keys) {
+        let missions = await getRow(key) || [];
+        const filtered = missions.filter((m: any) => m.id !== id);
+        if (filtered.length !== missions.length) {
+            await setRow(key, filtered);
+        }
+    }
 }
 
 // --- PULSE / ANALYTICS ---

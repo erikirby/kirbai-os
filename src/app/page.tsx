@@ -208,8 +208,8 @@ export default function Home() {
       </nav>
 
       {/* 4. Modular Content Area */}
-      <div className="w-full max-w-screen-2xl px-6 mt-12 grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className={activeModule === "roadmap" ? "lg:col-span-3 flex flex-col gap-12" : "lg:col-span-4 flex flex-col gap-12"}>
+      <div className="w-full max-w-screen-2xl px-6 mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className={activeModule === "roadmap" ? "lg:col-span-3 flex flex-col gap-6" : "lg:col-span-4 flex flex-col gap-6"}>
           <div key={`${activeTab}-${activeModule}`} className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             {activeModule === "roadmap" && <Roadmap mode={activeTab} />}
             {activeModule === "vault" && <VaultManager theme={theme} mode={activeTab} />}

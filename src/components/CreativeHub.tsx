@@ -86,6 +86,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
     const [filterStatus, setFilterStatus] = useState<ConceptStatus | 'all'>('all');
     const [promotingId, setPromotingId] = useState<string | null>(null);
     const [lyrics, setLyrics] = useState("");
+    const [targetRuntime, setTargetRuntime] = useState("60");
     const [isPlanning, setIsPlanning] = useState(false);
 
     const load = async () => {
@@ -157,6 +158,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                     concept,
                     lyrics,
                     mode,
+                    targetRuntime,
                     alias: concept.character || (mode === 'kirbai' ? 'Kirbai' : 'AELOW')
                 })
             });
@@ -453,12 +455,28 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                                             <X className="w-4 h-4" />
                                                         </button>
                                                     </div>
-                                                    <textarea 
-                                                        value={lyrics}
-                                                        onChange={e => setLyrics(e.target.value)}
-                                                        placeholder="Paste the song lyrics or script poem here for the Director to analyze..."
-                                                        className="w-full h-32 bg-black/40 border border-white/5 rounded-xl p-4 text-xs font-mono focus:outline-none focus:border-accent/40 resize-none placeholder:text-white/20"
-                                                    />
+                                                    <div className="flex gap-4">
+                                                        <div className="flex-1 flex flex-col gap-1">
+                                                            <label className="text-[9px] font-black uppercase tracking-widest text-foreground/40">Lyrics / Script</label>
+                                                            <textarea 
+                                                                value={lyrics}
+                                                                onChange={e => setLyrics(e.target.value)}
+                                                                placeholder="Paste the song lyrics or script poem here..."
+                                                                className="w-full h-32 bg-black/40 border border-white/5 rounded-xl p-4 text-xs font-mono focus:outline-none focus:border-accent/40 resize-none placeholder:text-white/20"
+                                                            />
+                                                        </div>
+                                                        <div className="w-32 flex flex-col gap-1">
+                                                            <label className="text-[9px] font-black uppercase tracking-widest text-foreground/40">Runtime (sec)</label>
+                                                            <input 
+                                                                type="number"
+                                                                value={targetRuntime}
+                                                                onChange={e => setTargetRuntime(e.target.value)}
+                                                                placeholder="60"
+                                                                className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:border-accent/40 text-center"
+                                                            />
+                                                            <span className="text-[8px] text-foreground/20 italic leading-tight mt-1 text-center">Estimation for shot pacing</span>
+                                                        </div>
+                                                    </div>
                                                     <button 
                                                         onClick={() => handlePromote(concept)}
                                                         disabled={isPlanning || !lyrics.trim()}
