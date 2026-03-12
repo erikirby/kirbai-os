@@ -2,13 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { Sparkles, X, Check, Eye, Brain, TrendingUp, DollarSign, Heart, ChevronRight, Loader2 } from 'lucide-react';
-import { MuseCard, getMuseCardsAsync, saveMuseCardsAsync } from '@/lib/db';
+import { MuseCard, getMuseCardsAsync, saveMuseCardsAsync, saveUserPsycheAsync, getUserPsycheAsync } from '@/lib/db';
 import MuseClefairy from './MuseClefairy';
+import MuseHistory from './MuseHistory';
 
 const MuseDeck = ({ mode }: { mode: string }) => {
     const [cards, setCards] = useState<MuseCard[]>([]);
+    const [history, setHistory] = useState<MuseCard[]>([]);
     const [loading, setLoading] = useState(false);
     const [activeIdx, setActiveIdx] = useState(0);
+    const [showHistory, setShowHistory] = useState(false);
     const [clefairyEmotion, setClefairyEmotion] = useState<'idle' | 'thinking' | 'happy'>('idle');
     const [clefairyMessage, setClefairyMessage] = useState<string | undefined>("Hi Erik! Ready to see what the Muse has for you today?");
 
@@ -19,7 +22,9 @@ const MuseDeck = ({ mode }: { mode: string }) => {
     const loadCards = async () => {
         const stored = await getMuseCardsAsync();
         const pending = stored.filter(c => c.status === 'pending');
+        const accepted = stored.filter(c => c.status === 'yes');
         setCards(pending);
+        setHistory(accepted);
     };
 
     const runSymposium = async () => {
@@ -60,6 +65,18 @@ const MuseDeck = ({ mode }: { mode: string }) => {
         if (status === 'yes') {
             setClefairyEmotion('happy');
             setClefairyMessage("Great choice! I'll add that to the Roadmap.");
+            
+            // Advance Psyche Memory
+            const psyche = await getUserPsycheAsync();
+            if (psyche) {
+                psyche.wins.push(currentCard.title);
+                psyche.motivationLevel = Math.min(100, (psyche.motivationLevel || 50) + 5);
+                await saveUserPsycheAsync(psyche);
+            }
+
+            // Update History
+            setHistory(prev => [currentCard, ...prev]);
+
             // Trigger celebration effect
             const burst = document.createElement('div');
             burst.className = 'fixed inset-0 pointer-events-none z-50 flex items-center justify-center';
@@ -81,6 +98,14 @@ const MuseDeck = ({ mode }: { mode: string }) => {
     };
 
     const currentCard = cards[activeIdx];
+
+    if (showHistory) {
+        return (
+            <div className="w-full max-w-4xl px-6 py-12">
+                <MuseHistory cards={history} onBack={() => setShowHistory(false)} />
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col items-center gap-12 py-12 min-h-[700px] animate-in fade-in duration-1000">
@@ -167,6 +192,13 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                             className="px-8 py-4 bg-accent text-white rounded-full font-black uppercase tracking-widest shadow-xl shadow-accent/20 hover:bg-accent/80 transition-all flex items-center gap-3"
                         >
                             <Brain className="w-4 h-4" /> Start Symposium
+                        </button>
+
+                        <button 
+                            onClick={() => setShowHistory(true)}
+                            className="px-6 py-2 text-[9px] font-black uppercase tracking-widest text-foreground/40 hover:text-accent transition-all"
+                        >
+                            View History Vault
                         </button>
                     </div>
                 )}
