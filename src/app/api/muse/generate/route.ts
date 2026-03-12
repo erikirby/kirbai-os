@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         const contextSummary = `
             LORE: ${JSON.stringify(lore?.nodes?.slice(0, 10) || "Empty")}
             RECENT MISSIONS: ${JSON.stringify(missions?.slice(0, 3) || "None")}
-            CURRENT ROADMAP: ${JSON.stringify(roadmap?.phases?.find(p => p.status === 'Current Objective') || "None")}
+            CURRENT ROADMAP: ${JSON.stringify(roadmap?.phases?.find((p: any) => p.status === 'Current Objective') || "None")}
             USER PSYCHE: ${JSON.stringify(psyche || "No memory yet")}
             ANALYTICS: ${JSON.stringify(pulse?.summary || "No data")}
         `;
@@ -77,8 +77,8 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        const response = await (await model).text;
-        const parsed = JSON.parse(response);
+        const responseText = (await model).text || "";
+        const parsed = JSON.parse(responseText);
 
         // Store the cards (pending status)
         const cards: MuseCard[] = parsed.cards.map((c: any) => ({
