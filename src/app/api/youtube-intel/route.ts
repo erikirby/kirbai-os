@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { YoutubeTranscript } from "@danielxceron/youtube-transcript";
 import { getDbAsync, setIntelCacheAsync, IntelItem, logApiUsageAsync } from "@/lib/db";
+import { getLatestNewslettersAsync } from "@/lib/intel";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const CHANNEL_ID = "UCnsL7Nh-e09D1W5TmC6Yklw"; // Jesse from AI Guerrilla
@@ -147,11 +148,9 @@ export async function GET(req: Request) {
 
         // 4. Sync Newsletter Intel
         try {
-            const origin = new URL(req.url).origin;
-            const newsRes = await fetch(`${origin}/api/sync-newsletter`, { cache: 'no-store' });
-            const newsData = await newsRes.json();
-            if (newsData.success && newsData.intel) {
-                intelFeed.push(...newsData.intel);
+            const newsletterIntel = await getLatestNewslettersAsync();
+            if (newsletterIntel && newsletterIntel.length > 0) {
+                intelFeed.push(...newsletterIntel);
             }
         } catch (newsErr) {
             console.error("Newsletter integration failed:", newsErr);
