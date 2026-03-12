@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { getRow } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
+import { aiTools, save_to_vault, save_to_lore, save_to_creative } from "@/lib/ai-actions";
 
 // Load Context Files
 // Helper to pull context from Supabase persistence
@@ -72,46 +73,80 @@ export async function POST(req: NextRequest) {
             CRITICAL CONTEXT INJECTION - You must use the following data to inform your responses. Never ask the user for this information if it is provided here.
 
             === ARTIST CORE IDENTITY ===
-            This defines the tools, style, and tone of the brand.
             ${identityData}
 
             === HISTORICAL STYLE DNA ===
-            This is a list of past successful post descriptions. Mimic this formatting, tone, and emoji usage when writing new content.
             ${styleBaseData}
 
             === ABSOLUTE LORE CONTINUITY ===
-            The following facts form the worldbuilding rulebook for the universe. Do not ever output anything that contradicts this node graph logic.
             ${loreContext}
 
             === THE VAULT (PROJECT STATUS) ===
-            Here are the current active projects and their statuses:
             ${projectsData}
 
             RULES:
             1. Never break character. You are native to Kirbai OS.
-            2. READ-ONLY LIMITATION: You currently HAVE NO ABILITY to modify 'The Vault', 'Lore', or any other database settings directly. If the user asks you to save or update something, explain that while you can help them draft the content, they must manually input it into the dashboard for now. NEVER claim to have "logged" or "saved" something.
-            3. If the user asks you to write a post, analyze the 'Historical Style DNA' and ensure your output matches that exact vibe.
+            2. AUTO-SAVE CAPABILITY: You have tools to 'save_to_vault', 'save_to_lore', and 'save_to_creative'. Use these when a user brainstorm is finalized or when they explicitly ask you to "log", "save", or "file" something.
+            3. BE HONEST: You can only save what you have tools for. You cannot delete data.
             4. If the user asks for advice, reference their 'Artist Core Identity' and their active projects in 'The Vault'.
-            5. Keep responses concise, punchy, and highly actionable. Format nicely with markdown.
+            5. Keep responses concise, punchy, and highly actionable.
         `;
 
-        // Format rules for the V2 SDK: It expects { role: 'user' || 'model', parts: [{ text: "..." }] }
+        // Format history for Gemini
         const formattedHistory = messages.map((msg: any) => ({
             role: msg.role === 'ai' ? 'model' : 'user',
             parts: [{ text: msg.text }]
         }));
 
-        const response = await ai.models.generateContent({
+        // Initial Generation
+        let response = await ai.models.generateContent({
             model: 'gemini-2.5-pro',
             contents: formattedHistory,
             config: {
                 systemInstruction: systemInstruction,
+                tools: aiTools,
                 temperature: 0.7,
             }
         });
 
-        const outputText = response.text;
+        // Handle Function Calling Loop
+        const toolCalls = response.candidates?.[0]?.content?.parts?.filter(p => (p as any).functionCall);
+        
+        if (toolCalls && toolCalls.length > 0) {
+            const toolResults = [];
+            
+            for (const call of toolCalls as any[]) {
+                const { name, args } = call.functionCall;
+                console.log(`🤖 AI Triggering Tool: ${name}`, args);
+                
+                let result;
+                if (name === 'save_to_vault') result = await save_to_vault(args);
+                else if (name === 'save_to_lore') result = await save_to_lore(args);
+                else if (name === 'save_to_creative') result = await save_to_creative(args);
+                
+                toolResults.push({
+                    functionResponse: {
+                        name,
+                        response: result || { error: "Unknown tool" }
+                    }
+                });
+            }
 
+            // Send results back for final summary
+            const finalContents = [
+                ...formattedHistory,
+                response.candidates?.[0]?.content, // Model's call
+                { role: 'user', parts: toolResults } // The execution results
+            ];
+
+            response = await ai.models.generateContent({
+                model: 'gemini-2.5-pro',
+                contents: finalContents,
+                config: { systemInstruction, tools: aiTools }
+            });
+        }
+
+        const outputText = response.text || "I have processed your request.";
         return NextResponse.json({ result: outputText });
 
     } catch (error: any) {
