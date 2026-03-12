@@ -14,7 +14,7 @@ import LoreMatrix from "@/components/LoreMatrix";
 import PromptBank from "@/components/PromptBank";
 import CreativeHub from "@/components/CreativeHub";
 import DirectorSuite from "@/components/DirectorSuite"; // Added import
-import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Share2, Menu, X, Home as HomeIcon, Clapperboard, Layers } from 'lucide-react';
+import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Share2, Menu, X, Home as HomeIcon, Clapperboard, Layers, Sparkles, Wallet } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
 type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director"; // Added 'director'
@@ -307,7 +307,7 @@ export default function Home() {
               { id: "lore", label: "Lore Matrix", icon: Network, group: "Archive" },
               { id: "vault", label: "Vault", icon: Database, group: "Archive" },
               { id: "pulse", label: "Pulse", icon: LineChart, group: "Stats" },
-              { id: "finance", label: "Money", icon: LineChart, group: "Stats" },
+              { id: "finance", label: "Money", icon: Wallet, group: "Stats" },
               { id: "prompts", label: "Prompt Bank", icon: MessageSquare, group: "Archive" },
               { id: "core", label: "Core Config", icon: Settings2, group: "Admin" },
             ].map((item) => (
