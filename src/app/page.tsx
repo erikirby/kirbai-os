@@ -327,10 +327,7 @@ export default function Home() {
             </div>
           </div>
 
-          <p className="text-center text-[9px] font-black uppercase tracking-[0.5em] text-foreground/20 mt-auto pb-10">PREFERENCE MATRIX V3.2.1</p>
-        </div>
       )}
-    </main>
 
       {/* 4. Modular Content Area */}
       <div className="w-full max-w-screen-2xl px-6 mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
