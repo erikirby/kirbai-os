@@ -29,28 +29,31 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
     const [pendingIgFollowers, setPendingIgFollowers] = useState<string>("");
 
     useEffect(() => {
-        const prefix = mode === 'factory' ? 'factory_' : 'kirbai_';
-        // Load persistent manual stats
-        const savedIGFollowers = localStorage.getItem(`${prefix}ig_followers`);
-        const savedIGReach = localStorage.getItem(`${prefix}ig_reach`);
-        const savedTTFollowers = localStorage.getItem(`${prefix}tt_followers`);
-        const savedTTViews = localStorage.getItem(`${prefix}tt_views`);
-        const savedTTDate = localStorage.getItem(`${prefix}tt_last_updated`);
-        const savedIGDate = localStorage.getItem(`${prefix}ig_last_updated`);
-
-        setIgFollowers(savedIGFollowers || "0");
-        setIgReach(savedIGReach || "0");
-        setTtFollowers(savedTTFollowers || "0");
-        setTtViews(savedTTViews || "0");
-        setTtLastUpdated(savedTTDate || "");
-        setIgLastUpdated(savedIGDate || "");
-
-        const savedTrends = localStorage.getItem(`${prefix}pulse_trends`);
-        const savedNarrative = localStorage.getItem(`${prefix}pulse_narrative`);
-        if (savedTrends) setTrends(JSON.parse(savedTrends));
-        else setTrends(null);
-        if (savedNarrative) setNarrative(savedNarrative);
-        else setNarrative("");
+        // Fetch Pulse State from Supabase
+        const fetchPulse = async () => {
+            try {
+                const res = await fetch(`/api/pulse?mode=${mode}`);
+                const data = await res.json();
+                if (data.success && data.state) {
+                    const s = data.state;
+                    setIgFollowers(s.igFollowers || "0");
+                    setIgReach(s.igReach || "0");
+                    setTtFollowers(s.ttFollowers || "0");
+                    setTtViews(s.ttViews || "0");
+                    setTtLastUpdated(s.ttLastUpdated || "");
+                    setIgLastUpdated(s.igLastUpdated || "");
+                    setTrends(s.trends || null);
+                    setNarrative(s.narrative || "");
+                    setAnalysis(s.analysis || null); // Persist synthesis results
+                    
+                    // Also sync pending manual inputs
+                    setPendingIgFollowers(s.igFollowers || "0");
+                    setPendingTtFollowers(s.ttFollowers || "0");
+                }
+            } catch (e) {
+                console.error("Pulse Load Error:", e);
+            }
+        };
 
         // Fetch YT Stats
         const fetchYT = async () => {
@@ -64,14 +67,10 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                 setIsLoadingYT(false);
             }
         };
+
+        fetchPulse();
         fetchYT();
     }, [mode]);
-
-    // Sync pending states when persistence loads
-    useEffect(() => {
-        setPendingIgFollowers(igFollowers);
-        setPendingTtFollowers(ttFollowers);
-    }, [igFollowers, ttFollowers]);
 
     const handleSynthesize = async () => {
         setIsSynthesizing(true);
@@ -88,6 +87,19 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
             const data = await res.json();
             if (data.analysis) {
                 setAnalysis(data.analysis);
+                
+                // Sync the new analysis to Supabase immediately
+                await syncToSupabase({
+                    igFollowers,
+                    igReach,
+                    ttFollowers,
+                    ttViews,
+                    ttLastUpdated,
+                    igLastUpdated,
+                    trends,
+                    narrative,
+                    analysis: data.analysis
+                });
             }
         } catch (e) {
             console.error(e);
@@ -96,16 +108,44 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
         }
     };
 
-    const updateAndSave = (setter: any, key: string, value: string, dateSetter?: any, dateKey?: string) => {
-        const prefix = mode === 'factory' ? 'factory_' : 'kirbai_';
+    const syncToSupabase = async (newState: any) => {
+        try {
+            await fetch('/api/pulse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mode, state: newState })
+            });
+        } catch (e) {
+            console.error("Pulse Sync Error:", e);
+        }
+    };
+
+    const updateAndSave = async (setter: any, key: string, value: string, dateSetter?: any, dateKey?: string) => {
         setter(value);
-        localStorage.setItem(`${prefix}${key}`, value);
+        
+        // Construct new state for sync
+        const currentState = {
+            igFollowers,
+            igReach,
+            ttFollowers,
+            ttViews,
+            ttLastUpdated,
+            igLastUpdated,
+            trends,
+            narrative,
+            analysis // Include analysis in every sync
+        };
+
+        const newState = { ...currentState };
+        (newState as any)[key] = value;
 
         if (dateSetter && dateKey) {
             const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             dateSetter(now);
-            localStorage.setItem(`${prefix}${dateKey}`, now);
+            (newState as any)[dateKey] = now;
         }
+
+        await syncToSupabase(newState);
     };
 
     const handleCSVUpload = async (platform: 'tiktok' | 'instagram', event: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,28 +169,36 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                 const { followers, reach, trends: newTrends, narrative: newNarrative } = json.data;
                 const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-                const prefix = mode === 'factory' ? 'factory_' : 'kirbai_';
-                if (newTrends) {
-                    setTrends(newTrends);
-                    localStorage.setItem(`${prefix}pulse_trends`, JSON.stringify(newTrends));
-                }
-                if (newNarrative) {
-                    setNarrative(newNarrative);
-                    localStorage.setItem(`${prefix}pulse_narrative`, newNarrative);
+                // Update UI state
+                if (newTrends) setTrends(newTrends);
+                if (newNarrative) setNarrative(newNarrative);
+
+                let updatedFollowers = followers?.toString() || (platform === 'tiktok' ? ttFollowers : igFollowers);
+                let updatedReach = reach?.toString() || (platform === 'tiktok' ? ttViews : igReach);
+                
+                if (platform === 'tiktok') {
+                    setTtFollowers(updatedFollowers);
+                    setTtViews(updatedReach);
+                    setTtLastUpdated(now);
+                } else {
+                    setIgFollowers(updatedFollowers);
+                    setIgReach(updatedReach);
+                    setIgLastUpdated(now);
                 }
 
-                if (platform === 'tiktok') {
-                    if (followers) updateAndSave(setTtFollowers, "tt_followers", followers.toString());
-                    if (reach) updateAndSave(setTtViews, "tt_views", reach.toString());
-                    setTtLastUpdated(now);
-                    localStorage.setItem("tt_last_updated", now);
-                } else {
-                    if (followers) updateAndSave(setIgFollowers, "ig_followers", followers.toString());
-                    setIgLastUpdated(now);
-                    localStorage.setItem("ig_last_updated", now);
-                    // Also update reach in UI for analysis reference even if input is gone
-                    setIgReach(reach?.toString() || "0");
-                }
+                // Sync everything to Supabase
+                await syncToSupabase({
+                    igFollowers: platform === 'instagram' ? updatedFollowers : igFollowers,
+                    igReach: platform === 'instagram' ? updatedReach : igReach,
+                    ttFollowers: platform === 'tiktok' ? updatedFollowers : ttFollowers,
+                    ttViews: platform === 'tiktok' ? updatedReach : ttViews,
+                    ttLastUpdated: platform === 'tiktok' ? now : ttLastUpdated,
+                    igLastUpdated: platform === 'instagram' ? now : igLastUpdated,
+                    trends: newTrends || trends,
+                    narrative: newNarrative || narrative,
+                    analysis // Preserve existing analysis if it exists
+                });
+
             } else {
                 console.error("AI Parser Failed:", json.error);
                 alert(`Analysis Failed: ${json.error || 'Check console for details'}`);
@@ -159,7 +207,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
             console.error("CSV Parse Request Error:", e);
         } finally {
             setIsUploadingCSV(null);
-            event.target.value = ''; // Reset input to allow re-uploading the same file
+            event.target.value = ''; 
         }
     };
 

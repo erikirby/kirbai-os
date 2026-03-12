@@ -204,6 +204,18 @@ export async function getMissionsAsync(mode: string): Promise<Mission[]> {
     return await getRow(key) || [];
 }
 
+// --- PULSE / ANALYTICS ---
+
+export async function savePulseStateAsync(mode: string, state: any) {
+    const key = mode === 'factory' ? 'pulse_state_factory' : 'pulse_state_kirbai';
+    await setRow(key, state);
+}
+
+export async function getPulseStateAsync(mode: string) {
+    const key = mode === 'factory' ? 'pulse_state_factory' : 'pulse_state_kirbai';
+    return await getRow(key);
+}
+
 // --- TELEMETRY (stored in persistence table) ---
 
 export interface ApiLog {
