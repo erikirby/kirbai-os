@@ -3,6 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 import { getRow } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 import { aiTools, save_to_vault, save_to_lore, save_to_concepts } from "@/lib/ai-actions";
+import { logApiUsage } from "@/lib/db";
 
 // Load Context Files
 // Helper to pull context from Supabase persistence
@@ -119,6 +120,10 @@ export async function POST(req: NextRequest) {
             }
         });
 
+        if (response.usageMetadata) {
+            logApiUsage("/api/generate-content (pre-tool)", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+        }
+
         // Handle Function Calling Loop
         const toolCalls = response.candidates?.[0]?.content?.parts?.filter(p => (p as any).functionCall);
         
@@ -154,6 +159,10 @@ export async function POST(req: NextRequest) {
                 contents: finalContents,
                 config: { systemInstruction, tools: aiTools }
             });
+
+            if (response.usageMetadata) {
+                logApiUsage("/api/generate-content (final)", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            }
         }
 
         const outputText = response.text || "I have processed your request.";

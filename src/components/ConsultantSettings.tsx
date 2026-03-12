@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Loader2, Database, Brain, PenTool, Sparkles, Target, Settings2 } from 'lucide-react';
 
-export default function ConsultantSettings() {
+export default function ConsultantSettings({ theme }: { theme?: string }) {
     const [identity, setIdentity] = useState({
         brandIdentity: "",
         aestheticRules: "",
