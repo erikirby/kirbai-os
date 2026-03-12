@@ -488,68 +488,70 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
 
                             {/* Mission Header */}
                             <div className="p-6 bg-surface/40 border border-border/10 rounded-[40px] flex flex-col gap-4 glass">
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-6">
-                                        <div className="w-16 h-16 rounded-3xl bg-accent/20 flex items-center justify-center border border-accent/20 shadow-inner">
-                                            <Play className="w-8 h-8 text-accent fill-accent" />
+                                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mobile-stack-header">
+                                    <div className="flex items-center gap-4 sm:gap-6">
+                                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-accent/20 flex items-center justify-center border border-accent/20 shadow-inner shrink-0">
+                                            <Play className="w-6 h-6 sm:w-8 sm:h-8 text-accent fill-accent" />
                                         </div>
-                                        <div className="flex flex-col gap-1">
-                                            <h3 className="text-2xl font-black uppercase tracking-tight">{activeMission.title}</h3>
-                                            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-foreground/40">
-                                                <span className="text-accent underline">Active Mission</span>
-                                                <span>•</span>
-                                                <span className="font-mono">{activeMission.id}</span>
+                                        <div className="flex flex-col gap-0.5 sm:gap-1">
+                                            <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight leading-tight max-w-[200px] sm:max-w-none">{activeMission.title}</h3>
+                                            <div className="flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-foreground/40">
+                                                <span className="text-accent underline shrink-0">Active Mission</span>
+                                                <span className="shrink-0">•</span>
+                                                <span className="font-mono truncate">{activeMission.id}</span>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     {/* Regenerate Vision Trigger */}
-                                    <div className="flex flex-col items-end gap-1">
+                                    <div className="flex flex-col items-start lg:items-end gap-1 w-full lg:w-auto">
                                         <button 
                                             onClick={regenerateVision}
                                             disabled={isRegenerating}
                                             title="Regenerate all shots based on latest refs/cameos"
-                                            className="flex items-center gap-2 px-5 py-2.5 bg-accent/10 border border-accent/20 text-accent rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-accent hover:text-white transition-all disabled:opacity-50"
+                                            className="w-full lg:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-accent/10 border border-accent/20 text-accent rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-accent hover:text-white transition-all disabled:opacity-50"
                                         >
                                             {isRegenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
                                             {isRegenerating ? "Syncing" : "Regenerate Vision"}
                                         </button>
-                                        <p className="text-[8px] font-black uppercase tracking-tighter text-foreground/20 italic">Syncs Outline + Refs + Cameos</p>
+                                        <p className="text-[8px] font-black uppercase tracking-tighter text-foreground/20 italic mt-1">Syncs Outline + Refs + Cameos</p>
                                     </div>
                                 </div>
                                 
                                 {/* Tab Navigation */}
-                                <div className="flex items-center bg-black/20 p-1 rounded-2xl border border-white/5 w-fit">
-                                    <button 
-                                        onClick={() => setActiveTab("outline")}
-                                        className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'outline' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
-                                    >
-                                        <Sparkles className="w-3 h-3" /> Outline
-                                    </button>
-                                    <button 
-                                        onClick={() => setActiveTab("references")}
-                                        className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'references' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
-                                    >
-                                        <Camera className="w-3 h-3" /> Refs
-                                    </button>
-                                    <button 
-                                        onClick={() => setActiveTab("cameos")}
-                                        className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'cameos' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
-                                    >
-                                        <Users className="w-3 h-3" /> Cameos
-                                    </button>
-                                    <button 
-                                        onClick={() => setActiveTab("blocking")}
-                                        className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'blocking' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
-                                    >
-                                        <Layout className="w-3 h-3" /> Blocking
-                                    </button>
-                                    <button 
-                                        onClick={() => setActiveTab("frames")}
-                                        className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'frames' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
-                                    >
-                                        <ImageIcon className="w-3 h-3" /> Frames
-                                    </button>
+                                <div className="tabs-container pb-2">
+                                    <div className="flex items-center bg-black/20 p-1 rounded-2xl border border-white/5 w-fit">
+                                        <button 
+                                            onClick={() => setActiveTab("outline")}
+                                            className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0 ${activeTab === 'outline' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
+                                        >
+                                            <Sparkles className="w-3 h-3" /> Outline
+                                        </button>
+                                        <button 
+                                            onClick={() => setActiveTab("references")}
+                                            className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0 ${activeTab === 'references' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
+                                        >
+                                            <Camera className="w-3 h-3" /> Refs
+                                        </button>
+                                        <button 
+                                            onClick={() => setActiveTab("cameos")}
+                                            className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0 ${activeTab === 'cameos' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
+                                        >
+                                            <Users className="w-3 h-3" /> Cameos
+                                        </button>
+                                        <button 
+                                            onClick={() => setActiveTab("blocking")}
+                                            className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0 ${activeTab === 'blocking' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
+                                        >
+                                            <Layout className="w-3 h-3" /> Blocking
+                                        </button>
+                                        <button 
+                                            onClick={() => setActiveTab("frames")}
+                                            className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0 ${activeTab === 'frames' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
+                                        >
+                                            <ImageIcon className="w-3 h-3" /> Frames
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -775,7 +777,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                 {activeTab === "blocking" && (
                                     <div className="animate-in fade-in duration-300">
                                         <div className="overflow-x-auto">
-                                            <table className="w-full text-left border-collapse">
+                                            <table className="w-full text-left border-collapse responsive-table">
                                                 <thead>
                                                     <tr className="border-b border-border/10 bg-black/20">
                                                         <th className="p-6 text-[10px] font-black uppercase tracking-widest text-foreground/40">Time</th>
@@ -788,32 +790,44 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                     {activeMission.shots.map((shot, idx) => (
                                                         <tr key={shot.id} className="group hover:bg-white/5 transition-colors">
                                                             <td className="p-6 align-top">
-                                                                <span className="text-[11px] font-mono font-black text-accent bg-accent/5 px-2 py-1 rounded-md">{shot.timestamp}</span>
+                                                                <div className="flex flex-col gap-1">
+                                                                    <span className="lg:hidden text-[9px] font-black uppercase tracking-widest text-accent mb-1 opacity-50">Timestamp</span>
+                                                                    <span className="text-[11px] font-mono font-black text-accent bg-accent/5 px-2 py-1 rounded-md w-fit">
+                                                                        {shot.timestamp}
+                                                                    </span>
+                                                                </div>
                                                             </td>
-                                                            <td className="p-6 align-top max-w-[150px]">
-                                                                <p className="text-[10px] font-mono text-pink-400 leading-relaxed italic">{shot.lyric || "—"}</p>
+                                                            <td className="p-6 lg:p-6 align-top max-w-none lg:max-w-[150px]">
+                                                                <div className="flex flex-col gap-1">
+                                                                    <span className="lg:hidden text-[9px] font-black uppercase tracking-widest text-accent mb-1 opacity-50">Lyric Sync</span>
+                                                                    <p className="text-[10px] font-mono text-pink-400 leading-relaxed italic m-0">{shot.lyric || "—"}</p>
+                                                                </div>
                                                             </td>
-                                                            <td className="p-6 align-top max-w-sm">
-                                                                <p className="text-sm leading-relaxed font-medium text-foreground/80">{shot.visualDescription}</p>
+                                                            <td className="p-6 lg:p-6 align-top max-w-none lg:max-w-sm">
+                                                                <div className="flex flex-col gap-1">
+                                                                    <span className="lg:hidden text-[9px] font-black uppercase tracking-widest text-accent mb-1 opacity-50">Director's Vision</span>
+                                                                    <p className="text-sm leading-relaxed font-medium text-foreground/80 m-0">{shot.visualDescription}</p>
+                                                                </div>
                                                             </td>
-                                                            <td className="p-6 align-top max-w-sm">
+                                                            <td className="p-6 lg:p-6 align-top max-w-none lg:max-w-sm">
                                                                 <div className="flex flex-col gap-3">
+                                                                    <span className="lg:hidden text-[9px] font-black uppercase tracking-widest text-accent mb-1 opacity-50">Critiques</span>
                                                                     {shot.personaCritiques?.director && (
                                                                         <div className="flex gap-2">
                                                                             <Sparkles className="w-2.5 h-2.5 text-purple-400 mt-1 shrink-0" />
-                                                                            <p className="text-[10px] leading-relaxed text-foreground/50"><span className="text-purple-400 font-black uppercase tracking-tighter">Director:</span> {shot.personaCritiques.director}</p>
+                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-purple-400 font-black uppercase tracking-tighter">Director:</span> {shot.personaCritiques.director}</p>
                                                                         </div>
                                                                     )}
                                                                     {shot.personaCritiques?.strategist && (
                                                                         <div className="flex gap-2">
                                                                             <Sparkles className="w-2.5 h-2.5 text-emerald-400 mt-1 shrink-0" />
-                                                                            <p className="text-[10px] leading-relaxed text-foreground/50"><span className="text-emerald-400 font-black uppercase tracking-tighter">Strategist:</span> {shot.personaCritiques.strategist}</p>
+                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-emerald-400 font-black uppercase tracking-tighter">Strategist:</span> {shot.personaCritiques.strategist}</p>
                                                                         </div>
                                                                     )}
                                                                     {shot.personaCritiques?.audience && (
                                                                         <div className="flex gap-2">
                                                                             <Sparkles className="w-2.5 h-2.5 text-pink-400 mt-1 shrink-0" />
-                                                                            <p className="text-[10px] leading-relaxed text-foreground/50"><span className="text-pink-400 font-black uppercase tracking-tighter">Audience:</span> {shot.personaCritiques.audience}</p>
+                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-pink-400 font-black uppercase tracking-tighter">Audience:</span> {shot.personaCritiques.audience}</p>
                                                                         </div>
                                                                     )}
                                                                 </div>

@@ -38,7 +38,7 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen flex flex-col items-center pb-20 transition-colors duration-700">
+    <main className="min-h-screen p-4 lg:p-20 pb-40 flex flex-col gap-12 max-w-[1400px] mx-auto overflow-x-hidden">
       {/* 1. Header Navigation (Global) */}
       <header className="w-full max-w-screen-2xl px-6 py-4 flex justify-between items-center border-b border-border/10 backdrop-blur-xl sticky top-0 z-50">
         <div className="flex items-center gap-4">
