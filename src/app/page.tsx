@@ -103,31 +103,108 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Sub-Navigation (Module Switcher) */}
-      <nav className="w-full max-w-screen-2xl px-6 mt-6 flex gap-10 border-b border-border/10 overflow-x-auto scrollbar-hide">
-        {[
-          { id: "roadmap", label: "Home" },
-          { id: "vault", label: "Vault" },
-          { id: "intel", label: "Intel" },
-          { id: "pulse", label: "Pulse" },
-          { id: "lore", label: "Lore" },
-          { id: "creative", label: "Creative" },
-          { id: "director", label: "Director" },
-          { id: "chat", label: "Chat" },
-          { id: "prompts", label: "Prompts" },
-          { id: "finance", label: "Money" },
-          { id: "api-health", label: "API" },
-          { id: "core", label: "Core" },
-        ].map((mod) => (
+      {/* 3. Sub-Navigation (Module Switcher with Categories) */}
+      <nav className="w-full max-w-screen-2xl px-6 mt-6 flex flex-wrap items-end gap-1 border-b border-border/10 pb-0 shadow-[0_4px_10px_-5px_rgba(0,0,0,0.3)]">
+        
+        {/* MASTER CONTROL */}
+        <div className="flex flex-col gap-2 pb-4 mr-10">
+          <span className="text-[8px] font-black uppercase tracking-[0.4em] text-accent/60 ml-px">Master</span>
           <button
-            key={mod.id}
-            onClick={() => setActiveModule(mod.id as Module)}
-            className={`pb-4 text-[10px] font-black uppercase tracking-[0.3em] transition-all border-b-2 hover:text-foreground whitespace-nowrap ${activeModule === mod.id ? "border-accent text-accent" : "border-transparent text-neutral-500"
-              }`}
+            onClick={() => setActiveModule("chat")}
+            className={`flex items-center gap-3 px-6 py-3 rounded-2xl transition-all border relative overflow-hidden group shadow-2xl ${activeModule === "chat" 
+              ? "bg-accent border-accent/40 text-white scale-105" 
+              : "bg-surface/40 border-border/20 text-foreground/40 hover:text-white hover:border-accent/40"}`}
           >
-            {mod.label}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <MessageSquare className={`w-5 h-5 ${activeModule === "chat" ? "text-white" : "text-accent"}`} />
+            <span className="text-xs font-black uppercase tracking-widest">Chat</span>
+            {activeModule === "chat" && (
+              <div className="absolute inset-0 bg-white/10 animate-pulse pointer-events-none"></div>
+            )}
           </button>
-        ))}
+        </div>
+
+        {/* GROUPS */}
+        <div className="flex gap-12 items-end">
+          {/* GROUP: COMMAND */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-foreground/20 ml-1">Command</span>
+            <div className="flex gap-2 pb-4">
+              {[
+                { id: "roadmap", label: "Home" },
+                { id: "intel", label: "Intel" },
+              ].map((mod) => (
+                <button
+                  key={mod.id}
+                  onClick={() => setActiveModule(mod.id as Module)}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-xl border ${activeModule === mod.id ? "bg-white/10 text-accent border-accent/20 font-bold" : "text-neutral-500 border-transparent hover:text-foreground hover:bg-white/5"}`}
+                >
+                  {mod.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* GROUP: PIPELINE */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-foreground/20 ml-1">Pipeline</span>
+            <div className="flex gap-2 pb-4">
+              {[
+                { id: "creative", label: "Brainstorm" },
+                { id: "director", label: "Director" },
+              ].map((mod) => (
+                <button
+                  key={mod.id}
+                  onClick={() => setActiveModule(mod.id as Module)}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-xl border ${activeModule === mod.id ? "bg-white/10 text-accent border-accent/20 font-bold" : "text-neutral-500 border-transparent hover:text-foreground hover:bg-white/5"}`}
+                >
+                  {mod.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* GROUP: ARCHIVE */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-foreground/20 ml-1">Archive</span>
+            <div className="flex gap-2 pb-4">
+              {[
+                { id: "lore", label: "Lore" },
+                { id: "vault", label: "Vault" },
+                { id: "prompts", label: "Prompts" },
+                { id: "core", label: "Core" },
+              ].map((mod) => (
+                <button
+                  key={mod.id}
+                  onClick={() => setActiveModule(mod.id as Module)}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-xl border ${activeModule === mod.id ? "bg-white/10 text-accent border-accent/20 font-bold" : "text-neutral-500 border-transparent hover:text-foreground hover:bg-white/5"}`}
+                >
+                  {mod.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* GROUP: PERFORMANCE */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-foreground/20 ml-1">Performance</span>
+            <div className="flex gap-2 pb-4">
+              {[
+                { id: "pulse", label: "Pulse" },
+                { id: "finance", label: "Money" },
+                { id: "api-health", label: "API" },
+              ].map((mod) => (
+                <button
+                  key={mod.id}
+                  onClick={() => setActiveModule(mod.id as Module)}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-xl border ${activeModule === mod.id ? "bg-white/10 text-accent border-accent/20 font-bold" : "text-neutral-500 border-transparent hover:text-foreground hover:bg-white/5"}`}
+                >
+                  {mod.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       </nav>
 
       {/* 4. Modular Content Area */}
