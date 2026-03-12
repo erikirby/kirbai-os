@@ -42,7 +42,7 @@ export default function IntelInbox({ mode = "full", theme = "dark", activeTab = 
     const fetchIntel = async (force = false) => {
         // Check cache first if not forced
         if (!force) {
-            const cached = localStorage.getItem("kirbai_intel_cache");
+            const cached = localStorage.getItem("kirbai_intel_cache_v2");
             if (cached) {
                 const { intel: cIntel, news: cNews, timestamp } = JSON.parse(cached);
                 const age = Date.now() - timestamp;
@@ -71,7 +71,7 @@ export default function IntelInbox({ mode = "full", theme = "dark", activeTab = 
             setNews(finalNews);
 
             // Update cache
-            localStorage.setItem("kirbai_intel_cache", JSON.stringify({
+            localStorage.setItem("kirbai_intel_cache_v2", JSON.stringify({
                 intel: finalIntel,
                 news: finalNews,
                 timestamp: Date.now()
@@ -223,7 +223,7 @@ export default function IntelInbox({ mode = "full", theme = "dark", activeTab = 
                     <span className="text-[11px] font-black text-accent uppercase tracking-[0.6em]">Syncing Intel Streams</span>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div className="flex flex-col gap-16">
                     {/* High Prio Social Pulse Card */}
                     {news.some(n => n.source === "Social Pulse") && (
                         <div className="md:col-span-2 p-10 bg-accent/[0.04] border border-accent/30 squircle specular-reflect shadow-2xl relative overflow-hidden group">
@@ -251,45 +251,96 @@ export default function IntelInbox({ mode = "full", theme = "dark", activeTab = 
                         </div>
                     )}
 
-                    {/* YouTube Intel Feeds */}
-                    {intel.map((item: any) => (
-                        <div key={item.id} className="flex flex-col gap-6 p-10 bg-surface/20 border border-border/10 squircle hover:bg-surface/30 hover:border-accent/40 transition-all duration-1000 specular-reflect shadow-2xl overflow-hidden group">
-                            <div className="flex justify-between items-center relative z-10">
-                                <span className={`text-[10px] font-black tracking-[0.3em] px-4 py-1.5 rounded-full uppercase ${
-                                    item.tag === "KIRBAI" 
-                                        ? "bg-accent/15 text-accent" 
-                                        : item.tag === "NEWSLETTER"
-                                            ? "bg-pink-500/10 text-pink-400 border border-pink-500/20"
-                                            : "bg-black/40 text-foreground/40 border border-border/10"
-                                }`}>
-                                    {item.tag}
-                                </span>
-                                <span className="text-[10px] font-mono text-foreground/40 font-bold">{item.date}</span>
+                    {/* NEWSLETTER INTEL SECTION */}
+                    {intel.some(i => i.tag === "NEWSLETTER") && (
+                        <div className="flex flex-col gap-8">
+                            <div className="flex items-center gap-4 ml-1">
+                                <div className="h-px flex-1 bg-gradient-to-r from-pink-500/50 to-transparent" />
+                                <h3 className="text-[11px] font-black uppercase tracking-[0.6em] text-pink-400">Newsletter Protocols</h3>
+                                <div className="h-px flex-1 bg-gradient-to-l from-pink-500/50 to-transparent" />
                             </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                {intel.filter((i: any) => i.tag === "NEWSLETTER").map((item: any) => (
+                                    <div key={item.id} className="flex flex-col gap-6 p-10 bg-pink-500/[0.03] border border-pink-500/20 squircle hover:bg-pink-500/[0.06] hover:border-pink-500/50 transition-all duration-1000 specular-reflect shadow-2xl overflow-hidden group">
+                                        <div className="flex justify-between items-center relative z-10">
+                                            <span className="text-[10px] font-black tracking-[0.3em] px-4 py-1.5 rounded-full uppercase bg-pink-500/10 text-pink-400 border border-pink-500/20">
+                                                NEWSLETTER
+                                            </span>
+                                            <span className="text-[10px] font-mono text-pink-400/40 font-bold tracking-widest">{item.date}</span>
+                                        </div>
 
-                            <div className="flex flex-col gap-3 relative z-10">
-                                <h4 className="text-xl font-black text-foreground group-hover:text-accent transition-colors tracking-tighter leading-tight">{item.title}</h4>
-                                <p className="text-sm text-foreground/70 leading-relaxed font-bold opacity-80">{item.summary}</p>
+                                        <div className="flex flex-col gap-3 relative z-10">
+                                            <h4 className="text-xl font-black text-foreground group-hover:text-pink-400 transition-colors tracking-tighter leading-tight uppercase">{item.title.replace("Guerrilla: ", "")}</h4>
+                                            <p className="text-sm text-foreground/70 leading-relaxed font-bold opacity-80">{item.summary}</p>
+                                        </div>
+
+                                        <div className="bg-black/30 border border-pink-500/10 rounded-[2rem] p-8 mt-4 flex flex-col gap-6 relative z-10 shadow-inner group-hover:bg-black/50 transition-colors">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-1.5 h-1.5 bg-pink-500 rounded-full shadow-[0_0_8px_rgba(236,72,153,1)]" />
+                                                <span className="text-[11px] uppercase font-black text-pink-500 tracking-[0.5em]">Guerrilla Strategy:</span>
+                                            </div>
+                                            <ul className="flex flex-col gap-4">
+                                                {item.actionItems.map((action: string, idx: number) => (
+                                                    <li key={idx} className="text-sm text-neutral-200 font-bold flex gap-4 items-start tracking-tight leading-snug group-hover:translate-x-1 transition-transform">
+                                                        <span className="text-pink-500 font-black">0{idx + 1}</span>
+                                                        {action}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                        <a href={item.url} target="_blank" className="text-[10px] font-black uppercase tracking-[0.4em] text-pink-400/40 hover:text-pink-400 transition-all mt-4 ml-1">Analyze Source Protocol_</a>
+                                    </div>
+                                ))}
                             </div>
-
-                            <div className="bg-black/30 border border-white/5 rounded-[2rem] p-8 mt-4 flex flex-col gap-6 relative z-10 shadow-inner group-hover:bg-black/50 transition-colors">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-1.5 h-1.5 bg-accent rounded-full shadow-[0_0_8px_rgba(255,51,102,1)]" />
-                                    <span className="text-[11px] uppercase font-black text-accent tracking-[0.5em]">Strategic Protocol:</span>
-                                </div>
-                                <ul className="flex flex-col gap-4">
-                                    {item.actionItems.map((action: string, idx: number) => (
-                                        <li key={idx} className="text-sm text-neutral-200 font-bold flex gap-4 items-start tracking-tight leading-snug group-hover:translate-x-1 transition-transform">
-                                            <span className="text-accent font-black">0{idx + 1}</span>
-                                            {action}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            <a href={item.url} target="_blank" className="text-[10px] font-black uppercase tracking-[0.4em] text-neutral-700 hover:text-white transition-all mt-4 ml-1">Stream Content Matrix_</a>
                         </div>
-                    ))}
+                    )}
+
+                    {/* YOUTUBE INTEL SECTION */}
+                    <div className="flex flex-col gap-8">
+                        <div className="flex items-center gap-4 ml-1">
+                            <div className="h-px flex-1 bg-gradient-to-r from-accent/50 to-transparent" />
+                            <h3 className="text-[11px] font-black uppercase tracking-[0.6em] text-accent">Video Surveillance</h3>
+                            <div className="h-px flex-1 bg-gradient-to-l from-accent/50 to-transparent" />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            {intel.filter((i: any) => i.tag !== "NEWSLETTER").map((item: any) => (
+                                <div key={item.id} className="flex flex-col gap-6 p-10 bg-surface/20 border border-border/10 squircle hover:bg-surface/30 hover:border-accent/40 transition-all duration-1000 specular-reflect shadow-2xl overflow-hidden group">
+                                    <div className="flex justify-between items-center relative z-10">
+                                        <span className={`text-[10px] font-black tracking-[0.3em] px-4 py-1.5 rounded-full uppercase ${
+                                            item.tag === "KIRBAI" 
+                                                ? "bg-accent/15 text-accent" 
+                                                : "bg-black/40 text-foreground/40 border border-border/10"
+                                        }`}>
+                                            {item.tag}
+                                        </span>
+                                        <span className="text-[10px] font-mono text-foreground/40 font-bold">{item.date}</span>
+                                    </div>
+
+                                    <div className="flex flex-col gap-3 relative z-10">
+                                        <h4 className="text-xl font-black text-foreground group-hover:text-accent transition-colors tracking-tighter leading-tight">{item.title.replace("AIGuerrilla: ", "")}</h4>
+                                        <p className="text-sm text-foreground/70 leading-relaxed font-bold opacity-80">{item.summary}</p>
+                                    </div>
+
+                                    <div className="bg-black/30 border border-white/5 rounded-[2rem] p-8 mt-4 flex flex-col gap-6 relative z-10 shadow-inner group-hover:bg-black/50 transition-colors">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-1.5 h-1.5 bg-accent rounded-full shadow-[0_0_8px_rgba(255,51,102,1)]" />
+                                            <span className="text-[11px] uppercase font-black text-accent tracking-[0.5em]">Tactical Protocol:</span>
+                                        </div>
+                                        <ul className="flex flex-col gap-4">
+                                            {item.actionItems.map((action: string, idx: number) => (
+                                                <li key={idx} className="text-sm text-neutral-200 font-bold flex gap-4 items-start tracking-tight leading-snug group-hover:translate-x-1 transition-transform">
+                                                    <span className="text-accent font-black">0{idx + 1}</span>
+                                                    {action}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <a href={item.url} target="_blank" className="text-[10px] font-black uppercase tracking-[0.4em] text-neutral-700 hover:text-white transition-all mt-4 ml-1">Stream Content Matrix_</a>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

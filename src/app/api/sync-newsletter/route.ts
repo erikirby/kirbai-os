@@ -6,29 +6,40 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function GET(req: Request) {
     try {
-        // 1. Fetch the posts list from beehiiv public endpoint
+        // 1. Fetch the posts archive page
         const postsRes = await fetch("https://aiguerrilla.com/posts", {
             cache: "no-store",
-            headers: {
-                'Accept': 'application/json'
-            }
         });
-        const postsData = await postsRes.json();
-        const latestPosts = postsData.posts.slice(0, 2); // Get the 2 most recent
+        const html = await postsRes.text();
+        
+        // 2. Extract post slugs and titles using regex (since we don't have a DOM parser in standard edge runtime)
+        // Looking for patterns like: href="/p/slug-name" and the title nearby
+        // Beehiiv posts are usually in a structure like: <a class="..." href="/p/slug">Title</a>
+        const postRegex = /href="\/p\/([^"]+)"[^>]*>([^<]+)<\/a>/g;
+        const missions: { slug: string, title: string }[] = [];
+        let match;
+        
+        while ((match = postRegex.exec(html)) !== null && missions.length < 2) {
+            const slug = match[1];
+            const title = match[2].trim();
+            // Avoid duplicates
+            if (!missions.some(m => m.slug === slug)) {
+                missions.push({ slug, title });
+            }
+        }
 
         const newsletterIntel: IntelItem[] = [];
 
-        for (const post of latestPosts) {
+        for (const post of missions) {
             const postUrl = `https://aiguerrilla.com/p/${post.slug}`;
             
             // Fetch raw post content for analysis
             const postContentRes = await fetch(postUrl);
-            const html = await postContentRes.text();
+            const postHtml = await postContentRes.text();
             
-            // Basic extraction of text to avoid overwhelming Gemini with HTML
-            // We want the main article body. Beehiiv usually wraps it in a specific tag or we can just send the whole thing and let Gemini handle it.
-            // Limiting to first 6000 chars of HTML is usually enough for a newsletter.
-            const truncatedHtml = html.slice(0, 10000);
+            // Extract the main content. Beehiiv usually has it in a div or we can just grab a large chunk.
+            const contentStart = postHtml.indexOf('<article') !== -1 ? postHtml.indexOf('<article') : postHtml.indexOf('<body');
+            const truncatedHtml = postHtml.slice(contentStart, contentStart + 15000);
 
             const systemInstruction = `
                 You are an elite tactical analyst for a high-volume AI music brand.
@@ -44,8 +55,7 @@ export async function GET(req: Request) {
                 model: "gemini-2.5-flash-lite",
                 contents: `Analyze this newsletter post for a music creator.
                 
-                Title: ${post.web_title}
-                Subtitle: ${post.web_subtitle}
+                Title: ${post.title}
                 Content Fragment: ${truncatedHtml}`,
                 config: {
                     systemInstruction: systemInstruction,
@@ -71,15 +81,20 @@ export async function GET(req: Request) {
             if (response.text) {
                 const parsed = JSON.parse(response.text);
                 newsletterIntel.push({
-                    id: `newsletter-${post.id}`,
+                    id: `newsletter-${post.slug}`,
                     tag: "NEWSLETTER",
-                    date: new Date(post.override_scheduled_at || post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                    title: `Guerrilla: ${post.web_title}`,
+                    date: "Recent", // We don't have easy date extraction from HTML regex, but Gemini can probably find it if we asked
+                    title: `Guerrilla: ${post.title}`,
                     summary: parsed.summary,
                     actionItems: parsed.actionItems,
                     url: postUrl
                 });
             }
+        }
+
+        if (newsletterIntel.length === 0) {
+            // Backup/Mock if scraper fails to find anything
+            console.error("Scraper found 0 posts. HTML length:", html.length);
         }
 
         return NextResponse.json({ success: true, intel: newsletterIntel });
