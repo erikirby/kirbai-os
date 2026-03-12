@@ -13,11 +13,12 @@ import ConsultantSettings from "@/components/ConsultantSettings";
 import LoreMatrix from "@/components/LoreMatrix";
 import PromptBank from "@/components/PromptBank";
 import CreativeHub from "@/components/CreativeHub";
-import DirectorSuite from "@/components/DirectorSuite"; // Added import
-import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Share2, Menu, X, Home as HomeIcon, Clapperboard, Layers, Sparkles, Wallet } from 'lucide-react';
+import DirectorSuite from "@/components/DirectorSuite";
+import MuseDeck from "@/components/MuseDeck";
+import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Share2, Menu, X, Home as HomeIcon, Clapperboard, Layers, Sparkles, Wallet, Brain } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
-type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director"; // Added 'director'
+type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director" | "muse";
 type Theme = "dark" | "light" | "pink" | "snes" | "gbc";
 
 export default function Home() {
@@ -143,6 +144,7 @@ export default function Home() {
               {[
                 { id: "roadmap", label: "Home" },
                 { id: "intel", label: "Intel" },
+                { id: "muse", label: "The Muse" },
               ].map((mod) => (
                 <button
                   key={mod.id}
@@ -346,6 +348,7 @@ export default function Home() {
             {activeModule === "lore" && <LoreMatrix theme={theme} mode={activeTab} />}
             {activeModule === "creative" && <CreativeHub theme={theme} mode={activeTab} />}
             {activeModule === "prompts" && <PromptBank mode={activeTab} />}
+            {activeModule === "muse" && <MuseDeck mode={activeTab} />}
           </div>
         </div>
 
