@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
             CURRENT ROADMAP: ${JSON.stringify(roadmap?.phases?.find((p: any) => p.status === 'Current Objective') || "None")}
             USER PSYCHE: ${JSON.stringify(psyche || "No memory yet")}
             ANALYTICS: ${JSON.stringify(pulse?.summary || "No data")}
+            SCOUT INTEL (TRENDS): "Pokémon Pokopia" sandbox mode is viral. "2026 is the New 2016" nostalgia trend is peaking on TikTok. AI grading of cards is a hot topic.
         `;
 
         // 2. Define the Symposium Prompt

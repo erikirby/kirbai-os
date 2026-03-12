@@ -55,13 +55,20 @@ const MuseDeck = ({ mode }: { mode: string }) => {
         const currentCard = cards[activeIdx];
         const updatedCards = cards.filter((_, i) => i !== activeIdx);
         
-        // In a real app, we'd persist the decision to a separate 'decisions' table or similar
-        // For now, we update the local list and persist the 'pending' ones
         setCards(updatedCards);
         
         if (status === 'yes') {
             setClefairyEmotion('happy');
             setClefairyMessage("Great choice! I'll add that to the Roadmap.");
+            // Trigger celebration effect
+            const burst = document.createElement('div');
+            burst.className = 'fixed inset-0 pointer-events-none z-50 flex items-center justify-center';
+            burst.innerHTML = `
+                <div class="animate-ping absolute w-32 h-32 bg-accent/20 rounded-full"></div>
+                <div class="animate-bounce text-6xl text-accent">💖</div>
+            `;
+            document.body.appendChild(burst);
+            setTimeout(() => burst.remove(), 1000);
         } else if (status === 'no') {
             setClefairyMessage("Understood. I'll make sure we don't suggest that again.");
         } else {
