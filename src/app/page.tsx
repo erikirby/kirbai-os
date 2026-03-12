@@ -97,49 +97,6 @@ export default function Home() {
         >
           <Settings2 className="w-5 h-5" />
         </button>
-
-        {/* Mobile Settings Overlay */}
-        {showSettings && (
-          <div className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl p-10 flex flex-col gap-8 animate-in fade-in duration-300">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-black uppercase tracking-widest">Settings</h2>
-              <button onClick={() => setShowSettings(false)} className="p-2 bg-white/5 rounded-full"><X className="w-6 h-6" /></button>
-            </div>
-            
-            <div className="flex flex-col gap-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Theme</span>
-              <div className="grid grid-cols-2 gap-2">
-                {themes.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => { setTheme(t.id); setShowSettings(false); }}
-                    className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${theme === t.id ? "bg-accent border-accent text-white" : "bg-white/5 border-white/10 text-foreground/40"}`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Brand / Ecosystem</span>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => { setActiveTab("kirbai"); setShowSettings(false); }}
-                  className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${activeTab === "kirbai" ? "bg-accent border-accent text-white" : "bg-white/5 border-white/10 text-foreground/40"}`}
-                >
-                  Kirbai
-                </button>
-                <button
-                  onClick={() => { setActiveTab("factory"); setShowSettings(false); }}
-                  className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${activeTab === "factory" ? "bg-accent border-accent text-white" : "bg-white/5 border-white/10 text-foreground/40"}`}
-                >
-                  Factory
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </header>
 
       {/* 2. Hero Banner Section */}
@@ -328,6 +285,52 @@ export default function Home() {
           <p className="text-center text-[9px] font-black uppercase tracking-[0.5em] text-foreground/20 mt-auto pb-10">KIRBAI OS MOBILE SUIT V3.2.1</p>
         </div>
       )}
+
+      {/* MOBILE SETTINGS OVERLAY */}
+      {showSettings && (
+        <div className="fixed inset-0 z-[2000] bg-black/95 backdrop-blur-3xl p-10 flex flex-col gap-8 overflow-y-auto animate-in fade-in duration-300">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-black uppercase tracking-widest text-accent">Settings</h2>
+            <button onClick={() => setShowSettings(false)} className="p-3 bg-white/10 rounded-full"><X className="w-6 h-6" /></button>
+          </div>
+          
+          <div className="flex flex-col gap-4">
+            <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Theme</span>
+            <div className="grid grid-cols-2 gap-2">
+              {themes.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => { setTheme(t.id); setShowSettings(false); }}
+                  className={`px-6 py-6 rounded-3xl text-[10px] font-black uppercase tracking-widest border transition-all ${theme === t.id ? "bg-accent border-accent text-white shadow-xl shadow-accent/20" : "bg-white/5 border-white/10 text-foreground/40"}`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Brand / Ecosystem</span>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => { setActiveTab("kirbai"); setShowSettings(false); }}
+                className={`px-6 py-6 rounded-3xl text-[10px] font-black uppercase tracking-widest border transition-all ${activeTab === "kirbai" ? "bg-accent border-accent text-white shadow-xl shadow-accent/20" : "bg-white/5 border-white/10 text-foreground/40"}`}
+              >
+                Kirbai
+              </button>
+              <button
+                onClick={() => { setActiveTab("factory"); setShowSettings(false); }}
+                className={`px-6 py-6 rounded-3xl text-[10px] font-black uppercase tracking-widest border transition-all ${activeTab === "factory" ? "bg-accent border-accent text-white shadow-xl shadow-accent/20" : "bg-white/5 border-white/10 text-foreground/40"}`}
+              >
+                Factory
+              </button>
+            </div>
+          </div>
+
+          <p className="text-center text-[9px] font-black uppercase tracking-[0.5em] text-foreground/20 mt-auto pb-10">PREFERENCE MATRIX V3.2.1</p>
+        </div>
+      )}
+    </main>
 
       {/* 4. Modular Content Area */}
       <div className="w-full max-w-screen-2xl px-6 mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
