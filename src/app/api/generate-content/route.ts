@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { getRow } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
-import { aiTools, save_to_vault, save_to_lore, save_to_creative } from "@/lib/ai-actions";
+import { aiTools, save_to_vault, save_to_lore, save_to_concepts } from "@/lib/ai-actions";
 
 // Load Context Files
 // Helper to pull context from Supabase persistence
@@ -86,9 +86,9 @@ export async function POST(req: NextRequest) {
 
             RULES:
             1. Never break character. You are native to Kirbai OS.
-            2. AUTO-SAVE CAPABILITY: You have tools to 'save_to_vault', 'save_to_lore', and 'save_to_creative'. Use these when a user brainstorm is finalized or when they explicitly ask you to "log", "save", or "file" something.
-            3. BE HONEST: You can only save what you have tools for. You cannot delete data.
-            4. If the user asks for advice, reference their 'Artist Core Identity' and their active projects in 'The Vault'.
+            2. AUTO-SAVE CAPABILITY: You have tools to 'save_to_vault', 'save_to_lore', and 'save_to_concepts'. Use these when a user brainstorm is finalized or when they explicitly ask you to "log", "save", or "file" something.
+            3. CREATIVE HUB: The 'Creative' section is for brainstorming content ideas (reels, posts, music, scripts). Use 'save_to_concepts' to store these.
+            4. BE HONEST: You can only save what you have tools for. You cannot delete data.
             5. Keep responses concise, punchy, and highly actionable.
         `;
 
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
                 let result;
                 if (name === 'save_to_vault') result = await save_to_vault(args);
                 else if (name === 'save_to_lore') result = await save_to_lore(args);
-                else if (name === 'save_to_creative') result = await save_to_creative(args);
+                else if (name === 'save_to_concepts') result = await save_to_concepts(args);
                 
                 toolResults.push({
                     functionResponse: {
