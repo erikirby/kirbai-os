@@ -13,10 +13,11 @@ import ConsultantSettings from "@/components/ConsultantSettings";
 import LoreMatrix from "@/components/LoreMatrix";
 import PromptBank from "@/components/PromptBank";
 import CreativeHub from "@/components/CreativeHub";
+import DirectorSuite from "@/components/DirectorSuite"; // Added import
 import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Share2 } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
-type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative";
+type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director"; // Added 'director'
 type Theme = "dark" | "light" | "pink" | "snes" | "gbc";
 
 export default function Home() {
@@ -105,12 +106,13 @@ export default function Home() {
       {/* 3. Sub-Navigation (Module Switcher) */}
       <nav className="w-full max-w-screen-2xl px-6 mt-6 flex gap-10 border-b border-border/10 overflow-x-auto scrollbar-hide">
         {[
-          { id: "roadmap", label: "Roadmap" },
+          { id: "roadmap", label: "Home" },
           { id: "vault", label: "Vault" },
           { id: "intel", label: "Intel" },
           { id: "pulse", label: "Pulse" },
           { id: "lore", label: "Lore" },
           { id: "creative", label: "Creative" },
+          { id: "director", label: "Director" },
           { id: "chat", label: "Chat" },
           { id: "prompts", label: "Prompts" },
           { id: "finance", label: "Money" },
@@ -130,12 +132,13 @@ export default function Home() {
 
       {/* 4. Modular Content Area */}
       <div className="w-full max-w-screen-2xl px-6 mt-12 grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3 flex flex-col gap-12">
+        <div className={activeModule === "roadmap" ? "lg:col-span-3 flex flex-col gap-12" : "lg:col-span-4 flex flex-col gap-12"}>
           <div key={`${activeTab}-${activeModule}`} className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             {activeModule === "roadmap" && <Roadmap mode={activeTab} />}
             {activeModule === "vault" && <VaultManager theme={theme} mode={activeTab} />}
             {activeModule === "intel" && <IntelInbox mode="full" theme={theme} activeTab={activeTab} />}
             {activeModule === "pulse" && <AnalyticsMatrix theme={theme} mode={activeTab} />}
+            {activeModule === "director" && <DirectorSuite mode={activeTab} />}
             {activeModule === "finance" && <FinanceView mode={activeTab} />}
             {activeModule === "api-health" && <APIHealth theme={theme} />}
             {activeModule === "chat" && <AIHub theme={theme} />}
@@ -146,14 +149,16 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 5. Sidebar Command Center (Contextual Intel) */}
-        <div className="lg:col-span-1 flex flex-col gap-8 sticky top-28 self-start">
-          <div className="glass squircle p-6 specular-reflect shadow-2xl overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-[50px] rounded-full -mr-16 -mt-16" />
-            <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-foreground mb-8 border-b border-border/10 pb-4">Command Center</h3>
-            <IntelInbox mode="compact" theme={theme} />
+        {/* 5. Sidebar Command Center (Contextual Intel) - Only on HOME */}
+        {activeModule === "roadmap" && (
+          <div className="lg:col-span-1 flex flex-col gap-8 sticky top-28 self-start">
+            <div className="glass squircle p-6 specular-reflect shadow-2xl overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-[50px] rounded-full -mr-16 -mt-16" />
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-foreground mb-8 border-b border-border/10 pb-4">Command Center</h3>
+              <IntelInbox mode="compact" theme={theme} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </main>
   );

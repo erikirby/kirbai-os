@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { Plus, Loader2, Trash2, Edit2, Check, X, ChevronDown, ChevronUp, Sparkles, Filter } from 'lucide-react';
+import { Plus, Loader2, Trash2, Edit2, Check, X, ChevronDown, ChevronUp, Sparkles, Filter, Clapperboard, Send } from 'lucide-react';
 
 type ConceptType = 'reel' | 'post' | 'music' | 'general';
 type ConceptStatus = 'concept' | 'in-dev' | 'executed' | 'archived';
@@ -84,6 +84,9 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
     const [editForm, setEditForm] = useState(BLANK_FORM);
     const [filterType, setFilterType] = useState<ConceptType | 'all'>('all');
     const [filterStatus, setFilterStatus] = useState<ConceptStatus | 'all'>('all');
+    const [promotingId, setPromotingId] = useState<string | null>(null);
+    const [lyrics, setLyrics] = useState("");
+    const [isPlanning, setIsPlanning] = useState(false);
 
     const load = async () => {
         try {
@@ -141,6 +144,34 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
     const handleEdit = async (id: string) => {
         await saveConcept({ id, ...editForm });
         setEditingId(null);
+    };
+
+    const handlePromote = async (concept: Concept) => {
+        if (!lyrics.trim()) return;
+        setIsPlanning(true);
+        try {
+            const res = await fetch('/api/director/plan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    concept,
+                    lyrics,
+                    mode,
+                    alias: concept.character || (mode === 'kirbai' ? 'Kirbai' : 'AELOW')
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setPromotingId(null);
+                setLyrics("");
+                // Optionally switch to Director tab or show success
+                alert("Mission Created! Head to Director Suite.");
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsPlanning(false);
+        }
     };
 
     const startEdit = (c: Concept) => {
@@ -409,6 +440,43 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                                 {concept.body}
                                             </p>
                                         )}
+
+                                        {/* Promotion UI */}
+                                        <div className="mt-4 pt-4 border-t border-white/5 flex flex-col gap-4">
+                                            {promotingId === concept.id ? (
+                                                <div className="bg-accent/5 border border-accent/20 rounded-2xl p-4 flex flex-col gap-4 animate-in slide-in-from-top-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-accent flex items-center gap-2">
+                                                            <Clapperboard className="w-3 h-3" /> Initializing Mission Data
+                                                        </span>
+                                                        <button onClick={() => setPromotingId(null)} className="text-foreground/40 hover:text-white transition-colors">
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                    <textarea 
+                                                        value={lyrics}
+                                                        onChange={e => setLyrics(e.target.value)}
+                                                        placeholder="Paste the song lyrics or script poem here for the Director to analyze..."
+                                                        className="w-full h-32 bg-black/40 border border-white/5 rounded-xl p-4 text-xs font-mono focus:outline-none focus:border-accent/40 resize-none placeholder:text-white/20"
+                                                    />
+                                                    <button 
+                                                        onClick={() => handlePromote(concept)}
+                                                        disabled={isPlanning || !lyrics.trim()}
+                                                        className="bg-accent text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent/80 transition-all shadow-lg flex items-center justify-center gap-2"
+                                                    >
+                                                        {isPlanning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-3 h-3" />}
+                                                        Launch Multi-Agent Planning
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <button 
+                                                    onClick={() => setPromotingId(concept.id)}
+                                                    className="w-fit flex items-center gap-2 px-4 py-2 border border-border/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-foreground/40 hover:text-white hover:border-accent transition-all group/btn"
+                                                >
+                                                    <Clapperboard className="w-4 h-4 text-accent/50 group-hover/btn:text-accent" /> Promote to Director Suite
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
                             </div>

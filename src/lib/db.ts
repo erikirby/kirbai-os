@@ -38,6 +38,31 @@ export interface RoadmapTask {
     status: "todo" | "wip" | "done";
 }
 
+export interface Shot {
+    id: string;
+    timestamp: string;
+    lyric?: string;
+    visualDescription: string;
+    personaCritiques?: {
+        director?: string;
+        strategist?: string;
+    };
+    bananaPrompt?: string;
+    grokTrigger?: string;
+    status: "draft" | "planned" | "rendereded" | "final";
+}
+
+export interface Mission {
+    id: string;
+    conceptId: string;
+    title: string;
+    alias: string;
+    mode: "kirbai" | "factory";
+    shots: Shot[];
+    createdAt: string;
+    updatedAt: string;
+}
+
 interface DatabaseSchema {
     metadataHistory: MetadataPack[];
     intelCache: IntelItem[];
@@ -47,6 +72,7 @@ interface DatabaseSchema {
         phases: RoadmapPhase[];
         tasks: RoadmapTask[];
     };
+    missions: Mission[];
 }
 
 const DEFAULT_DB: DatabaseSchema = {
@@ -54,7 +80,8 @@ const DEFAULT_DB: DatabaseSchema = {
     intelCache: [],
     pokemonNews: [],
     financeAnalysis: null,
-    roadmap: { phases: [], tasks: [] }
+    roadmap: { phases: [], tasks: [] },
+    missions: []
 };
 
 // --- Generic persistence helpers ---
@@ -157,6 +184,24 @@ export async function getRoadmapAsync(mode?: string) {
 
 export function getRoadmap() {
     return { phases: [], tasks: [] }; // async callers use getRoadmapAsync
+}
+
+export async function saveMissionAsync(mission: Mission) {
+    const mode = mission.mode;
+    const key = mode === 'factory' ? 'missions_factory' : 'missions_kirbai';
+    let missions = await getRow(key) || [];
+    const idx = missions.findIndex((m: any) => m.id === mission.id);
+    if (idx !== -1) {
+        missions[idx] = mission;
+    } else {
+        missions.unshift(mission);
+    }
+    await setRow(key, missions);
+}
+
+export async function getMissionsAsync(mode: string): Promise<Mission[]> {
+    const key = mode === 'factory' ? 'missions_factory' : 'missions_kirbai';
+    return await getRow(key) || [];
 }
 
 // --- TELEMETRY (stored in persistence table) ---
