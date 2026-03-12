@@ -302,3 +302,48 @@ export async function resetTelemetryAsync() {
 export function resetTelemetry() {
     return resetTelemetryAsync().catch(console.error);
 }
+
+// --- MUSE ADVISORY SUITE ---
+
+export interface MuseCard {
+    id: string;
+    type: 'content' | 'workflow' | 'monetization' | 'competitor' | 'mental_health';
+    title: string;
+    description: string;
+    reason: string; // The "Scout" or "Strategist" justification
+    source?: string; // e.g. "YouTube Trends", "Competitor X Analysis"
+    status: 'pending' | 'yes' | 'no' | 'maybe';
+    debateLog: string; // The transcript of the Symposium
+    actionMatrix: {
+        time: 'low' | 'med' | 'high';
+        revenue: 'low' | 'med' | 'high';
+        creativeValue: 'low' | 'med' | 'high';
+    };
+    createdAt: string;
+}
+
+export interface UserPsyche {
+    mood: string;
+    recentTriggers: string[];
+    wins: string[];
+    motivationLevel: number; // 0-100
+    burnoutRisk: number; // 0-100
+    notes: string[]; // Self-reflection from The Advocate
+    updatedAt: string;
+}
+
+export async function saveMuseCardsAsync(cards: MuseCard[]) {
+    await setRow('muse_cards', cards);
+}
+
+export async function getMuseCardsAsync(): Promise<MuseCard[]> {
+    return await getRow('muse_cards') || [];
+}
+
+export async function saveUserPsycheAsync(psyche: UserPsyche) {
+    await setRow('user_psyche', psyche);
+}
+
+export async function getUserPsycheAsync(): Promise<UserPsyche | null> {
+    return await getRow('user_psyche');
+}
