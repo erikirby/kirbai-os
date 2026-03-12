@@ -186,16 +186,38 @@ export function getFinanceAnalysis() {
 export async function saveRoadmapAsync(roadmapData: { phases: RoadmapPhase[], tasks: RoadmapTask[] }, mode?: string) {
     const key = mode === 'factory' ? 'roadmap_factory' : 'roadmap';
     await setRow(key, roadmapData);
+export async function saveRoadmapAsync(mode: string, roadmap: RoadmapData) {
+    const key = mode === 'factory' ? 'roadmap_factory' : 'roadmap_kirbai';
+    await setRow(key, roadmap);
 }
 
 export function saveRoadmap(roadmapData: { phases: RoadmapPhase[], tasks: RoadmapTask[] }) {
-    saveRoadmapAsync(roadmapData).catch(console.error);
+    // This sync version is now deprecated due to the new async signature
+    // For compatibility, it calls the new async version with a default mode and converts the data
+    saveRoadmapAsync('kirbai', { phases: roadmapData.phases }).catch(console.error);
 }
 
-export async function getRoadmapAsync(mode?: string) {
-    const key = mode === 'factory' ? 'roadmap_factory' : 'roadmap';
+export async function getRoadmapAsync(mode: string): Promise<RoadmapData> {
+    const key = mode === 'factory' ? 'roadmap_factory' : 'roadmap_kirbai';
     const data = await getRow(key);
-    return data ?? { phases: [], tasks: [] };
+    return data || { phases: [] };
+}
+
+export async function addRoadmapTaskAsync(mode: string, title: string, description: string) {
+    const roadmap = await getRoadmapAsync(mode);
+    const currentPhase = roadmap.phases.find(p => p.status === 'Current Objective') || roadmap.phases[0];
+    
+    if (currentPhase) {
+        if (!currentPhase.tasks) currentPhase.tasks = [];
+        currentPhase.tasks.push({
+            id: crypto.randomUUID(),
+            title,
+            description,
+            status: 'Todo',
+            priority: 'High'
+        });
+        await saveRoadmapAsync(mode, roadmap);
+    }
 }
 
 export function getRoadmap() {

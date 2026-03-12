@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Sparkles, X, Check, Eye, Brain, TrendingUp, DollarSign, Heart, ChevronRight, Loader2 } from 'lucide-react';
-import { MuseCard, getMuseCardsAsync, saveMuseCardsAsync, saveUserPsycheAsync, getUserPsycheAsync } from '@/lib/db';
+import { MuseCard, getMuseCardsAsync, saveMuseCardsAsync, saveUserPsycheAsync, getUserPsycheAsync, addRoadmapTaskAsync } from '@/lib/db';
 import MuseClefairy from './MuseClefairy';
 import MuseHistory from './MuseHistory';
 
@@ -70,6 +70,9 @@ const MuseDeck = ({ mode }: { mode: string }) => {
             setClefairyEmotion('happy');
             setClefairyMessage("Great choice! I'll add that to the Roadmap.");
             
+            // Autopilot: Add to Roadmap
+            await addRoadmapTaskAsync(mode, currentCard.title, currentCard.description);
+
             // Advance Psyche Memory
             const psyche = await getUserPsycheAsync();
             if (psyche) {
