@@ -223,7 +223,33 @@ body {
   backdrop-filter: none !important;
 }
 
-[data-theme='snes'] /* Table to Card Transformation: Aggressive Nuke */
+[data-theme='snes'] .squircle {
+  border-radius: 0.5rem !important;
+}
+
+[data-theme='snes'] button:active,
+[data-theme='snes'] .snes-btn-active {
+  transform: translateY(4px) !important;
+  border-bottom-width: 2px !important;
+  box-shadow: none !important;
+}
+
+/* Gamification: XP Progress Bar */
+.xp-bar-inner {
+  background: linear-gradient(90deg, var(--accent-color), var(--accent-sunset));
+  box-shadow: 0 0 10px var(--accent-color);
+  transition: width 1s ease-in-out;
+}
+
+/* --- MOBILE SUIT: HIGH-FIDELITY RESPONSIVE SYSTEM --- */
+@media (max-width: 768px) {
+  .tabs-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+
+  /* Table to Card Transformation: Aggressive Nuke */
   .responsive-table,
   .responsive-table border-collapse,
   .responsive-table thead,
@@ -235,45 +261,34 @@ body {
     width: 100% !important;
   }
 
-[data-theme='snes'] .responsive-table thead {
+  .responsive-table thead {
     display: none !important;
   }
 
-[data-theme='snes'] .responsive-table tr {
+  .responsive-table tr {
     padding: 1.5rem !important;
-    margin-bottom: 1rem !important;
+    margin-bottom: 1.5rem !important;
     background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid var(--border-color) !important;
-    border-radius: 24px !important;
+    border-radius: 32px !important;
   }
 
-[data-theme='snes'] .responsive-table td {
+  .responsive-table td {
     border-bottom: 0 !important;
     padding: 0 !important;
     margin-bottom: 1rem !important;
   }
 
-[data-theme='snes'] .responsive-table td:last-child {
+  .responsive-table td:last-child {
     margin-bottom: 0 !important;
   }
 
-  /* Force stack headers */
-[data-theme='snes'] .mobile-stack-header {
+  /* Hardcoded Stack for Mission Header */
+  .mobile-stack-header {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 1.5rem !important;
   }
-
-[data-theme='snes'] .squircle {
-  border-radius: 0.5rem !important;
-  /* SNES is blocky */
-}
-
-[data-theme='snes'] button:active,
-[data-theme='snes'] .snes-btn-active {
-  transform: translateY(4px) !important;
-  border-bottom-width: 2px !important;
-  box-shadow: none !important;
 }
 
 /* Gamification: XP Progress Bar */
