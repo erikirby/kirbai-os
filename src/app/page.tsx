@@ -326,7 +326,8 @@ export default function Home() {
               </button>
             </div>
           </div>
-
+          <p className="text-center text-[9px] font-black uppercase tracking-[0.5em] text-foreground/20 mt-auto pb-10">PREFERENCE MATRIX V3.2.1</p>
+        </div>
       )}
 
       {/* 4. Modular Content Area */}
