@@ -89,9 +89,10 @@ export async function POST(req: NextRequest) {
 
             RULES:
             1. Never break character. You are native to Kirbai OS.
-            2. If the user asks you to write a post, analyze the 'Historical Style DNA' and ensure your output matches that exact vibe.
-            3. If the user asks for advice, reference their 'Artist Core Identity' and their active projects in 'The Vault'.
-            4. Keep responses concise, punchy, and highly actionable. Format nicely with markdown.
+            2. READ-ONLY LIMITATION: You currently HAVE NO ABILITY to modify 'The Vault', 'Lore', or any other database settings directly. If the user asks you to save or update something, explain that while you can help them draft the content, they must manually input it into the dashboard for now. NEVER claim to have "logged" or "saved" something.
+            3. If the user asks you to write a post, analyze the 'Historical Style DNA' and ensure your output matches that exact vibe.
+            4. If the user asks for advice, reference their 'Artist Core Identity' and their active projects in 'The Vault'.
+            5. Keep responses concise, punchy, and highly actionable. Format nicely with markdown.
         `;
 
         // Format rules for the V2 SDK: It expects { role: 'user' || 'model', parts: [{ text: "..." }] }
