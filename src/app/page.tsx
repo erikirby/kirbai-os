@@ -235,21 +235,21 @@ export default function Home() {
           <HomeIcon className="w-6 h-6" />
           <span>Home</span>
         </button>
-          <button 
-            onClick={() => setActiveModule("director")}
-            className={`flex flex-col items-center gap-1 transition-all ${activeModule === "director" ? "text-accent scale-110" : "text-foreground/40 hover:text-foreground/60"}`}
-          >
-            <Clapperboard className="w-6 h-6" />
-            <span className="text-[8px] font-black uppercase tracking-widest">Director</span>
-          </button>
+        <button 
+          onClick={() => setActiveModule("director")}
+          className={`mobile-dock-item ${activeModule === 'director' ? 'active' : ''}`}
+        >
+          <Clapperboard className="w-6 h-6" />
+          <span>Director</span>
+        </button>
 
-          <button 
-            onClick={() => setActiveModule("muse")}
-            className={`flex flex-col items-center gap-1 transition-all ${activeModule === "muse" ? "text-accent scale-110" : "text-foreground/40 hover:text-foreground/60"}`}
-          >
-            <Brain className="w-6 h-6" />
-            <span className="text-[8px] font-black uppercase tracking-widest">Muse</span>
-          </button>
+        <button 
+          onClick={() => setActiveModule("muse")}
+          className={`mobile-dock-item ${activeModule === 'muse' ? 'active' : ''}`}
+        >
+          <Brain className="w-6 h-6" />
+          <span>Muse</span>
+        </button>
         <button 
           onClick={() => setShowLauncher(true)}
           className={`mobile-dock-item ${showLauncher ? 'active' : ''}`}
