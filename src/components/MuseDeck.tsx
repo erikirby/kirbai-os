@@ -12,6 +12,7 @@ const MuseDeck = ({ mode }: { mode: string }) => {
     const [loading, setLoading] = useState(false);
     const [activeIdx, setActiveIdx] = useState(0);
     const [showHistory, setShowHistory] = useState(false);
+    const [motivation, setMotivation] = useState(50);
     const [clefairyEmotion, setClefairyEmotion] = useState<'idle' | 'thinking' | 'happy'>('idle');
     const [clefairyMessage, setClefairyMessage] = useState<string | undefined>("Hi Erik! Ready to see what the Muse has for you today?");
 
@@ -25,6 +26,9 @@ const MuseDeck = ({ mode }: { mode: string }) => {
         const accepted = stored.filter(c => c.status === 'yes');
         setCards(pending);
         setHistory(accepted);
+
+        const psyche = await getUserPsycheAsync();
+        if (psyche) setMotivation(psyche.motivationLevel || 50);
     };
 
     const runSymposium = async () => {
@@ -109,6 +113,20 @@ const MuseDeck = ({ mode }: { mode: string }) => {
 
     return (
         <div className="flex flex-col items-center gap-12 py-12 min-h-[700px] animate-in fade-in duration-1000">
+            {/* 0. Motivation Meter */}
+            <div className="w-full max-w-xs flex flex-col gap-2">
+                <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-[0.3em] text-foreground/30">
+                    <span>Motivation Level</span>
+                    <span className="text-accent">{motivation}%</span>
+                </div>
+                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                    <div 
+                        className="h-full bg-gradient-to-r from-accent/40 to-accent transition-all duration-1000 ease-out"
+                        style={{ width: `${motivation}%` }}
+                    />
+                </div>
+            </div>
+
             {/* 1. The Helper Area */}
             <MuseClefairy emotion={clefairyEmotion} message={clefairyMessage} />
 

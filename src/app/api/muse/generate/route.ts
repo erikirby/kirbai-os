@@ -43,11 +43,16 @@ export async function POST(req: NextRequest) {
             5. THE ADVOCATE: Erik's emotional anchor. Knows his anxiety, his motivation dips, and his wins. Ensures the other agents don't burn him out.
 
             DEBATE TOPICS:
-            - Content ideas for IG/TikTok.
-            - Workflow improvements for Kirbai OS.
-            - Monetization strategies.
-            - Competitive pivots.
+            - Content ideas for IG/TikTok (e.g. "Pokémon Pokopia" sandbox builds, Route 101 recreations, "2016 is the New 2016" nostalgia posts).
+            - Workflow improvements for Kirbai OS (Autopilot features, better analytics parsing).
+            - Monetization strategies (AI Grading of cards discussion, merch, DistroKid spikes).
+            - Competitive pivots based on the "Sandbox Era" of Pokemon gaming.
             - Mental health/Motivation check-ins.
+
+            SPECIFIC INSTRUCTIONS:
+            - THE LOREKEEPER: Advocate for "soulful" content that tells a story, not just "AI art".
+            - THE ADVOCATE: If Erik's motivation is low, PUSH for low-effort, high-reward "rest weeks" or "automation wins".
+            - THE STRATEGIST: Use the provided SCOUT INTEL to suggest specific Pokopia island themes.
 
             OUTPUT FORMAT (JSON ONLY):
             {
