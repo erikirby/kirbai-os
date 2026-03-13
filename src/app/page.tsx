@@ -19,7 +19,7 @@ import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Sh
 
 type Tab = "kirbai" | "factory";
 type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director" | "muse";
-type Theme = "dark" | "light" | "pink" | "snes" | "gbc";
+type Theme = "dark" | "light" | "pink" | "snes" | "gbc" | "pokopia";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("kirbai");
