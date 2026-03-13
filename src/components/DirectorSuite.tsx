@@ -257,16 +257,35 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         setGeneratingShotId(shot.id);
         setGeneratingType(isEdit ? "edit" : "new");
         try {
+            // OPTIMIZATION: Strip out references that are NOT relevant to this shot to prevent Vercel 413 Payload Too Large
+            const relevantRefIndices = new Set<number>();
+            if (shot.refLabels) {
+                shot.refLabels.forEach(label => {
+                    const req = activeMission.requiredReferences?.find(r => r.label === label);
+                    if (req && req.uploadedIndex !== undefined) relevantRefIndices.add(req.uploadedIndex);
+                });
+            }
+
+            const optimizedMission = {
+                ...activeMission,
+                references: activeMission.references?.map((ref, i) => relevantRefIndices.has(i) ? ref : null)
+            };
+
             const res = await fetch('/api/director/generate-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    mission: activeMission,
+                    mission: optimizedMission,
                     shot,
                     isEdit,
                     customPrompt: editingShotId === shot.id ? tempPrompt : (shot.bananaPromptV2 || shot.bananaPrompt)
                 })
             });
+
+            if (res.status === 413) {
+                throw new Error("Payload too large. Try reducing the number of reference images.");
+            }
+
             const data = await res.json();
             if (data.success) {
                 const newShots = activeMission.shots.map(s => 
@@ -442,16 +461,26 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 bananaPrompt: prompt
             };
 
+            // OPTIMIZATION: Only send the specific reference needed for regeneration
+            const optimizedMission = {
+                ...activeMission,
+                references: activeMission.references?.map((ref, i) => i === req.uploadedIndex ? ref : null)
+            };
+
             const res = await fetch('/api/director/generate-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    mission: activeMission,
+                    mission: optimizedMission,
                     shot: pseudoShot,
                     isEdit: false,
                     customPrompt: prompt
                 })
             });
+
+            if (res.status === 413) {
+                throw new Error("Payload too large. The reference image might be too high resolution.");
+            }
 
             const data = await res.json();
             if (data.success) {
