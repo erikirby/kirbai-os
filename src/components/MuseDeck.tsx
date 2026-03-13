@@ -10,6 +10,7 @@ const MuseDeck = ({ mode }: { mode: string }) => {
     const [cards, setCards] = useState<MuseCard[]>([]);
     const [history, setHistory] = useState<MuseCard[]>([]);
     const [loading, setLoading] = useState(false);
+    const [selectedDetail, setSelectedDetail] = useState<MuseCard | null>(null);
     const [activeIdx, setActiveIdx] = useState(0);
     const [showHistory, setShowHistory] = useState(false);
     const [motivation, setMotivation] = useState(50);
@@ -148,9 +149,38 @@ const MuseDeck = ({ mode }: { mode: string }) => {
     const acceptedAndMaybe = history.concat(cards.filter(c => c.status === 'maybe'));
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-6 py-12 min-h-screen animate-in fade-in duration-1000">
+        <div className="w-full max-w-7xl mx-auto px-6 py-12 min-h-screen relative flex flex-col items-center">
+            
+            {/* Sanctuary Animations (Isolated Refinement V2 - Seamless) */}
+            <style jsx>{`
+                @keyframes sanctuary-cycle {
+                    0% { background-color: #deb8c2; }
+                    33% { background-color: #b8cde0; }
+                    66% { background-color: #cdc0e0; }
+                    100% { background-color: #deb8c2; }
+                }
+                @keyframes float-slow {
+                    0%, 100% { transform: translateY(0) translateX(0); }
+                    50% { transform: translateY(-30px) translateX(15px); }
+                }
+                .animate-sanctuary-cycle {
+                    animation: sanctuary-cycle 20s ease-in-out infinite;
+                }
+                .animate-float-slow {
+                    animation: float-slow 15s ease-in-out infinite;
+                }
+            `}</style>
+
+            {/* Header / Title */}
+            <div className="w-full flex justify-between items-center mb-12">
+                <div className="flex flex-col gap-1">
+                    <h2 className="text-4xl font-black uppercase tracking-tighter text-accent/90 leading-none">Muse</h2>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-accent/30 pl-1">Advisory Suite</span>
+                </div>
+            </div>
+
             {/* Main 2-Column Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start w-full relative z-10">
                 
                 {/* LEFT COLUMN: Deck & Decisions (8 Units) */}
                 <div className={`lg:col-span-8 flex flex-col gap-12 ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'animate-bob' : ''}`}>
@@ -186,10 +216,10 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                                     <div className="absolute top-8 left-8 right-8 h-full bg-white/5 border border-white/10 rounded-[40px] -z-20 translate-y-4 scale-[0.96] opacity-30" />
                                 )}
 
-                                <div className="relative z-10 p-12 bg-white/60 backdrop-blur-2xl rounded-[48px] border border-white p-12 shadow-[0_40px_100px_rgba(255,51,102,0.05)] flex flex-col gap-8 animate-in slide-in-from-bottom-10 duration-700">
+                                <div className={`relative z-10 p-10 md:p-12 rounded-[64px] border flex flex-col gap-8 animate-in slide-in-from-bottom-10 duration-[1000ms] ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'bg-white border-white shadow-xl' : 'animate-sanctuary-cycle border-white shadow-[0_50px_120px_rgba(0,0,0,0.15)]'}`}>
                                     <div className="flex justify-between items-start">
                                         <div className="flex flex-col gap-2">
-                                            <span className="text-[11px] font-black uppercase tracking-[0.3em] text-accent flex items-center gap-2">
+                                            <span className={`text-[11px] font-black uppercase tracking-[0.3em] flex items-center gap-2 drop-shadow-sm ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'text-accent' : 'text-[#3b2b1d]/60'}`}>
                                                 {currentCard.type === 'content' && <Eye className="w-4 h-4" />}
                                                 {currentCard.type === 'workflow' && <Brain className="w-4 h-4" />}
                                                 {currentCard.type === 'competitor' && <TrendingUp className="w-4 h-4" />}
@@ -197,48 +227,50 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                                                 {currentCard.type === 'mental_health' && <Heart className="w-4 h-4" />}
                                                 {currentCard.type}
                                             </span>
-                                            <h3 className="text-3xl font-black uppercase tracking-tighter text-accent/80 leading-none">{currentCard.title}</h3>
+                                            <h3 className={`text-4xl font-black uppercase tracking-tighter leading-none drop-shadow-sm ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'text-accent' : 'text-[#121212]'}`}>{currentCard.title}</h3>
                                         </div>
-                                        <span className="px-4 py-1.5 bg-accent/10 rounded-full text-[10px] font-black text-accent">{activeIdx + 1} / {cards.length}</span>
+                                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-black border whitespace-nowrap ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'bg-accent/20 text-accent border-accent/10' : 'bg-black/5 text-black/40 border-black/5'}`}>{activeIdx + 1} / {cards.length}</span>
                                     </div>
 
-                                    <p className="text-base text-accent/60 leading-relaxed font-medium max-w-prose">
+                                    <p className={`text-xl leading-relaxed font-semibold max-w-prose ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'text-accent/75' : 'text-[#3b2b1d]/85'}`}>
                                         {currentCard.description}
                                     </p>
 
-                                    <div className="p-6 bg-white/40 rounded-3xl border border-white/60 shadow-inner">
-                                        <p className="text-[11px] text-accent/40 leading-relaxed italic font-medium">
-                                            <strong className="text-accent/60">The Symposium Debated:</strong> {currentCard.debateLog}
+                                    <div className={`p-8 md:p-10 rounded-[40px] border shadow-inner overflow-visible min-h-[120px] ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'bg-white/60 border-white/85' : 'bg-black/5 border-black/5'}`}>
+                                        <p className={`text-sm leading-relaxed italic font-bold ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'text-accent/55' : 'text-[#3b2b1d]/75'}`}>
+                                            <strong className={typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'text-accent/85 opacity-70' : 'text-[#121212] opacity-90'}>The Symposium Debated:</strong> {currentCard.debateLog}
                                         </p>
                                     </div>
 
                                     {/* Action Matrix */}
                                     <div className="grid grid-cols-3 gap-3">
                                         {Object.entries(currentCard.actionMatrix).map(([key, val]) => (
-                                            <div key={key} className="p-4 bg-white/40 border border-white rounded-3xl flex flex-col items-center gap-1.5 shadow-sm">
-                                                <span className="text-[9px] font-black uppercase tracking-widest text-accent/30">{key}</span>
-                                                <span className={`text-[11px] font-black uppercase ${val === 'high' ? 'text-accent' : val === 'med' ? 'text-orange-400' : 'text-green-500'}`}>{val}</span>
+                                            <div key={key} className={`p-4 border rounded-[32px] flex flex-col items-center gap-1.5 shadow-sm transition-transform hover:scale-[1.02] ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'bg-white/50 border-white/90' : 'bg-white/40 border-white/40'}`}>
+                                                <span className={`text-[9px] font-black uppercase tracking-widest ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'text-accent/40' : 'text-[#3b2b1d]/40'}`}>{key}</span>
+                                                <span className={`text-[11px] font-black uppercase ${val === 'high' ? (typeof document !== "undefined" && document.documentElement.getAttribute("data-theme") === "pokopia" ? "text-accent" : "text-[#121212]") : val === 'med' ? 'text-orange-600' : 'text-green-700'}`}>{val}</span>
                                             </div>
                                         ))}
                                     </div>
 
-                                    {/* Decision Buttons */}
-                                    <div className="grid grid-cols-3 gap-6 mt-4">
+                                    {/* Decision Buttons */}                                    <div className="grid grid-cols-3 gap-6 mt-4 p-2 bg-black/5 rounded-[48px]">
                                         <button 
                                             onClick={() => handleAction('no')}
-                                            className="h-20 flex items-center justify-center bg-white/40 border border-white/60 rounded-[32px] text-accent/20 hover:bg-red-50 hover:text-red-400 transition-all shadow-sm"
+                                            title="Archive this idea"
+                                            className={`h-20 flex items-center justify-center border-2 rounded-[36px] transition-all shadow-xl group ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'bg-white border-red-200 text-red-500 hover:bg-red-50' : 'bg-white border-white/20 text-red-500 hover:bg-red-50 shadow-[0_10px_30px_rgba(239,68,68,0.2)]'}`}
                                         >
-                                            <X className="w-8 h-8" />
+                                            <X className="w-10 h-10 group-hover:scale-110 transition-transform" />
                                         </button>
                                         <button 
                                             onClick={() => handleAction('maybe')}
-                                            className="h-20 flex items-center justify-center bg-white/40 border border-white/60 rounded-[32px] text-accent/40 hover:bg-blue-50 hover:text-blue-400 transition-all font-black text-[11px] uppercase tracking-[0.3em] shadow-sm"
+                                            title="Keep in Session Log for later"
+                                            className={`h-20 flex items-center justify-center border-2 rounded-[36px] transition-all font-black text-[12px] uppercase tracking-[0.3em] shadow-xl active:scale-95 ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'bg-white border-blue-200 text-blue-500 hover:bg-blue-50' : 'bg-white border-white/20 text-blue-500 hover:bg-blue-50 shadow-[0_10px_30px_rgba(59,130,246,0.2)]'}`}
                                         >
                                             Maybe
                                         </button>
                                         <button 
                                             onClick={() => handleAction('yes')}
-                                            className="h-20 flex items-center justify-center bg-accent text-white rounded-[32px] shadow-2xl shadow-accent/40 hover:scale-[1.05] active:scale-[0.95] transition-all"
+                                            title="Add to Roadmap & Action Plan"
+                                            className={`h-20 flex items-center justify-center rounded-[36px] shadow-[0_20px_60px_rgba(255,51,102,0.4)] hover:scale-[1.05] active:scale-[0.95] transition-all border-2 border-white/20 ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'bg-accent text-white' : 'bg-accent text-white'}`}
                                         >
                                             <Check className="w-10 h-10" />
                                         </button>
@@ -246,7 +278,7 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center gap-8 p-20 bg-white/20 border border-white/40 rounded-[48px] text-center backdrop-blur-sm">
+                            <div className={`flex flex-col items-center gap-8 p-20 rounded-[48px] text-center ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'bg-white border-white' : 'bg-white/20 border-white/40 backdrop-blur-sm'}`}>
                                 <div className="w-24 h-24 bg-accent/5 rounded-full flex items-center justify-center animate-pulse">
                                     <Sparkles className="w-12 h-12 text-accent" />
                                 </div>
@@ -273,36 +305,37 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                         )}
                     </div>
 
-                    {/* 2. PERSISTENT DECISION LIST (Directly below) */}
-                    {(history.length > 0 || cards.some(c => c.status === 'maybe')) && (
-                        <div className="flex flex-col gap-8 p-10 bg-white/20 border border-white/40 rounded-[48px] backdrop-blur-sm animate-in fade-in duration-1000">
-                            <div className="flex items-center gap-3 pb-4 border-b border-accent/10">
-                                <Bookmark className="w-5 h-5 text-accent" />
-                                <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-accent/60">Session Log: Priorities</h4>
+                    {/* 2. PERSISTENT DECISION LIST */}
+                    {history.length > 0 && (
+                        <div className="flex flex-col gap-8 p-12 bg-white/40 border border-white/60 rounded-[64px] backdrop-blur-2xl animate-in fade-in duration-1000 shadow-[0_30px_80px_rgba(255,51,102,0.08)]">
+                            <div className="flex items-center justify-between pb-6 border-b border-accent/10">
+                                <div className="flex items-center gap-3">
+                                    <Bookmark className="w-5 h-5 text-accent" />
+                                    <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-accent/60">Session Log: Evolution</h4>
+                                </div>
+                                <span className="text-[8px] font-black uppercase tracking-widest text-accent/30 bg-accent/5 px-3 py-1 rounded-full border border-accent/10">Archive: Roadmap + Session</span>
                             </div>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {history.slice(0, 4).map(card => (
-                                    <div key={card.id} className="flex items-center gap-4 p-5 bg-white/40 rounded-3xl border border-white">
-                                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                {history.map(card => (
+                                    <button 
+                                        key={card.id} 
+                                        onClick={() => setSelectedDetail(card)}
+                                        className="flex items-center gap-4 p-6 bg-white/60 rounded-[40px] border border-white/80 hover:bg-white transition-all text-left shadow-sm group hover:scale-[1.02] active:scale-[0.98]"
+                                    >
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-inner ${card.status === 'yes' ? 'bg-green-100/50' : 'bg-blue-100/50'}`}>
+                                            {card.status === 'yes' ? (
+                                                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                            ) : (
+                                                <Bookmark className="w-4 h-4 text-blue-500" />
+                                            )}
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[11px] font-black uppercase tracking-[0.1em] text-accent/80">{card.title}</span>
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-accent/30">{card.type}</span>
+                                        <div className="flex flex-col flex-1">
+                                            <span className="text-[11px] font-black uppercase tracking-[0.1em] text-accent/80 group-hover:text-accent transition-colors truncate">{card.title}</span>
+                                            <span className="text-[8px] font-bold uppercase tracking-widest text-accent/30">{card.status === 'yes' ? 'Live in Roadmap' : 'Session Intent'}</span>
                                         </div>
-                                    </div>
-                                ))}
-                                {cards.filter(c => c.status === 'maybe').map(card => (
-                                    <div key={card.id} className="flex items-center gap-4 p-5 bg-white/40 rounded-3xl border border-white opacity-60">
-                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                            <Bookmark className="w-4 h-4 text-blue-500" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[11px] font-black uppercase tracking-[0.1em] text-accent/80">{card.title}</span>
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-accent/30">Shelved / Potential</span>
-                                        </div>
-                                    </div>
+                                        <ChevronRight className="w-4 h-4 text-accent/20 group-hover:text-accent/60 group-hover:translate-x-1 transition-all" />
+                                    </button>
                                 ))}
                             </div>
                         </div>
@@ -316,13 +349,43 @@ const MuseDeck = ({ mode }: { mode: string }) => {
 
             </div>
 
-            {/* Background Aesthetic (Pastel) */}
-            <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden bg-[#fdf2f5]">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-accent/10 blur-[150px] rounded-full animate-pulse-slow" />
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-200/20 blur-[120px] rounded-full" />
-                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-200/20 blur-[120px] rounded-full" />
-                <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-mint-200/10 blur-[100px] rounded-full" />
-            </div>
+            {/* DETAIL VIEW MODAL */}
+            {selectedDetail && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-accent/20 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="relative w-full max-w-2xl bg-white/95 backdrop-blur-3xl rounded-[48px] border border-white p-12 shadow-[0_50px_100px_rgba(255,51,102,0.2)] animate-in zoom-in-95 duration-300">
+                        <button 
+                            onClick={() => setSelectedDetail(null)}
+                            className="absolute top-8 right-8 w-12 h-12 flex items-center justify-center bg-accent/10 rounded-full text-accent hover:bg-accent hover:text-white transition-all"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+
+                        <div className="flex flex-col gap-8 text-accent">
+                            <div className="flex flex-col gap-2">
+                                <span className="text-[12px] font-black uppercase tracking-[0.3em] text-accent/40">{selectedDetail.type}</span>
+                                <h3 className="text-4xl font-black uppercase tracking-tighter leading-none">{selectedDetail.title}</h3>
+                            </div>
+
+                            <div className="flex flex-col gap-6">
+                                <div className="p-8 bg-accent/5 rounded-[32px] border border-accent/10">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-accent/40 mb-3">Proposal Detail</h4>
+                                    <p className="text-lg font-semibold leading-relaxed text-accent/80">{selectedDetail.description}</p>
+                                </div>
+
+                                <div className="p-8 bg-white border border-accent/10 rounded-[32px] shadow-inner">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-accent/40 mb-3">The Symposium Debate</h4>
+                                    <p className="text-sm font-bold leading-relaxed text-accent/60 italic">{selectedDetail.debateLog}</p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-accent/30 italic">
+                                <span>Status: {selectedDetail.status}</span>
+                                <span>ID: {selectedDetail.id.slice(0, 8)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

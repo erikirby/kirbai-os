@@ -27,6 +27,7 @@ export default function Home() {
   const [theme, setTheme] = useState<Theme>("dark");
   const [showLauncher, setShowLauncher] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -42,7 +43,7 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen p-4 lg:p-20 pb-40 flex flex-col gap-12 max-w-[1400px] mx-auto overflow-x-hidden">
+    <main className="min-h-screen p-4 lg:p-8 flex flex-col gap-8 max-w-[1500px] mx-auto relative overflow-x-hidden">
       {/* 1. Header Navigation (Global) */}
       <header className="w-full max-w-screen-2xl px-6 py-4 flex justify-between items-center border-b border-border/10 backdrop-blur-xl sticky top-0 z-50">
         <div className="flex items-center gap-4">
@@ -57,13 +58,13 @@ export default function Home() {
 
         {/* Theme Switcher - Desktop Only */}
         <div className="hidden lg:flex items-center gap-4">
-          <div className="flex bg-surface/40 p-1 rounded-full border border-border/10 shadow-inner">
+          <div className={`flex p-1 shadow-inner ${theme === 'pokopia' ? 'bg-white rounded-[40px] border-4 border-white' : 'bg-surface/40 rounded-full border border-border/10'}`}>
             {themes.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTheme(t.id)}
                 className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest rounded-full transition-all ${theme === t.id
-                  ? (theme === "snes" ? "snes-btn-red text-white scale-105" : theme === "gbc" ? "bg-accent/20 border-2 border-accent text-accent scale-105 rounded-none shadow-[2px_2px_0_rgba(0,0,0,0.5)]" : theme === "pokopia" ? "bg-white text-[#A6D9F7] border-2 border-[#A6D9F7] scale-105 shadow-lg" : "bg-accent text-white shadow-md scale-105")
+                  ? (theme === "snes" ? "snes-btn-red text-white scale-105" : theme === "gbc" ? "bg-accent/20 border-2 border-accent text-accent scale-105 rounded-none shadow-[2px_2px_0_rgba(0,0,0,0.5)]" : theme === "pokopia" ? "bg-[#A6D9F7] text-white scale-105 shadow-lg" : "bg-accent text-white shadow-md scale-105")
                   : "text-foreground/50 hover:text-foreground/80"
                   }`}
               >
@@ -74,17 +75,17 @@ export default function Home() {
 
           <div className="h-6 w-px bg-border/20 mx-2" />
 
-          <div className="flex bg-surface/50 border border-border/40 p-1 rounded-sm">
+          <div className={`flex p-1 ${theme === 'pokopia' ? 'bg-white rounded-full border-4 border-white' : 'bg-surface/50 border border-border/40 rounded-sm'}`}>
             <button
               onClick={() => setActiveTab("kirbai")}
-              className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all rounded-sm ${activeTab === "kirbai" ? (theme === "snes" ? "snes-btn-blue text-white" : "bg-accent text-white shadow-lg") : "text-neutral-500 hover:text-neutral-300"
+              className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all ${theme === 'pokopia' ? 'rounded-full' : 'rounded-sm'} ${activeTab === "kirbai" ? (theme === "snes" ? "snes-btn-blue text-white" : "bg-accent text-white shadow-lg") : "text-neutral-500 hover:text-neutral-300"
                 }`}
             >
               Kirbai
             </button>
             <button
               onClick={() => setActiveTab("factory")}
-              className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all rounded-sm ${activeTab === "factory" ? (theme === "snes" ? "snes-btn-green text-white" : "bg-accent text-white shadow-lg") : "text-neutral-500 hover:text-neutral-300"
+              className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all ${theme === 'pokopia' ? 'rounded-full' : 'rounded-sm'} ${activeTab === "factory" ? (theme === "snes" ? "snes-btn-green text-white" : "bg-accent text-white shadow-lg") : "text-neutral-500 hover:text-neutral-300"
                 }`}
             >
               Factory
@@ -100,9 +101,12 @@ export default function Home() {
           <Settings2 className="w-5 h-5" />
         </button>
       </header>
+      
+      {/* Pokopia Top Divider */}
+      {theme === 'pokopia' && <div className="divider-cloud -mt-8 animate-drift" />}
 
       {/* 2. Hero Banner Section */}
-      <section className="w-full max-w-screen-2xl px-6 mt-8">
+      <section className="w-full max-w-screen-2xl px-6 -mt-4">
         <div className="relative w-full h-[240px] squircle overflow-hidden border border-border/20 group specular-reflect shadow-2xl">
           <Image src="/assets/banner.jpg" alt="Kirbai Banner" fill className="object-cover group-hover:scale-[1.05] transition-transform duration-2000" priority />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
@@ -115,263 +119,116 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Sub-Navigation - Desktop Only */}
-      <nav className="hide-on-mobile w-full max-w-screen-2xl px-6 mt-6 flex flex-wrap items-end gap-1 border-b border-border/10 pb-0 shadow-[0_4px_10px_-5px_rgba(0,0,0,0.3)]">
+      {/* 3. Sub-Navigation - Desktop Only: Consolidated Single-Line Dropdown */}
+      <nav className="hide-on-mobile w-full max-w-screen-2xl px-6 flex items-center justify-between gap-4 border-b border-border/10 pb-4 shadow-[0_4px_10px_-5px_rgba(0,0,0,0.3)]">
         
-        {/* MASTER CONTROL */}
-        <div className="flex flex-col gap-2 pb-4 mr-10">
-          <span className="text-[8px] font-black uppercase tracking-[0.4em] text-accent/60 ml-px">Master</span>
+        <div className="flex items-center gap-8">
+          {/* MASTER CONTROL - ALWAYS VISIBLE */}
           <button
             onClick={() => setActiveModule("chat")}
-            className={`flex items-center gap-3 px-6 py-3 rounded-2xl transition-all border relative overflow-hidden group shadow-2xl ${activeModule === "chat" 
-              ? "bg-accent border-accent/40 text-white scale-105" 
-              : "bg-surface/40 border-border/20 text-foreground/40 hover:text-white hover:border-accent/40"}`}
+            className={`flex items-center gap-3 px-6 py-2.5 transition-all outline-none border relative overflow-hidden group shadow-xl ${theme === 'pokopia' ? 'nav-btn rounded-full' : 'rounded-2xl'} ${activeModule === "chat" 
+              ? (theme === 'pokopia' ? "bg-white border-white scale-105" : "bg-accent border-accent/40 text-white scale-105") 
+              : (theme === 'pokopia' ? "bg-section-blue border-white text-[#3b2b1d]" : "bg-surface/40 border-border/20 text-foreground/40 hover:text-white hover:border-accent/40")}`}
           >
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <MessageSquare className={`w-5 h-5 ${activeModule === "chat" ? "text-white" : "text-accent"}`} />
-            <span className="text-xs font-black uppercase tracking-widest">Chat</span>
-            {activeModule === "chat" && (
+            <MessageSquare className={`w-4 h-4 ${activeModule === "chat" ? (theme === 'pokopia' ? "text-accent" : "text-white") : (theme === 'pokopia' ? "text-[#3b2b1d]" : "text-accent")}`} />
+            <span className={`uppercase tracking-widest ${theme === 'pokopia' ? 'text-[#3b2b1d]' : ''}`}>Chat</span>
+            {activeModule === "chat" && theme !== 'pokopia' && (
               <div className="absolute inset-0 bg-white/10 animate-pulse pointer-events-none"></div>
             )}
           </button>
+
+          {/* DROPDOWN GROUPS */}
+          <div className="flex gap-4 items-center">
+            {[
+              { id: "command", label: "Command", items: [{ id: "roadmap", label: "Home" }, { id: "intel", label: "Intel" }, { id: "muse", label: "Muse" }] },
+              { id: "pipeline", label: "Pipeline", items: [{ id: "creative", label: "Brainstorm" }, { id: "director", label: "Director" }] },
+              { id: "archive", label: "Archive", items: [{ id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "prompts", label: "Prompts" }, { id: "core", label: "Core" }] },
+              { id: "performance", label: "Performance", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "api-health", label: "API" }] },
+            ].map((group) => (
+              <div 
+                key={group.id} 
+                className="relative"
+                onMouseEnter={() => setOpenDropdown(group.id)}
+                onMouseLeave={() => setOpenDropdown(null)}
+              >
+                <button className={`dropdown-pill h-full ${theme === 'pokopia' ? 'nav-btn' : 'px-4 py-2.5 border rounded-xl border-border/20 text-foreground/60 hover:text-white hover:border-accent'}`}>
+                  <span>{group.label}</span>
+                </button>
+
+                {openDropdown === group.id && (
+                  <div className={`absolute top-full left-0 z-[100] pt-0 min-w-[200px] animate-in fade-in slide-in-from-top-1 duration-200`}>
+                    {/* ENLARGED Bridge for hover continuity - spanning the entire button area */}
+                    <div className="absolute inset-x-0 -top-12 h-12 pointer-events-auto" />
+                    <div className={`${theme === 'pokopia' ? 'dropdown-menu' : 'bg-background border border-border rounded-2xl p-2 shadow-2xl'}`}>
+                      <div className="flex flex-col gap-1">
+                        {group.items.map((item) => (
+                          <button
+                            key={item.id}
+                            onClick={() => { setActiveModule(item.id as Module); setOpenDropdown(null); }}
+                            className={`w-full text-left px-4 py-2 transition-all rounded-lg ${activeModule === item.id 
+                              ? "bg-accent/20 text-accent" 
+                              : "text-neutral-500 hover:text-foreground hover:bg-white/5"}`}
+                          >
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* GROUPS */}
-        <div className="flex gap-12 items-end">
-          {/* GROUP: COMMAND */}
-          <div className="flex flex-col gap-2">
-            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-foreground/20 ml-1">Command</span>
-            <div className="flex gap-2 pb-4">
-              {[
-                { id: "roadmap", label: "Home" },
-                { id: "intel", label: "Intel" },
-                { id: "muse", label: "The Muse" },
-              ].map((mod) => (
-                <button
-                  key={mod.id}
-                  onClick={() => setActiveModule(mod.id as Module)}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-xl border ${activeModule === mod.id ? "bg-white/10 text-accent border-accent/20 font-bold" : "text-neutral-500 border-transparent hover:text-foreground hover:bg-white/5"}`}
-                >
-                  {mod.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* GROUP: PIPELINE */}
-          <div className="flex flex-col gap-2">
-            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-foreground/20 ml-1">Pipeline</span>
-            <div className="flex gap-2 pb-4">
-              {[
-                { id: "creative", label: "Brainstorm" },
-                { id: "director", label: "Director" },
-              ].map((mod) => (
-                <button
-                  key={mod.id}
-                  onClick={() => setActiveModule(mod.id as Module)}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-xl border ${activeModule === mod.id ? "bg-white/10 text-accent border-accent/20 font-bold" : "text-neutral-500 border-transparent hover:text-foreground hover:bg-white/5"}`}
-                >
-                  {mod.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* GROUP: ARCHIVE */}
-          <div className="flex flex-col gap-2">
-            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-foreground/20 ml-1">Archive</span>
-            <div className="flex gap-2 pb-4">
-              {[
-                { id: "lore", label: "Lore" },
-                { id: "vault", label: "Vault" },
-                { id: "prompts", label: "Prompts" },
-                { id: "core", label: "Core" },
-              ].map((mod) => (
-                <button
-                  key={mod.id}
-                  onClick={() => setActiveModule(mod.id as Module)}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-xl border ${activeModule === mod.id ? "bg-white/10 text-accent border-accent/20 font-bold" : "text-neutral-500 border-transparent hover:text-foreground hover:bg-white/5"}`}
-                >
-                  {mod.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* GROUP: PERFORMANCE */}
-          <div className="flex flex-col gap-2">
-            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-foreground/20 ml-1">Performance</span>
-            <div className="flex gap-2 pb-4">
-              {[
-                { id: "pulse", label: "Pulse" },
-                { id: "finance", label: "Money" },
-                { id: "api-health", label: "API" },
-              ].map((mod) => (
-                <button
-                  key={mod.id}
-                  onClick={() => setActiveModule(mod.id as Module)}
-                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-xl border ${activeModule === mod.id ? "bg-white/10 text-accent border-accent/20 font-bold" : "text-neutral-500 border-transparent hover:text-foreground hover:bg-white/5"}`}
-                >
-                  {mod.label}
-                </button>
-              ))}
-            </div>
-          </div>
+        {/* ECOSYSTEM INDICATOR (Right Side) */}
+        <div className={`hidden lg:flex items-center gap-2 px-4 py-1.5 rounded-full border border-border/10 ${theme === 'pokopia' ? 'bg-[#A6D9F7] border-white text-brown' : 'bg-surface/20'}`}>
+          <div className="w-2 h-2 rounded-full animate-pulse bg-green-500" />
+          <span className="text-[9px] font-black uppercase tracking-widest opacity-60">System Online:</span>
+          <span className="text-[9px] font-black uppercase tracking-widest text-accent">{activeTab} Ecosystem</span>
         </div>
       </nav>
 
-      {/* MOBILE BOTTOM DOCK */}
-      <div className="show-on-mobile-only mobile-bottom-dock">
-        <button 
-          onClick={() => setActiveModule("chat")}
-          className={`mobile-dock-item ${activeModule === 'chat' ? 'active' : ''}`}
-        >
-          <MessageSquare className="w-6 h-6" />
-          <span>Chat</span>
-        </button>
-        <button 
-          onClick={() => setActiveModule("roadmap")}
-          className={`mobile-dock-item ${activeModule === 'roadmap' ? 'active' : ''}`}
-        >
-          <HomeIcon className="w-6 h-6" />
-          <span>Home</span>
-        </button>
-        <button 
-          onClick={() => setActiveModule("director")}
-          className={`mobile-dock-item ${activeModule === 'director' ? 'active' : ''}`}
-        >
-          <Clapperboard className="w-6 h-6" />
-          <span>Director</span>
-        </button>
+      {/* 4. Main Body Color Blocking (Sectional based on group) */}
+      <section className={`flex-1 w-full transition-colors duration-700 ${theme === 'pokopia' ? (
+        activeModule === 'roadmap' || activeModule === 'intel' || activeModule === 'muse' ? 'bg-section-green' :
+        activeModule === 'creative' || activeModule === 'director' ? 'bg-section-blue' :
+        activeModule === 'lore' || activeModule === 'vault' || activeModule === 'core' ? 'bg-section-purple' :
+        'bg-section-wood'
+      ) : ''}`}>
+        <div className="mx-auto w-full max-w-screen-2xl px-6 py-6 flex flex-col gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className={activeModule === "roadmap" ? "lg:col-span-3 flex flex-col gap-12" : "lg:col-span-4 flex flex-col gap-12"}>
+              <div key={`${activeTab}-${activeModule}`} className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                {activeModule === "roadmap" && <Roadmap mode={activeTab} />}
+                {activeModule === "vault" && <VaultManager theme={theme} mode={activeTab} />}
+                {activeModule === "intel" && <IntelInbox mode="full" theme={theme} activeTab={activeTab} />}
+                {activeModule === "pulse" && <AnalyticsMatrix theme={theme} mode={activeTab} />}
+                {activeModule === "director" && <DirectorSuite mode={activeTab} />}
+                {activeModule === "finance" && <FinanceView mode={activeTab} />}
+                {activeModule === "api-health" && <APIHealth theme={theme} />}
+                {activeModule === "chat" && <AIHub theme={theme} />}
+                {activeModule === "core" && <ConsultantSettings theme={theme} />}
+                {activeModule === "lore" && <LoreMatrix theme={theme} mode={activeTab} />}
+                {activeModule === "creative" && <CreativeHub theme={theme} mode={activeTab} />}
+                {activeModule === "prompts" && <PromptBank mode={activeTab} />}
+                {activeModule === "muse" && <MuseDeck mode={activeTab} />}
+              </div>
+            </div>
 
-        <button 
-          onClick={() => setActiveModule("muse")}
-          className={`mobile-dock-item ${activeModule === 'muse' ? 'active' : ''}`}
-        >
-          <Brain className="w-6 h-6" />
-          <span>Muse</span>
-        </button>
-        <button 
-          onClick={() => setShowLauncher(true)}
-          className={`mobile-dock-item ${showLauncher ? 'active' : ''}`}
-        >
-          <Layers className="w-6 h-6" />
-          <span>More</span>
-        </button>
-      </div>
-
-      {/* MOBILE LAUNCHER OVERLAY */}
-      {showLauncher && (
-        <div className="mobile-launcher-overlay animate-in fade-in slide-in-from-bottom-10 duration-500">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-black uppercase tracking-widest text-accent">Strategic Suite</h2>
-            <button onClick={() => setShowLauncher(false)} className="p-3 bg-white/10 rounded-full"><X className="w-6 h-6" /></button>
-          </div>
-
-          <div className="launcher-grid">
-            {[
-              { id: "intel", label: "Intel", icon: MessageSquare, group: "Command" },
-              { id: "creative", label: "Brainstorm", icon: Sparkles, group: "Pipeline" },
-              { id: "lore", label: "Lore Matrix", icon: Network, group: "Archive" },
-              { id: "vault", label: "Vault", icon: Database, group: "Archive" },
-              { id: "pulse", label: "Pulse", icon: LineChart, group: "Stats" },
-              { id: "finance", label: "Money", icon: Wallet, group: "Stats" },
-              { id: "prompts", label: "Prompt Bank", icon: MessageSquare, group: "Archive" },
-              { id: "core", label: "Core Config", icon: Settings2, group: "Admin" },
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => { setActiveModule(item.id as Module); setShowLauncher(false); }}
-                className={`mobile-launcher-btn ${activeModule === item.id ? 'active' : ''}`}
-              >
-                <div className="flex flex-col items-center gap-1">
-                  <span className="text-[7px] font-black uppercase tracking-[0.3em] opacity-40">{item.group}</span>
-                  <item.icon className={`w-8 h-8 ${activeModule === item.id ? 'text-accent' : 'text-white/40'}`} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest mt-2">{item.label}</span>
+            {/* 5. Sidebar Command Center (Contextual Intel) - Only on HOME */}
+            {activeModule === "roadmap" && (
+              <div className="lg:col-span-1 flex flex-col gap-8 sticky top-28 self-start">
+                <div className="glass squircle p-6 specular-reflect shadow-2xl overflow-hidden relative">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-[50px] rounded-full -mr-16 -mt-16" />
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-foreground mb-8 border-b border-border/10 pb-4">Command Center</h3>
+                  <IntelInbox mode="compact" theme={theme} />
                 </div>
-              </button>
-            ))}
-          </div>
-
-          <p className="text-center text-[9px] font-black uppercase tracking-[0.5em] text-foreground/20 mt-auto pb-10">KIRBAI OS MOBILE SUIT V3.2.1</p>
-        </div>
-      )}
-
-      {/* MOBILE SETTINGS OVERLAY */}
-      {showSettings && (
-        <div className="fixed inset-0 z-[2000] bg-black/95 backdrop-blur-3xl p-10 flex flex-col gap-8 overflow-y-auto animate-in fade-in duration-300">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-black uppercase tracking-widest text-accent">Settings</h2>
-            <button onClick={() => setShowSettings(false)} className="p-3 bg-white/10 rounded-full"><X className="w-6 h-6" /></button>
-          </div>
-          
-          <div className="flex flex-col gap-4">
-            <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Theme</span>
-            <div className="grid grid-cols-2 gap-2">
-              {themes.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => { setTheme(t.id); setShowSettings(false); }}
-                  className={`px-6 py-6 rounded-3xl text-[10px] font-black uppercase tracking-widest border transition-all ${theme === t.id ? "bg-accent border-accent text-white shadow-xl shadow-accent/20" : theme === t.id && theme === 'pokopia' ? "bg-white border-[#A6D9F7] text-[#A6D9F7]" : "bg-white/5 border-white/10 text-foreground/40"}`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Brand / Ecosystem</span>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => { setActiveTab("kirbai"); setShowSettings(false); }}
-                className={`px-6 py-6 rounded-3xl text-[10px] font-black uppercase tracking-widest border transition-all ${activeTab === "kirbai" ? "bg-accent border-accent text-white shadow-xl shadow-accent/20" : "bg-white/5 border-white/10 text-foreground/40"}`}
-              >
-                Kirbai
-              </button>
-              <button
-                onClick={() => { setActiveTab("factory"); setShowSettings(false); }}
-                className={`px-6 py-6 rounded-3xl text-[10px] font-black uppercase tracking-widest border transition-all ${activeTab === "factory" ? "bg-accent border-accent text-white shadow-xl shadow-accent/20" : "bg-white/5 border-white/10 text-foreground/40"}`}
-              >
-                Factory
-              </button>
-            </div>
-          </div>
-          <p className="text-center text-[9px] font-black uppercase tracking-[0.5em] text-foreground/20 mt-auto pb-10">PREFERENCE MATRIX V3.2.1</p>
-        </div>
-      )}
-
-      {/* 4. Modular Content Area */}
-      <div className="w-full max-w-screen-2xl px-6 mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className={activeModule === "roadmap" ? "lg:col-span-3 flex flex-col gap-6" : "lg:col-span-4 flex flex-col gap-6"}>
-          <div key={`${activeTab}-${activeModule}`} className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {activeModule === "roadmap" && <Roadmap mode={activeTab} />}
-            {activeModule === "vault" && <VaultManager theme={theme} mode={activeTab} />}
-            {activeModule === "intel" && <IntelInbox mode="full" theme={theme} activeTab={activeTab} />}
-            {activeModule === "pulse" && <AnalyticsMatrix theme={theme} mode={activeTab} />}
-            {activeModule === "director" && <DirectorSuite mode={activeTab} />}
-            {activeModule === "finance" && <FinanceView mode={activeTab} />}
-            {activeModule === "api-health" && <APIHealth theme={theme} />}
-            {activeModule === "chat" && <AIHub theme={theme} />}
-            {activeModule === "core" && <ConsultantSettings theme={theme} />}
-            {activeModule === "lore" && <LoreMatrix theme={theme} mode={activeTab} />}
-            {activeModule === "creative" && <CreativeHub theme={theme} mode={activeTab} />}
-            {activeModule === "prompts" && <PromptBank mode={activeTab} />}
-            {activeModule === "muse" && <MuseDeck mode={activeTab} />}
+              </div>
+            )}
           </div>
         </div>
-
-        {/* 5. Sidebar Command Center (Contextual Intel) - Only on HOME */}
-        {activeModule === "roadmap" && (
-          <div className="lg:col-span-1 flex flex-col gap-8 sticky top-28 self-start">
-            <div className="glass squircle p-6 specular-reflect shadow-2xl overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-[50px] rounded-full -mr-16 -mt-16" />
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-foreground mb-8 border-b border-border/10 pb-4">Command Center</h3>
-              <IntelInbox mode="compact" theme={theme} />
-            </div>
-          </div>
-        )}
-      </div>
+      </section>
     </main>
   );
 }

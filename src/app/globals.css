@@ -9,6 +9,25 @@
   --color-border: var(--border-color, #2A2A2A);
 
   --animate-pulse-slow: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-sanctuary-cycle: sanctuary-cycle 20s ease-in-out infinite;
+  --animate-float-slow: float-slow 15s ease-in-out infinite;
+}
+
+@keyframes sanctuary-cycle {
+  0% { background-color: #deb8c2; }
+  33% { background-color: #b8cde0; }
+  66% { background-color: #cdc0e0; }
+  100% { background-color: #deb8c2; }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-30px) translateX(15px); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
 }
 
 @keyframes pulse-slow {
@@ -122,45 +141,148 @@ html[data-theme='gbc'] .glass-accent {
 }
 
 html[data-theme='pokopia'] {
-  /* Pokémon Pokopia Daylight Palette */
-  --bg-color: #A6D9F7; /* Sky Blue */
-  --fg-color: #2D1E2F;
-  --surface-color: #FFFFFF;
-  --border-color: #FFFFFF;
-  --accent-color: #B5E089; /* Sage Green */
-  --accent-sunset: #FFD93D; /* Sunlight Yellow */
-  --panel-blur: 0px;
+  /* Pokémon Pokopia Deep Palette & Textures */
+  --bg-color: #f7e9d7; /* Wood Base stays as secondary texture */
+  --bg-sky: #A6D9F7;   /* Re-introducing Sky Blue */
+  --fg-color: #3b2b1d; 
+  --bg-card: #ffffff;
+  --surface-color: #ffffff;
+  --border-color: #ffffff;
+  --accent-color: #a3c422; 
+  --accent-sunset: #f89d1b; 
+  
+  /* Specialized Shadows */
+  --pokopia-shadow-green: 0 6px 0 rgba(3, 60, 21, 0.15);
+  --pokopia-shadow-brown: 0 6px 0 rgba(59, 43, 29, 0.12);
+  --pokopia-sticker-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
 }
 
+html[data-theme='pokopia'], 
 html[data-theme='pokopia'] body {
-  background-color: #A6D9F7 !important;
+  background-color: var(--bg-sky) !important; /* Sky Blue as PRIMARY Canvas */
+  color: #3b2b1d !important;
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+/* Force All Interactive and Content Text to High Contrast */
+html[data-theme='pokopia'] h1, 
+html[data-theme='pokopia'] h2, 
+html[data-theme='pokopia'] h3, 
+html[data-theme='pokopia'] h4, 
+html[data-theme='pokopia'] span,
+html[data-theme='pokopia'] p,
+html[data-theme='pokopia'] li {
+  color: #3b2b1d !important;
+}
+
+/* Sky Blue primary canvas with a subtle wood "ground" texture at the bottom */
+html[data-theme='pokopia'] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-color: var(--bg-sky);
   background-image: 
-    linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 100%),
-    repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 20px, transparent 20px, transparent 40px) !important;
-  background-attachment: fixed !important;
+    linear-gradient(to bottom, transparent 60%, rgba(59, 43, 29, 0.05) 100%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 80px, transparent 80px, transparent 160px);
+  background-size: 100% 100%, 160px 100%;
+  background-attachment: fixed;
+  z-index: -20;
+  pointer-events: none;
 }
 
-/* Pokopia specific sticker look */
-html[data-theme='pokopia'] .squircle {
-  border-radius: 32px !important;
-  border: 6px solid #FFFFFF !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(0, 0, 0, 0.05) !important;
-  background: #FFFFFF !important;
-}
-
+/* ABSOLUTELY NO HARD ANGLES */
+html[data-theme='pokopia'] header,
+html[data-theme='pokopia'] section,
+html[data-theme='pokopia'] button,
+html[data-theme='pokopia'] .squircle,
 html[data-theme='pokopia'] .glass {
-  background: white !important;
-  border: 6px solid #FFFFFF !important;
-  border-radius: 32px !important;
-  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08) !important;
-  backdrop-filter: none !important;
+  border-radius: 40px !important;
 }
 
-html[data-theme='pokopia'] .text-gradient {
-  background: linear-gradient(135deg, #FF6F91 0%, #FF9671 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Navigation Wood Slab Contrast */
+html[data-theme='pokopia'] nav {
+  background: #f7e9d7 !important;
+  background-image: repeating-linear-gradient(rgba(59, 43, 29, 0.05) 0, rgba(59, 43, 29, 0.05) 1px, transparent 1px, transparent 40px) !important;
+  border: 4px solid #ffffff !important;
+  border-radius: 999px !important;
+  padding: 8px 32px !important;
+  box-shadow: 0 8px 20px rgba(59, 43, 29, 0.15) !important;
+  margin: 32px 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  border-bottom: 4px solid #ffffff !important;
+}
+
+/* Dropdown Utilities */
+.dropdown-pill {
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+html[data-theme='pokopia'] .nav-btn {
+  background-color: var(--bg-sky) !important;
+  color: #3b2b1d !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 999px !important;
+  padding: 6px 18px !important;
+  font-weight: 900 !important;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.05);
+}
+
+html[data-theme='pokopia'] .dropdown-menu {
+    background: #f7e9d7 !important;
+    border: 4px solid white !important;
+    border-radius: 24px !important;
+    padding: 12px !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important;
+}
+
+/* Pokopia Sticker Components */
+html[data-theme='pokopia'] .squircle,
+html[data-theme='pokopia'] .glass,
+html[data-theme='pokopia'] .responsive-table tr {
+  border-radius: 30px !important;
+  border: 4px solid #ffffff !important;
+  background: #ffffff !important;
+  box-shadow: var(--pokopia-shadow-brown) !important;
+  backdrop-filter: none !important;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+}
+
+/* Pokopia Sectional Colors */
+html[data-theme='pokopia'] .bg-section-green { background-color: #C0E8A8 !important; }
+html[data-theme='pokopia'] .bg-section-blue { background-color: #A6D9F7 !important; }
+html[data-theme='pokopia'] .bg-section-purple { background-color: #D3C2F7 !important; }
+html[data-theme='pokopia'] .bg-section-wood { background-color: #f7e9d7 !important; }
+
+html[data-theme='pokopia'] .responsive-table tr {
+  margin-bottom: 2rem !important;
+}
+
+html[data-theme='pokopia'] button,
+html[data-theme='pokopia'] .clickable,
+html[data-theme='pokopia'] .mobile-launcher-btn {
+  border-radius: 40px !important;
+  border: 4px solid #ffffff !important;
+  box-shadow: var(--pokopia-shadow-brown) !important;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+html[data-theme='pokopia'] button:hover,
+html[data-theme='pokopia'] .clickable:hover,
+html[data-theme='pokopia'] .mobile-launcher-btn:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Pokopia Navigation Force Consistency */
+html[data-theme='pokopia'] .nav-btn,
+html[data-theme='pokopia'] .dropdown-pill span,
+html[data-theme='pokopia'] .dropdown-menu button {
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
 }
 
 body {
@@ -274,24 +396,26 @@ body {
   box-shadow: none !important;
 }
 
-/* Pokopia Animations */
-@keyframes bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+/* Pokopia Animations: Wouncy & Bouncy */
+@keyframes wounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
 }
 
-.animate-bob {
-  animation: bob 3s ease-in-out infinite;
+.animate-wounce {
+  animation: wounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.sticker-hover {
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+@keyframes drift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(20px); }
 }
 
-.sticker-hover:hover {
-  transform: scale(1.05) rotate(1deg);
-  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
+.animate-drift {
+  animation: drift 10s ease-in-out infinite alternate;
 }
+
+/* removed divider-grass and divider-cloud */
 
 /* --- MOBILE SUIT: HIGH-FIDELITY RESPONSIVE SYSTEM --- */
 @media (max-width: 768px) {

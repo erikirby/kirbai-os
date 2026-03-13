@@ -69,22 +69,22 @@ const MuseClefairy: React.FC<MuseClefairyProps> = ({ emotion = 'idle', message }
                 </div>
 
                 {/* Avatar Cropped Tight */}
-                <div className="relative w-[90%] h-[90%] rounded-full overflow-hidden flex items-center justify-center p-4">
+                <div className={`relative w-[85%] h-[85%] rounded-full overflow-hidden flex items-center justify-center bg-white/5 border ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'border-white border-8 shadow-2xl' : 'border-white/40'}`}>
                     <img 
                         src={getEmotionSrc()} 
                         alt="Muse Clefairy"
-                        className="w-full h-full object-contain relative z-10 transition-all duration-500 hover:scale-110"
+                        className="w-full h-full object-contain scale-[1.4] origin-center relative z-10 transition-all duration-500 hover:scale-[1.5]"
                     />
                 </div>
 
-                {/* Speech Bubble - Pastel Style */}
+                {/* Speech Bubble - Pastel Style (Contrast Optimized) */}
                 {displayedMessage && (
-                    <div className="absolute -top-4 -left-32 w-48 md:w-64 bg-white/90 backdrop-blur-3xl p-4 rounded-3xl rounded-br-sm shadow-xl border border-accent/10 animate-in zoom-in slide-in-from-bottom-2 duration-300 z-50">
-                        <p className="text-[10px] font-bold text-accent/80 uppercase tracking-widest leading-relaxed text-center italic">
+                    <div className="absolute -top-10 -left-40 w-64 md:w-80 bg-white/95 backdrop-blur-3xl p-6 rounded-[40px] rounded-br-sm shadow-[0_30px_70px_rgba(255,51,102,0.2)] border-2 border-accent/20 animate-in zoom-in slide-in-from-bottom-4 duration-300 z-[100]">
+                        <p className="text-[12px] font-black text-accent uppercase tracking-widest leading-relaxed text-center italic drop-shadow-sm">
                             {displayedMessage}
                         </p>
                         {/* Bubble Tail */}
-                        <div className="absolute bottom-0 right-[-10px] w-6 h-6 bg-white/90 border-r border-b border-accent/10 rotate-45 transform skew-x-12" style={{ clipPath: 'polygon(100% 100%, 0% 100%, 100% 0%)' }} />
+                        <div className="absolute bottom-[-2px] right-[-12px] w-8 h-8 bg-white/95 border-r-2 border-b-2 border-accent/20 rotate-45 transform skew-x-12" style={{ clipPath: 'polygon(100% 100%, 0% 100%, 100% 0%)' }} />
                     </div>
                 )}
             </div>
