@@ -630,6 +630,14 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
 
     const regenerateVision = async () => {
         if (!activeMission) return;
+
+        // Safety Shield: Check if assets/work exists
+        const hasWork = activeMission.shots.some(s => s.thumbnailUrl) || activeMission.references?.length;
+        if (hasWork) {
+            const confirmed = window.confirm("⚠️ DESTRUCTIVE: This will replace your current storyboard and regenerate all vision prompts based on the latest references. Manual edits to frame prompts will be lost. Are you sure?");
+            if (!confirmed) return;
+        }
+
         setIsRegenerating(true);
         try {
             const res = await fetch('/api/director/plan', {
@@ -657,6 +665,37 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             }
         } catch (e) {
             console.error(e);
+        } finally {
+            setIsRegenerating(false);
+        }
+    };
+
+    const handleCloneMission = async () => {
+        if (!activeMission) return;
+        
+        setIsRegenerating(true); // Re-using loading state for feedback
+        try {
+            const clonedMission = {
+                ...activeMission,
+                id: `m-${Math.random().toString(36).substr(2, 9)}`,
+                title: `${activeMission.title} (Copy)`,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            const res = await fetch('/api/missions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mode, mission: clonedMission })
+            });
+
+            if (res.ok) {
+                setMissions(prev => [clonedMission, ...prev]);
+                setActiveMission(clonedMission);
+                setActiveTab("blocking");
+            }
+        } catch (e) {
+            console.error("Cloning failed:", e);
         } finally {
             setIsRegenerating(false);
         }
@@ -832,18 +871,28 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                         </div>
                                     </div>
                                     
-                                    {/* Regenerate Vision Trigger */}
-                                    <div className="flex flex-col items-start lg:items-end gap-1 w-full lg:w-auto">
+                                    {/* Mission Controls */}
+                                    <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2 w-full lg:w-auto">
                                         <button 
-                                            onClick={regenerateVision}
+                                            onClick={handleCloneMission}
                                             disabled={isRegenerating}
-                                            title="Regenerate all shots based on latest refs/cameos"
-                                            className="w-full lg:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-accent/10 border border-accent/20 text-accent rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-accent hover:text-white transition-all disabled:opacity-50"
+                                            title="Branch/Clone Mission (Save progress and experiment)"
+                                            className="w-full lg:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-accent/60 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 hover:text-accent transition-all disabled:opacity-50"
                                         >
-                                            {isRegenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                            {isRegenerating ? "Syncing" : "Regenerate Vision"}
+                                            <Copy className="w-3 h-3" />
+                                            Clone
                                         </button>
-                                        <p className="text-[8px] font-black uppercase tracking-tighter text-foreground/20 italic mt-1">Syncs Outline + Refs + Cameos</p>
+                                        <div className="flex flex-col items-start lg:items-end gap-1 w-full lg:w-auto">
+                                            <button 
+                                                onClick={regenerateVision}
+                                                disabled={isRegenerating}
+                                                title="Regenerate all shots based on latest refs/cameos"
+                                                className="w-full lg:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-accent/10 border border-accent/20 text-accent rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-accent hover:text-white transition-all disabled:opacity-50"
+                                            >
+                                                {isRegenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                                {isRegenerating ? "Syncing" : "Regenerate Vision"}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 
