@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
             1. Output ONLY the finalized prompt. NO conversational text.
             2. MANDATORY PREFIX: You MUST start every response with "generate image of a ".
             3. BACKGROUND: If Category is "Character" or "Object", YOU MUST include "grey studio background" for isolation.
-            4. **OFFICIAL DESIGNS**: You MUST adhere to the official Pokemon designs, shapes, and colors. Do NOT hallucinate colors (e.g., if a Pokemon is teal/cream, do not call it 'blue').
+            4. **OFFICIAL DESIGNS**: You MUST adhere to the official Pokemon designs, shapes, and colors. However, YOU MUST include the phrase "adhering to the design, shape, and colors of the provided reference image" to ensure the generator follows the specific variant (like a Shiny) that the user has uploaded.
             5. **TEXTURE & MATERIALS**: For all assets, specify realistic textures: "hyper-realistic fur, detailed skin texture, subsurface scattering, reflective metallic surfaces, or photorealistic environmental materials."
             6. **POSE & PROPS**: For Characters, enforce a "neutral standing pose" or "T-pose". Do NOT add props, food, snacks, or accessories unless explicitly in the Description. Focus purely on the character's physical model.
             7. **LIGHTING**: Use "professional studio lighting, cinematic high-fidelity, 8k resolution."
