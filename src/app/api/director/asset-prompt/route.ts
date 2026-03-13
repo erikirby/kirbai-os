@@ -15,14 +15,11 @@ export async function POST(req: NextRequest) {
         const ai = new GoogleGenAI({ apiKey });
 
         const prompt = `
-             You are "The Asset Artist". Your goal is to generate an EXTREMELY CONCISE visual prompt for a specific source asset.
+            You are "The Asset Artist". Your goal is to generate an EXTREMELY CONCISE, technical visual prompt for a high-fidelity reference asset.
             
             MISSION CONTEXT:
             - Title: ${mission.title}
             - Description: ${mission.conceptDescription}
-            
-            STORYBOARD (BLOCKING):
-            ${mission.shots.map((s: any) => `[${s.timestamp}] ${s.visualDescription}`).join("\n")}
             
             TARGET ASSET:
             - Label: ${requirement.label}
@@ -31,16 +28,18 @@ export async function POST(req: NextRequest) {
             
             RULES (STRICT):
             1. Output ONLY the finalized prompt. NO conversational text.
-            2. MANDATORY PREFIX: You MUST start every response with the exact words "generate image of a ".
-            3. BACKGROUND: If Category is "Character" or "Object", YOU MUST include the phrase "grey background" to ensure asset isolation.
-            4. STORYBOARD SYNC: Scan the MISSION CONTEXT and STORYBOARD above. If this asset or its environment is described in any shot (e.g., "pristine white floor" or "dark industrial setting"), YOU MUST incorporate those specific visual details into the prompt to ensure consistency.
-            5. MINIMALISM: Use short, punchy phrases. Avoid flowery adjectives.
-            6. NO PEOPLE: Unless explicitly stated as a main character, do NOT include humans, figures, or people. Focus on the architecture/object. YOU MUST INCLUDE the literal phrase "no people" to ensure the generator avoids humanoids.
-            7. ASPECT RATIO: You MUST include the exact phrase "9:16 aspect ratio".
-            8. NO SELF-REFERENCE: Do NOT mention "see ref image" or "following style". This prompt IS the source of truth for the reference.
-            9. FOCUS: Describe the subject, key physical features, materials, and lighting.
+            2. MANDATORY PREFIX: You MUST start every response with "generate image of a ".
+            3. BACKGROUND: If Category is "Character" or "Object", YOU MUST include "grey studio background" for isolation.
+            4. **OFFICIAL DESIGNS**: You MUST adhere to the official Pokemon designs, shapes, and colors. Do NOT hallucinate colors (e.g., if a Pokemon is teal/cream, do not call it 'blue').
+            5. **TEXTURE & MATERIALS**: For all assets, specify realistic textures: "hyper-realistic fur, detailed skin texture, subsurface scattering, reflective metallic surfaces, or photorealistic environmental materials."
+            6. **POSE & PROPS**: For Characters, enforce a "neutral standing pose" or "T-pose". Do NOT add props, food, snacks, or accessories unless explicitly in the Description. Focus purely on the character's physical model.
+            7. **LIGHTING**: Use "professional studio lighting, cinematic high-fidelity, 8k resolution."
+            8. **NO PEOPLE**: Include the literal phrase "no people".
+            9. STORYBOARD SYNC: If the STORYBOARD below mentions specific physical states (e.g., "damaged armor", "glow-in-the-dark eyes"), incorporate those. Otherwise, stay neutral.
+            10. ASPECT RATIO: Include "9:16 aspect ratio".
             
-            The goal is for this prompt to generate a high-fidelity reference image that serves as the visual anchor for future video shots.
+            STORYBOARD (ORPHAN CONTEXT):
+            ${mission.shots.map((s: any) => `[${s.timestamp}] ${s.visualDescription}`).join("\n")}
         `;
 
         const result = await ai.models.generateContent({
