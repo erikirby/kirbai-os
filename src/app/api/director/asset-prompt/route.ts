@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
             3. BACKGROUND: If Category is "Character" or "Object", YOU MUST include the phrase "grey background" to ensure asset isolation.
             4. STORYBOARD SYNC: Scan the MISSION CONTEXT and STORYBOARD above. If this asset or its environment is described in any shot (e.g., "pristine white floor" or "dark industrial setting"), YOU MUST incorporate those specific visual details into the prompt to ensure consistency.
             5. MINIMALISM: Use short, punchy phrases. Avoid flowery adjectives.
-            6. NO PEOPLE: Unless explicitly stated as a main character, do NOT include humans, figures, or people. Focus on the architecture/object.
+            6. NO PEOPLE: Unless explicitly stated as a main character, do NOT include humans, figures, or people. Focus on the architecture/object. YOU MUST INCLUDE the literal phrase "no people" to ensure the generator avoids humanoids.
             7. ASPECT RATIO: You MUST include the exact phrase "9:16 aspect ratio".
             8. NO SELF-REFERENCE: Do NOT mention "see ref image" or "following style". This prompt IS the source of truth for the reference.
             9. FOCUS: Describe the subject, key physical features, materials, and lighting.

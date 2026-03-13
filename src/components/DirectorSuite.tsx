@@ -72,6 +72,9 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
     const [forgingVideoShotId, setForgingVideoShotId] = useState<string | null>(null);
     const [telemetry, setTelemetry] = useState<any>(null);
     const [costShieldOverridden, setCostShieldOverridden] = useState(false);
+    const [editingRefLabel, setEditingRefLabel] = useState<string | null>(null);
+    const [refTempDescription, setRefTempDescription] = useState("");
+    const [isRegeneratingRef, setIsRegeneratingRef] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchMissionsAndTelemetry = async () => {
@@ -385,6 +388,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             if (data.prompt) {
                 if (forShot && shotId) {
                     setTempPrompt(data.prompt);
+                } else if (editingRefLabel === req.label) {
+                    return data.prompt;
                 } else {
                     await navigator.clipboard.writeText(data.prompt);
                     setCopiedId(req.label);
@@ -395,6 +400,102 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             console.error("Failed to generate asset prompt.", e);
         } finally {
             setIsAssetPromptLoading(null);
+        }
+    };
+
+    const saveReferenceDescription = async (label: string) => {
+        if (!activeMission) return;
+        const updatedReqs = (activeMission.requiredReferences || []).map(r => 
+            r.label === label ? { ...r, description: refTempDescription } : r
+        );
+        const updated = { ...activeMission, requiredReferences: updatedReqs };
+        setActiveMission(updated);
+        setEditingRefLabel(null);
+        
+        await fetch('/api/missions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mode, mission: updated })
+        });
+    };
+
+    const handleRegenerateReference = async (req: any) => {
+        if (!activeMission) return;
+        
+        // Cost Shield Logic (Monthly $10)
+        if (isOverBudget && !costShieldOverridden) {
+            alert("⚠️ COST SHIELD ACTIVE: You have exceeded the monthly $10.00 budget. Please check the 'Unlock Over-Budget Generations' box in the API Health bar to continue.");
+            return;
+        }
+
+        setIsRegeneratingRef(req.label);
+        try {
+            // 1. Get updated prompt from Asset Artist
+            const prompt = await getAssetPrompt(req);
+            if (!prompt) throw new Error("Could not forge vision prompt.");
+
+            // 2. Generate image using Nano Banana
+            // We create a pseudo-shot for the API
+            const pseudoShot = {
+                id: `ref-${req.label}`,
+                visualDescription: req.description,
+                bananaPrompt: prompt
+            };
+
+            const res = await fetch('/api/director/generate-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mission: activeMission,
+                    shot: pseudoShot,
+                    isEdit: false,
+                    customPrompt: prompt
+                })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                // 3. Update references array and mission mapping
+                const updatedRefs = [...(activeMission.references || [])];
+                let newIdx = req.uploadedIndex;
+
+                if (newIdx !== undefined && newIdx < updatedRefs.length) {
+                    updatedRefs[newIdx] = data.thumbnailUrl;
+                } else {
+                    updatedRefs.push(data.thumbnailUrl);
+                    newIdx = updatedRefs.length - 1;
+                }
+
+                const updatedReqs = [...(activeMission.requiredReferences || [])].map(r => 
+                    r.label === req.label ? { ...r, uploadedIndex: newIdx } : r
+                );
+
+                const updated = { 
+                    ...activeMission, 
+                    references: updatedRefs, 
+                    requiredReferences: updatedReqs,
+                    updatedAt: new Date().toISOString()
+                };
+
+                setActiveMission(updated);
+                setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
+                refreshTelemetry();
+
+                await fetch('/api/missions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode, mission: updated })
+                });
+                
+                setEditingRefLabel(null);
+            } else {
+                alert(data.error || "Nano Banana failed to regenerate asset.");
+            }
+        } catch (e: any) {
+            console.error("Reference regeneration failed:", e);
+            alert(e.message || "Connection error: Could not reach AI Engine.");
+        } finally {
+            setIsRegeneratingRef(null);
         }
     };
     
@@ -1045,7 +1146,20 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                     </button>
                                                                                     <span className="text-[10px] font-black uppercase tracking-tighter text-accent">{req.label}</span>
                                                                                 </div>
-                                                                                 {req.uploadedIndex !== undefined ? (
+                                                                                <div className="flex items-center gap-2">
+                                                                                    {editingRefLabel !== req.label && (
+                                                                                        <button 
+                                                                                            onClick={() => {
+                                                                                                setEditingRefLabel(req.label);
+                                                                                                setRefTempDescription(req.description);
+                                                                                            }}
+                                                                                            className="p-1.5 hover:bg-white/5 rounded-lg text-foreground/20 hover:text-accent transition-all"
+                                                                                            title="Edit Description"
+                                                                                        >
+                                                                                            <Layout className="w-3 h-3" />
+                                                                                        </button>
+                                                                                    )}
+                                                                                    {req.uploadedIndex !== undefined ? (
                                                                                      <div className="flex items-center gap-2">
                                                                                          <div className="w-8 h-8 rounded-lg border border-green-500/30 overflow-hidden shadow-lg shadow-green-500/10 shrink-0">
                                                                                              <img src={activeMission.references?.[req.uploadedIndex]} className="w-full h-full object-cover" alt="" />
@@ -1071,7 +1185,41 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                     </button>
                                                                                 )}
                                                                             </div>
-                                                                            <p className="text-[10px] text-foreground/60 leading-relaxed font-medium line-clamp-2">{req.description}</p>
+                                                                        </div>
+                                                                            {editingRefLabel === req.label ? (
+                                                                                <div className="flex flex-col gap-2 animate-in fade-in duration-200">
+                                                                                    <textarea 
+                                                                                        value={refTempDescription}
+                                                                                        onChange={e => setRefTempDescription(e.target.value)}
+                                                                                        className="w-full h-20 p-3 bg-black/40 border border-accent/40 rounded-xl font-medium text-[10px] text-foreground/80 leading-relaxed focus:outline-none focus:border-accent transition-all resize-none"
+                                                                                        autoFocus
+                                                                                    />
+                                                                                    <div className="flex gap-2">
+                                                                                        <button 
+                                                                                            onClick={() => handleRegenerateReference(req)}
+                                                                                            disabled={isRegeneratingRef === req.label}
+                                                                                            className="flex-1 px-3 py-1.5 bg-accent text-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-accent/80 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+                                                                                        >
+                                                                                            {isRegeneratingRef === req.label ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <RefreshCw className="w-2.5 h-2.5" />}
+                                                                                            Regenerate Image
+                                                                                        </button>
+                                                                                        <button 
+                                                                                            onClick={() => saveReferenceDescription(req.label)}
+                                                                                            className="px-3 py-1.5 bg-white/10 text-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-white/20 transition-all"
+                                                                                        >
+                                                                                            Save Only
+                                                                                        </button>
+                                                                                        <button 
+                                                                                            onClick={() => setEditingRefLabel(null)}
+                                                                                            className="px-3 py-1.5 bg-white/5 text-foreground/40 rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+                                                                                        >
+                                                                                            Cancel
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <p className="text-[10px] text-foreground/60 leading-relaxed font-medium line-clamp-2">{req.description}</p>
+                                                                            )}
                                                                             
                                                                             <div className="mt-auto flex gap-2">
                                                                                  <button 
