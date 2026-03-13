@@ -121,7 +121,47 @@ html[data-theme='gbc'] .glass-accent {
   box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15) !important;
 }
 
+html[data-theme='pokopia'] {
+  /* Pokémon Pokopia Daylight Palette */
+  --bg-color: #A6D9F7; /* Sky Blue */
+  --fg-color: #2D1E2F;
+  --surface-color: #FFFFFF;
+  --border-color: #FFFFFF;
+  --accent-color: #B5E089; /* Sage Green */
+  --accent-sunset: #FFD93D; /* Sunlight Yellow */
+  --panel-blur: 0px;
+}
 
+html[data-theme='pokopia'] body {
+  background-color: #A6D9F7 !important;
+  background-image: 
+    linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 100%),
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 20px, transparent 20px, transparent 40px) !important;
+  background-attachment: fixed !important;
+}
+
+/* Pokopia specific sticker look */
+html[data-theme='pokopia'] .squircle {
+  border-radius: 32px !important;
+  border: 6px solid #FFFFFF !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(0, 0, 0, 0.05) !important;
+  background: #FFFFFF !important;
+}
+
+html[data-theme='pokopia'] .glass {
+  background: white !important;
+  border: 6px solid #FFFFFF !important;
+  border-radius: 32px !important;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08) !important;
+  backdrop-filter: none !important;
+}
+
+html[data-theme='pokopia'] .text-gradient {
+  background: linear-gradient(135deg, #FF6F91 0%, #FF9671 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
 body {
   background-color: var(--bg-color);
@@ -234,11 +274,23 @@ body {
   box-shadow: none !important;
 }
 
-/* Gamification: XP Progress Bar */
-.xp-bar-inner {
-  background: linear-gradient(90deg, var(--accent-color), var(--accent-sunset));
-  box-shadow: 0 0 10px var(--accent-color);
-  transition: width 1s ease-in-out;
+/* Pokopia Animations */
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-bob {
+  animation: bob 3s ease-in-out infinite;
+}
+
+.sticker-hover {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.sticker-hover:hover {
+  transform: scale(1.05) rotate(1deg);
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
 }
 
 /* --- MOBILE SUIT: HIGH-FIDELITY RESPONSIVE SYSTEM --- */

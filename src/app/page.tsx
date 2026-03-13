@@ -38,6 +38,7 @@ export default function Home() {
     { id: "pink", label: "Pink" },
     { id: "snes", label: "SNES", class: "snes-btn-purple text-white" },
     { id: "gbc", label: "GBC" },
+    { id: "pokopia", label: "Pokopia" },
   ];
 
   return (
@@ -62,7 +63,7 @@ export default function Home() {
                 key={t.id}
                 onClick={() => setTheme(t.id)}
                 className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest rounded-full transition-all ${theme === t.id
-                  ? (theme === "snes" ? "snes-btn-red text-white scale-105" : theme === "gbc" ? "bg-accent/20 border-2 border-accent text-accent scale-105 rounded-none shadow-[2px_2px_0_rgba(0,0,0,0.5)]" : "bg-accent text-white shadow-md scale-105")
+                  ? (theme === "snes" ? "snes-btn-red text-white scale-105" : theme === "gbc" ? "bg-accent/20 border-2 border-accent text-accent scale-105 rounded-none shadow-[2px_2px_0_rgba(0,0,0,0.5)]" : theme === "pokopia" ? "bg-white text-[#A6D9F7] border-2 border-[#A6D9F7] scale-105 shadow-lg" : "bg-accent text-white shadow-md scale-105")
                   : "text-foreground/50 hover:text-foreground/80"
                   }`}
               >
@@ -311,7 +312,7 @@ export default function Home() {
                 <button
                   key={t.id}
                   onClick={() => { setTheme(t.id); setShowSettings(false); }}
-                  className={`px-6 py-6 rounded-3xl text-[10px] font-black uppercase tracking-widest border transition-all ${theme === t.id ? "bg-accent border-accent text-white shadow-xl shadow-accent/20" : "bg-white/5 border-white/10 text-foreground/40"}`}
+                  className={`px-6 py-6 rounded-3xl text-[10px] font-black uppercase tracking-widest border transition-all ${theme === t.id ? "bg-accent border-accent text-white shadow-xl shadow-accent/20" : theme === t.id && theme === 'pokopia' ? "bg-white border-[#A6D9F7] text-[#A6D9F7]" : "bg-white/5 border-white/10 text-foreground/40"}`}
                 >
                   {t.label}
                 </button>

@@ -4,7 +4,7 @@ import { getRow, getMissionsAsync, getRoadmapAsync, getUserPsycheAsync, MuseCard
 
 export async function POST(req: NextRequest) {
     try {
-        const { mode = 'kirbai' } = await req.json();
+        const { mode = 'kirbai', existingTitles = [] } = await req.json();
 
         if (!process.env.GEMINI_API_KEY) {
             throw new Error("GEMINI_API_KEY is not set");
@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
             CURRENT ROADMAP: ${JSON.stringify(roadmap?.phases?.find((p: any) => p.status === 'Current Objective') || "None")}
             USER PSYCHE: ${JSON.stringify(psyche || "No memory yet")}
             ANALYTICS: ${JSON.stringify(pulse?.summary || "No data")}
+            ALREADY SUGGESTED (DO NOT REPEAT): ${JSON.stringify(existingTitles)}
             SCOUT INTEL (TRENDS): "Pokémon Pokopia" sandbox mode is viral. "2026 is the New 2016" nostalgia trend is peaking on TikTok. AI grading of cards is a hot topic.
         `;
 
@@ -34,6 +35,9 @@ export async function POST(req: NextRequest) {
         const symposiumPrompt = `
             You are a board of 5 specialized agents advising Erik on his project 'Kirbai OS'.
             Your goal is to debate and produce 3 actionable 'Proposal Cards' for today.
+            
+            SOOTHING DIRECTIVE: This is a stress-free, soothing sanctuary. Suggestions should be inspiring and manageable, not overwhelming. 
+            Avoid high-stress "grind" culture. Focus on "soulful" progress.
 
             THE AGENTS:
             1. THE LOREKEEPER: Obsessed with Pokemon narrative, character soul, and world-building. Hates generic content.
@@ -42,6 +46,8 @@ export async function POST(req: NextRequest) {
             4. THE MONETIZER: Only cares about the bottom line. DistroKid, YouTube AdRev, and scaling the business.
             5. THE ADVOCATE: Erik's emotional anchor. Knows his anxiety, his motivation dips, and his wins. Ensures the other agents don't burn him out.
             6. THE MUSE (CLEFAIRY): The synthesizer. She watches the debate with starry-eyed wonder but grounded wisdom. She provides a final, comforting, yet insightful summary of why these choices matter for Erik's soul.
+
+            STRICT RULE: Do NOT repeat any titles from the ALREADY SUGGESTED list. We need fresh, evolving inspiration every day.
 
             DEBATE TOPICS:
             - Content ideas for IG/TikTok (e.g. "Pokémon Pokopia" sandbox builds, Route 101 recreations, "2016 is the New 2016" nostalgia posts).
