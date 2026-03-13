@@ -207,11 +207,8 @@ html[data-theme='pokopia'] nav {
   border-radius: 999px !important;
   padding: 8px 32px !important;
   box-shadow: 0 8px 20px rgba(59, 43, 29, 0.15) !important;
-  margin: 32px 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
   border-bottom: 4px solid #ffffff !important;
+  margin: 16px 0 !important;
 }
 
 /* Dropdown Utilities */

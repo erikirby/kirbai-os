@@ -6,7 +6,8 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY as string });
 
 export async function GET() {
     try {
-        const stored = getFinanceAnalysis();
+        const { getFinanceAnalysisAsync } = await import("@/lib/db");
+        const stored = await getFinanceAnalysisAsync();
         return NextResponse.json({ analysis: stored });
     } catch (err: any) {
         return NextResponse.json({ error: "Failed to retrieve stored data" }, { status: 500 });

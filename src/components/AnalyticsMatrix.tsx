@@ -16,6 +16,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
     const [ttViews, setTtViews] = useState<string>("0");
     const [ttLastUpdated, setTtLastUpdated] = useState<string>("");
     const [igLastUpdated, setIgLastUpdated] = useState<string>("");
+    const [ytLastUpdated, setYtLastUpdated] = useState<string>("");
 
     const [isLoadingYT, setIsLoadingYT] = useState(true);
     const [isSynthesizing, setIsSynthesizing] = useState(false);
@@ -60,7 +61,14 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
             try {
                 const res = await fetch(`/api/youtube-stats?mode=${mode}`);
                 const data = await res.json();
-                if (data.stats) setYtStats(data.stats);
+                if (data.stats) {
+                    setYtStats(data.stats);
+                    if (data.persistedAt) {
+                        setYtLastUpdated(new Date(data.persistedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+                    } else if (!data.isCached) {
+                        setYtLastUpdated(new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+                    }
+                }
             } catch (e) {
                 console.error(e);
             } finally {
@@ -238,7 +246,10 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                 {/* YOUTUBE (AUTOMATED) */}
                 <div className={`p-8 border squircle flex flex-col gap-6 reltive overflow-hidden ${theme === 'snes' ? 'bg-surface/60 border-b-4 border-r-4' : 'bg-surface/30 glass border-border/10'}`}>
                     <div className="flex items-center gap-3">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground">YouTube <span className="text-foreground/40">(Auto)</span></h3>
+                        <div className="flex flex-col">
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground">YouTube <span className="text-foreground/40">(Auto)</span></h3>
+                            {ytLastUpdated && <span className="text-[8px] font-mono text-foreground/40 tracking-widest uppercase mt-0.5">Updated: {ytLastUpdated}</span>}
+                        </div>
                     </div>
                     {isLoadingYT ? (
                         <div className="flex items-center gap-2 py-10 opacity-50">

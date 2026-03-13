@@ -68,19 +68,31 @@ export async function GET(req: Request) {
                 };
             } catch (err) {
                 console.error(`Failed to fetch official API stats for ${channel.handle}`, err);
-                return {
-                    id: channel.id,
-                    name: channel.name,
-                    handle: channel.handle,
-                    subscribers: 0,
-                    views: 0,
-                    videoCount: 0,
-                    avatarUrl: ""
-                };
+                return null; // Signals failure for this channel
             }
         }));
 
-        return NextResponse.json({ stats });
+        // Persistence Logic
+        const { saveYouTubeStatsAsync, getYouTubeStatsAsync } = await import("@/lib/db");
+        
+        const validStats = stats.filter(s => s !== null);
+        
+        if (validStats.length > 0) {
+            // Success: update the cache
+            await saveYouTubeStatsAsync(mode, validStats);
+            return NextResponse.json({ stats: validStats });
+        } else {
+            // Failure: load from cache
+            const cached = await getYouTubeStatsAsync(mode);
+            if (cached) {
+                return NextResponse.json({ 
+                    stats: cached.stats, 
+                    isCached: true, 
+                    persistedAt: cached.persistedAt 
+                });
+            }
+            throw new Error("No YouTube data available (API and Cache both failed).");
+        }
     } catch (e: any) {
         console.error("YouTube Official Stats Fetch Error:", e);
         return NextResponse.json({ error: "Failed to fetch top-level stats" }, { status: 500 });

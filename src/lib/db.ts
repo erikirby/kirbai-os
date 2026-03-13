@@ -180,7 +180,7 @@ export async function getFinanceAnalysisAsync() {
 }
 
 export function getFinanceAnalysis() {
-    return null; // async callers use getFinanceAnalysisAsync
+    return null; // legacy synchronous call
 }
 
 export interface RoadmapData {
@@ -274,6 +274,22 @@ export async function savePulseStateAsync(mode: string, state: any) {
 
 export async function getPulseStateAsync(mode: string) {
     const key = mode === 'factory' ? 'pulse_state_factory' : 'pulse_state_kirbai';
+    return await getRow(key);
+}
+
+// --- YOUTUBE STATS CACHE ---
+
+export async function saveYouTubeStatsAsync(mode: string, stats: any[]) {
+    const key = mode === 'factory' ? 'yt_stats_factory' : 'yt_stats_kirbai';
+    const data = {
+        stats,
+        persistedAt: new Date().toISOString()
+    };
+    await setRow(key, data);
+}
+
+export async function getYouTubeStatsAsync(mode: string) {
+    const key = mode === 'factory' ? 'yt_stats_factory' : 'yt_stats_kirbai';
     return await getRow(key);
 }
 

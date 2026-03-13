@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { MuseCard, getMuseCardsAsync, saveMuseCardsAsync, saveUserPsycheAsync, getUserPsycheAsync, addRoadmapTaskAsync } from '@/lib/db';
 import MuseClefairy from './MuseClefairy';
-import MuseHistory from './MuseHistory';
 import { Sparkles, X, Check, Eye, Brain, TrendingUp, DollarSign, Heart, ChevronRight, Loader2, Bookmark, CheckCircle2 } from 'lucide-react';
 
 const MuseDeck = ({ mode }: { mode: string }) => {
@@ -12,10 +11,10 @@ const MuseDeck = ({ mode }: { mode: string }) => {
     const [loading, setLoading] = useState(false);
     const [selectedDetail, setSelectedDetail] = useState<MuseCard | null>(null);
     const [activeIdx, setActiveIdx] = useState(0);
-    const [showHistory, setShowHistory] = useState(false);
-    const [motivation, setMotivation] = useState(50);
-    const [clefairyEmotion, setClefairyEmotion] = useState<'idle' | 'thinking' | 'happy' | 'starry-eyed' | 'worried' | 'surprised'>('idle');
+    const [clefairyEmotion, setClefairyEmotion] = useState<'idle' | 'thinking' | 'happy' | 'starry-eyed' | 'worried' | 'surprised' | 'excited' | 'singing' | 'annoyed' | 'proud' | 'cheerful'>('idle');
     const [clefairyMessage, setClefairyMessage] = useState<string | undefined>("Hi Erik! Ready to see what the Muse has for you today?");
+    const [journalPage, setJournalPage] = useState(0);
+    const LOGS_PER_PAGE = 3;
 
     useEffect(() => {
         loadCards();
@@ -24,21 +23,18 @@ const MuseDeck = ({ mode }: { mode: string }) => {
     const loadCards = async () => {
         const stored = await getMuseCardsAsync();
         const pending = stored.filter(c => c.status === 'pending');
-        const accepted = stored.filter(c => c.status === 'yes');
+        const accepted = stored.filter(c => c.status !== 'pending'); // includes yes, no, maybe
         setCards(pending);
         setHistory(accepted);
-
-        const psyche = await getUserPsycheAsync();
-        if (psyche) setMotivation(psyche.motivationLevel || 50);
     };
 
     const runSymposium = async () => {
         setLoading(true);
-        setClefairyEmotion('thinking');
+        setClefairyEmotion('singing');
         setClefairyMessage("The Symposium is debating... one second...");
         
         try {
-            // Gather all existing titles to prevent repetition
+            // Gather all existing titles (pending, history) to prevent repetition
             const existingTitles = [...cards, ...history].map(c => c.title);
 
             const res = await fetch('/api/muse/generate', {
@@ -48,8 +44,9 @@ const MuseDeck = ({ mode }: { mode: string }) => {
             });
             const data = await res.json();
             if (data.cards) {
-                setCards(data.cards);
-                await saveMuseCardsAsync(data.cards);
+                const combined = [...cards, ...data.cards];
+                setCards(combined);
+                await saveMuseCardsAsync(combined);
                 
                 // Soulful Synthesis
                 setClefairyEmotion(data.clefairyEmotion || 'happy');
@@ -60,9 +57,8 @@ const MuseDeck = ({ mode }: { mode: string }) => {
             setClefairyMessage("Something went wrong with the brain-sync...");
         } finally {
             setLoading(false);
-            // Don't reset to idle immediately if she's starry-eyed or worried
             setTimeout(() => {
-                if (!['worried', 'starry-eyed'].includes(clefairyEmotion)) {
+                if (!['worried', 'starry-eyed', 'excited', 'annoyed', 'proud', 'cheerful'].includes(clefairyEmotion)) {
                     setClefairyEmotion('idle');
                 }
             }, 5000);
@@ -73,80 +69,42 @@ const MuseDeck = ({ mode }: { mode: string }) => {
         if (!cards[activeIdx]) return;
         
         const currentCard = cards[activeIdx];
-        const updatedCards = cards.filter((_, i) => i !== activeIdx);
+        const updatedPending = cards.filter((_, i) => i !== activeIdx);
         
-        setCards(updatedCards);
+        let updatedHistory = history;
         
         if (status === 'yes') {
             setClefairyEmotion('starry-eyed');
             setClefairyMessage(`I knew you'd like that! "${currentCard.title}" has so much soul.`);
-            
-            // Autopilot: Add to Roadmap
             await addRoadmapTaskAsync(mode, currentCard.title, currentCard.description);
-
-            // Advance Psyche Memory
-            const psyche = await getUserPsycheAsync();
-            if (psyche) {
-                psyche.wins.push(currentCard.title);
-                psyche.motivationLevel = Math.min(100, (psyche.motivationLevel || 50) + 5);
-                await saveUserPsycheAsync(psyche);
-                setMotivation(psyche.motivationLevel);
-            }
-
-            // Update History
-            setHistory(prev => [currentCard, ...prev]);
-
-            // Trigger celebration effect
-            const burst = document.createElement('div');
-            burst.className = 'fixed inset-0 pointer-events-none z-50 flex items-center justify-center';
-            burst.innerHTML = `
-                <div class="animate-ping absolute w-48 h-48 bg-accent/20 rounded-full"></div>
-                <div class="animate-bounce text-7xl text-accent drop-shadow-[0_0_20px_rgba(255,51,102,0.6)]">✨</div>
-            `;
-            document.body.appendChild(burst);
-            setTimeout(() => burst.remove(), 1200);
+            updatedHistory = [{ ...currentCard, status: 'yes' }, ...history];
         } else if (status === 'no') {
-            const isHighValue = currentCard.actionMatrix.revenue === 'high' || currentCard.actionMatrix.creativeValue === 'high';
-            
-            if (isHighValue) {
-                setClefairyEmotion('worried');
-                setClefairyMessage("Oh? Are you sure? That one seemed really promising for the brand...");
-            } else {
-                setClefairyEmotion('idle');
-                setClefairyMessage("Understood. I'll make sure we don't suggest that again.");
-            }
-            
-            const psyche = await getUserPsycheAsync();
-            if (psyche) {
-                psyche.motivationLevel = Math.max(0, (psyche.motivationLevel || 50) - 2);
-                await saveUserPsycheAsync(psyche);
-                setMotivation(psyche.motivationLevel);
-            }
+            setClefairyEmotion('annoyed');
+            setClefairyMessage(currentCard.actionMatrix.revenue === 'high' ? "Oh? Are you sure? That one seemed really promising..." : "Understood. I'll make sure we don't suggest that again.");
+            updatedHistory = [{ ...currentCard, status: 'no' }, ...history];
         } else {
-            setClefairyEmotion('idle');
+            setClefairyEmotion('cheerful');
             setClefairyMessage("Saving it for later in the Idea Vault.");
-            
-            // Track Maybes in session history too
-            const maybeCard = { ...currentCard, status: 'maybe' as const };
-            setHistory(prev => [maybeCard, ...prev]);
+            updatedHistory = [{ ...currentCard, status: 'maybe' }, ...history];
         }
 
-        setTimeout(() => {
-            setClefairyEmotion('idle');
-        }, 3000);
+        setCards(updatedPending);
+        setHistory(updatedHistory);
+        await saveMuseCardsAsync([...updatedPending, ...updatedHistory]);
+
+        setTimeout(() => setClefairyEmotion('idle'), 3000);
     };
 
     const currentCard = cards[activeIdx];
 
-    if (showHistory) {
-        return (
-            <div className="w-full max-w-4xl px-6 py-12">
-                <MuseHistory cards={history} onBack={() => setShowHistory(false)} />
-            </div>
-        );
-    }
 
-    const acceptedAndMaybe = history.concat(cards.filter(c => c.status === 'maybe'));
+    const journalItems = history
+        .filter(c => c.status !== 'no')
+        .sort((a, b) => {
+            if (a.status === 'yes' && b.status !== 'yes') return -1;
+            if (a.status !== 'yes' && b.status === 'yes') return 1;
+            return 0;
+        });
 
     return (
         <div className="w-full max-w-7xl mx-auto px-6 py-12 min-h-screen relative flex flex-col items-center">
@@ -172,7 +130,7 @@ const MuseDeck = ({ mode }: { mode: string }) => {
             `}</style>
 
             {/* Header / Title */}
-            <div className="w-full flex justify-between items-center mb-12">
+            <div className="w-full flex justify-between items-center mb-6">
                 <div className="flex flex-col gap-1">
                     <h2 className="text-4xl font-black uppercase tracking-tighter text-accent/90 leading-none">Muse</h2>
                     <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-accent/30 pl-1">Advisory Suite</span>
@@ -185,19 +143,7 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                 {/* LEFT COLUMN: Deck & Decisions (8 Units) */}
                 <div className={`lg:col-span-8 flex flex-col gap-12 ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'animate-bob' : ''}`}>
                     
-                    {/* 0. Motivation Meter (Pastel Style) */}
-                    <div className="w-full max-w-md flex flex-col gap-3">
-                        <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-[0.3em] text-accent/40">
-                            <span>Motivation Synergy</span>
-                            <span className="text-accent">{motivation}%</span>
-                        </div>
-                        <div className="h-2 w-full bg-accent/5 rounded-full overflow-hidden border border-accent/10 p-0.5">
-                            <div 
-                                className="h-full bg-gradient-to-r from-accent/20 to-accent rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(255,51,102,0.3)]"
-                                style={{ width: `${motivation}%` }}
-                            />
-                        </div>
-                    </div>
+
 
                     {/* 1. The Sanctuary Deck */}
                     <div className="relative w-full">
@@ -293,58 +239,73 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                                     >
                                         <Brain className="w-5 h-5" /> Start Symposium
                                     </button>
-                                    
-                                    <button 
-                                        onClick={() => setShowHistory(true)}
-                                        className="text-[10px] font-black uppercase tracking-[0.4em] text-accent/30 hover:text-accent transition-all"
-                                    >
-                                        View Decision Archive
-                                    </button>
                                 </div>
                             </div>
                         )}
                     </div>
+                </div>
 
-                    {/* 2. PERSISTENT DECISION LIST */}
-                    {history.length > 0 && (
-                        <div className="flex flex-col gap-8 p-12 bg-white/40 border border-white/60 rounded-[64px] backdrop-blur-2xl animate-in fade-in duration-1000 shadow-[0_30px_80px_rgba(255,51,102,0.08)]">
-                            <div className="flex items-center justify-between pb-6 border-b border-accent/10">
-                                <div className="flex items-center gap-3">
-                                    <Bookmark className="w-5 h-5 text-accent" />
-                                    <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-accent/60">Session Log: Evolution</h4>
+                {/* RIGHT COLUMN: The Muse & Clefairy's Log (4 Units) */}
+                <div className="lg:col-span-4 sticky top-12 flex flex-col items-center pt-10 lg:pt-20 relative z-30 gap-8">
+                    <MuseClefairy emotion={clefairyEmotion} message={clefairyMessage} />
+
+                    {/* Clefairy's Log (Stylized Journal) */}
+                    {journalItems.length > 0 && (
+                        <div className="w-full flex flex-col gap-4 animate-in fade-in slide-in-from-right-4 duration-700">
+                            <div className="relative bg-[#f2ebd9] border-2 border-[#d4c5a9] rounded-xl p-8 shadow-2xl overflow-hidden before:absolute before:inset-0 before:bg-[url('https://www.transparenttextures.com/patterns/paper-fibers.png')] before:opacity-20">
+                                {/* Binder Holes */}
+                                <div className="absolute left-4 top-0 bottom-0 flex flex-col justify-around py-4">
+                                    {[1,2,3,4,5].map(i => <div key={i} className="w-3 h-3 rounded-full bg-neutral-300 shadow-inner" />)}
                                 </div>
-                                <span className="text-[8px] font-black uppercase tracking-widest text-accent/30 bg-accent/5 px-3 py-1 rounded-full border border-accent/10">Archive: Roadmap + Session</span>
-                            </div>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {history.map(card => (
-                                    <button 
-                                        key={card.id} 
-                                        onClick={() => setSelectedDetail(card)}
-                                        className="flex items-center gap-4 p-6 bg-white/60 rounded-[40px] border border-white/80 hover:bg-white transition-all text-left shadow-sm group hover:scale-[1.02] active:scale-[0.98]"
-                                    >
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-inner ${card.status === 'yes' ? 'bg-green-100/50' : 'bg-blue-100/50'}`}>
-                                            {card.status === 'yes' ? (
-                                                <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                            ) : (
-                                                <Bookmark className="w-4 h-4 text-blue-500" />
-                                            )}
+
+                                <div className="pl-6">
+                                    <div className="flex items-center justify-between mb-6 border-b-2 border-[#e6dcc7] pb-2">
+                                        <h4 className="text-[12px] font-black uppercase tracking-widest text-[#8b7355] italic">Clefairy's Log</h4>
+                                        <span className="text-[9px] font-bold text-[#8b7355]/40 italic">Page {journalPage + 1}</span>
+                                    </div>
+
+                                    <div className="flex flex-col gap-4">
+                                        {journalItems.slice(journalPage * LOGS_PER_PAGE, (journalPage + 1) * LOGS_PER_PAGE).map(card => (
+                                            <button 
+                                                key={card.id} 
+                                                onClick={() => setSelectedDetail(card)}
+                                                className="group relative border-l-2 border-[#e6dcc7] pl-4 py-1 text-left hover:bg-black/5 transition-all rounded-r-lg"
+                                            >
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className={`w-2 h-2 rounded-full ${card.status === 'yes' ? 'bg-green-400' : 'bg-blue-400'}`} />
+                                                    <span className="text-[10px] font-black uppercase tracking-tighter text-[#5c4a31]">{card.title}</span>
+                                                </div>
+                                                <p className="text-[10px] text-[#8b7355] leading-relaxed line-clamp-2 italic">
+                                                    {card.status === 'yes' ? 'Erik approved the symposium\'s debate on this. Pushing to roadmap.' : 
+                                                     'Stored for future synthesis in the vault.'}
+                                                </p>
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* Turning the Page */}
+                                    {journalItems.length > LOGS_PER_PAGE && (
+                                        <div className="mt-8 flex justify-center gap-8">
+                                            <button 
+                                                disabled={journalPage === 0}
+                                                onClick={() => setJournalPage(p => p - 1)}
+                                                className="text-[9px] font-black uppercase tracking-widest text-[#8b7355] disabled:opacity-20 hover:text-accent transition-colors"
+                                            >
+                                                Previous
+                                            </button>
+                                            <button 
+                                                disabled={(journalPage + 1) * LOGS_PER_PAGE >= journalItems.length}
+                                                onClick={() => setJournalPage(p => p + 1)}
+                                                className="text-[9px] font-black uppercase tracking-widest text-[#8b7355] disabled:opacity-20 hover:text-accent transition-colors"
+                                            >
+                                                Next Page
+                                            </button>
                                         </div>
-                                        <div className="flex flex-col flex-1">
-                                            <span className="text-[11px] font-black uppercase tracking-[0.1em] text-accent/80 group-hover:text-accent transition-colors truncate">{card.title}</span>
-                                            <span className="text-[8px] font-bold uppercase tracking-widest text-accent/30">{card.status === 'yes' ? 'Live in Roadmap' : 'Session Intent'}</span>
-                                        </div>
-                                        <ChevronRight className="w-4 h-4 text-accent/20 group-hover:text-accent/60 group-hover:translate-x-1 transition-all" />
-                                    </button>
-                                ))}
+                                    )}
+                                </div>
                             </div>
                         </div>
                     )}
-                </div>
-
-                {/* RIGHT COLUMN: The Muse (4 Units) */}
-                <div className="lg:col-span-4 sticky top-12 flex flex-col items-center pt-20 lg:pt-40">
-                    <MuseClefairy emotion={clefairyEmotion} message={clefairyMessage} />
                 </div>
 
             </div>

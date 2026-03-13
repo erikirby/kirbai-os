@@ -90,7 +90,15 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                 {analysisResults?.persistedAt && (
                     <div className="flex flex-col items-end gap-1">
                         <span className="text-[9px] font-mono text-neutral-600 uppercase tracking-widest font-bold">Data Current As Of:</span>
-                        <span className="text-[11px] font-black text-accent uppercase tracking-widest italic">{new Date(analysisResults.persistedAt).toLocaleString()}</span>
+                        <span className="text-[11px] font-black text-accent uppercase tracking-widest italic">
+                            {new Date(analysisResults.persistedAt).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}
+                        </span>
                     </div>
                 )}
             </div>

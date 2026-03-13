@@ -43,7 +43,7 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen p-4 lg:p-8 flex flex-col gap-8 max-w-[1500px] mx-auto relative overflow-x-hidden">
+    <main className="min-h-screen p-4 lg:p-6 flex flex-col gap-4 max-w-[1500px] mx-auto relative overflow-x-hidden">
       {/* 1. Header Navigation (Global) */}
       <header className="w-full max-w-screen-2xl px-6 py-4 flex justify-between items-center border-b border-border/10 backdrop-blur-xl sticky top-0 z-50">
         <div className="flex items-center gap-4">
@@ -119,54 +119,49 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Sub-Navigation - Desktop Only: Consolidated Single-Line Dropdown */}
-      <nav className="hide-on-mobile w-full max-w-screen-2xl px-6 flex items-center justify-between gap-4 border-b border-border/10 pb-4 shadow-[0_4px_10px_-5px_rgba(0,0,0,0.3)]">
-        
-        <div className="flex items-center gap-8">
-          {/* MASTER CONTROL - ALWAYS VISIBLE */}
-          <button
-            onClick={() => setActiveModule("chat")}
-            className={`flex items-center gap-3 px-6 py-2.5 transition-all outline-none border relative overflow-hidden group shadow-xl ${theme === 'pokopia' ? 'nav-btn rounded-full' : 'rounded-2xl'} ${activeModule === "chat" 
-              ? (theme === 'pokopia' ? "bg-white border-white scale-105" : "bg-accent border-accent/40 text-white scale-105") 
-              : (theme === 'pokopia' ? "bg-section-blue border-white text-[#3b2b1d]" : "bg-surface/40 border-border/20 text-foreground/40 hover:text-white hover:border-accent/40")}`}
-          >
-            <MessageSquare className={`w-4 h-4 ${activeModule === "chat" ? (theme === 'pokopia' ? "text-accent" : "text-white") : (theme === 'pokopia' ? "text-[#3b2b1d]" : "text-accent")}`} />
-            <span className={`uppercase tracking-widest ${theme === 'pokopia' ? 'text-[#3b2b1d]' : ''}`}>Chat</span>
-            {activeModule === "chat" && theme !== 'pokopia' && (
-              <div className="absolute inset-0 bg-white/10 animate-pulse pointer-events-none"></div>
-            )}
-          </button>
+      {/* 3. Sub-Navigation: Floating Pill Navigation (Standardized) */}
+      <nav className="hide-on-mobile w-full max-w-screen-2xl px-6 flex items-center gap-2 mt-2 relative z-40">
+        {/* CHAT - Standardized Size & Rounding */}
+        <button
+          onClick={() => setActiveModule("chat")}
+          className={`flex items-center gap-2 px-6 py-3 transition-all outline-none border shadow-xl ${theme === 'pokopia' ? 'nav-btn rounded-full' : 'bg-surface/40 backdrop-blur-md rounded-full border-border/10 text-foreground/60 hover:text-white hover:border-accent/40'} ${activeModule === "chat" 
+            ? (theme === 'pokopia' ? "bg-white border-white scale-105" : "bg-accent border-accent/40 text-white scale-105") 
+            : ""}`}
+        >
+          <MessageSquare className={`w-4 h-4 ${activeModule === "chat" ? (theme === 'pokopia' ? "text-accent" : "text-white") : (theme === 'pokopia' ? "text-[#3b2b1d]" : "text-accent")}`} />
+          <span className="text-[11px] font-bold uppercase tracking-widest leading-none">Chat</span>
+        </button>
 
-          {/* DROPDOWN GROUPS */}
-          <div className="flex gap-4 items-center">
-            {[
-              { id: "command", label: "Command", items: [{ id: "roadmap", label: "Home" }, { id: "intel", label: "Intel" }, { id: "muse", label: "Muse" }] },
-              { id: "pipeline", label: "Pipeline", items: [{ id: "creative", label: "Brainstorm" }, { id: "director", label: "Director" }] },
-              { id: "archive", label: "Archive", items: [{ id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "prompts", label: "Prompts" }, { id: "core", label: "Core" }] },
-              { id: "performance", label: "Performance", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "api-health", label: "API" }] },
-            ].map((group) => (
-              <div 
-                key={group.id} 
-                className="relative"
-                onMouseEnter={() => setOpenDropdown(group.id)}
-                onMouseLeave={() => setOpenDropdown(null)}
-              >
-                <button className={`dropdown-pill h-full ${theme === 'pokopia' ? 'nav-btn' : 'px-4 py-2.5 border rounded-xl border-border/20 text-foreground/60 hover:text-white hover:border-accent'}`}>
-                  <span>{group.label}</span>
-                </button>
+        {/* MODULES PILL */}
+        <div className={`flex items-center gap-1 p-1 relative z-50 ${theme === 'pokopia' ? '' : 'bg-surface/20 backdrop-blur-md rounded-full border border-border/10 shadow-2xl'}`}>
+          {[
+            { id: "command", label: "Command", items: [{ id: "roadmap", label: "Home" }, { id: "intel", label: "Intel" }, { id: "muse", label: "Muse" }] },
+            { id: "pipeline", label: "Pipeline", items: [{ id: "creative", label: "Brainstorm" }, { id: "director", label: "Director" }] },
+            { id: "archive", label: "Archive", items: [{ id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "prompts", label: "Prompts" }, { id: "core", label: "Core" }] },
+            { id: "performance", label: "Performance", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "api-health", label: "API" }] },
+          ].map((group) => (
+            <div 
+              key={group.id} 
+              className="relative"
+              onMouseEnter={() => setOpenDropdown(group.id)}
+              onMouseLeave={() => setOpenDropdown(null)}
+            >
+              <button className={`dropdown-pill h-full transition-all flex items-center ${theme === 'pokopia' ? 'nav-btn' : 'px-4 py-2 text-foreground/60 hover:text-white rounded-full'}`}>
+                <span className="text-[11px] font-bold uppercase tracking-widest leading-none">{group.label}</span>
+              </button>
 
                 {openDropdown === group.id && (
                   <div className={`absolute top-full left-0 z-[100] pt-0 min-w-[200px] animate-in fade-in slide-in-from-top-1 duration-200`}>
                     {/* ENLARGED Bridge for hover continuity - spanning the entire button area */}
                     <div className="absolute inset-x-0 -top-12 h-12 pointer-events-auto" />
-                    <div className={`${theme === 'pokopia' ? 'dropdown-menu' : 'bg-background border border-border rounded-2xl p-2 shadow-2xl'}`}>
+                    <div className={`${theme === 'pokopia' ? 'dropdown-menu' : 'bg-background border border-border rounded-[40px] p-2 shadow-2xl'}`}>
                       <div className="flex flex-col gap-1">
                         {group.items.map((item) => (
                           <button
                             key={item.id}
                             onClick={() => { setActiveModule(item.id as Module); setOpenDropdown(null); }}
-                            className={`w-full text-left px-4 py-2 transition-all rounded-lg ${activeModule === item.id 
-                              ? "bg-accent/20 text-accent" 
+                            className={`w-full text-left px-4 py-2 transition-all rounded-full text-[11px] font-bold uppercase tracking-widest ${activeModule === item.id 
+                              ? "bg-accent/20 text-accent font-black" 
                               : "text-neutral-500 hover:text-foreground hover:bg-white/5"}`}
                           >
                             {item.label}
@@ -179,10 +174,9 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
 
         {/* ECOSYSTEM INDICATOR (Right Side) */}
-        <div className={`hidden lg:flex items-center gap-2 px-4 py-1.5 rounded-full border border-border/10 ${theme === 'pokopia' ? 'bg-[#A6D9F7] border-white text-brown' : 'bg-surface/20'}`}>
+        <div className={`ml-auto hidden lg:flex items-center gap-2 px-4 py-1.5 rounded-full border border-border/10 shadow-lg ${theme === 'pokopia' ? 'bg-[#A6D9F7] border-white text-brown' : 'bg-surface/20 backdrop-blur-md'}`}>
           <div className="w-2 h-2 rounded-full animate-pulse bg-green-500" />
           <span className="text-[9px] font-black uppercase tracking-widest opacity-60">System Online:</span>
           <span className="text-[9px] font-black uppercase tracking-widest text-accent">{activeTab} Ecosystem</span>
