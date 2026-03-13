@@ -15,24 +15,31 @@ export async function POST(req: NextRequest) {
         const ai = new GoogleGenAI({ apiKey });
 
         const prompt = `
-            You are "The Asset Artist". Your goal is to generate a high-fidelity image generation prompt for a specific visual source material.
+             You are "The Asset Artist". Your goal is to generate an EXTREMELY CONCISE visual prompt for a specific source asset.
             
             MISSION CONTEXT:
             - Title: ${mission.title}
             - Description: ${mission.conceptDescription}
-            - Style: Kirbai OS (90s Anime, High-Fashion, Camp, Pokemon aesthetic).
+            
+            STORYBOARD (BLOCKING):
+            ${mission.shots.map((s: any) => `[${s.timestamp}] ${s.visualDescription}`).join("\n")}
             
             TARGET ASSET:
             - Label: ${requirement.label}
             - Category: ${requirement.category}
             - Description: ${requirement.description}
             
-            RULES:
-            1. Output ONLY the finalized prompt for Banana (Image Generator).
-            2. Hardcode "9:16 aspect ratio" if it's a character or location.
-            3. Ensure the prompt describes textures, lighting (e.g. vaporwave, soft glow), and specific pokemon features.
-            4. If it's a character, describe the specific outfit and pose based on the description.
-            5. The prompt should be descriptive enough to act as a standalone generation for this asset.
+            RULES (STRICT):
+            1. Output ONLY the finalized prompt. NO conversational text.
+            2. MANDATORY PREFIX: You MUST start every response with the exact words "generate image of a ".
+            3. STORYBOARD SYNC: Scan the MISSION CONTEXT and STORYBOARD above. If this asset or its environment is described in any shot (e.g., "pristine white floor" or "dark industrial setting"), YOU MUST incorporate those specific visual details into the prompt to ensure consistency.
+            4. MINIMALISM: Use short, punchy phrases. Avoid flowery adjectives.
+            5. NO PEOPLE: Unless explicitly stated as a main character, do NOT include humans, figures, or people. Focus on the architecture/object.
+            6. ASPECT RATIO: You MUST include the exact phrase "9:16 aspect ratio".
+            7. NO SELF-REFERENCE: Do NOT mention "see ref image" or "following style". This prompt IS the source of truth for the reference.
+            8. FOCUS: Describe the subject, key physical features, materials, and lighting.
+            
+            The goal is for this prompt to generate a high-fidelity reference image that serves as the visual anchor for future video shots.
         `;
 
         const result = await ai.models.generateContent({

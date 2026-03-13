@@ -170,7 +170,7 @@ export async function POST(req: NextRequest) {
 
             RULES FOR PROMPTS:
             - bananaPromptV2: High-fidelity (9:16). EXPLICITLY reference multiple asset labels in brackets.
-            - grokPromptV2: Movement instructions. No morphing.
+            - grokPromptV2: Movement instructions for Grok/Sora. MUST start with "models stay consistent and do not morph. no music, only sound effects. ". Use physical descriptions instead of emotions. No morphing.
             - syncedLyrics: The EXACT lyric line.
 
             Return a JSON object containing:

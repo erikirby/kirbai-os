@@ -54,6 +54,9 @@ export interface Shot {
     grokPromptV2?: string;
     refLabels?: string[]; // Array of reference labels
     isProduced?: boolean; // Progress tracking
+    thumbnailUrl?: string; // Cache of the generated preview (Base64)
+    upscaledUrl?: string; // High-res version
+    lastGenerationPrompt?: string; // Snapshot for "Edit" context
     status: "draft" | "planned" | "rendered" | "final";
 }
 
@@ -307,16 +310,32 @@ export interface TelemetryData {
     lifetimeInputTokens: number;
     lifetimeOutputTokens: number;
     lifetimeCost: number;
+    imageCount: number;
+    lifetimeImageCost: number;
     logs: ApiLog[];
 }
 
 export async function getTelemetryAsync(): Promise<TelemetryData> {
     const data = await getRow('telemetry');
-    return data ?? { lifetimeInputTokens: 0, lifetimeOutputTokens: 0, lifetimeCost: 0, logs: [] };
+    return data ?? { 
+        lifetimeInputTokens: 0, 
+        lifetimeOutputTokens: 0, 
+        lifetimeCost: 0, 
+        imageCount: 0,
+        lifetimeImageCost: 0,
+        logs: [] 
+    };
 }
 
 export function getTelemetry(): TelemetryData {
-    return { lifetimeInputTokens: 0, lifetimeOutputTokens: 0, lifetimeCost: 0, logs: [] };
+    return { 
+        lifetimeInputTokens: 0, 
+        lifetimeOutputTokens: 0, 
+        lifetimeCost: 0, 
+        imageCount: 0,
+        lifetimeImageCost: 0,
+        logs: [] 
+    };
 }
 
 export async function saveTelemetryAsync(data: TelemetryData): Promise<void> {
@@ -338,12 +357,42 @@ export async function logApiUsageAsync(route: string, inputTokens: number, outpu
     await saveTelemetryAsync(tl);
 }
 
+export async function logImageUsageAsync(count: number = 1, model: string = "nano-banana") {
+    const tl = await getTelemetryAsync();
+    const perImageCost = model.includes("pro") ? 0.09 : 0.045; // Defaulting to Nate Herk's mention for banana
+    const cost = count * perImageCost;
+    
+    tl.imageCount = (tl.imageCount || 0) + count;
+    tl.lifetimeImageCost = (tl.lifetimeImageCost || 0) + cost;
+    tl.lifetimeCost += cost;
+    
+    tl.logs.unshift({ 
+        timestamp: Date.now(), 
+        route: `/image-gen/${model}`, 
+        inputTokens: 0, 
+        outputTokens: 0, 
+        estimatedCost: cost 
+    });
+    tl.logs = tl.logs.slice(0, 100);
+    await saveTelemetryAsync(tl);
+}
+
 export function logApiUsage(route: string, inputTokens: number, outputTokens: number) {
     logApiUsageAsync(route, inputTokens, outputTokens).catch(console.error);
 }
 
+export function logImageUsage(count: number = 1, model: string = "nano-banana") {
+    logImageUsageAsync(count, model).catch(console.error);
+}
 export async function resetTelemetryAsync() {
-    const initial = { lifetimeInputTokens: 0, lifetimeOutputTokens: 0, lifetimeCost: 0, logs: [] };
+    const initial = { 
+        lifetimeInputTokens: 0, 
+        lifetimeOutputTokens: 0, 
+        lifetimeCost: 0, 
+        imageCount: 0,
+        lifetimeImageCost: 0,
+        logs: [] 
+    };
     await saveTelemetryAsync(initial);
     return initial;
 }

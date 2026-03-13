@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { 
-    Clapperboard, Play, Check, Copy, AlertCircle, Sparkles, 
-    ChevronRight, MessageSquare, Download, Trash2, Loader2, 
+    Clapperboard, Play, Check, Copy, AlertCircle, Sparkles, Video,
+    ChevronRight, MessageSquare, Download, Trash2, Loader2, RefreshCw,
     Camera, Users, Layout, Image as ImageIcon, Upload, X, Plus, Send
 } from "lucide-react";
 
@@ -23,6 +23,9 @@ interface Shot {
     grokPromptV2?: string;
     refLabels?: string[];
     isProduced?: boolean;
+    thumbnailUrl?: string;
+    upscaledUrl?: string;
+    lastGenerationPrompt?: string;
     status: string;
 }
 
@@ -59,6 +62,55 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const [targetingReqIdx, setTargetingReqIdx] = useState<number | null>(null);
     const [isAssetPromptLoading, setIsAssetPromptLoading] = useState<string | null>(null);
+    const [generatingShotId, setGeneratingShotId] = useState<string | null>(null);
+    const [generatingType, setGeneratingType] = useState<"new" | "edit" | null>(null);
+    const [editingShotId, setEditingShotId] = useState<string | null>(null);
+    const [addingRefCategory, setAddingRefCategory] = useState<string | null>(null);
+    const [managingRefsShotId, setManagingRefsShotId] = useState<string | null>(null);
+    const [newRefLabel, setNewRefLabel] = useState("");
+    const [tempPrompt, setTempPrompt] = useState("");
+    const [forgingVideoShotId, setForgingVideoShotId] = useState<string | null>(null);
+    const [telemetry, setTelemetry] = useState<any>(null);
+    const [costShieldOverridden, setCostShieldOverridden] = useState(false);
+
+    useEffect(() => {
+        const fetchMissionsAndTelemetry = async () => {
+            setIsLoading(true);
+            try {
+                const [mRes, tRes] = await Promise.all([
+                    fetch(`/api/missions?mode=${mode}`),
+                    fetch('/api/telemetry')
+                ]);
+                const mData = await mRes.json();
+                const tData = await tRes.json();
+                setMissions(mData.data || []);
+                if (tData.success) setTelemetry(tData.data);
+            } catch (e) {
+                console.error("Fetch failed:", e);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchMissionsAndTelemetry();
+    }, [mode]);
+
+    const refreshTelemetry = async () => {
+        const res = await fetch('/api/telemetry');
+        const data = await res.json();
+        if (data.success) setTelemetry(data.data);
+    };
+
+    const getMonthlySpend = () => {
+        if (!telemetry?.logs) return 0;
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        return telemetry.logs
+            .filter((l: any) => l.timestamp >= startOfMonth)
+            .reduce((acc: number, l: any) => acc + (l.estimatedCost || 0), 0);
+    };
+
+    const monthlySpend = getMonthlySpend();
+    const isOverBudget = monthlySpend > 10.00;
 
     const toggleReferenceManual = async (idx: number) => {
         if (!activeMission) return;
@@ -89,9 +141,240 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         });
     };
 
-    const getAssetPrompt = async (req: any) => {
+    const handleForgeVideoPrompt = async (shot: Shot) => {
+        if (!activeMission || !shot.thumbnailUrl) return;
+        setForgingVideoShotId(shot.id);
+        try {
+            const res = await fetch('/api/director/video-prompt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    thumbnailUrl: shot.thumbnailUrl,
+                    visualDescription: shot.visualDescription,
+                    shotId: shot.id
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                const newShots = activeMission.shots.map(s => 
+                    s.id === shot.id ? { ...s, grokPromptV2: data.prompt } : s
+                );
+                const updated = { ...activeMission, shots: newShots };
+                setActiveMission(updated);
+                
+                await fetch('/api/missions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode, mission: updated })
+                });
+            } else {
+                alert(data.error || "Failed to forge video prompt.");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Connection error: Could not reach Video Architect.");
+        } finally {
+            setForgingVideoShotId(null);
+        }
+    };
+
+    const handleUploadShot = async (shotId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!activeMission || !e.target.files?.[0]) return;
+        
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64 = reader.result as string;
+            
+            // Compression logic (simplified for shots, same as handleUploadReference but targeted)
+            const img = new Image();
+            img.src = base64;
+            img.onload = async () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const max = 1024;
+                if (width > max || height > max) {
+                    if (width > height) {
+                        height *= max / width;
+                        width = max;
+                    } else {
+                        width *= max / height;
+                        height = max;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx?.drawImage(img, 0, 0, width, height);
+                const compressed = canvas.toDataURL('image/jpeg', 0.6); // Tightened for scanner cost efficiency
+
+                const newShots = activeMission.shots.map(s => 
+                    s.id === shotId ? { ...s, thumbnailUrl: compressed, lastGenerationPrompt: "Manual Upload (Photoshop/External)" } : s
+                );
+                const updated = { ...activeMission, shots: newShots };
+                setActiveMission(updated);
+                setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
+
+                await fetch('/api/missions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode, mission: updated })
+                });
+            };
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleClearShot = async (shotId: string) => {
         if (!activeMission) return;
-        setIsAssetPromptLoading(req.label);
+        const newShots = activeMission.shots.map(s => 
+            s.id === shotId ? { ...s, thumbnailUrl: undefined } : s
+        );
+        const updated = { ...activeMission, shots: newShots };
+        setActiveMission(updated);
+        setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
+
+        await fetch('/api/missions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mode, mission: updated })
+        });
+    };
+
+    const handleGenerateImage = async (shot: Shot, isEdit: boolean = false) => {
+        if (!activeMission) return;
+        
+        // Cost Shield Logic (Monthly $10)
+        if (isOverBudget && !costShieldOverridden) {
+            alert("⚠️ COST SHIELD ACTIVE: You have exceeded the monthly $10.00 budget. Please check the 'Unlock Over-Budget Generations' box in the API Health bar to continue.");
+            return;
+        }
+
+        setGeneratingShotId(shot.id);
+        setGeneratingType(isEdit ? "edit" : "new");
+        try {
+            const res = await fetch('/api/director/generate-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mission: activeMission,
+                    shot,
+                    isEdit,
+                    customPrompt: editingShotId === shot.id ? tempPrompt : (shot.bananaPromptV2 || shot.bananaPrompt)
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                const newShots = activeMission.shots.map(s => 
+                    s.id === shot.id ? { 
+                        ...s, 
+                        thumbnailUrl: data.thumbnailUrl,
+                        lastGenerationPrompt: data.prompt
+                    } : s
+                );
+                const updated = { ...activeMission, shots: newShots };
+                setActiveMission(updated);
+                setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
+                refreshTelemetry();
+                
+                await fetch('/api/missions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode, mission: updated })
+                });
+                
+                setEditingShotId(null);
+            } else {
+                alert(data.error || "Nano Banana was unable to visualize this frame.");
+            }
+        } catch (e: any) {
+            console.error("Generation failed:", e);
+            alert("Connection error: Could not reach Nano Banana.");
+        } finally {
+            setGeneratingShotId(null);
+            setGeneratingType(null);
+        }
+    };
+
+    const handleAddCustomReference = async (category: string) => {
+        if (!activeMission || !newRefLabel.trim()) return;
+        
+        const newReq = {
+            label: newRefLabel.trim(),
+            description: `Manual source for ${newRefLabel.trim()}`,
+            category: category as "Character" | "Location" | "Object",
+            manualCheck: false,
+            isCustom: true
+        };
+
+        const updated = {
+            ...activeMission,
+            requiredReferences: [...(activeMission.requiredReferences || []), newReq]
+        };
+
+        setActiveMission(updated);
+        setAddingRefCategory(null);
+        setNewRefLabel("");
+
+        await fetch('/api/missions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mode, mission: updated })
+        });
+    };
+
+    const deleteCustomReference = async (label: string) => {
+        if (!activeMission) return;
+        const updatedReqs = (activeMission.requiredReferences || []).filter(r => r.label !== label);
+        const updated = { ...activeMission, requiredReferences: updatedReqs };
+        setActiveMission(updated);
+        await fetch('/api/missions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mode, mission: updated })
+        });
+    };
+
+    const clearReferenceImage = async (idx: number) => {
+        if (!activeMission) return;
+        const updatedReqs = [...(activeMission.requiredReferences || [])];
+        if (updatedReqs[idx]) {
+            updatedReqs[idx] = { ...updatedReqs[idx], uploadedIndex: undefined };
+        }
+        const updated = { ...activeMission, requiredReferences: updatedReqs };
+        setActiveMission(updated);
+        await fetch('/api/missions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mode, mission: updated })
+        });
+    };
+
+    const toggleRefForShot = async (shotId: string, label: string) => {
+        if (!activeMission) return;
+        const newShots = activeMission.shots.map(s => {
+            if (s.id !== shotId) return s;
+            const currentRefs = s.refLabels || [];
+            const newRefs = currentRefs.includes(label)
+                ? currentRefs.filter(l => l !== label)
+                : [...currentRefs, label];
+            return { ...s, refLabels: newRefs };
+        });
+        const updated = { ...activeMission, shots: newShots };
+        setActiveMission(updated);
+
+        await fetch('/api/missions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mode, mission: updated })
+        });
+    };
+
+    const getAssetPrompt = async (req: any, forShot: boolean = false, shotId: string | null = null) => {
+        if (!activeMission) return;
+        const loadingKey = shotId || req.label;
+        setIsAssetPromptLoading(loadingKey);
         try {
             const resp = await fetch("/api/director/asset-prompt", {
                 method: "POST",
@@ -100,8 +383,13 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             });
             const data = await resp.json();
             if (data.prompt) {
-                await navigator.clipboard.writeText(data.prompt);
-                // Optionally add a non-toast notification here
+                if (forShot && shotId) {
+                    setTempPrompt(data.prompt);
+                } else {
+                    await navigator.clipboard.writeText(data.prompt);
+                    setCopiedId(req.label);
+                    setTimeout(() => setCopiedId(null), 2000);
+                }
             }
         } catch (e) {
             console.error("Failed to generate asset prompt.", e);
@@ -256,11 +544,6 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             
             if (targetingReqIdx !== null && updatedReqs[targetingReqIdx]) {
                 updatedReqs[targetingReqIdx].uploadedIndex = newIndex;
-            } else {
-                const emptySlot = updatedReqs.find((r: any) => r.uploadedIndex === undefined);
-                if (emptySlot) {
-                    emptySlot.uploadedIndex = newIndex;
-                }
             }
 
             const updatedMission = {
@@ -394,6 +677,52 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
 
     return (
         <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* API Health / Cost Shield Bar */}
+            <div className="mb-4 flex flex-col md:flex-row gap-4 items-center justify-between p-4 bg-black/40 border border-white/5 rounded-3xl backdrop-blur-xl">
+                <div className="flex items-center gap-6">
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-[8px] font-black text-accent uppercase tracking-widest">Monthly Spend</span>
+                        <span className={`text-sm font-mono font-black ${isOverBudget ? 'text-red-400 animate-pulse' : 'text-foreground'}`}>
+                            ${monthlySpend.toFixed(2)}
+                        </span>
+                    </div>
+                    <div className="w-px h-8 bg-white/5" />
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-[8px] font-black text-accent uppercase tracking-widest">Session Logic</span>
+                        <span className="text-xs font-bold text-green-400 flex items-center gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                            Nano Banana Online
+                        </span>
+                    </div>
+                    {telemetry && (
+                        <>
+                            <div className="w-px h-8 bg-white/5" />
+                            <div className="flex flex-col gap-0.5">
+                                <span className="text-[8px] font-black text-accent uppercase tracking-widest">Est. Trial Used</span>
+                                <span className="text-xs font-bold text-foreground/60">
+                                    ${(telemetry.lifetimeCost || 0).toFixed(2)} / $300
+                                </span>
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                {isOverBudget && (
+                    <div className="flex items-center gap-3 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-2xl animate-in fade-in zoom-in">
+                        <AlertCircle className="w-4 h-4 text-red-500" />
+                        <span className="text-[10px] font-black text-red-500 uppercase tracking-tight">Monthly Limit Reached</span>
+                        <label className="flex items-center gap-2 cursor-pointer group">
+                            <input 
+                                type="checkbox" 
+                                checked={costShieldOverridden} 
+                                onChange={e => setCostShieldOverridden(e.target.checked)}
+                                className="w-4 h-4 rounded border-red-500/40 bg-black/40 text-red-500 focus:ring-red-500 focus:ring-offset-0 transition-all cursor-pointer"
+                            />
+                            <span className="text-[9px] font-bold text-foreground/40 group-hover:text-foreground transition-colors uppercase">Unlock Over-Budget</span>
+                        </label>
+                    </div>
+                )}
+            </div>
             {/* Header Area: Synchronized with 4-column layout */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6 items-end">
                 <div className="lg:col-span-1 flex flex-col gap-1 ml-1">
@@ -613,10 +942,43 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                     
                                                     return (
                                                         <div key={category} className="flex flex-col gap-4">
-                                                            <div className="flex flex-col gap-1 border-l-2 border-accent/20 pl-4">
-                                                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-accent/60">{category} Sources</h4>
-                                                                <p className="text-[8px] text-foreground/30 uppercase font-bold tracking-widest">Mandatory visual data for {category.toLowerCase()} consistency</p>
-                                                            </div>
+                                                                 <div className="flex items-center justify-between border-l-2 border-accent/20 pl-4">
+                                                                    <div>
+                                                                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-accent/60">{category} Sources</h4>
+                                                                        <p className="text-[8px] text-foreground/30 uppercase font-bold tracking-widest">Mandatory visual data for {category.toLowerCase()} consistency</p>
+                                                                    </div>
+                                                                    <button 
+                                                                        onClick={() => setAddingRefCategory(category)}
+                                                                        className="flex items-center gap-1.5 px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-[8px] font-black uppercase tracking-widest text-accent/60 hover:text-accent transition-all"
+                                                                    >
+                                                                        <Plus className="w-3 h-3" /> Add Source
+                                                                    </button>
+                                                                 </div>
+                                                                 
+                                                                 {addingRefCategory === category && (
+                                                                     <div className="p-4 bg-accent/5 border border-dashed border-accent/20 rounded-2xl flex items-center gap-3 animate-in slide-in-from-top-2 duration-300">
+                                                                         <input 
+                                                                             value={newRefLabel}
+                                                                             onChange={e => setNewRefLabel(e.target.value)}
+                                                                             placeholder="e.g. Pheromosa High-Def"
+                                                                             className="flex-1 bg-black/40 border border-accent/20 rounded-xl px-4 py-2 text-[10px] font-mono text-white focus:outline-none"
+                                                                             autoFocus
+                                                                             onKeyDown={e => e.key === 'Enter' && handleAddCustomReference(category)}
+                                                                         />
+                                                                         <button 
+                                                                             onClick={() => handleAddCustomReference(category)}
+                                                                             className="px-4 py-2 bg-accent text-white rounded-xl text-[9px] font-black uppercase"
+                                                                         >
+                                                                             Add
+                                                                         </button>
+                                                                         <button 
+                                                                             onClick={() => setAddingRefCategory(null)}
+                                                                             className="p-2 hover:bg-white/5 rounded-xl text-foreground/20"
+                                                                         >
+                                                                             <X className="w-4 h-4" />
+                                                                         </button>
+                                                                     </div>
+                                                                 )}
                                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                                                 {filtered.map((req) => {
                                                                     // Find actual index in original array
@@ -634,9 +996,21 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                     </button>
                                                                                     <span className="text-[10px] font-black uppercase tracking-tighter text-accent">{req.label}</span>
                                                                                 </div>
-                                                                                {req.uploadedIndex !== undefined ? (
-                                                                                    <div className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[8px] font-black uppercase rounded-md border border-green-500/20">Uploaded</div>
-                                                                                ) : (
+                                                                                 {req.uploadedIndex !== undefined ? (
+                                                                                     <div className="flex items-center gap-2">
+                                                                                         <div className="w-8 h-8 rounded-lg border border-green-500/30 overflow-hidden shadow-lg shadow-green-500/10 shrink-0">
+                                                                                             <img src={activeMission.references?.[req.uploadedIndex]} className="w-full h-full object-cover" alt="" />
+                                                                                         </div>
+                                                                                         <div className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[8px] font-black uppercase rounded-md border border-green-500/20 whitespace-nowrap">Linked</div>
+                                                                                         <button 
+                                                                                            onClick={() => clearReferenceImage(originalIdx)}
+                                                                                            className="p-1.5 hover:bg-white/5 rounded-lg text-foreground/20 hover:text-accent transition-all"
+                                                                                            title="Clear Reference Image"
+                                                                                         >
+                                                                                            <Trash2 className="w-3 h-3" />
+                                                                                         </button>
+                                                                                     </div>
+                                                                                 ) : (
                                                                                     <button 
                                                                                         onClick={() => {
                                                                                             setTargetingReqIdx(originalIdx);
@@ -650,14 +1024,25 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                             </div>
                                                                             <p className="text-[10px] text-foreground/60 leading-relaxed font-medium line-clamp-2">{req.description}</p>
                                                                             
-                                                                            <button 
-                                                                                onClick={() => getAssetPrompt(req)}
-                                                                                disabled={isAssetPromptLoading === req.label}
-                                                                                className="mt-auto flex items-center justify-center gap-2 py-2 bg-black/40 border border-white/5 rounded-xl text-[8px] font-black uppercase tracking-widest text-foreground/40 hover:text-accent hover:border-accent/20 transition-all active:scale-95 disabled:opacity-50"
-                                                                            >
-                                                                                {isAssetPromptLoading === req.label ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3 text-accent" />}
-                                                                                {isAssetPromptLoading === req.label ? "Forging..." : "Get Prompt help"}
-                                                                            </button>
+                                                                            <div className="mt-auto flex gap-2">
+                                                                                 <button 
+                                                                                     onClick={() => getAssetPrompt(req)}
+                                                                                     disabled={isAssetPromptLoading === req.label}
+                                                                                     className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 ${copiedId === req.label ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-black/40 border border-white/5 text-foreground/40 hover:text-accent hover:border-accent/20'}`}
+                                                                                 >
+                                                                                     {isAssetPromptLoading === req.label ? <Loader2 className="w-3 h-3 animate-spin" /> : (copiedId === req.label ? <Check className="w-3 h-3" /> : <Sparkles className="w-3 h-3 text-accent" />)}
+                                                                                     {isAssetPromptLoading === req.label ? "Forging..." : (copiedId === req.label ? "Copied" : "Get Prompt help")}
+                                                                                 </button>
+                                                                                {(req as any).isCustom && (
+                                                                                    <button 
+                                                                                        onClick={() => deleteCustomReference(req.label)}
+                                                                                        className="p-2 bg-black/40 border border-white/5 rounded-xl text-foreground/20 hover:text-red-400 hover:border-red-400/20 transition-all"
+                                                                                        title="Delete Custom Source"
+                                                                                    >
+                                                                                        <X className="w-3 h-3" />
+                                                                                    </button>
+                                                                                )}
+                                                                            </div>
                                                                         </div>
                                                                     );
                                                                 })}
@@ -668,17 +1053,11 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                             </div>
                                         )}
 
-                                        <div className="flex justify-between items-center">
+                                        <div className="flex justify-between items-center bg-black/40 border border-white/5 p-6 rounded-3xl">
                                             <div className="flex flex-col gap-1">
                                                 <h4 className="text-sm font-black uppercase tracking-widest text-foreground/80">Reference Library</h4>
-                                                <p className="text-[10px] text-foreground/40 uppercase">Upload photos to fulfill requirements above</p>
+                                                <p className="text-[10px] text-foreground/40 uppercase">Assets linked to requirements above</p>
                                             </div>
-                                            <button 
-                                                onClick={() => fileInputRef.current?.click()}
-                                                className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent/80 transition-all"
-                                            >
-                                                <Upload className="w-3 h-3" /> Upload Assets
-                                            </button>
                                             <input type="file" ref={fileInputRef} onChange={handleUploadReference} className="hidden" accept="image/*" />
                                         </div>
  
@@ -863,15 +1242,25 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
 
                                         <div className="grid grid-cols-1 gap-4">
                                             {activeMission.shots.map((shot, idx) => (
-                                                <div key={shot.id} className={`p-6 rounded-3xl flex flex-col gap-4 border transition-all ${shot.isProduced ? 'bg-accent/[0.03] border-accent/20 opacity-80' : 'bg-black/40 border-white/5'}`}>
-                                                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                                                <div key={shot.id} className={`p-6 rounded-[2.5rem] flex flex-col gap-6 border transition-all relative overflow-hidden group ${shot.isProduced ? 'bg-accent/[0.03] border-accent/20 opacity-80' : 'bg-black/60 border-white/5'}`}>
+                                                    {shot.thumbnailUrl && (
+                                                        <div className="absolute top-0 right-0 w-64 h-full pointer-events-none opacity-20 group-hover:opacity-40 transition-opacity">
+                                                            <img src={shot.thumbnailUrl} className="w-full h-full object-cover blur-sm" alt="" />
+                                                            <div className="absolute inset-0 bg-gradient-to-l from-black via-black/40 to-transparent" />
+                                                        </div>
+                                                    )}
+                                                    
+                                                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 relative z-10">
                                                         <div className="flex items-center gap-3 flex-wrap">
-                                                            <div className={`px-2 py-1 rounded-md text-[10px] font-mono font-black border ${shot.isProduced ? 'bg-accent/20 border-accent/40 text-accent' : 'bg-accent/5 border-white/5 text-accent'}`}>
+                                                            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-[10px] font-black text-white border border-white/10 shrink-0">
+                                                                {idx + 1}
+                                                            </div>
+                                                            <div className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-black border ${shot.isProduced ? 'bg-accent/20 border-accent/40 text-accent' : 'bg-accent/5 border-white/5 text-accent'}`}>
                                                                 {shot.timestamp}
                                                             </div>
                                                             <button 
                                                                 onClick={() => toggleShotProduced(shot.id)}
-                                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${shot.isProduced ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'bg-white/5 text-foreground/40 hover:bg-white/10'}`}
+                                                                className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${shot.isProduced ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'bg-white/5 text-foreground/40 hover:bg-white/10'}`}
                                                             >
                                                                 {shot.isProduced ? <Check className="w-3 h-3" /> : <div className="w-3 h-3 rounded-full border-2 border-current opacity-30" />}
                                                                 {shot.isProduced ? "Produced" : "Mark Finished"}
@@ -879,35 +1268,263 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                         </div>
                                                         <div className="flex gap-2 items-center flex-wrap">
                                                             <button 
-                                                                onClick={() => copyPrompt(shot.bananaPromptV2 || shot.bananaPrompt || "", `${shot.id}-banana`)}
-                                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all ${copiedId === `${shot.id}-banana` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-surface/40 border-border/10 hover:border-accent'}`}
+                                                                onClick={() => handleGenerateImage(shot)}
+                                                                disabled={generatingShotId === shot.id}
+                                                                className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all bg-yellow-400 text-black hover:bg-yellow-300 shadow-[0_0_20px_rgba(250,204,21,0.2)] active:scale-95 disabled:opacity-50`}
                                                             >
-                                                                {copiedId === `${shot.id}-banana` ? <Check className="w-3 h-3" /> : <ImageIcon className="w-3 h-3 text-accent" />}
-                                                                Banana
+                                                                {generatingShotId === shot.id && generatingType === "new" ? <Loader2 className="w-3 h-3 animate-spin" /> : <span className="text-sm">🍌</span>}
+                                                                {generatingShotId === shot.id && generatingType === "new" ? "Forging..." : "Generate"}
                                                             </button>
-                                                            <button 
-                                                                onClick={() => copyPrompt(shot.grokPromptV2 || shot.grokTrigger || "", `${shot.id}-grok`)}
-                                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all ${copiedId === `${shot.id}-grok` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-surface/40 border-border/10 hover:border-accent'}`}
-                                                            >
-                                                                {copiedId === `${shot.id}-grok` ? <Check className="w-3 h-3" /> : <Play className="w-3 h-3 text-accent" />}
-                                                                Grok
-                                                            </button>
-                                                            {shot.refLabels && shot.refLabels.map((lbl, li) => (
-                                                                <div key={li} className="px-3 py-1.5 bg-accent/5 border border-accent/20 rounded-xl flex items-center gap-2">
-                                                                    <Camera className="w-3 h-3 text-accent" />
-                                                                    <span className="text-[9px] font-black uppercase tracking-widest text-accent/60">USE: {lbl}</span>
+                                                                       {shot.thumbnailUrl && (
+                                                                <button 
+                                                                    onClick={() => handleForgeVideoPrompt(shot)}
+                                                                    disabled={forgingVideoShotId === shot.id}
+                                                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20 shadow-lg active:scale-95 disabled:opacity-50`}
+                                                                >
+                                                                    {forgingVideoShotId === shot.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Video className="w-3 h-3" />}
+                                                                    {forgingVideoShotId === shot.id ? "Forging..." : "📽️ Prompt"}
+                                                                </button>
+                                                             )}
+
+                                                             <div className="h-6 w-px bg-white/10 mx-2 hidden lg:block" />
+
+                                                             {shot.thumbnailUrl && (
+                                                                <button 
+                                                                    onClick={() => handleGenerateImage(shot, true)}
+                                                                    disabled={generatingShotId === shot.id}
+                                                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-white/5 border border-white/5 text-foreground/60 hover:text-white hover:bg-white/10 shadow-lg active:scale-95 disabled:opacity-50`}
+                                                                >
+                                                                    {generatingShotId === shot.id && generatingType === "edit" ? <Loader2 className="w-3 h-3 animate-spin" /> : <ImageIcon className="w-3 h-3" />}
+                                                                    {generatingShotId === shot.id && generatingType === "edit" ? "Refining..." : "🖼️ Edit"}
+                                                                </button>
+                                                             )}
+           
+
+                                                            <div className="h-6 w-px bg-white/10 mx-2 hidden lg:block" />
+
+                                                            
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+                                                        <div className="lg:col-span-8 flex flex-col gap-3">
+                                                            {editingShotId === shot.id ? (
+                                                                <div className="flex flex-col gap-2">
+                                                                       <div className="flex justify-between items-center mb-1">
+                                                                            <span className="text-[10px] font-black uppercase tracking-widest text-accent/60">Banana Image Prompt</span>
+                                                                            <div className="flex items-center gap-2">
+                                                                                <button 
+                                                                                    onClick={() => copyPrompt(shot.bananaPromptV2 || shot.bananaPrompt || "", `${shot.id}-banana`)}
+                                                                                    className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[8px] font-black uppercase tracking-widest transition-all ${copiedId === `${shot.id}-banana` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-white/5 border-white/5 text-accent/40 hover:text-accent hover:border-accent'}`}
+                                                                                >
+                                                                                    <Copy className={`w-2.5 h-2.5 ${copiedId === `${shot.id}-banana` ? 'hidden' : 'block'}`} />
+                                                                                    {copiedId === `${shot.id}-banana` ? 'Copied' : 'Copy Banana'}
+                                                                                </button>
+                                                                                <button 
+                                                                                    onClick={() => getAssetPrompt({ label: shot.id, description: shot.visualDescription, category: 'Shot' }, true, shot.id)}
+                                                                                    className="p-1.5 hover:bg-white/5 rounded-lg text-accent/40 hover:text-accent transition-all"
+                                                                                    title="Regenerate Prompt from Vision"
+                                                                                >
+                                                                                    {isAssetPromptLoading === shot.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <textarea 
+                                                                            value={tempPrompt}
+                                                                        onChange={(e) => setTempPrompt(e.target.value)}
+                                                                        className="w-full h-32 p-4 bg-black/40 border border-accent/40 rounded-2xl font-mono text-[11px] text-white focus:outline-none resize-none"
+                                                                        autoFocus
+                                                                    />
+                                                                    <div className="flex gap-2">
+                                                                        <button 
+                                                                            onClick={async () => {
+                                                                                if (!activeMission) return;
+                                                                                const newShots = activeMission.shots.map(s => 
+                                                                                    s.id === shot.id ? { ...s, bananaPromptV2: tempPrompt } : s
+                                                                                );
+                                                                                const updated = { ...activeMission, shots: newShots };
+                                                                                setActiveMission(updated);
+                                                                                await fetch('/api/missions', {
+                                                                                    method: 'POST',
+                                                                                    headers: { 'Content-Type': 'application/json' },
+                                                                                    body: JSON.stringify({ mode, mission: updated })
+                                                                                });
+                                                                                setEditingShotId(null);
+                                                                            }}
+                                                                            className="px-3 py-1 bg-accent rounded-lg text-[9px] font-black uppercase"
+                                                                        >
+                                                                            Save
+                                                                        </button>
+                                                                        <button 
+                                                                            onClick={() => setEditingShotId(null)}
+                                                                            className="px-3 py-1 bg-white/5 rounded-lg text-[9px] font-black uppercase"
+                                                                        >
+                                                                            Cancel
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
-                                                            ))}
+                                                            ) : (
+                                                                <div className="flex flex-col gap-2">
+                                                                    <div className="flex justify-between items-center mb-1">
+                                                                        <span className="text-[10px] font-black uppercase tracking-widest text-accent/60">Banana Image Prompt</span>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <button 
+                                                                                onClick={() => copyPrompt(shot.bananaPromptV2 || shot.bananaPrompt || "", `${shot.id}-banana`)}
+                                                                                className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[8px] font-black uppercase tracking-widest transition-all ${copiedId === `${shot.id}-banana` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-white/5 border-white/5 text-accent/40 hover:text-accent hover:border-accent'}`}
+                                                                            >
+                                                                                <Copy className={`w-2.5 h-2.5 ${copiedId === `${shot.id}-banana` ? 'hidden' : 'block'}`} />
+                                                                                {copiedId === `${shot.id}-banana` ? 'Copied' : 'Copy Banana'}
+                                                                            </button>
+                                                                            <button 
+                                                                                onClick={() => getAssetPrompt({ label: shot.id, description: shot.visualDescription, category: 'Shot' }, true, shot.id)}
+                                                                                className="p-1.5 hover:bg-white/5 rounded-lg text-accent/40 hover:text-accent transition-all"
+                                                                                title="Regenerate Prompt from Vision"
+                                                                            >
+                                                                                {isAssetPromptLoading === shot.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div 
+                                                                        onClick={() => {
+                                                                            setEditingShotId(shot.id);
+                                                                            setTempPrompt(shot.bananaPromptV2 || shot.bananaPrompt || "");
+                                                                        }}
+                                                                        className="p-4 bg-black/60 rounded-2xl border border-white/5 font-mono text-[11px] text-foreground/60 leading-relaxed whitespace-pre-wrap cursor-edit hover:border-accent/30 transition-all min-h-[100px]"
+                                                                    >
+                                                                        {shot.bananaPromptV2 || shot.bananaPrompt || "No prompt generated yet."}
+                                                                    </div>
+                                                                </div>
+                                                             )}
+                                                            
+                                                            {shot.grokPromptV2 && (
+                                                                <div className="flex flex-col gap-2 mt-4">
+                                                                    <div className="flex justify-between items-center mb-1">
+                                                                        <span className={`text-[10px] font-black uppercase tracking-widest ${shot.grokPromptV2?.startsWith("models stay consistent") ? 'text-purple-400' : 'text-purple-400/50'}`}>
+                                                                            {shot.grokPromptV2?.startsWith("models stay consistent") ? "Grok Anti-Morph Forge (Vision-Aware)" : "Grok Movement (Initial Draft)"}
+                                                                        </span>
+                                                                        <button 
+                                                                            onClick={() => copyPrompt(shot.grokPromptV2!, `${shot.id}-grok`)}
+                                                                            className={`px-3 py-1 rounded-lg border text-[8px] font-black uppercase tracking-widest transition-all ${copiedId === `${shot.id}-grok` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-surface/40 border-border/10 hover:border-accent'}`}
+                                                                        >
+                                                                            {copiedId === `${shot.id}-grok` ? 'Copied' : 'Copy Command'}
+                                                                        </button>
+                                                                    </div>
+                                                                    <textarea 
+                                                                        value={shot.grokPromptV2}
+                                                                        onChange={async (e) => {
+                                                                            const newVal = e.target.value;
+                                                                            const newShots = activeMission.shots.map(s => 
+                                                                                s.id === shot.id ? { ...s, grokPromptV2: newVal } : s
+                                                                            );
+                                                                            const updated = { ...activeMission, shots: newShots };
+                                                                            setActiveMission(updated);
+                                                                            await fetch('/api/missions', {
+                                                                                method: 'POST',
+                                                                                headers: { 'Content-Type': 'application/json' },
+                                                                                body: JSON.stringify({ mode, mission: updated })
+                                                                            });
+                                                                        }}
+                                                                        className="w-full h-24 p-4 bg-purple-500/5 border border-purple-500/20 rounded-2xl font-mono text-[11px] text-foreground/80 focus:outline-none resize-none"
+                                                                    />
+                                                                </div>
+                                                             )}
+                                                            {shot.lyric && (
+                                                                <p className="px-1 text-[10px] font-black uppercase tracking-widest text-accent/80 italic">
+                                                                    "{shot.lyric}"
+                                                                </p>
+                                                            )}
+                                                            <div className="flex flex-col gap-4 mt-2">
+                                                                <div className="flex items-center justify-between">
+                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-accent/40">Visual References</span>
+                                                                    <button 
+                                                                        onClick={() => setManagingRefsShotId(managingRefsShotId === shot.id ? null : shot.id)}
+                                                                        className="flex items-center gap-1.5 px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-[8px] font-black uppercase tracking-widest text-accent/60 hover:text-accent transition-all"
+                                                                    >
+                                                                        <Plus className="w-3 h-3" /> Manage
+                                                                    </button>
+                                                                </div>
+
+                                                                {managingRefsShotId === shot.id && (
+                                                                    <div className="p-4 bg-accent/5 border border-accent/20 rounded-2xl flex flex-wrap gap-2 animate-in slide-in-from-top-2 duration-300">
+                                                                        {(activeMission.requiredReferences || []).map((req, ri) => (
+                                                                            <button 
+                                                                                key={ri}
+                                                                                onClick={() => toggleRefForShot(shot.id, req.label)}
+                                                                                className={`px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all ${shot.refLabels?.includes(req.label) ? 'bg-accent text-white border-accent' : 'bg-black/40 border-white/5 text-foreground/40 hover:border-accent/30'}`}
+                                                                            >
+                                                                                {req.label}
+                                                                            </button>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+
+                                                                {shot.refLabels && shot.refLabels.map((lbl, li) => {
+                                                                    const req = activeMission.requiredReferences?.find(r => r.label === lbl);
+                                                                    const hasImage = req && req.uploadedIndex !== undefined && activeMission.references?.[req.uploadedIndex];
+                                                                    
+                                                                    return (
+                                                                        <div key={li} className="flex flex-col gap-2">
+                                                                            <div className="px-3 py-1 bg-accent/5 border border-accent/20 rounded-lg flex items-center gap-2 w-fit">
+                                                                                <Camera className="w-3 h-3 text-accent" />
+                                                                                <span className="text-[8px] font-black uppercase tracking-widest text-accent/60">USE: {lbl}</span>
+                                                                            </div>
+                                                                            {hasImage && (
+                                                                                <div className="w-16 h-16 rounded-xl border border-white/10 overflow-hidden shadow-2xl ml-1">
+                                                                                    <img src={activeMission.references![req.uploadedIndex!]} className="w-full h-full object-cover" alt={lbl} />
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                             </div>
+                                                        </div>
+
+                                                        <div className="lg:col-span-4 flex flex-col gap-3">
+                                                            {shot.thumbnailUrl ? (
+                                                                <div className="aspect-[9/16] rounded-3xl overflow-hidden border border-white/10 bg-black/40 shadow-2xl relative group/img">
+                                                                     <img src={shot.thumbnailUrl} className="w-full h-full object-cover" alt="Generated Frame" />
+                                                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 p-6">
+                                                                         <button 
+                                                                             onClick={() => {
+                                                                                 const link = document.createElement('a');
+                                                                                 link.href = shot.thumbnailUrl!;
+                                                                                 link.download = `frame-${shot.timestamp}.jpg`;
+                                                                                 link.click();
+                                                                             }}
+                                                                             className="w-full flex items-center justify-center gap-2 py-2 bg-accent text-white rounded-xl text-[9px] font-black uppercase tracking-widest"
+                                                                         >
+                                                                             <Download className="w-3 h-3" /> Download High-Fi
+                                                                         </button>
+                                                                         
+                                                                         <div className="grid grid-cols-2 gap-2 w-full">
+                                                                             <label className="flex items-center justify-center gap-2 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[9px] font-black uppercase tracking-widest cursor-pointer transition-all">
+                                                                                 <Upload className="w-3 h-3" /> Swap
+                                                                                 <input 
+                                                                                     type="file" 
+                                                                                     className="hidden" 
+                                                                                     accept="image/*"
+                                                                                     onChange={(e) => handleUploadShot(shot.id, e)}
+                                                                                 />
+                                                                             </label>
+                                                                             <button 
+                                                                                 onClick={() => handleClearShot(shot.id)}
+                                                                                 className="flex items-center justify-center gap-2 py-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
+                                                                             >
+                                                                                 <Trash2 className="w-3 h-3" /> Clear
+                                                                             </button>
+                                                                         </div>
+                                                                     </div>
+                                                                 </div>
+                                                            ) : (
+                                                                <div className="aspect-[9/16] rounded-3xl border border-dashed border-white/5 bg-black/20 flex flex-col items-center justify-center gap-4 text-foreground/10">
+                                                                    <div className="w-12 h-12 rounded-full border border-current flex items-center justify-center animate-pulse">
+                                                                        <ImageIcon className="w-6 h-6" />
+                                                                    </div>
+                                                                    <span className="text-[9px] font-black uppercase tracking-widest">Awaiting Vision</span>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
-                                                    <div className="p-4 bg-black/60 rounded-2xl border border-white/5 font-mono text-[11px] text-foreground/60 leading-relaxed whitespace-pre-wrap">
-                                                        {shot.bananaPromptV2 || shot.bananaPrompt || "No prompt generated yet."}
-                                                    </div>
-                                                    {shot.lyric && (
-                                                        <div className="px-4 text-[10px] font-black uppercase tracking-widest text-accent/80 italic">
-                                                            "{shot.lyric}"
-                                                        </div>
-                                                    )}
                                                 </div>
                                             ))}
                                         </div>
