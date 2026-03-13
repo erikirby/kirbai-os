@@ -29,17 +29,16 @@ export async function POST(req: NextRequest) {
             RULES (STRICT):
             1. Output ONLY the finalized prompt. NO conversational text.
             2. MANDATORY PREFIX: You MUST start every response with "generate image of a ".
-            3. BACKGROUND: If Category is "Character" or "Object", YOU MUST include "grey studio background" for isolation.
-            4. **OFFICIAL DESIGNS**: You MUST adhere to the official Pokemon designs, shapes, and colors. However, YOU MUST include the phrase "adhering to the design, shape, and colors of the provided reference image" to ensure the generator follows the specific variant (like a Shiny) that the user has uploaded.
-            5. **TEXTURE & MATERIALS**: For all assets, specify realistic textures: "hyper-realistic fur, detailed skin texture, subsurface scattering, reflective metallic surfaces, or photorealistic environmental materials."
-            6. **POSE & PROPS**: For Characters, enforce a "neutral standing pose" or "T-pose". Do NOT add props, food, snacks, or accessories unless explicitly in the Description. Focus purely on the character's physical model.
-            7. **LIGHTING**: Use "professional studio lighting, cinematic high-fidelity, 8k resolution."
-            8. **NO PEOPLE**: Include the literal phrase "no people".
-            9. STORYBOARD SYNC: If the STORYBOARD below mentions specific physical states (e.g., "damaged armor", "glow-in-the-dark eyes"), incorporate those. Otherwise, stay neutral.
+            3. **ISOLATION**: This is a REFERENCE ASSET. You MUST generate an isolated model/sprite. NO background scene, NO action, NO secondary characters, and NO environmental context from the mission. 
+            4. **BACKGROUND**: You MUST include "grey studio background" to ensure the asset can be used in any scene.
+            5. **OFFICIAL DESIGNS**: You MUST adhere to the official Pokemon designs, shapes, and colors. However, YOU MUST include the phrase "adhering to the design, shape, and colors of the provided reference image" to ensure the generator follows the specific variant (like a Shiny) that the user has uploaded.
+            6. **TEXTURE & MATERIALS**: For all assets, specify realistic textures: "hyper-realistic fur, detailed skin texture, subsurface scattering, reflective metallic surfaces, or photorealistic environmental materials."
+            7. **POSE**: For Characters, enforce a "neutral standing pose" or "T-pose".
+            8. **LIGHTING**: Use "professional studio lighting, cinematic high-fidelity, 8k resolution."
+            9. **NO PEOPLE**: Include the literal phrase "no people".
             10. ASPECT RATIO: Include "9:16 aspect ratio".
             
-            STORYBOARD (ORPHAN CONTEXT):
-            ${mission.shots.map((s: any) => `[${s.timestamp}] ${s.visualDescription}`).join("\n")}
+            The goal is for this prompt to generate a high-fidelity reference image that serves as the visual anchor for future video shots. It should NOT be a cinematic shot itself.
         `;
 
         const result = await ai.models.generateContent({
