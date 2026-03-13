@@ -29,16 +29,16 @@ export async function POST(req: NextRequest) {
             RULES (STRICT):
             1. Output ONLY the finalized prompt. NO conversational text.
             2. MANDATORY PREFIX: You MUST start every response with "generate image of a ".
-            3. **ISOLATION**: This is a REFERENCE ASSET. You MUST generate an isolated model/sprite. NO background scene, NO action, NO secondary characters, and NO environmental context from the mission. 
-            4. **BACKGROUND**: You MUST include "grey studio background" to ensure the asset can be used in any scene.
-            5. **OFFICIAL DESIGNS**: You MUST adhere to the official Pokemon designs, shapes, and colors. However, YOU MUST include the phrase "adhering to the design, shape, and colors of the provided reference image" to ensure the generator follows the specific variant (like a Shiny) that the user has uploaded.
-            6. **TEXTURE & MATERIALS**: For all assets, specify realistic textures: "hyper-realistic fur, detailed skin texture, subsurface scattering, reflective metallic surfaces, or photorealistic environmental materials."
-            7. **POSE**: For Characters, enforce a "neutral standing pose" or "T-pose".
-            8. **LIGHTING**: Use "professional studio lighting, cinematic high-fidelity, 8k resolution."
-            9. **NO PEOPLE**: Include the literal phrase "no people".
-            10. ASPECT RATIO: Include "9:16 aspect ratio".
+            3. **ISOLATION & BACKGROUND**: 
+               - If Category is "Character" or "Object": You MUST generate an isolated model in a "neutral standing pose" or "T-pose" on a "plain grey studio background". NO environment, NO props.
+               - If Category is "Location": You MUST generate a "full-screen environmental wide shot" with "NO characters, NO pokemon, and NO people". It must be a completely empty architectural or natural space.
+            4. **OFFICIAL DESIGNS**: Adhere to official designs and colors. However, YOU MUST include the phrase "adhering to the design, shape, and colors of the provided reference image" to ensure variant accuracy (like Shinies).
+            5. **TEXTURE & MATERIALS**: For all assets, specify realistic textures: "hyper-realistic fur, detailed skin texture, subsurface scattering, reflective metallic surfaces, or photorealistic environmental materials."
+            6. **LIGHTING**: Use "professional studio lighting, cinematic high-fidelity, 8k resolution."
+            7. **NO PEOPLE**: Include the literal phrase "no people".
+            8. ASPECT RATIO: Include "9:16 aspect ratio".
             
-            The goal is for this prompt to generate a high-fidelity reference image that serves as the visual anchor for future video shots. It should NOT be a cinematic shot itself.
+            The goal is for this prompt to generate a high-fidelity "ingredient" (an isolated asset or an empty room) that serves as the visual anchor for future video shots. It should NOT be a cinematic story-driven shot itself.
         `;
 
         const result = await ai.models.generateContent({
