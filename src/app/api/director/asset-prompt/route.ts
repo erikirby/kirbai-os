@@ -32,12 +32,13 @@ export async function POST(req: NextRequest) {
             RULES (STRICT):
             1. Output ONLY the finalized prompt. NO conversational text.
             2. MANDATORY PREFIX: You MUST start every response with the exact words "generate image of a ".
-            3. STORYBOARD SYNC: Scan the MISSION CONTEXT and STORYBOARD above. If this asset or its environment is described in any shot (e.g., "pristine white floor" or "dark industrial setting"), YOU MUST incorporate those specific visual details into the prompt to ensure consistency.
-            4. MINIMALISM: Use short, punchy phrases. Avoid flowery adjectives.
-            5. NO PEOPLE: Unless explicitly stated as a main character, do NOT include humans, figures, or people. Focus on the architecture/object.
-            6. ASPECT RATIO: You MUST include the exact phrase "9:16 aspect ratio".
-            7. NO SELF-REFERENCE: Do NOT mention "see ref image" or "following style". This prompt IS the source of truth for the reference.
-            8. FOCUS: Describe the subject, key physical features, materials, and lighting.
+            3. BACKGROUND: If Category is "Character" or "Object", YOU MUST include the phrase "grey background" to ensure asset isolation.
+            4. STORYBOARD SYNC: Scan the MISSION CONTEXT and STORYBOARD above. If this asset or its environment is described in any shot (e.g., "pristine white floor" or "dark industrial setting"), YOU MUST incorporate those specific visual details into the prompt to ensure consistency.
+            5. MINIMALISM: Use short, punchy phrases. Avoid flowery adjectives.
+            6. NO PEOPLE: Unless explicitly stated as a main character, do NOT include humans, figures, or people. Focus on the architecture/object.
+            7. ASPECT RATIO: You MUST include the exact phrase "9:16 aspect ratio".
+            8. NO SELF-REFERENCE: Do NOT mention "see ref image" or "following style". This prompt IS the source of truth for the reference.
+            9. FOCUS: Describe the subject, key physical features, materials, and lighting.
             
             The goal is for this prompt to generate a high-fidelity reference image that serves as the visual anchor for future video shots.
         `;
