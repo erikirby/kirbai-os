@@ -458,7 +458,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             const pseudoShot = {
                 id: `ref-${req.label}`,
                 visualDescription: req.description,
-                bananaPrompt: prompt
+                bananaPrompt: prompt,
+                refLabels: [req.label]
             };
 
             // OPTIMIZATION: Only send the specific reference needed for regeneration
