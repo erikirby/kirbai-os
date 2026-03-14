@@ -441,16 +441,17 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
     const getShotPrompt = async (shot: Shot) => {
         if (!activeMission) return;
         setIsAssetPromptLoading(shot.id);
+        const currentPrompt = shot.bananaPromptV2 || shot.bananaPrompt || "";
         try {
             const resp = await fetch("/api/director/shot-prompt", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ mission: activeMission, shot })
+                body: JSON.stringify({ mission: activeMission, shot, currentPrompt })
             });
             const data = await resp.json();
             if (data.prompt) {
                 setTempPrompt(data.prompt);
-                setEditingShotId(shot.id); // Ensure we are in edit mode to see the tempPrompt
+                setEditingShotId(shot.id); 
             }
         } catch (e) {
             console.error("Failed to generate shot prompt.", e);
