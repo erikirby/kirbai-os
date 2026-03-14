@@ -300,11 +300,24 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
                 refreshTelemetry();
                 
-                await fetch('/api/missions', {
+                const resSave = await fetch('/api/director/save-shot', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mode, mission: updated })
+                    body: JSON.stringify({ 
+                        missionId: activeMission.id, 
+                        mode, 
+                        shotId: shot.id, 
+                        updates: { 
+                            thumbnailUrl: data.thumbnailUrl,
+                            lastGenerationPrompt: data.prompt
+                        } 
+                    })
                 });
+
+                if (!resSave.ok) {
+                    const err = await resSave.json();
+                    console.error("Auto-commit failed:", err.error);
+                }
                 
                 setEditingShotId(null);
             } else {
@@ -1569,14 +1582,28 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                 const newShots = activeMission.shots.map(s => 
                                                                                     s.id === shot.id ? { ...s, bananaPromptV2: tempPrompt } : s
                                                                                 );
-                                                                                const updated = { ...activeMission, shots: newShots };
-                                                                                setActiveMission(updated);
-                                                                                await fetch('/api/missions', {
-                                                                                    method: 'POST',
-                                                                                    headers: { 'Content-Type': 'application/json' },
-                                                                                    body: JSON.stringify({ mode, mission: updated })
-                                                                                });
-                                                                                setEditingShotId(null);
+                                                                                    const res = await fetch('/api/director/save-shot', {
+                                                                                        method: 'POST',
+                                                                                        headers: { 'Content-Type': 'application/json' },
+                                                                                        body: JSON.stringify({ 
+                                                                                            missionId: activeMission.id, 
+                                                                                            mode, 
+                                                                                            shotId: shot.id, 
+                                                                                            updates: { bananaPromptV2: tempPrompt } 
+                                                                                        })
+                                                                                    });
+                                                                                    if (res.ok) {
+                                                                                        const updated = {
+                                                                                            ...activeMission,
+                                                                                            shots: activeMission.shots.map(s => s.id === shot.id ? { ...s, bananaPromptV2: tempPrompt } : s)
+                                                                                        };
+                                                                                        setActiveMission(updated);
+                                                                                        setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
+                                                                                        setEditingShotId(null);
+                                                                                    } else {
+                                                                                        const err = await res.json();
+                                                                                        alert(`COMMIT ERROR: ${err.error || "Mission Vault failed to lock in your edit."}`);
+                                                                                    }
                                                                             }}
                                                                             className="px-3 py-1 bg-accent rounded-lg text-[9px] font-black uppercase"
                                                                         >

@@ -163,6 +163,8 @@ export async function POST(req: NextRequest) {
                - CAMEO RULE: You MUST create a "Character" requirement for EVERY cameo listed above (${allCameos.join(", ")}).
                - SHOT COMPOSITION: Each shot should typically link to multiple references (e.g. 1 Character + 1 Location).
             5. PROMPT SYNC: The Banana prompts MUST explicitly use the labels (e.g. "Based on the [Pheromosa Character] and [90s City Location] sources...").
+            6. STRICTLY STATIC: These are "Start Frames" for future animation. DO NOT include "motion blur", "speed lines", "motion trails", or "blurring past". Characters should be in a static, high-fidelity pose.
+            7. LENS & LIGHTING: Specify cinematic lighting and lens details (e.g. "35mm lens, rim lighting") to ensure premium quality.
 
             AGENT NOTES:
             - Incorporate feedback from Director/Strategist/Audience into the visualDescription.
