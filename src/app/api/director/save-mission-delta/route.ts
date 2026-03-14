@@ -30,33 +30,7 @@ export async function POST(req: NextRequest) {
         const updatedMission = { ...mission, ...updates };
         updatedMission.updatedAt = new Date().toISOString();
         
-        // DEFRAGMENTATION: Extract large assets before saving the mission record
-        const { saveMissionAssetAsync } = await import("@/lib/db");
-        
-        // 1. Process References
-        if (updates.references && Array.isArray(updates.references)) {
-            for (let i = 0; i < updates.references.length; i++) {
-                const base64 = updates.references[i];
-                if (base64 && base64.startsWith('data:image')) {
-                    await saveMissionAssetAsync(missionId, 'reference', i.toString(), base64);
-                }
-            }
-            // Clear references from the mission record to stay slim
-            updatedMission.references = updates.references.map((r: string, i: number) => 
-                r.startsWith('data:image') ? `/api/director/asset/${missionId}/reference/${i}` : r
-            );
-        }
-
-        // 2. Process Shot Thumbnails
-        if (updates.shots && Array.isArray(updates.shots)) {
-             for (const shot of updatedMission.shots) {
-                 if (shot.thumbnailUrl && shot.thumbnailUrl.startsWith('data:image')) {
-                     await saveMissionAssetAsync(missionId, 'shot', shot.id, shot.thumbnailUrl);
-                     shot.thumbnailUrl = `/api/director/asset/${missionId}/shot/${shot.id}`;
-                 }
-             }
-        }
-
+        // saveMissionAsync now handles automatic asset extraction (Defragmentation)
         await saveMissionAsync(updatedMission as any);
 
         // 4. Fetch fresh telemetry

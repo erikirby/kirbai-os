@@ -86,7 +86,7 @@ export function slimMission(m: Mission): Mission {
     return {
         ...m,
         references: [], 
-        shots: m.shots.map(s => ({ ...s, thumbnailUrl: undefined })) 
+        shots: [] // COMPLETELY remove shots from the index to prevent master-list bloat
     };
 }
 
@@ -122,11 +122,21 @@ export async function getRow(key: string): Promise<any> {
 }
 
 export async function setRow(key: string, value: any): Promise<void> {
+    const json = JSON.stringify(value);
+    const sizeKB = Math.round(json.length / 1024);
+    
+    // Safety Audit: Log large writes
+    if (sizeKB > 500) {
+        console.warn(`[Vault Warning] Large Write Detected! Key: ${key}, Size: ${sizeKB}KB`);
+    } else {
+        console.log(`[Vault Write] Key: ${key}, Size: ${sizeKB}KB`);
+    }
+
     const { error } = await supabase
         .from('persistence')
         .upsert({ key, value }, { onConflict: 'key' });
     if (error) {
-        console.error(`Supabase persistence Error [Key: ${key}]:`, error);
+        console.error(`Supabase persistence Error [Key: ${key}] Size: ${sizeKB}KB:`, error);
         throw new Error(`Vault Write Error: ${error.message}`);
     }
 }
@@ -253,9 +263,34 @@ export function getRoadmap() {
 export async function saveMissionAsync(mission: Mission) {
     const mode = mission.mode;
     const indexKey = mode === 'factory' ? 'missions_factory' : 'missions_kirbai';
-    const missionKey = `mission_${mission.id}`;
+    const missionId = mission.id;
+    const missionKey = `mission_${missionId}`;
 
-    // 1. Save Full record (The "Fat" one)
+    // --- DEFRAGMENTATION ENGINE ---
+    // Automatically extract large assets (references and thumbnails) if they are in Base64
+    
+    // 1. Process References
+    if (mission.references && Array.isArray(mission.references)) {
+        for (let i = 0; i < mission.references.length; i++) {
+            const data = mission.references[i];
+            if (data && data.startsWith('data:image')) {
+                await saveMissionAssetAsync(missionId, 'reference', i.toString(), data);
+                mission.references[i] = `/api/director/asset/${missionId}/reference/${i}`;
+            }
+        }
+    }
+
+    // 2. Process Shot Thumbnails
+    if (mission.shots && Array.isArray(mission.shots)) {
+        for (const shot of mission.shots) {
+            if (shot.thumbnailUrl && shot.thumbnailUrl.startsWith('data:image')) {
+                await saveMissionAssetAsync(missionId, 'shot', shot.id, shot.thumbnailUrl);
+                shot.thumbnailUrl = `/api/director/asset/${missionId}/shot/${shot.id}`;
+            }
+        }
+    }
+
+    // 1. Save Full record (Now Slimmed by the Defragmentation Engine)
     await setRow(missionKey, mission);
 
     // 2. Update Index (The "Slim" one)
