@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRow, setRow } from "@/lib/db";
+import { getMissionByIdAsync, saveMissionAsync, getTelemetryAsync } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
     try {
@@ -9,28 +9,26 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Missing missionId, shotId, or updates" }, { status: 400 });
         }
 
-        const key = mode === 'factory' ? 'missions_factory' : 'missions_kirbai';
-        const missions = await getRow(key) || [];
-        
-        const mIdx = missions.findIndex((m: any) => m.id === missionId);
-        if (mIdx === -1) {
-            return NextResponse.json({ error: "Mission not found" }, { status: 404 });
+        const mission = await getMissionByIdAsync(missionId);
+        if (!mission) {
+            return NextResponse.json({ error: "Mission not found in vault" }, { status: 404 });
         }
 
-        const mission = missions[mIdx];
         const sIdx = mission.shots.findIndex((s: any) => s.id === shotId);
         if (sIdx === -1) {
-            return NextResponse.json({ error: "Shot not found" }, { status: 404 });
+            return NextResponse.json({ error: "Shot not found in mission" }, { status: 404 });
         }
 
         // Apply updates to the specific shot
         mission.shots[sIdx] = { ...mission.shots[sIdx], ...updates };
         mission.updatedAt = new Date().toISOString();
 
-        // Save the entire missions array back (this is safe on the server side as we aren't limited by request payload size here)
-        await setRow(key, missions);
+        // 3. Save via the hardened Dual-Key helper
+        await saveMissionAsync(mission);
 
-        return NextResponse.json({ success: true });
+        // 4. Fetch fresh telemetry
+        const telemetry = await getTelemetryAsync();
+        return NextResponse.json({ success: true, mission, telemetry });
 
     } catch (e: any) {
         console.error("Save Shot Error:", e);

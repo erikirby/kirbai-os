@@ -6,6 +6,7 @@ import {
     ChevronRight, MessageSquare, Download, Trash2, Loader2, RefreshCw,
     Camera, Users, Layout, Image as ImageIcon, Upload, X, Plus, Send
 } from "lucide-react";
+import StatusButton from "./StatusButton";
 
 interface Shot {
     id: string;
@@ -76,6 +77,10 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
     const [refTempDescription, setRefTempDescription] = useState("");
     const [isRegeneratingRef, setIsRegeneratingRef] = useState<string | null>(null);
     const [isSavingPrompt, setIsSavingPrompt] = useState<string | null>(null);
+    const [isFullMissionLoading, setIsFullMissionLoading] = useState<string | null>(null);
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [isUploadingRef, setIsUploadingRef] = useState(false);
+    const [isUploadingShotId, setIsUploadingShotId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchMissionsAndTelemetry = async () => {
@@ -104,6 +109,12 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         if (data.success) setTelemetry(data.data);
     };
 
+    const isPayloadSafe = (data: any, limitMB = 4.0): boolean => {
+        const json = JSON.stringify(data);
+        const sizeMB = (json.length * 2) / 1024 / 1024; // Roughly 2 bytes per char for UTF-16
+        return sizeMB < limitMB;
+    };
+
     const getMonthlySpend = () => {
         if (!telemetry?.logs) return 0;
         const now = new Date();
@@ -115,6 +126,25 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
 
     const monthlySpend = getMonthlySpend();
     const isOverBudget = monthlySpend > 10.00;
+
+    const loadMission = async (m: Mission) => {
+        setIsFullMissionLoading(m.id);
+        setActiveTab("blocking");
+        setActiveMission(m); // Set slim immediately for UI responsiveness
+        try {
+            const res = await fetch(`/api/mission/${m.id}`);
+            const data = await res.json();
+            if (data.success) {
+                setActiveMission(data.data);
+                // Sync the missions list index if needed
+                setMissions(prev => prev.map(old => old.id === m.id ? { ...data.data, references: [], shots: data.data.shots.map((s: any) => ({ ...s, thumbnailUrl: undefined })) } : old));
+            }
+        } catch (e) {
+            console.error("Load Full Mission Error:", e);
+        } finally {
+            setIsFullMissionLoading(null);
+        }
+    };
 
     const toggleReferenceManual = async (idx: number) => {
         if (!activeMission) return;
@@ -195,6 +225,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
     const handleUploadShot = async (shotId: string, e: React.ChangeEvent<HTMLInputElement>) => {
         if (!activeMission || !e.target.files?.[0]) return;
         
+        setIsUploadingShotId(shotId);
         const file = e.target.files[0];
         const reader = new FileReader();
         reader.onloadend = async () => {
@@ -240,8 +271,11 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                         updates: { thumbnailUrl: compressed, lastGenerationPrompt: "Manual Upload (Photoshop/External)" } 
                     })
                 });
+                setIsUploadingShotId(null);
             };
+            img.onerror = () => setIsUploadingShotId(null);
         };
+        reader.onerror = () => setIsUploadingShotId(null);
         reader.readAsDataURL(file);
     };
 
@@ -296,7 +330,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 ...slim,
                 requiredReferences: activeMission.requiredReferences,
                 // Keep indices stable but null out others to minimize payload size
-                references: activeMission.references?.map((ref, i) => relevantRefIndices.has(i) ? ref : null),
+                // PRE-COMPRESSION SHIFT: Only compress the relevant references
+                references: await Promise.all(activeMission.references?.map(async (ref, i) => (relevantRefIndices.has(i) && ref) ? await compressImage(ref) : null) || []),
                 // Strip thumbnails from all other shots. Strip current thumbnail unless it's a structural EDIT.
                 shots: slim.shots.map(s => ({
                     ...s,
@@ -335,6 +370,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
                 refreshTelemetry();
                 
+                setIsSyncing(true);
                 const resSave = await fetch('/api/director/save-shot', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -344,16 +380,27 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                         shotId: shot.id, 
                         updates: { 
                             thumbnailUrl: data.thumbnailUrl,
-                            bananaPromptV2: usedPrompt || data.prompt, // PERSIST THE PROMPT
-                            lastGenerationPrompt: data.prompt
+                            bananaPromptV2: (shot.bananaPromptV2 || shot.bananaPrompt) || data.prompt, // PERSIST THE PROMPT
+                            lastGenerationPrompt: data.prompt,
+                            status: "rendered"
                         } 
                     })
                 });
 
-                if (!resSave.ok) {
+                if (resSave.ok) {
+                    const saveResult = await resSave.json();
+                    if (saveResult.telemetry) setTelemetry(saveResult.telemetry);
+                    if (saveResult.mission) {
+                        const fatMission = saveResult.mission;
+                        setActiveMission(fatMission);
+                        // Update missions list with SLIM version
+                        setMissions(prev => prev.map(m => m.id === fatMission.id ? { ...fatMission, references: [], shots: fatMission.shots.map((s: any) => ({ ...s, thumbnailUrl: undefined })) } : m));
+                    }
+                } else {
                     const err = await resSave.json();
                     console.error("Auto-commit failed:", err.error);
                 }
+                setIsSyncing(false);
                 
                 setEditingShotId(null);
             } else {
@@ -439,19 +486,24 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         });
     };
     const saveMissionDelta = async (missionId: string, updates: any) => {
+        setIsSyncing(true);
         try {
             const res = await fetch('/api/director/save-mission-delta', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ missionId, mode, updates })
             });
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.error || `HTTP ${res.status}`);
+            const data = await res.json();
+            if (data.success) {
+                if (data.telemetry) setTelemetry(data.telemetry);
+            } else {
+                throw new Error(data.error || `HTTP ${res.status}`);
             }
         } catch (e: any) {
             console.error("Delta Save Failed:", e);
             alert(`PERSISTENCE ERROR: ${e.message}`);
+        } finally {
+            setIsSyncing(false);
         }
     };
 
@@ -470,6 +522,36 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             bananaPromptV2: s.bananaPromptV2
         }))
     });
+
+    const compressImage = (base64: string, maxSize = 768): Promise<string> => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxSize) {
+                        height *= maxSize / width;
+                        width = maxSize;
+                    }
+                } else {
+                    if (height > maxSize) {
+                        width *= maxSize / height;
+                        height = maxSize;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx?.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.5)); // 50% quality for faster uploads
+            };
+            img.src = base64;
+        });
+    };
 
     const getAssetPrompt = async (req: any, forShot: boolean = false, shotId: string | null = null) => {
         if (!activeMission) return;
@@ -604,7 +686,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 requiredReferences: activeMission.requiredReferences,
                 // OPTIMIZATION: Strip thumbnails from all shots during reference generation
                 shots: slim.shots.map(s => ({ ...s, thumbnailUrl: null })),
-                references: activeMission.references?.map((ref, i) => i === req.uploadedIndex ? ref : null)
+                // PRE-COMPRESSION SHIFT: Compress the specific reference being used
+                references: await Promise.all(activeMission.references?.map(async (ref, i) => (i === req.uploadedIndex && ref) ? await compressImage(ref) : null) || [])
             };
 
             const res = await fetch('/api/director/generate-image', {
@@ -646,15 +729,26 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                     updatedAt: new Date().toISOString()
                 };
 
+                if (data.telemetry) setTelemetry(data.telemetry);
                 setActiveMission(updated);
                 setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
-                refreshTelemetry();
 
-                await saveMissionDelta(activeMission.id, { 
-                    references: updatedRefs, 
-                    requiredReferences: updatedReqs,
-                    updatedAt: new Date().toISOString()
+                setIsSyncing(true);
+                const resSave = await fetch('/api/director/save-mission-delta', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        missionId: activeMission.id, 
+                        mode,
+                        updates: {
+                            references: updatedRefs, 
+                            requiredReferences: updatedReqs,
+                            updatedAt: new Date().toISOString()
+                        }
+                    })
                 });
+                const saveData = await resSave.json();
+                if (saveData.telemetry) setTelemetry(saveData.telemetry);
                 
                 setEditingRefLabel(null);
             } else {
@@ -665,6 +759,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             alert(`Connection Error: ${e.message || "Reference Regeneration Timeout"}\n\nThis can happen if the base reference is very high resolution. Try hitting 'Regenerate' again or re-uploading the source.`);
         } finally {
             setIsRegeneratingRef(null);
+            setIsSyncing(false);
         }
     };
     
@@ -738,18 +833,28 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
 
     const handleSmartEdit = async () => {
         if (!instruction.trim() || !activeMission) return;
-        setIsEditing(true);
+        if (!isPayloadSafe({ instruction, mission: activeMission })) {
+            alert("⚠️ PAYLOAD SHIELD: This instruction/mission combo is too large for the AI to process in one pass. Try making smaller, more specific edits.");
+            setIsEditing(false);
+            return;
+        }
+
+        // --- SAFETY NET: Automatic Snapshot ---
+        await fetch('/api/director/backup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ missionId: activeMission.id })
+        });
+
         try {
-                const res = await fetch('/api/director/edit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        instruction,
-                        mission: getSlimMission(activeMission)
-                    })
-                });
+            const res = await fetch('/api/director/edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ instruction, mission: getSlimMission(activeMission) })
+            });
             const data = await res.json();
             if (data.success) {
+                if (data.telemetry) setTelemetry(data.telemetry);
                 setActiveMission(data.mission);
                 setMissions(prev => prev.map(m => m.id === data.mission.id ? data.mission : m));
                 setInstruction("");
@@ -760,43 +865,14 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         } finally {
             setIsEditing(false);
         }
-    };
 
-    const compressImage = (base64Str: string): Promise<string> => {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.src = base64Str;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 768; // Optimized for faster multimodal inference
-                const MAX_HEIGHT = 768;
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height) {
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
-                    }
-                } else {
-                    if (height > MAX_HEIGHT) {
-                        width *= MAX_HEIGHT / height;
-                        height = MAX_HEIGHT;
-                    }
-                }
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx?.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.5)); // 50% quality for faster uploads
-            };
-        });
     };
 
     const handleUploadReference = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file || !activeMission) return;
 
+        setIsUploadingRef(true);
         const reader = new FileReader();
         reader.onload = async (event) => {
             const base64Raw = event.target?.result as string;
@@ -829,7 +905,9 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             setActiveMission(updatedMission);
             setMissions(prev => prev.map(m => m.id === updatedMission.id ? updatedMission : m));
             setTargetingReqIdx(null); // Clear targeting state
+            setIsUploadingRef(false);
         };
+        reader.onerror = () => setIsUploadingRef(false);
         reader.readAsDataURL(file);
     };
 
@@ -848,12 +926,28 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             return r;
         });
 
+        const labelToRemove = ((activeMission as any).requiredReferences || [])[idx]?.label;
+
+        // Reference Integrity Check: Purge missing labels from all shots
+        const cleanedShots = activeMission.shots.map(shot => ({
+            ...shot,
+            refLabels: shot.refLabels?.filter(l => l !== labelToRemove) || []
+        }));
+
         const updated = {
             ...activeMission,
             references: updatedRefs,
             requiredReferences: updatedReqs,
+            shots: cleanedShots,
             updatedAt: new Date().toISOString()
         };
+
+        setActiveMission(updated);
+        await saveMissionDelta(activeMission.id, { 
+            references: updatedRefs, 
+            requiredReferences: updatedReqs,
+            shots: cleanedShots 
+        });
 
         setActiveMission(updated);
         setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
@@ -901,7 +995,20 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             if (!confirmed) return;
         }
 
-        setIsRegenerating(true);
+        if (!isPayloadSafe({ activeMission })) {
+            alert("⚠️ PAYLOAD SHIELD: This mission is too large to regenerate in its current state. Try deleting some references first.");
+            setIsRegenerating(false);
+            return;
+        }
+
+        // --- SAFETY NET: Automatic Snapshot ---
+        await fetch('/api/director/backup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ missionId: activeMission.id })
+        });
+
+        setIsSyncing(true);
         try {
             const res = await fetch('/api/director/plan', {
                 method: 'POST',
@@ -915,13 +1022,15 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                     lyrics: activeMission.shots.map(s => s.lyric).filter(Boolean).join("\n") || "No lyrics provided.",
                     mode: activeMission.mode,
                     alias: activeMission.alias,
-                    references: activeMission.references,
+                    // PRE-COMPRESSION SHIFT: Ensure all references are compressed before planning
+                    references: await Promise.all((activeMission.references || []).map(ref => ref ? (window as any).compressImage(ref) : Promise.resolve(null))),
                     cameos: activeMission.cameos,
                     targetRuntime: (activeMission as any).targetRuntime
                 })
             });
             const data = await res.json();
             if (data.success) {
+                if (data.telemetry) setTelemetry(data.telemetry);
                 setActiveMission(data.mission);
                 setMissions(prev => prev.map(m => m.id === activeMission.id ? data.mission : m));
                 setActiveTab("blocking");
@@ -930,6 +1039,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             console.error(e);
         } finally {
             setIsRegenerating(false);
+            setIsSyncing(false);
         }
     };
 
@@ -1012,6 +1122,15 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                             </div>
                         </>
                     )}
+                    {isSyncing && (
+                        <>
+                            <div className="w-px h-8 bg-white/5" />
+                            <div className="flex items-center gap-2 animate-pulse">
+                                <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_#FF3366]" />
+                                <span className="text-[10px] font-black text-accent uppercase tracking-widest">Vault Syncing...</span>
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {isOverBudget && (
@@ -1048,14 +1167,15 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                 placeholder="Ask AI to make changes (e.g. 'Add 3 cameos', 'Make the end dramatic')"
                                 className="flex-1 bg-transparent border-none text-sm font-bold text-white focus:outline-none placeholder:text-foreground/30"
                             />
-                            <button 
+                            <StatusButton 
                                 onClick={handleSmartEdit}
-                                disabled={isEditing || !instruction.trim()}
-                                className="px-4 py-2 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent/80 transition-all disabled:opacity-50 flex items-center gap-2"
+                                loading={isEditing}
+                                disabled={!instruction.trim()}
+                                className="px-4 py-2 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent/80"
+                                icon={<Send className="w-3 h-3" />}
                             >
-                                {isEditing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                                 Ask AI
-                            </button>
+                            </StatusButton>
                         </div>
                     )}
                 </div>
@@ -1073,10 +1193,14 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                         missions.map(m => (
                             <div key={m.id} className="relative group">
                                 <button
-                                    onClick={() => { setActiveMission(m); setActiveTab("blocking"); }}
-                                    className={`w-full p-4 rounded-2xl border transition-all text-left flex flex-col gap-2 ${activeMission?.id === m.id ? 'bg-accent/10 border-accent/40 shadow-lg' : 'bg-surface/30 border-border/10 hover:border-accent/20'}`}
+                                    onClick={() => loadMission(m)}
+                                    disabled={isFullMissionLoading === m.id}
+                                    className={`w-full p-4 rounded-2xl border transition-all text-left flex flex-col gap-2 relative ${activeMission?.id === m.id ? 'bg-accent/10 border-accent/40 shadow-lg' : 'bg-surface/30 border-border/10 hover:border-accent/20'}`}
                                 >
-                                    <span className={`text-[9px] font-black uppercase tracking-widest ${activeMission?.id === m.id ? 'text-accent' : 'text-foreground/40'}`}>{m.alias}</span>
+                                    <div className="flex items-center justify-between">
+                                        <span className={`text-[9px] font-black uppercase tracking-widest ${activeMission?.id === m.id ? 'text-accent' : 'text-foreground/40'}`}>{m.alias}</span>
+                                        {isFullMissionLoading === m.id ? <Loader2 className="w-3 h-3 animate-spin text-accent" /> : null}
+                                    </div>
                                     <span className="text-xs font-bold truncate pr-6">{m.title}</span>
                                     <span className="text-[9px] font-mono text-foreground/30 uppercase">{m.shots.length} SHOTS</span>
                                 </button>
@@ -1141,25 +1265,26 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                     
                                     {/* Mission Controls */}
                                     <div className="flex flex-col lg:flex-row items-start lg:items-center gap-2 w-full lg:w-auto">
-                                        <button 
+                                        <StatusButton 
                                             onClick={handleCloneMission}
-                                            disabled={isRegenerating}
+                                            loading={isRegenerating}
                                             title="Branch/Clone Mission (Save progress and experiment)"
-                                            className="w-full lg:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-accent/60 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 hover:text-accent transition-all disabled:opacity-50"
+                                            className="w-full lg:w-auto px-4 py-2 bg-white/5 border border-white/10 text-accent/60 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 hover:text-accent"
+                                            icon={<Copy className="w-3 h-3" />}
                                         >
-                                            <Copy className="w-3 h-3" />
                                             Clone
-                                        </button>
+                                        </StatusButton>
                                         <div className="flex flex-col items-start lg:items-end gap-1 w-full lg:w-auto">
-                                            <button 
+                                            <StatusButton 
                                                 onClick={regenerateVision}
-                                                disabled={isRegenerating}
+                                                loading={isRegenerating}
+                                                loadingText="Syncing"
                                                 title="Regenerate all shots based on latest refs/cameos"
-                                                className="w-full lg:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-accent/10 border border-accent/20 text-accent rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-accent hover:text-white transition-all disabled:opacity-50"
+                                                className="w-full lg:w-auto px-5 py-2.5 bg-accent/10 border border-accent/20 text-accent rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-accent hover:text-white"
+                                                icon={<Sparkles className="w-3 h-3" />}
                                             >
-                                                {isRegenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                                {isRegenerating ? "Syncing" : "Regenerate Vision"}
-                                            </button>
+                                                Regenerate Vision
+                                            </StatusButton>
                                         </div>
                                     </div>
                                 </div>
@@ -1219,12 +1344,13 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                 </button>
                                             ) : (
                                                 <div className="flex gap-2">
-                                                    <button 
+                                                    <StatusButton 
                                                         onClick={saveOutline}
-                                                        className="px-4 py-2 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent/80 transition-all"
+                                                        loading={isSyncing}
+                                                        className="px-4 py-2 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent/80"
                                                     >
                                                         Save
-                                                    </button>
+                                                    </StatusButton>
                                                     <button 
                                                         onClick={() => setIsEditingOutline(false)}
                                                         className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
@@ -1341,15 +1467,16 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                          </button>
                                                                                      </div>
                                                                                  ) : (
-                                                                                    <button 
-                                                                                        onClick={() => {
-                                                                                            setTargetingReqIdx(originalIdx);
-                                                                                            fileInputRef.current?.click();
-                                                                                        }}
-                                                                                        className="px-2 py-0.5 bg-accent/20 text-accent text-[8px] font-black uppercase rounded-md border border-accent/20 hover:bg-accent hover:text-white transition-all shadow-lg"
-                                                                                    >
-                                                                                        Upload
-                                                                                    </button>
+                                                                                    <StatusButton 
+                                                                                         onClick={() => {
+                                                                                             setTargetingReqIdx(originalIdx);
+                                                                                             fileInputRef.current?.click();
+                                                                                         }}
+                                                                                         loading={isUploadingRef && targetingReqIdx === originalIdx}
+                                                                                         className="px-2 py-0.5 bg-accent/20 text-accent text-[8px] font-black uppercase rounded-md border border-accent/20 hover:bg-accent hover:text-white transition-all shadow-lg"
+                                                                                     >
+                                                                                         Upload
+                                                                                     </StatusButton>
                                                                                 )}
                                                                             </div>
                                                                         </div>
@@ -1362,14 +1489,14 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                         autoFocus
                                                                                     />
                                                                                     <div className="flex gap-2">
-                                                                                        <button 
-                                                                                            onClick={() => handleRegenerateReference(req)}
-                                                                                            disabled={isRegeneratingRef === req.label}
-                                                                                            className="flex-1 px-3 py-1.5 bg-accent text-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-accent/80 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
-                                                                                        >
-                                                                                            {isRegeneratingRef === req.label ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <RefreshCw className="w-2.5 h-2.5" />}
-                                                                                            Regenerate Image
-                                                                                        </button>
+                                                                                         <StatusButton 
+                                                                                             onClick={() => handleRegenerateReference(req)}
+                                                                                             loading={isRegeneratingRef === req.label}
+                                                                                             className="flex-1 px-3 py-1.5 bg-accent text-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-accent/80 transition-all flex items-center justify-center gap-1.5"
+                                                                                             icon={<RefreshCw className="w-2.5 h-2.5" />}
+                                                                                         >
+                                                                                             Regenerate Image
+                                                                                         </StatusButton>
                                                                                         <button 
                                                                                             onClick={() => saveReferenceDescription(req.label)}
                                                                                             className="px-3 py-1.5 bg-white/10 text-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-white/20 transition-all"
@@ -1389,14 +1516,15 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                             )}
                                                                             
                                                                             <div className="mt-auto flex gap-2">
-                                                                                 <button 
-                                                                                     onClick={() => getAssetPrompt(req)}
-                                                                                     disabled={isAssetPromptLoading === req.label}
-                                                                                     className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 ${copiedId === req.label ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-black/40 border border-white/5 text-foreground/40 hover:text-accent hover:border-accent/20'}`}
-                                                                                 >
-                                                                                     {isAssetPromptLoading === req.label ? <Loader2 className="w-3 h-3 animate-spin" /> : (copiedId === req.label ? <Check className="w-3 h-3" /> : <Sparkles className="w-3 h-3 text-accent" />)}
-                                                                                     {isAssetPromptLoading === req.label ? "Forging..." : (copiedId === req.label ? "Copied" : "Get Prompt help")}
-                                                                                 </button>
+                                                                                 <StatusButton 
+                                                                                      onClick={() => getAssetPrompt(req)}
+                                                                                      loading={isAssetPromptLoading === req.label}
+                                                                                      loadingText="Forging..."
+                                                                                      className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all active:scale-95 ${copiedId === req.label ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-black/40 border border-white/5 text-foreground/40 hover:text-accent hover:border-accent/20'}`}
+                                                                                      icon={copiedId === req.label ? <Check className="w-3 h-3" /> : <Sparkles className="w-3 h-3 text-accent" />}
+                                                                                  >
+                                                                                      {copiedId === req.label ? "Copied" : "Get Prompt help"}
+                                                                                  </StatusButton>
                                                                                 {(req as any).isCustom && (
                                                                                     <button 
                                                                                         onClick={() => deleteCustomReference(req.label)}
@@ -1440,13 +1568,17 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                     </div>
                                                 </div>
                                             ))}
-                                            <button 
-                                                onClick={() => fileInputRef.current?.click()}
-                                                className="aspect-[3/4] rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center gap-3 text-foreground/20 hover:text-accent hover:border-accent/40 transition-all bg-white/2 hover:bg-accent/5"
-                                            >
-                                                <Plus className="w-6 h-6" />
-                                                <span className="text-[9px] font-black uppercase tracking-widest">New Reference</span>
-                                            </button>
+                                            <StatusButton 
+                                                 onClick={() => {
+                                                     setTargetingReqIdx(null);
+                                                     fileInputRef.current?.click();
+                                                 }}
+                                                 loading={isUploadingRef && targetingReqIdx === null}
+                                                 className="aspect-[3/4] rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center gap-3 text-foreground/20 hover:text-accent hover:border-accent/40 transition-all bg-white/2 hover:bg-accent/5"
+                                                 icon={<Plus className="w-6 h-6" />}
+                                             >
+                                                 <span className="text-[9px] font-black uppercase tracking-widest">New Reference</span>
+                                             </StatusButton>
                                         </div>
                                     </div>
                                 )}
@@ -1627,36 +1759,40 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                             </button>
                                                         </div>
                                                         <div className="flex gap-2 items-center flex-wrap">
-                                                            <button 
+                                                            <StatusButton 
                                                                 onClick={() => handleGenerateImage(shot)}
-                                                                disabled={generatingShotId === shot.id}
-                                                                className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all bg-yellow-400 text-black hover:bg-yellow-300 shadow-[0_0_20px_rgba(250,204,21,0.2)] active:scale-95 disabled:opacity-50`}
+                                                                loading={generatingShotId === shot.id && generatingType === "new"}
+                                                                loadingText="Forging..."
+                                                                className="px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-yellow-400 text-black hover:bg-yellow-300 shadow-[0_0_20px_rgba(250,204,21,0.2)] active:scale-95"
+                                                                icon={<span className="text-sm">🍌</span>}
                                                             >
-                                                                {generatingShotId === shot.id && generatingType === "new" ? <Loader2 className="w-3 h-3 animate-spin" /> : <span className="text-sm">🍌</span>}
-                                                                {generatingShotId === shot.id && generatingType === "new" ? "Forging..." : "Generate"}
-                                                            </button>
-                                                                       {shot.thumbnailUrl && (
-                                                                <button 
+                                                                Generate
+                                                            </StatusButton>
+                                                            
+                                                            {shot.thumbnailUrl && (
+                                                                 <StatusButton 
                                                                     onClick={() => handleForgeVideoPrompt(shot)}
-                                                                    disabled={forgingVideoShotId === shot.id}
-                                                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20 shadow-lg active:scale-95 disabled:opacity-50`}
+                                                                    loading={forgingVideoShotId === shot.id}
+                                                                    loadingText="Forging..."
+                                                                    className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20 shadow-lg active:scale-95"
+                                                                    icon={<Video className="w-3 h-3" />}
                                                                 >
-                                                                    {forgingVideoShotId === shot.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Video className="w-3 h-3" />}
-                                                                    {forgingVideoShotId === shot.id ? "Forging..." : "📽️ Prompt"}
-                                                                </button>
+                                                                    📽️ Prompt
+                                                                </StatusButton>
                                                              )}
 
                                                              <div className="h-6 w-px bg-white/10 mx-2 hidden lg:block" />
 
                                                              {shot.thumbnailUrl && (
-                                                                <button 
+                                                                <StatusButton 
                                                                     onClick={() => handleGenerateImage(shot, true)}
-                                                                    disabled={generatingShotId === shot.id}
-                                                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-white/5 border border-white/5 text-foreground/60 hover:text-white hover:bg-white/10 shadow-lg active:scale-95 disabled:opacity-50`}
+                                                                    loading={generatingShotId === shot.id && generatingType === "edit"}
+                                                                    loadingText="Refining..."
+                                                                    className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 border border-white/5 text-foreground/60 hover:text-white hover:bg-white/10 shadow-lg active:scale-95"
+                                                                    icon={<ImageIcon className="w-3 h-3" />}
                                                                 >
-                                                                    {generatingShotId === shot.id && generatingType === "edit" ? <Loader2 className="w-3 h-3 animate-spin" /> : <ImageIcon className="w-3 h-3" />}
-                                                                    {generatingShotId === shot.id && generatingType === "edit" ? "Refining..." : "🖼️ Edit"}
-                                                                </button>
+                                                                    🖼️ Edit
+                                                                </StatusButton>
                                                              )}
            
 
@@ -1680,66 +1816,83 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                     <Copy className={`w-2.5 h-2.5 ${copiedId === `${shot.id}-banana` ? 'hidden' : 'block'}`} />
                                                                                     {copiedId === `${shot.id}-banana` ? 'Copied' : 'Copy Banana'}
                                                                                 </button>
-                                                                                <button 
-                                                                                    onClick={() => getShotPrompt(shot)}
-                                                                                    className="p-1.5 hover:bg-white/5 rounded-lg text-accent/40 hover:text-accent transition-all"
-                                                                                    title="Regenerate Prompt from Vision"
-                                                                                >
-                                                                                    {isAssetPromptLoading === shot.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
-                                                                                </button>
+                                                                                <StatusButton 
+                                                                                     onClick={() => getShotPrompt(shot)}
+                                                                                     loading={isAssetPromptLoading === shot.id}
+                                                                                     className="p-1.5 hover:bg-white/5 rounded-lg text-accent/40 hover:text-accent"
+                                                                                     title="Regenerate Prompt from Vision"
+                                                                                     icon={<RefreshCw className="w-3 h-3" />}
+                                                                                 />
+                                         
                                                                             </div>
                                                                         </div>
                                                                         <textarea 
                                                                             value={tempPrompt}
-                                                                        onChange={(e) => setTempPrompt(e.target.value)}
-                                                                        className="w-full h-32 p-4 bg-black/40 border border-accent/40 rounded-2xl font-mono text-[11px] text-white focus:outline-none resize-none"
-                                                                        autoFocus
-                                                                    />
-                                                                    <div className="flex gap-2">
-                                                                        <button 
-                                                                            onClick={async () => {
-                                                                                if (!activeMission) return;
-                                                                                const newShots = activeMission.shots.map(s => 
-                                                                                    s.id === shot.id ? { ...s, bananaPromptV2: tempPrompt } : s
-                                                                                );
-                                                                                    setIsSavingPrompt(shot.id);
-                                                                                    const res = await fetch('/api/director/save-shot', {
-                                                                                        method: 'POST',
-                                                                                        headers: { 'Content-Type': 'application/json' },
-                                                                                        body: JSON.stringify({ 
-                                                                                            missionId: activeMission.id, 
-                                                                                            mode, 
-                                                                                            shotId: shot.id, 
-                                                                                            updates: { bananaPromptV2: tempPrompt } 
-                                                                                        })
-                                                                                    });
-                                                                                    if (res.ok) {
-                                                                                        const updated = {
-                                                                                            ...activeMission,
-                                                                                            shots: activeMission.shots.map(s => s.id === shot.id ? { ...s, bananaPromptV2: tempPrompt } : s)
-                                                                                        };
-                                                                                        setActiveMission(updated);
-                                                                                        setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
-                                                                                        setIsSavingPrompt('success');
-                                                                                        setTimeout(() => {
-                                                                                            setIsSavingPrompt(null);
-                                                                                            setEditingShotId(null);
-                                                                                        }, 800);
-                                                                                    } else {
-                                                                                        const err = await res.json();
-                                                                                        alert(`COMMIT ERROR: ${err.error || "Mission Vault failed to lock in your edit."}`);
-                                                                                        setIsSavingPrompt(null);
-                                                                                    }
+                                                                            onChange={(e) => setTempPrompt(e.target.value)}
+                                                                            onBlur={async () => {
+                                                                                if (!activeMission || tempPrompt === (shot.bananaPromptV2 || shot.bananaPrompt)) return;
+                                                                                setIsSavingPrompt(shot.id);
+                                                                                await fetch('/api/director/save-shot', {
+                                                                                    method: 'POST',
+                                                                                    headers: { 'Content-Type': 'application/json' },
+                                                                                    body: JSON.stringify({ 
+                                                                                        missionId: activeMission.id, 
+                                                                                        mode, 
+                                                                                        shotId: shot.id, 
+                                                                                        updates: { bananaPromptV2: tempPrompt } 
+                                                                                    })
+                                                                                });
+                                                                                setIsSavingPrompt(null);
                                                                             }}
-                                                                            className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase transition-all flex items-center gap-1.5 ${
-                                                                                isSavingPrompt === 'success' 
-                                                                                ? 'bg-green-500 text-white' 
-                                                                                : 'bg-accent text-black hover:bg-accent/80'
-                                                                            }`}
-                                                                        >
-                                                                            {isSavingPrompt === shot.id ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
-                                                                            {isSavingPrompt === 'success' ? 'Saved!' : 'Save'}
-                                                                        </button>
+                                                                            className="w-full h-32 p-4 bg-black/40 border border-accent/40 rounded-2xl font-mono text-[11px] text-white focus:outline-none resize-none"
+                                                                            autoFocus
+                                                                        />
+                                                                    <div className="flex gap-2">
+                                                                        <StatusButton 
+                                                                                 onClick={async () => {
+                                                                                     if (!activeMission) return;
+                                                                                     const newShots = activeMission.shots.map(s => 
+                                                                                         s.id === shot.id ? { ...s, bananaPromptV2: tempPrompt } : s
+                                                                                     );
+                                                                                         setIsSavingPrompt(shot.id);
+                                                                                         const res = await fetch('/api/director/save-shot', {
+                                                                                             method: 'POST',
+                                                                                             headers: { 'Content-Type': 'application/json' },
+                                                                                             body: JSON.stringify({ 
+                                                                                                 missionId: activeMission.id, 
+                                                                                                 mode, 
+                                                                                                 shotId: shot.id, 
+                                                                                                 updates: { bananaPromptV2: tempPrompt } 
+                                                                                             })
+                                                                                         });
+                                                                                         if (res.ok) {
+                                                                                             const updated = {
+                                                                                                 ...activeMission,
+                                                                                                 shots: activeMission.shots.map(s => s.id === shot.id ? { ...s, bananaPromptV2: tempPrompt } : s)
+                                                                                             };
+                                                                                             setActiveMission(updated);
+                                                                                             setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
+                                                                                             setIsSavingPrompt('success');
+                                                                                             setTimeout(() => {
+                                                                                                 setIsSavingPrompt(null);
+                                                                                                 setEditingShotId(null);
+                                                                                             }, 800);
+                                                                                         } else {
+                                                                                             const err = await res.json();
+                                                                                             alert(`COMMIT ERROR: ${err.error || "Mission Vault failed to lock in your edit."}`);
+                                                                                             setIsSavingPrompt(null);
+                                                                                         }
+                                                                                 }}
+                                                                                 loading={isSavingPrompt === shot.id}
+                                                                                 className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase transition-all ${
+                                                                                     isSavingPrompt === 'success' 
+                                                                                     ? 'bg-green-500 text-white' 
+                                                                                     : 'bg-accent text-black hover:bg-accent/80'
+                                                                                 }`}
+                                                                             >
+                                                                                 {isSavingPrompt === 'success' ? 'Saved!' : 'Save'}
+                                                                             </StatusButton>
+                                         
                                                                         <button 
                                                                             onClick={() => setEditingShotId(null)}
                                                                             className="px-3 py-1 bg-white/5 rounded-lg text-[9px] font-black uppercase"
@@ -1796,13 +1949,18 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                     </div>
                                                                     <textarea 
                                                                         value={shot.grokPromptV2}
-                                                                        onChange={async (e) => {
+                                                                        onChange={(e) => {
                                                                             const newVal = e.target.value;
                                                                             const newShots = activeMission.shots.map(s => 
                                                                                 s.id === shot.id ? { ...s, grokPromptV2: newVal } : s
                                                                             );
                                                                             const updated = { ...activeMission, shots: newShots };
                                                                             setActiveMission(updated);
+                                                                        }}
+                                                                        onBlur={async (e) => {
+                                                                            const newVal = e.target.value;
+                                                                            if (!activeMission) return;
+                                                                            setIsSavingPrompt(shot.id);
                                                                             await fetch('/api/director/save-shot', {
                                                                                 method: 'POST',
                                                                                 headers: { 'Content-Type': 'application/json' },
@@ -1813,6 +1971,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                     updates: { grokPromptV2: newVal } 
                                                                                 })
                                                                             });
+                                                                            setIsSavingPrompt(null);
                                                                         }}
                                                                         className="w-full h-24 p-4 bg-purple-500/5 border border-purple-500/20 rounded-2xl font-mono text-[11px] text-foreground/80 focus:outline-none resize-none"
                                                                     />
@@ -1887,13 +2046,15 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                          </button>
                                                                          
                                                                          <div className="grid grid-cols-2 gap-2 w-full">
-                                                                             <label className="flex items-center justify-center gap-2 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[9px] font-black uppercase tracking-widest cursor-pointer transition-all">
-                                                                                 <Upload className="w-3 h-3" /> Swap
+                                                                             <label className={`flex items-center justify-center gap-2 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[9px] font-black uppercase tracking-widest cursor-pointer transition-all ${isUploadingShotId === shot.id ? 'opacity-50 pointer-events-none' : ''}`}>
+                                                                                 {isUploadingShotId === shot.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
+                                                                                 {isUploadingShotId === shot.id ? "Uploading..." : "Swap"}
                                                                                  <input 
                                                                                      type="file" 
                                                                                      className="hidden" 
                                                                                      accept="image/*"
                                                                                      onChange={(e) => handleUploadShot(shot.id, e)}
+                                                                                     disabled={isUploadingShotId === shot.id}
                                                                                  />
                                                                              </label>
                                                                              <button 

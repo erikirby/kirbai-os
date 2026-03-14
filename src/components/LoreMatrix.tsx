@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Send, Loader2, Sparkles, Undo2, ImagePlus, Link as LinkIcon, Trash2, Edit2, Check, X } from 'lucide-react';
+import StatusButton from './StatusButton';
 
 interface LoreNode {
     id: string;
@@ -327,9 +328,13 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                                                 placeholder="Traits / psychological profile..."
                                             />
                                             <div className="flex gap-2">
-                                                <button onClick={saveEditNode} className="flex items-center gap-1 px-3 py-1.5 bg-accent/20 border border-accent/30 rounded-lg text-accent text-xs font-black hover:bg-accent/40 transition-colors">
-                                                    <Check className="w-3 h-3" /> Save
-                                                </button>
+                                                <StatusButton
+                                                    onClick={saveEditNode}
+                                                    className="px-3 py-1.5 bg-accent/20 border border-accent/30 rounded-lg text-accent text-xs font-black hover:bg-accent/40 transition-colors"
+                                                    icon={<Check className="w-3 h-3" />}
+                                                >
+                                                    Save
+                                                </StatusButton>
                                                 <button onClick={() => setEditingNodeId(null)} className="flex items-center gap-1 px-3 py-1.5 text-white/30 text-xs font-black hover:text-white transition-colors">
                                                     <X className="w-3 h-3" /> Cancel
                                                 </button>
@@ -409,13 +414,14 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                         disabled={isGenerating}
                     />
 
-                    <button 
+                    <StatusButton 
                         onClick={handlePromptSubmit}
-                        disabled={isGenerating || !prompt.trim()}
+                        loading={isGenerating}
+                        disabled={!prompt.trim()}
+                        loadingText=""
                         className="w-10 h-10 bg-accent text-white rounded-xl flex items-center justify-center hover:bg-accent/80 transition-colors disabled:opacity-50 shrink-0 shadow-lg shadow-accent/20 cursor-pointer relative z-10"
-                    >
-                        {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    </button>
+                        icon={<Send className="w-4 h-4" />}
+                    />
                 </div>
             </div>
         </div>

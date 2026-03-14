@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Settings, Send, Bot, Loader2, Sparkles, Check, Copy, Trash2, Download } from 'lucide-react';
+import StatusButton from './StatusButton';
 
 // Basic zero-dependency markdown parser for AI Responses
 const MarkdownRenderer = ({ content }: { content: string }) => {
@@ -336,13 +337,14 @@ export default function AIHub({ theme }: { theme?: string }) {
                         </button>
 
                         {/* Send Button */}
-                        <button 
+                        <StatusButton 
                             onClick={() => handleGenerate()}
-                            disabled={!prompt.trim() || isGenerating}
+                            loading={isGenerating}
+                            disabled={!prompt.trim()}
+                            loadingText=""
                             className="w-12 h-12 rounded-xl bg-accent text-white flex items-center justify-center hover:bg-accent/80 disabled:opacity-50 transition-all shadow-lg shadow-accent/20"
-                        >
-                            <Send className="w-5 h-5" />
-                        </button>
+                            icon={<Send className="w-5 h-5" />}
+                        />
                     </div>
                 </div>
             </div>

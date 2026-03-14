@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
-import { saveMissionAsync, logApiUsage } from "@/lib/db";
+import { saveMissionAsync, logApiUsage, getTelemetryAsync } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
     try {
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
         const directorDraft = directorResult.text;
         
         if (directorResult.usageMetadata) {
-            logApiUsage("/api/director/plan (Director)", directorResult.usageMetadata.promptTokenCount || 0, directorResult.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsage("/api/director/plan (Director)", directorResult.usageMetadata.promptTokenCount || 0, directorResult.usageMetadata.candidatesTokenCount || 0);
         }
 
         // Phase 2 & 3: Parallel Critiques (Strategist & Audience Critic)
@@ -113,8 +113,8 @@ export async function POST(req: NextRequest) {
         const strategistCritique = strategistResult.text;
         const audienceCritique = audienceResult.text;
 
-        if (strategistResult.usageMetadata) logApiUsage("/api/director/plan (Strategist)", strategistResult.usageMetadata.promptTokenCount || 0, strategistResult.usageMetadata.candidatesTokenCount || 0);
-        if (audienceResult.usageMetadata) logApiUsage("/api/director/plan (Audience)", audienceResult.usageMetadata.promptTokenCount || 0, audienceResult.usageMetadata.candidatesTokenCount || 0);
+        if (strategistResult.usageMetadata) await logApiUsage("/api/director/plan (Strategist)", strategistResult.usageMetadata.promptTokenCount || 0, strategistResult.usageMetadata.candidatesTokenCount || 0);
+        if (audienceResult.usageMetadata) await logApiUsage("/api/director/plan (Audience)", audienceResult.usageMetadata.promptTokenCount || 0, audienceResult.usageMetadata.candidatesTokenCount || 0);
 
         // Phase 4: The Director's Revised "Final Cut"
         const refinementPrompt = `
@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
         const finalCut = refinedResult.text;
 
         if (refinedResult.usageMetadata) {
-            logApiUsage("/api/director/plan (Refinement)", refinedResult.usageMetadata.promptTokenCount || 0, refinedResult.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsage("/api/director/plan (Refinement)", refinedResult.usageMetadata.promptTokenCount || 0, refinedResult.usageMetadata.candidatesTokenCount || 0);
         }
 
         // Pre-process lyrics to determine expected shot count
@@ -227,7 +227,7 @@ export async function POST(req: NextRequest) {
 
 
         if (visualistResult.usageMetadata) {
-            logApiUsage("/api/director/plan (Visualist)", visualistResult.usageMetadata.promptTokenCount || 0, visualistResult.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsage("/api/director/plan (Visualist)", visualistResult.usageMetadata.promptTokenCount || 0, visualistResult.usageMetadata.candidatesTokenCount || 0);
         }
 
         const responseData = JSON.parse(visualistResult.text || "{}");
@@ -267,8 +267,8 @@ export async function POST(req: NextRequest) {
         };
 
         await saveMissionAsync(mission as any);
-
-        return NextResponse.json({ success: true, mission });
+        const telemetry = await getTelemetryAsync();
+        return NextResponse.json({ success: true, mission, telemetry });
 
     } catch (e: any) {
         console.error("Director Plan Error:", e);

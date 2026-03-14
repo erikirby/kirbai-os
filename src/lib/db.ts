@@ -75,11 +75,19 @@ export interface Mission {
         description: string; 
         category: "Character" | "Location" | "Object";
         uploadedIndex?: number;
-        manualCheck?: boolean; // For manual tracking without upload
+        manualCheck?: boolean; 
     }[]; 
-    cameos?: string[];     // Array of secondary pokemon names
+    cameos?: string[];     
     createdAt: string;
     updatedAt: string;
+}
+
+export function slimMission(m: Mission): Mission {
+    return {
+        ...m,
+        references: [], 
+        shots: m.shots.map(s => ({ ...s, thumbnailUrl: undefined })) 
+    };
 }
 
 interface DatabaseSchema {
@@ -240,15 +248,26 @@ export function getRoadmap() {
 
 export async function saveMissionAsync(mission: Mission) {
     const mode = mission.mode;
-    const key = mode === 'factory' ? 'missions_factory' : 'missions_kirbai';
-    let missions = await getRow(key) || [];
-    const idx = missions.findIndex((m: any) => m.id === mission.id);
+    const indexKey = mode === 'factory' ? 'missions_factory' : 'missions_kirbai';
+    const missionKey = `mission_${mission.id}`;
+
+    // 1. Save Full record (The "Fat" one)
+    await setRow(missionKey, mission);
+
+    // 2. Update Index (The "Slim" one)
+    let index = await getRow(indexKey) || [];
+    const slimmed = slimMission(mission);
+    const idx = index.findIndex((m: any) => m.id === mission.id);
     if (idx !== -1) {
-        missions[idx] = mission;
+        index[idx] = slimmed;
     } else {
-        missions.unshift(mission);
+        index.unshift(slimmed);
     }
-    await setRow(key, missions);
+    await setRow(indexKey, index);
+}
+
+export async function getMissionByIdAsync(id: string): Promise<Mission | null> {
+    return await getRow(`mission_${id}`);
 }
 
 export async function getMissionsAsync(mode: string): Promise<Mission[]> {
@@ -257,14 +276,29 @@ export async function getMissionsAsync(mode: string): Promise<Mission[]> {
 }
 
 export async function deleteMissionAsync(id: string) {
-    // We don't know the mode for sure, so we check both tables
     const keys = ['missions_kirbai', 'missions_factory'];
     for (const key of keys) {
-        let missions = await getRow(key) || [];
-        const filtered = missions.filter((m: any) => m.id !== id);
-        if (filtered.length !== missions.length) {
+        let index = await getRow(key) || [];
+        const filtered = index.filter((m: any) => m.id !== id);
+        if (filtered.length !== index.length) {
             await setRow(key, filtered);
         }
+    }
+    // Delete the individual record
+    await setRow(`mission_${id}`, null);
+}
+
+export async function backupMissionAsync(id: string) {
+    const original = await getMissionByIdAsync(id);
+    if (original) {
+        await setRow(`mission_${id}_backup`, original);
+    }
+}
+
+export async function restoreMissionFromBackupAsync(id: string) {
+    const backup = await getRow(`mission_${id}_backup`);
+    if (backup) {
+        await saveMissionAsync(backup);
     }
 }
 

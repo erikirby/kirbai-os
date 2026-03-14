@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { logApiUsage, logImageUsage } from "@/lib/db";
+import { logApiUsage, logImageUsage, getTelemetryAsync } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
     try {
@@ -76,7 +76,7 @@ PROMPT: ${prompt}
         });
 
         if (result.usageMetadata) {
-            logApiUsage(`/api/director/generate-image (${isEdit ? 'Edit' : 'New'})`, result.usageMetadata.promptTokenCount || 0, result.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsage(`/api/director/generate-image (${isEdit ? 'Edit' : 'New'})`, result.usageMetadata.promptTokenCount || 0, result.usageMetadata.candidatesTokenCount || 0);
         }
 
         const candidate = result.candidates?.[0];
@@ -87,11 +87,13 @@ PROMPT: ${prompt}
         
         if (imagePart && (imagePart as any).inlineData) {
             const base64Image = `data:${(imagePart as any).inlineData.mimeType};base64,${(imagePart as any).inlineData.data}`;
-            logImageUsage(1, modelName); // Track high-res image cost
+            await logImageUsage(1, modelName); // Track high-res image cost
+            const telemetry = await getTelemetryAsync();
             return NextResponse.json({ 
                 success: true, 
                 thumbnailUrl: base64Image,
-                prompt: prompt 
+                prompt: prompt,
+                telemetry
             });
         } else {
             throw new Error("Nano Banana generated text but no image. Ensure the prompt is focused on visual output.");

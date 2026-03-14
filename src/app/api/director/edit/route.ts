@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
-import { getRow, saveMissionAsync, logApiUsage } from "@/lib/db";
+import { getRow, saveMissionAsync, logApiUsage, getTelemetryAsync } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
     try {
@@ -145,7 +145,9 @@ export async function POST(req: NextRequest) {
             };
             
             await saveMissionAsync(updatedMission);
-            return NextResponse.json({ success: true, mission: updatedMission });
+            // 3. Fetch fresh telemetry (since no specific tokens were logged here yet, but we bundle anyway)
+            const telemetry = await getTelemetryAsync();
+            return NextResponse.json({ success: true, mission: updatedMission, telemetry });
         } else {
             throw new Error("Failed to parse updated mission.");
         }

@@ -7,6 +7,7 @@ import {
     ExternalLink, Music, BookOpen, Cpu, ArrowRight, ClipboardList,
     AlertCircle, X, CheckCircle2, FileText, Wand2, ChevronUp
 } from "lucide-react";
+import StatusButton from "./StatusButton";
 
 interface ExternalLink {
     name: string;
@@ -677,13 +678,15 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                                 placeholder="Paste Google Sheet URL to auto-fill..."
                                                 className="w-full bg-transparent p-1.5 text-[9px] font-mono tracking-widest placeholder:text-foreground/30 focus:outline-none min-w-0"
                                             />
-                                            <button
+                                            <StatusButton
                                                 onClick={handleSheetSync}
-                                                disabled={isSyncingSheet || !sheetUrl.trim()}
-                                                className={`p-1.5 px-3 text-[9px] font-black uppercase tracking-widest rounded-full transition-all shrink-0 ${isSyncingSheet ? 'bg-cyan-400/20 text-cyan-400 animate-pulse' : sheetUrl.trim() ? 'bg-cyan-400 text-black hover:scale-105' : 'bg-foreground/10 text-foreground/30'}`}
+                                                loading={isSyncingSheet}
+                                                disabled={!sheetUrl.trim()}
+                                                loadingText="..."
+                                                className={`p-1.5 px-3 text-[9px] font-black uppercase tracking-widest rounded-full transition-all shrink-0 ${isSyncingSheet ? 'bg-cyan-400/20 text-cyan-400' : sheetUrl.trim() ? 'bg-cyan-400 text-black hover:scale-105' : 'bg-foreground/10 text-foreground/30'}`}
                                             >
-                                                {isSyncingSheet ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Sync'}
-                                            </button>
+                                                Sync
+                                            </StatusButton>
                                         </div>
 
                                         {/* Delete / Confirm */}
@@ -784,19 +787,18 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                                                     />
                                                                 </label>
                                                                 <div className="w-px h-3 bg-foreground/10"></div>
-                                                                <button
+                                                                <StatusButton
                                                                     onClick={() => handleFormatLyric(track, lyric?.content || '')}
-                                                                    disabled={!lyric?.content || isFormattingTrack === track}
+                                                                    loading={isFormattingTrack === track}
+                                                                    disabled={!lyric?.content}
+                                                                    loadingText="Formatting..."
                                                                     className={`text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 transition-all
-                                                                        ${isFormattingTrack === track ? 'text-cyan-400 animate-pulse' :
+                                                                        ${isFormattingTrack === track ? 'text-cyan-400' :
                                                                             !lyric?.content ? 'text-foreground/20 cursor-not-allowed' : 'text-cyan-400 hover:text-cyan-300'}`}
+                                                                    icon={<Wand2 className="w-3 h-3" />}
                                                                 >
-                                                                    {isFormattingTrack === track ? (
-                                                                        <><Loader2 className="w-3 h-3 animate-spin" /> Formatting...</>
-                                                                    ) : (
-                                                                        <><Wand2 className="w-3 h-3" /> AI Format & Clean</>
-                                                                    )}
-                                                                </button>
+                                                                    AI Format & Clean
+                                                                </StatusButton>
                                                             </div>
 
                                                             <textarea

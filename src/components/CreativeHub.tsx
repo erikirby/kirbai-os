@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Loader2, Trash2, Edit2, Check, X, ChevronDown, ChevronUp, Sparkles, Filter, Clapperboard, Send } from 'lucide-react';
+import StatusButton from './StatusButton';
 
 type ConceptType = 'reel' | 'post' | 'music' | 'general';
 type ConceptStatus = 'concept' | 'in-dev' | 'executed' | 'archived';
@@ -261,14 +262,15 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                         rows={10}
                         className="px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white/80 text-sm font-mono leading-relaxed focus:outline-none focus:border-accent/40 resize-none placeholder:text-white/20"
                     />
-                    <button
+                    <StatusButton
                         onClick={handleNew}
-                        disabled={isSaving || !form.title.trim() || !form.body.trim()}
-                        className="self-end flex items-center gap-2 px-6 py-2.5 bg-accent text-white rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-accent/80 transition-all disabled:opacity-50 shadow-lg shadow-accent/20"
+                        loading={isSaving}
+                        disabled={!form.title.trim() || !form.body.trim()}
+                        className="self-end px-6 py-2.5 bg-accent text-white rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-accent/80 transition-all disabled:opacity-50 shadow-lg shadow-accent/20"
+                        icon={<Check className="w-4 h-4" />}
                     >
-                        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                         Save Concept
-                    </button>
+                    </StatusButton>
                 </div>
             )}
 
@@ -421,14 +423,14 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                                     className="px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white/80 text-sm font-mono leading-relaxed focus:outline-none focus:border-accent/40 resize-none"
                                                 />
                                                 <div className="flex gap-2 self-end">
-                                                    <button
+                                                    <StatusButton
                                                         onClick={() => handleEdit(concept.id)}
-                                                        disabled={isSaving}
-                                                        className="flex items-center gap-1.5 px-4 py-2 bg-accent/20 border border-accent/30 rounded-xl text-accent text-xs font-black hover:bg-accent/40 transition-colors"
+                                                        loading={isSaving}
+                                                        className="px-4 py-2 bg-accent/20 border border-accent/30 rounded-xl text-accent text-xs font-black hover:bg-accent/40 transition-colors"
+                                                        icon={<Check className="w-3 h-3" />}
                                                     >
-                                                        {isSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
                                                         Save
-                                                    </button>
+                                                    </StatusButton>
                                                     <button
                                                         onClick={() => setEditingId(null)}
                                                         className="flex items-center gap-1.5 px-4 py-2 text-white/30 text-xs font-black hover:text-white transition-colors"
@@ -477,14 +479,16 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                                             <span className="text-[8px] text-foreground/20 italic leading-tight mt-1 text-center">Estimation for shot pacing</span>
                                                         </div>
                                                     </div>
-                                                    <button 
+                                                    <StatusButton 
                                                         onClick={() => handlePromote(concept)}
-                                                        disabled={isPlanning || !lyrics.trim()}
+                                                        loading={isPlanning}
+                                                        disabled={!lyrics.trim()}
+                                                        loadingText="Planning..."
                                                         className="bg-accent text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent/80 transition-all shadow-lg flex items-center justify-center gap-2"
+                                                        icon={<Send className="w-3 h-3" />}
                                                     >
-                                                        {isPlanning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-3 h-3" />}
                                                         Launch Multi-Agent Planning
-                                                    </button>
+                                                    </StatusButton>
                                                 </div>
                                             ) : (
                                                 <button 
