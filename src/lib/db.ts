@@ -269,13 +269,15 @@ export async function saveMissionAsync(mission: Mission) {
     // --- DEFRAGMENTATION ENGINE ---
     // Automatically extract large assets (references and thumbnails) if they are in Base64
     
+    const v = Date.now();
+    
     // 1. Process References
     if (mission.references && Array.isArray(mission.references)) {
         for (let i = 0; i < mission.references.length; i++) {
             const data = mission.references[i];
             if (data && data.startsWith('data:image')) {
                 await saveMissionAssetAsync(missionId, 'reference', i.toString(), data);
-                mission.references[i] = `/api/director/asset/${missionId}/reference/${i}`;
+                mission.references[i] = `/api/director/asset/${missionId}/reference/${i}?v=${v}`;
             }
         }
     }
@@ -285,7 +287,7 @@ export async function saveMissionAsync(mission: Mission) {
         for (const shot of mission.shots) {
             if (shot.thumbnailUrl && shot.thumbnailUrl.startsWith('data:image')) {
                 await saveMissionAssetAsync(missionId, 'shot', shot.id, shot.thumbnailUrl);
-                shot.thumbnailUrl = `/api/director/asset/${missionId}/shot/${shot.id}`;
+                shot.thumbnailUrl = `/api/director/asset/${missionId}/shot/${shot.id}?v=${v}`;
             }
         }
     }

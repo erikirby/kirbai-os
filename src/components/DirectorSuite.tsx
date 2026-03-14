@@ -390,12 +390,6 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 if (resSave.ok) {
                     const saveResult = await resSave.json();
                     if (saveResult.telemetry) setTelemetry(saveResult.telemetry);
-                    if (saveResult.mission) {
-                        const fatMission = saveResult.mission;
-                        setActiveMission(fatMission);
-                        // Update missions list with SLIM version
-                        setMissions(prev => prev.map(m => m.id === fatMission.id ? { ...fatMission, references: [], shots: fatMission.shots.map((s: any) => ({ ...s, thumbnailUrl: undefined })) } : m));
-                    }
                 } else {
                     const err = await resSave.json();
                     console.error("Auto-commit failed:", err.error);
