@@ -268,6 +268,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
 
             const optimizedMission = {
                 ...activeMission,
+                // OPTIMIZATION: Strip thumbnails from all other shots to save massive payload space
+                shots: activeMission.shots.map(s => ({ ...s, thumbnailUrl: s.id === shot.id ? s.thumbnailUrl : null })),
                 references: activeMission.references?.map((ref, i) => relevantRefIndices.has(i) ? ref : null)
             };
 
@@ -478,6 +480,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             // OPTIMIZATION: Only send the specific reference needed for regeneration
             const optimizedMission = {
                 ...activeMission,
+                // OPTIMIZATION: Strip thumbnails from all shots during reference generation
+                shots: activeMission.shots.map(s => ({ ...s, thumbnailUrl: null })),
                 references: activeMission.references?.map((ref, i) => i === req.uploadedIndex ? ref : null)
             };
 
