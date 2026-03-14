@@ -11,7 +11,11 @@ export async function POST(req: NextRequest) {
 
         const mission = await getMissionByIdAsync(missionId);
         if (!mission) {
-            return NextResponse.json({ error: "Mission not found in vault" }, { status: 404 });
+            console.error(`Mission lookup failed for ID: ${missionId}. Tried key: mission_${missionId}`);
+            return NextResponse.json({ 
+                error: `Mission not found in vault! (ID: ${missionId})`,
+                debug: { requestedId: missionId, triedKey: `mission_${missionId}` }
+            }, { status: 404 });
         }
 
         // Apply top-level updates safely

@@ -796,7 +796,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             if (data.success) {
                 setMissions(data.data);
                 if (data.data.length > 0 && !activeMission) {
-                    setActiveMission(data.data[0]);
+                    loadMission(data.data[0]);
                 }
             }
         } catch (e) {
@@ -878,7 +878,15 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             const base64Raw = event.target?.result as string;
             const compressed = await compressImage(base64Raw);
             
-            const updatedRefs = [...(activeMission.references || []), compressed];
+            // PAYLOAD SHIELD: Check if we are about to blow up the KV limit
+            const currentRefs = activeMission.references || [];
+            if (!isPayloadSafe([...currentRefs, compressed], 4.5)) {
+                alert("STATION ALERT: Reference Library is reaching capacity. Please remove unused references before adding more to stay within Vault limits.");
+                setIsUploadingRef(false);
+                return;
+            }
+
+            const updatedRefs = [...currentRefs, compressed];
             const newIndex = updatedRefs.length - 1;
             
             // Auto-assign to the targeted req slot OR the first empty one
