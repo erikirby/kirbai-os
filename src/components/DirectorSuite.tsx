@@ -514,10 +514,29 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             const data = await resp.json();
             if (data.prompt) {
                 if (data.prompt === currentPrompt) {
-                    alert("Director Review: AI returned an identical vision. Try again or edit manually.");
+                    alert("Director Review: AI returned an identical vision. Try adding more context and click Reload again.");
+                    // Still update to trigger any minor formatting changes and show it finished
                 }
-                setTempPrompt(data.prompt);
-                setEditingShotId(shot.id); 
+                
+                // Update Local State
+                const newShots = activeMission.shots.map(s => 
+                    s.id === shot.id ? { ...s, bananaPromptV2: data.prompt } : s
+                );
+                const updated = { ...activeMission, shots: newShots };
+                setActiveMission(updated);
+                setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
+
+                // Persist Automatically
+                await fetch('/api/director/save-shot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        missionId: activeMission.id, 
+                        mode, 
+                        shotId: shot.id, 
+                        updates: { bananaPromptV2: data.prompt } 
+                    })
+                });
             }
         } catch (e: any) {
             console.error("Failed to generate shot prompt.", e);
@@ -1725,7 +1744,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                 {copiedId === `${shot.id}-banana` ? 'Copied' : 'Copy Banana'}
                                                                             </button>
                                                                             <button 
-                                                                                onClick={() => getAssetPrompt({ label: shot.id, description: shot.visualDescription, category: 'Shot' }, true, shot.id)}
+                                                                                onClick={() => getShotPrompt(shot)}
                                                                                 className="p-1.5 hover:bg-white/5 rounded-lg text-accent/40 hover:text-accent transition-all"
                                                                                 title="Regenerate Prompt from Vision"
                                                                             >
