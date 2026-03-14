@@ -9,13 +9,21 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Missing missionId, mode, or updates" }, { status: 400 });
         }
 
-        const mission = await getMissionByIdAsync(missionId);
+        let mission = await getMissionByIdAsync(missionId);
+        
         if (!mission) {
-            console.error(`Mission lookup failed for ID: ${missionId}. Tried key: mission_${missionId}`);
-            return NextResponse.json({ 
-                error: `Mission not found in vault! (ID: ${missionId})`,
-                debug: { requestedId: missionId, triedKey: `mission_${missionId}` }
-            }, { status: 404 });
+            console.warn(`Mission individual record missing for ${missionId}. Attempting index recovery...`);
+            const { getMissionsAsync } = await import("@/lib/db");
+            const allMissions = await getMissionsAsync(mode);
+        mission = allMissions.find((m: any) => m.id === missionId) || null;
+            
+            if (!mission) {
+                return NextResponse.json({ 
+                    error: `Mission not found in vault! (ID: ${missionId})`,
+                    debug: { requestedId: missionId }
+                }, { status: 404 });
+            }
+            console.log(`Auto-healed mission record from index for ${missionId}`);
         }
 
         // Apply top-level updates safely

@@ -122,9 +122,13 @@ export async function getRow(key: string): Promise<any> {
 }
 
 export async function setRow(key: string, value: any): Promise<void> {
-    await supabase
+    const { error } = await supabase
         .from('persistence')
         .upsert({ key, value }, { onConflict: 'key' });
+    if (error) {
+        console.error(`Supabase persistence Error [Key: ${key}]:`, error);
+        throw new Error(`Vault Write Error: ${error.message}`);
+    }
 }
 
 // --- DB helpers (async versions) ---
