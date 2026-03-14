@@ -123,25 +123,30 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         const updated = { ...activeMission, requiredReferences: newReqs };
         setActiveMission(updated);
         
-        await fetch('/api/missions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode, mission: updated })
-        });
+        await saveMissionDelta(activeMission.id, { requiredReferences: newReqs });
     };
 
     const toggleShotProduced = async (shotId: string) => {
         if (!activeMission) return;
+        const shotToToggle = activeMission.shots.find(s => s.id === shotId);
+        if (!shotToToggle) return;
+        
+        const isNowProduced = !shotToToggle.isProduced;
         const newShots = activeMission.shots.map(s => 
-            s.id === shotId ? { ...s, isProduced: !s.isProduced } : s
+            s.id === shotId ? { ...s, isProduced: isNowProduced } : s
         );
         const updated = { ...activeMission, shots: newShots };
         setActiveMission(updated);
 
-        await fetch('/api/missions', {
+        await fetch('/api/director/save-shot', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode, mission: updated })
+            body: JSON.stringify({ 
+                missionId: activeMission.id, 
+                mode, 
+                shotId, 
+                updates: { isProduced: isNowProduced } 
+            })
         });
     };
 
@@ -166,10 +171,15 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 const updated = { ...activeMission, shots: newShots };
                 setActiveMission(updated);
                 
-                await fetch('/api/missions', {
+                await fetch('/api/director/save-shot', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mode, mission: updated })
+                    body: JSON.stringify({ 
+                        missionId: activeMission.id, 
+                        mode, 
+                        shotId: shot.id, 
+                        updates: { grokPromptV2: data.prompt } 
+                    })
                 });
             } else {
                 alert(data.error || "Failed to forge video prompt.");
@@ -220,10 +230,15 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 setActiveMission(updated);
                 setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
 
-                await fetch('/api/missions', {
+                await fetch('/api/director/save-shot', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mode, mission: updated })
+                    body: JSON.stringify({ 
+                        missionId: activeMission.id, 
+                        mode, 
+                        shotId, 
+                        updates: { thumbnailUrl: compressed, lastGenerationPrompt: "Manual Upload (Photoshop/External)" } 
+                    })
                 });
             };
         };
@@ -239,10 +254,15 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         setActiveMission(updated);
         setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
 
-        await fetch('/api/missions', {
+        await fetch('/api/director/save-shot', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode, mission: updated })
+            body: JSON.stringify({ 
+                missionId: activeMission.id, 
+                mode, 
+                shotId, 
+                updates: { thumbnailUrl: undefined } 
+            })
         });
     };
 
@@ -355,11 +375,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         setAddingRefCategory(null);
         setNewRefLabel("");
 
-        await fetch('/api/missions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode, mission: updated })
-        });
+        await saveMissionDelta(activeMission.id, { requiredReferences: updated.requiredReferences });
     };
 
     const deleteCustomReference = async (label: string) => {
@@ -367,11 +383,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         const updatedReqs = (activeMission.requiredReferences || []).filter(r => r.label !== label);
         const updated = { ...activeMission, requiredReferences: updatedReqs };
         setActiveMission(updated);
-        await fetch('/api/missions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode, mission: updated })
-        });
+        await saveMissionDelta(activeMission.id, { requiredReferences: updatedReqs });
     };
 
     const clearReferenceImage = async (idx: number) => {
@@ -382,31 +394,52 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         }
         const updated = { ...activeMission, requiredReferences: updatedReqs };
         setActiveMission(updated);
-        await fetch('/api/missions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode, mission: updated })
-        });
+        await saveMissionDelta(activeMission.id, { requiredReferences: updatedReqs });
     };
 
     const toggleRefForShot = async (shotId: string, label: string) => {
         if (!activeMission) return;
-        const newShots = activeMission.shots.map(s => {
-            if (s.id !== shotId) return s;
-            const currentRefs = s.refLabels || [];
-            const newRefs = currentRefs.includes(label)
-                ? currentRefs.filter(l => l !== label)
-                : [...currentRefs, label];
-            return { ...s, refLabels: newRefs };
-        });
+        const shotToUpdate = activeMission.shots.find(s => s.id === shotId);
+        if (!shotToUpdate) return;
+        
+        const currentRefs = shotToUpdate.refLabels || [];
+        const isRemove = currentRefs.includes(label);
+        const newRefs = isRemove
+            ? currentRefs.filter(l => l !== label)
+            : [...currentRefs, label];
+            
+        const newShots = activeMission.shots.map(s => 
+            s.id === shotId ? { ...s, refLabels: newRefs } : s
+        );
         const updated = { ...activeMission, shots: newShots };
         setActiveMission(updated);
 
-        await fetch('/api/missions', {
+        await fetch('/api/director/save-shot', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode, mission: updated })
+            body: JSON.stringify({ 
+                missionId: activeMission.id, 
+                mode, 
+                shotId, 
+                updates: { refLabels: newRefs } 
+            })
         });
+    };
+    const saveMissionDelta = async (missionId: string, updates: any) => {
+        try {
+            const res = await fetch('/api/director/save-mission-delta', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ missionId, mode, updates })
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || `HTTP ${res.status}`);
+            }
+        } catch (e: any) {
+            console.error("Delta Save Failed:", e);
+            alert(`PERSISTENCE ERROR: ${e.message}`);
+        }
     };
 
     const getSlimMission = (m: Mission) => ({
@@ -503,11 +536,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         setActiveMission(updated);
         setEditingRefLabel(null);
         
-        await fetch('/api/missions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode, mission: updated })
-        });
+        await saveMissionDelta(activeMission.id, { requiredReferences: updatedReqs });
     };
 
     const handleRegenerateReference = async (req: any) => {
@@ -585,10 +614,10 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
                 refreshTelemetry();
 
-                await fetch('/api/missions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mode, mission: updated })
+                await saveMissionDelta(activeMission.id, { 
+                    references: updatedRefs, 
+                    requiredReferences: updatedReqs,
+                    updatedAt: new Date().toISOString()
                 });
                 
                 setEditingRefLabel(null);
@@ -668,25 +697,21 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         const updated = { ...activeMission, conceptDescription: outlineDraft };
         setActiveMission(updated);
         setIsEditingOutline(false);
-        await fetch('/api/missions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode, mission: updated })
-        });
+        await saveMissionDelta(activeMission.id, { conceptDescription: outlineDraft });
     };
 
     const handleSmartEdit = async () => {
         if (!instruction.trim() || !activeMission) return;
         setIsEditing(true);
         try {
-            const res = await fetch('/api/director/edit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    instruction,
-                    mission: activeMission
-                })
-            });
+                const res = await fetch('/api/director/edit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        instruction,
+                        mission: getSlimMission(activeMission)
+                    })
+                });
             const data = await res.json();
             if (data.success) {
                 setActiveMission(data.mission);
@@ -759,10 +784,10 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             };
             
             // Save immediately
-            await fetch('/api/missions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ mode, mission: updatedMission })
+            await saveMissionDelta(activeMission.id, { 
+                references: updatedRefs, 
+                requiredReferences: updatedReqs,
+                updatedAt: new Date().toISOString()
             });
             
             setActiveMission(updatedMission);
@@ -797,10 +822,10 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         setActiveMission(updated);
         setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
 
-        await fetch('/api/missions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode, mission: updated })
+        await saveMissionDelta(activeMission.id, { 
+            references: updatedRefs, 
+            requiredReferences: updatedReqs,
+            updatedAt: new Date().toISOString()
         });
     };
 
@@ -812,25 +837,22 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         };
         setActiveMission(updated);
         setNewCameo("");
-        await fetch('/api/missions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode, mission: updated })
-        });
+        await saveMissionDelta(activeMission.id, { cameos: updated.cameos });
     };
 
-    const removeCameo = async (idx: number) => {
+    const removeCameo = async (cameo: string | number) => {
         if (!activeMission) return;
+        const currentCameos = activeMission.cameos || [];
+        const updatedCameos = typeof cameo === 'string' 
+            ? currentCameos.filter(c => c !== cameo)
+            : currentCameos.filter((_, i) => i !== cameo);
+            
         const updated = {
             ...activeMission,
-            cameos: (activeMission.cameos || []).filter((_, i) => i !== idx)
+            cameos: updatedCameos
         };
         setActiveMission(updated);
-        await fetch('/api/missions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode, mission: updated })
-        });
+        await saveMissionDelta(activeMission.id, { cameos: updatedCameos });
     };
 
     const regenerateVision = async () => {
@@ -893,6 +915,11 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ mode, mission: clonedMission })
             });
+
+            if (res.status === 413) {
+                alert("⚠️ Mission Payload Too Large! This project contains too many high-resolution frame uploads to clone in one request. Try deleting some unused storyboard images first.");
+                return;
+            }
 
             if (res.ok) {
                 setMissions(prev => [clonedMission, ...prev]);
@@ -1426,11 +1453,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                            cameos: [...(activeMission.cameos || []), suggested]
                                                                         };
                                                                         setActiveMission(updated);
-                                                                        fetch('/api/missions', {
-                                                                            method: 'POST',
-                                                                            headers: { 'Content-Type': 'application/json' },
-                                                                            body: JSON.stringify({ mode, mission: updated })
-                                                                        });
+                                                                        saveMissionDelta(activeMission.id, { cameos: updated.cameos });
                                                                     }}
                                                                     className="px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-lg text-[10px] font-bold text-accent hover:bg-accent/20 transition-all"
                                                                 >
@@ -1744,10 +1767,15 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                             );
                                                                             const updated = { ...activeMission, shots: newShots };
                                                                             setActiveMission(updated);
-                                                                            await fetch('/api/missions', {
+                                                                            await fetch('/api/director/save-shot', {
                                                                                 method: 'POST',
                                                                                 headers: { 'Content-Type': 'application/json' },
-                                                                                body: JSON.stringify({ mode, mission: updated })
+                                                                                body: JSON.stringify({ 
+                                                                                    missionId: activeMission.id, 
+                                                                                    mode, 
+                                                                                    shotId: shot.id, 
+                                                                                    updates: { grokPromptV2: newVal } 
+                                                                                })
                                                                             });
                                                                         }}
                                                                         className="w-full h-24 p-4 bg-purple-500/5 border border-purple-500/20 rounded-2xl font-mono text-[11px] text-foreground/80 focus:outline-none resize-none"
