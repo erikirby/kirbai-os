@@ -279,6 +279,16 @@ export async function getMissionsAsync(mode: string): Promise<Mission[]> {
     return await getRow(key) || [];
 }
 
+export async function saveMissionAssetAsync(missionId: string, type: 'reference' | 'shot', identifier: string, base64: string): Promise<void> {
+    const assetKey = `asset_${missionId}_${type}_${identifier}`;
+    await setRow(assetKey, base64);
+}
+
+export async function getMissionAssetAsync(missionId: string, type: 'reference' | 'shot', identifier: string): Promise<string | null> {
+    const assetKey = `asset_${missionId}_${type}_${identifier}`;
+    return await getRow(assetKey);
+}
+
 export async function deleteMissionAsync(id: string) {
     const keys = ['missions_kirbai', 'missions_factory'];
     for (const key of keys) {

@@ -31,7 +31,17 @@ export async function POST(req: NextRequest) {
         }
 
         // Apply updates to the specific shot
-        mission.shots[sIdx] = { ...mission.shots[sIdx], ...updates };
+        const targetShot = mission.shots[sIdx];
+        const newShot = { ...targetShot, ...updates };
+        
+        // DEFRAGMENTATION: Extract thumbnail if it's a new Base64
+        const { saveMissionAssetAsync } = await import("@/lib/db");
+        if (updates.thumbnailUrl && updates.thumbnailUrl.startsWith('data:image')) {
+            await saveMissionAssetAsync(missionId, 'shot', shotId, updates.thumbnailUrl);
+            newShot.thumbnailUrl = `/api/director/asset/${missionId}/shot/${shotId}`;
+        }
+        
+        mission.shots[sIdx] = newShot;
         mission.updatedAt = new Date().toISOString();
 
         // 3. Save via the hardened Dual-Key helper

@@ -252,7 +252,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx?.drawImage(img, 0, 0, width, height);
-                const compressed = canvas.toDataURL('image/jpeg', 0.6); // Tightened for scanner cost efficiency
+                const compressed = canvas.toDataURL('image/jpeg', 0.4); // Aggressive compression for defragmentation
 
                 const newShots = activeMission.shots.map(s => 
                     s.id === shotId ? { ...s, thumbnailUrl: compressed, lastGenerationPrompt: "Manual Upload (Photoshop/External)" } : s
@@ -547,7 +547,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx?.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.5)); // 50% quality for faster uploads
+                resolve(canvas.toDataURL('image/jpeg', 0.4)); // 40% quality for extreme persistence safety
             };
             img.src = base64;
         });
@@ -903,7 +903,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 updatedAt: new Date().toISOString()
             };
             
-            // Save immediately
+            // Save immediately 
+            // The API will auto-defragment these Base64s into Asset KV pairs
             await saveMissionDelta(activeMission.id, { 
                 references: updatedRefs, 
                 requiredReferences: updatedReqs,
