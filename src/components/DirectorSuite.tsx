@@ -302,6 +302,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 }))
             };
 
+            const usedPrompt = editingShotId === shot.id ? tempPrompt : (shot.bananaPromptV2 || shot.bananaPrompt);
             const res = await fetch('/api/director/generate-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -309,7 +310,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                     mission: optimizedMission,
                     shot,
                     isEdit,
-                    customPrompt: editingShotId === shot.id ? tempPrompt : (shot.bananaPromptV2 || shot.bananaPrompt)
+                    customPrompt: usedPrompt
                 })
             });
 
@@ -323,6 +324,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                     s.id === shot.id ? { 
                         ...s, 
                         thumbnailUrl: data.thumbnailUrl,
+                        bananaPromptV2: usedPrompt || data.prompt, // LOCK IN THE PROMPT
                         lastGenerationPrompt: data.prompt
                     } : s
                 );
@@ -340,6 +342,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                         shotId: shot.id, 
                         updates: { 
                             thumbnailUrl: data.thumbnailUrl,
+                            bananaPromptV2: usedPrompt || data.prompt, // PERSIST THE PROMPT
                             lastGenerationPrompt: data.prompt
                         } 
                     })

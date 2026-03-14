@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
-import { saveMissionAsync, logApiUsage } from "@/lib/db";
+import { getRow, saveMissionAsync, logApiUsage } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
     try {
@@ -121,14 +121,26 @@ export async function POST(req: NextRequest) {
         const aiMission = updatedData.mission;
 
         if (aiMission) {
+            // GHOST PROTECTION: Fetch the FULL mission from DB to ensure we don't wipe binary references
+            const dbKey = mission.mode === 'factory' ? 'missions_factory' : 'missions_kirbai';
+            const missions = await getRow(dbKey) || [];
+            const existingMission = missions.find((m: any) => m.id === mission.id);
+
+            if (!existingMission) {
+                // If not found, fall back to the provided mission (though this shouldn't happen)
+                console.warn(`[edit] Mission ${mission.id} not found in DB. Falling back to request payload.`);
+            }
+
+            const sourceOfTruth = existingMission || mission;
+
             // SAFE MERGE: Preserve existing fields unless explicitly updated by AI
             const updatedMission = {
-                ...mission,
-                title: aiMission.title || mission.title,
-                conceptDescription: aiMission.conceptDescription || mission.conceptDescription,
-                requiredReferences: aiMission.requiredReferences || mission.requiredReferences,
-                cameos: aiMission.cameos || mission.cameos,
-                shots: aiMission.shots || mission.shots,
+                ...sourceOfTruth,
+                title: aiMission.title || sourceOfTruth.title,
+                conceptDescription: aiMission.conceptDescription || sourceOfTruth.conceptDescription,
+                requiredReferences: aiMission.requiredReferences || sourceOfTruth.requiredReferences,
+                cameos: aiMission.cameos || sourceOfTruth.cameos,
+                shots: aiMission.shots || sourceOfTruth.shots,
                 updatedAt: new Date().toISOString()
             };
             
