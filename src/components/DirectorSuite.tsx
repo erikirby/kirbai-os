@@ -1832,21 +1832,6 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                         <textarea 
                                                                             value={tempPrompt}
                                                                             onChange={(e) => setTempPrompt(e.target.value)}
-                                                                            onBlur={async () => {
-                                                                                if (!activeMission || tempPrompt === (shot.bananaPromptV2 || shot.bananaPrompt)) return;
-                                                                                setIsSavingPrompt(shot.id);
-                                                                                await fetch('/api/director/save-shot', {
-                                                                                    method: 'POST',
-                                                                                    headers: { 'Content-Type': 'application/json' },
-                                                                                    body: JSON.stringify({ 
-                                                                                        missionId: activeMission.id, 
-                                                                                        mode, 
-                                                                                        shotId: shot.id, 
-                                                                                        updates: { bananaPromptV2: tempPrompt } 
-                                                                                    })
-                                                                                });
-                                                                                setIsSavingPrompt(null);
-                                                                            }}
                                                                             className="w-full h-32 p-4 bg-black/40 border border-accent/40 rounded-2xl font-mono text-[11px] text-white focus:outline-none resize-none"
                                                                             autoFocus
                                                                         />
