@@ -438,6 +438,27 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         }
     };
 
+    const getShotPrompt = async (shot: Shot) => {
+        if (!activeMission) return;
+        setIsAssetPromptLoading(shot.id);
+        try {
+            const resp = await fetch("/api/director/shot-prompt", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ mission: activeMission, shot })
+            });
+            const data = await resp.json();
+            if (data.prompt) {
+                setTempPrompt(data.prompt);
+                setEditingShotId(shot.id); // Ensure we are in edit mode to see the tempPrompt
+            }
+        } catch (e) {
+            console.error("Failed to generate shot prompt.", e);
+        } finally {
+            setIsAssetPromptLoading(null);
+        }
+    };
+
     const saveReferenceDescription = async (label: string) => {
         if (!activeMission) return;
         const updatedReqs = (activeMission.requiredReferences || []).map(r => 
@@ -1566,7 +1587,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                     {copiedId === `${shot.id}-banana` ? 'Copied' : 'Copy Banana'}
                                                                                 </button>
                                                                                 <button 
-                                                                                    onClick={() => getAssetPrompt({ label: shot.id, description: shot.visualDescription, category: 'Shot' }, true, shot.id)}
+                                                                                    onClick={() => getShotPrompt(shot)}
                                                                                     className="p-1.5 hover:bg-white/5 rounded-lg text-accent/40 hover:text-accent transition-all"
                                                                                     title="Regenerate Prompt from Vision"
                                                                                 >
