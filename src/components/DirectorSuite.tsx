@@ -275,6 +275,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             return;
         }
 
+        const currentMissionId = activeMission.id;
+        const currentMode = mode;
         setGeneratingShotId(shot.id);
         setGeneratingType(isEdit ? "edit" : "new");
         try {
@@ -337,8 +339,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        missionId: activeMission.id, 
-                        mode, 
+                        missionId: currentMissionId, 
+                        mode: currentMode, 
                         shotId: shot.id, 
                         updates: { 
                             thumbnailUrl: data.thumbnailUrl,
@@ -505,6 +507,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
 
     const getShotPrompt = async (shot: Shot) => {
         if (!activeMission) return;
+        const currentMissionId = activeMission.id;
+        const currentMode = mode;
         setIsAssetPromptLoading(shot.id);
         const currentPrompt = shot.bananaPromptV2 || shot.bananaPrompt || "";
         try {
@@ -542,8 +546,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        missionId: activeMission.id, 
-                        mode, 
+                        missionId: currentMissionId, 
+                        mode: currentMode, 
                         shotId: shot.id, 
                         updates: { bananaPromptV2: data.prompt } 
                     })
