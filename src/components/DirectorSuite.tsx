@@ -75,6 +75,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
     const [editingRefLabel, setEditingRefLabel] = useState<string | null>(null);
     const [refTempDescription, setRefTempDescription] = useState("");
     const [isRegeneratingRef, setIsRegeneratingRef] = useState<string | null>(null);
+    const [isSavingPrompt, setIsSavingPrompt] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchMissionsAndTelemetry = async () => {
@@ -1586,6 +1587,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                 const newShots = activeMission.shots.map(s => 
                                                                                     s.id === shot.id ? { ...s, bananaPromptV2: tempPrompt } : s
                                                                                 );
+                                                                                    setIsSavingPrompt(shot.id);
                                                                                     const res = await fetch('/api/director/save-shot', {
                                                                                         method: 'POST',
                                                                                         headers: { 'Content-Type': 'application/json' },
@@ -1603,15 +1605,25 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                         };
                                                                                         setActiveMission(updated);
                                                                                         setMissions(prev => prev.map(m => m.id === updated.id ? updated : m));
-                                                                                        setEditingShotId(null);
+                                                                                        setIsSavingPrompt('success');
+                                                                                        setTimeout(() => {
+                                                                                            setIsSavingPrompt(null);
+                                                                                            setEditingShotId(null);
+                                                                                        }, 800);
                                                                                     } else {
                                                                                         const err = await res.json();
                                                                                         alert(`COMMIT ERROR: ${err.error || "Mission Vault failed to lock in your edit."}`);
+                                                                                        setIsSavingPrompt(null);
                                                                                     }
                                                                             }}
-                                                                            className="px-3 py-1 bg-accent rounded-lg text-[9px] font-black uppercase"
+                                                                            className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase transition-all flex items-center gap-1.5 ${
+                                                                                isSavingPrompt === 'success' 
+                                                                                ? 'bg-green-500 text-white' 
+                                                                                : 'bg-accent text-black hover:bg-accent/80'
+                                                                            }`}
                                                                         >
-                                                                            Save
+                                                                            {isSavingPrompt === shot.id ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                                                                            {isSavingPrompt === 'success' ? 'Saved!' : 'Save'}
                                                                         </button>
                                                                         <button 
                                                                             onClick={() => setEditingShotId(null)}
