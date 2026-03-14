@@ -409,6 +409,22 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         });
     };
 
+    const getSlimMission = (m: Mission) => ({
+        id: m.id,
+        title: m.title,
+        conceptDescription: m.conceptDescription,
+        mode: m.mode,
+        alias: m.alias,
+        shots: m.shots.map(s => ({ 
+            id: s.id, 
+            visualDescription: s.visualDescription,
+            lyric: s.lyric,
+            refLabels: s.refLabels,
+            bananaPrompt: s.bananaPrompt,
+            bananaPromptV2: s.bananaPromptV2
+        }))
+    });
+
     const getAssetPrompt = async (req: any, forShot: boolean = false, shotId: string | null = null) => {
         if (!activeMission) return;
         const loadingKey = shotId || req.label;
@@ -417,8 +433,12 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             const resp = await fetch("/api/director/asset-prompt", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ mission: activeMission, requirement: req })
+                body: JSON.stringify({ mission: getSlimMission(activeMission), requirement: req })
             });
+            if (!resp.ok) {
+                const err = await resp.json();
+                throw new Error(err.error || `HTTP ${resp.status}`);
+            }
             const data = await resp.json();
             if (data.prompt) {
                 if (forShot && shotId) {
@@ -431,8 +451,9 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                     setTimeout(() => setCopiedId(null), 2000);
                 }
             }
-        } catch (e) {
+        } catch (e: any) {
             console.error("Failed to generate asset prompt.", e);
+            alert(`RELOAD ERROR: ${e.message}`);
         } finally {
             setIsAssetPromptLoading(null);
         }
@@ -446,15 +467,28 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             const resp = await fetch("/api/director/shot-prompt", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ mission: activeMission, shot, currentPrompt })
+                body: JSON.stringify({ 
+                    mission: getSlimMission(activeMission), 
+                    shot, 
+                    currentPrompt,
+                    entropy: Math.random() // Stop deterministic caching
+                })
             });
+            if (!resp.ok) {
+                const err = await resp.json();
+                throw new Error(err.error || `HTTP ${resp.status}`);
+            }
             const data = await resp.json();
             if (data.prompt) {
+                if (data.prompt === currentPrompt) {
+                    alert("Director Review: AI returned an identical vision. Try again or edit manually.");
+                }
                 setTempPrompt(data.prompt);
                 setEditingShotId(shot.id); 
             }
-        } catch (e) {
+        } catch (e: any) {
             console.error("Failed to generate shot prompt.", e);
+            alert(`RELOAD ERROR: ${e.message}`);
         } finally {
             setIsAssetPromptLoading(null);
         }

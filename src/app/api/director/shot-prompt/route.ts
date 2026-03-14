@@ -3,7 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 
 export async function POST(req: NextRequest) {
     try {
-        const { mission, shot, currentPrompt } = await req.json();
+        const { mission, shot, currentPrompt, entropy } = await req.json();
 
         if (!mission || !shot) {
             return NextResponse.json({ error: "Missing mission or shot data" }, { status: 400 });
@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
             6. **PROMPT SYNC**: Reference labels in brackets exactly (e.g. "[Pheromosa Character]").
             7. **LENS & LIGHTING**: Specify cinematic lighting (e.g. "35mm lens, rim lighting, 8k resolution").
             8. **NO PEOPLE**: Include "no people". 9:16 aspect ratio.
+            Focus on creating a visually arresting, premium "start frame" that the animator can then bring to life.
+            [ENTROPY: ${entropy}]
         `;
 
         const result = await ai.models.generateContent({
