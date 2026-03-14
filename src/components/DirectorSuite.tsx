@@ -278,6 +278,9 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
         setGeneratingShotId(shot.id);
         setGeneratingType(isEdit ? "edit" : "new");
         try {
+            // OPTIMIZATION: Use getSlimMission as baseline
+            const slim = getSlimMission(activeMission);
+
             // OPTIMIZATION: Strip out references that are NOT relevant to this shot to prevent Vercel 413 Payload Too Large
             const relevantRefIndices = new Set<number>();
             if (shot.refLabels) {
@@ -288,10 +291,15 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             }
 
             const optimizedMission = {
-                ...activeMission,
-                // OPTIMIZATION: Strip thumbnails from all other shots to save massive payload space
-                shots: activeMission.shots.map(s => ({ ...s, thumbnailUrl: s.id === shot.id ? s.thumbnailUrl : null })),
-                references: activeMission.references?.map((ref, i) => relevantRefIndices.has(i) ? ref : null)
+                ...slim,
+                requiredReferences: activeMission.requiredReferences,
+                // Keep indices stable but null out others to minimize payload size
+                references: activeMission.references?.map((ref, i) => relevantRefIndices.has(i) ? ref : null),
+                // Strip thumbnails from all other shots. Strip current thumbnail unless it's a structural EDIT.
+                shots: slim.shots.map(s => ({
+                    ...s,
+                    thumbnailUrl: (isEdit && s.id === shot.id) ? (activeMission.shots.find(as => as.id === s.id)?.thumbnailUrl || null) : null
+                }))
             };
 
             const res = await fetch('/api/director/generate-image', {
@@ -583,10 +591,12 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             };
 
             // OPTIMIZATION: Only send the specific reference needed for regeneration
+            const slim = getSlimMission(activeMission);
             const optimizedMission = {
-                ...activeMission,
+                ...slim,
+                requiredReferences: activeMission.requiredReferences,
                 // OPTIMIZATION: Strip thumbnails from all shots during reference generation
-                shots: activeMission.shots.map(s => ({ ...s, thumbnailUrl: null })),
+                shots: slim.shots.map(s => ({ ...s, thumbnailUrl: null })),
                 references: activeMission.references?.map((ref, i) => i === req.uploadedIndex ? ref : null)
             };
 
