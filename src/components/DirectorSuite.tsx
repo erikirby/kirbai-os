@@ -312,7 +312,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             }
         } catch (e: any) {
             console.error("Generation failed:", e);
-            alert("Connection error: Could not reach Nano Banana.");
+            alert(`Connection Error: ${e.message || "AI Session Timeout"}\n\nThis usually happens when the image takes longer than 10 seconds to generate. Try again or use fewer reference images.`);
         } finally {
             setGeneratingShotId(null);
             setGeneratingType(null);
@@ -523,7 +523,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             }
         } catch (e: any) {
             console.error("Reference regeneration failed:", e);
-            alert(e.message || "Connection error: Could not reach AI Engine.");
+            alert(`Connection Error: ${e.message || "Reference Regeneration Timeout"}\n\nThis can happen if the base reference is very high resolution. Try hitting 'Regenerate' again or re-uploading the source.`);
         } finally {
             setIsRegeneratingRef(null);
         }
@@ -633,8 +633,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             img.src = base64Str;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 1024;
-                const MAX_HEIGHT = 1024;
+                const MAX_WIDTH = 768; // Optimized for faster multimodal inference
+                const MAX_HEIGHT = 768;
                 let width = img.width;
                 let height = img.height;
 
@@ -653,7 +653,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx?.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.7)); // 70% quality jpeg
+                resolve(canvas.toDataURL('image/jpeg', 0.5)); // 50% quality for faster uploads
             };
         });
     };
