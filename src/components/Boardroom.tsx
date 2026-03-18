@@ -8,6 +8,10 @@ import {
   Brain,
   Dna,
   ShieldCheck,
+  Zap,
+  MessageSquare,
+  History,
+  RotateCcw,
   Scale,
   Bot
 } from 'lucide-react';
@@ -127,6 +131,22 @@ export default function Boardroom({ mode }: { mode: string }) {
     }
   };
 
+  const handleReviewLastMeeting = async () => {
+    try {
+        const res = await fetch('/api/boardroom/history');
+        if (res.ok) {
+            const data = await res.json();
+            if (data.length > 0) {
+                const last = data[0];
+                setLatestBrief(last.brief);
+                setFeed([{ agent: 'System', text: `Archived Meeting: ${last.prompt}`, type: 'action' }]);
+            }
+        }
+    } catch (e) {
+        console.error("Failed to fetch history:", e);
+    }
+  };
+
   const handleClearSession = () => {
     setFeed([]);
     setActiveAgents([]);
@@ -134,6 +154,16 @@ export default function Boardroom({ mode }: { mode: string }) {
     setStressLevels({});
     setLatestBrief(null);
     setPrompt("");
+  };
+
+  const getDivisionColor = (division: string) => {
+    switch(division) {
+        case 'High-Command': return 'bg-accent';
+        case 'Growth': return 'bg-green-500';
+        case 'Lab': return 'bg-purple-500';
+        case 'Operations': return 'bg-blue-500';
+        default: return 'bg-white/10';
+    }
   };
 
   return (
@@ -190,10 +220,11 @@ export default function Boardroom({ mode }: { mode: string }) {
                                         : 'bg-surface/20 border-border/5'
                                 }`}
                             >
-                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive ? 'bg-accent text-white' : 'bg-surface/60 text-foreground/20'}`}>
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center relative ${isActive ? 'bg-accent text-white' : 'bg-surface/60 text-foreground/20'}`}>
                                     <Icon className="w-4 h-4" />
+                                    <div className={`absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full border-2 border-black ${getDivisionColor(agent.division)}`} title={agent.division} />
                                 </div>
-                                <div className="flex flex-col">
+                                <div className="flex flex-col flex-1">
                                     <span className={`text-[9px] font-black uppercase tracking-widest ${isActive ? 'text-accent' : 'text-foreground/40'}`}>
                                         {agent.name.split(' ')[0]}
                                     </span>
@@ -202,6 +233,14 @@ export default function Boardroom({ mode }: { mode: string }) {
                                         <span className="text-[7px] font-bold uppercase opacity-30">{isActive ? 'Active' : 'Idle'}</span>
                                     </div>
                                 </div>
+                                <button 
+                                    onClick={() => handleLaunchBoardroom(`@[${agent.id}] Give me your specific take on this.`)}
+                                    disabled={isProcessing}
+                                    className="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors disabled:opacity-0"
+                                    title="Ask Opinion"
+                                >
+                                    <MessageSquare className="w-3 h-3 text-foreground/40" />
+                                </button>
                                 {stress > 30 && (
                                     <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping" />
                                 )}
@@ -211,21 +250,21 @@ export default function Boardroom({ mode }: { mode: string }) {
                 </div>
             </div>
             
-            <div className="bg-surface/40 border border-border/10 rounded-2xl p-4 backdrop-blur-md">
-                <h4 className="text-[8px] font-black uppercase tracking-widest text-foreground/40 mb-3">Sync Status</h4>
-                <div className="flex flex-col gap-2">
-                    {['High-Command', 'Growth', 'Lab', 'Ops'].map(div => (
-                        <div key={div} className="flex flex-col gap-1">
-                            <div className="flex justify-between text-[8px] font-bold">
-                                <span className="text-foreground/40">{div}</span>
-                                <span className="text-accent">READY</span>
-                            </div>
-                            <div className="h-0.5 bg-black/40 rounded-full overflow-hidden">
-                                <div className="h-full bg-accent/40 w-full" />
-                            </div>
-                        </div>
-                    ))}
-                </div>
+            <div className="bg-surface/40 border border-border/10 rounded-2xl p-4 backdrop-blur-md flex flex-col gap-3">
+                <button 
+                    onClick={handleClearSession}
+                    className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl flex items-center justify-center gap-2 transition-all group"
+                >
+                    <RotateCcw className="w-3 h-3 text-foreground/40 group-hover:text-accent group-hover:rotate-180 transition-all duration-500" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground/60 group-hover:text-foreground">New Meeting</span>
+                </button>
+                <button 
+                    onClick={handleReviewLastMeeting}
+                    className="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl flex items-center justify-center gap-2 transition-all group"
+                >
+                    <History className="w-3 h-3 text-foreground/40 group-hover:text-accent transition-all" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground/60 group-hover:text-foreground">Review Last</span>
+                </button>
             </div>
         </div>
 

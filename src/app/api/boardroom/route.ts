@@ -110,14 +110,21 @@ export async function POST(req: NextRequest) {
                         .map(([aid, text]) => `${AGENTS.find(a => a.id === aid)?.name}: ${text}`)
                         .join('\n');
 
+                    const isDirectInquiry = prompt.toLowerCase().includes(`@${agent.id}`) || prompt.toLowerCase().includes(agent.name.toLowerCase());
+
                     const specPrompt = `
                         ${agent.persona}
                         CONTEXT: ${context}
                         Logic to Analyze: "${prompt}"
                         BANNED SLOP: ${BANNED_SLOP}
-                        ${index > 0 ? `PREVIOUS COMMENTS:\n${previousComments}\nTASK: Do NOT repeat what others said. Either build upon it with a new angle or challenge it if it's mid. One blunt, human sentence.` : `TASK: One blunt, human sentence. No corporate slop.`}
+                        
+                        EARNED AGREEMENT POLICY: Do NOT agree with previous specialists or the user unless their reasoning is undeniably sound. If you agree, you MUST state the specific "earned" reason why. Otherwise, find a new angle, a hidden risk, or a missed opportunity.
+                        
+                        ${isDirectInquiry ? `DIRECT INQUIRY: You have been addressed directly. Give an unfiltered, independent take.` : ""}
+                        ${index > 0 ? `PREVIOUS COMMENTS:\n${previousComments}\nTASK: Do NOT repeat what others said. Build upon it or challenge it.` : `TASK: One blunt, human sentence. No corporate slop.`}
+                        
                         REASONING MODEL: ${logicType}
-                        CONSTRAINT: Speak like you're in a Slack thread. Max 1 sentence.
+                        CONSTRAINT: Speak like you're in a Slack thread. Max 1-2 blunt sentences.
                     `;
 
                     const res = await ai.models.generateContent({
