@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { logApiUsage, logImageUsage, getTelemetryAsync } from "@/lib/db";
+import { logApiUsageAsync, logImageUsageAsync, getTelemetryAsync } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
     try {
@@ -15,8 +15,8 @@ export async function POST(req: NextRequest) {
 
         const ai = new GoogleGenAI({ apiKey });
         
-        // CONFIRMED ID: Nano Banana 2 = gemini-3.1-flash-image-preview
-        const modelName = "gemini-3.1-flash-image-preview"; 
+        // 2.5-flash is now the standard for all speed-sensitive multimodal tasks
+        const modelName = "gemini-2.5-flash"; 
 
         const prompt = customPrompt || shot.bananaPromptV2 || shot.bananaPrompt;
 
@@ -76,7 +76,7 @@ PROMPT: ${prompt}
         });
 
         if (result.usageMetadata) {
-            await logApiUsage(`/api/director/generate-image (${isEdit ? 'Edit' : 'New'})`, result.usageMetadata.promptTokenCount || 0, result.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsageAsync(`/api/director/generate-image (${isEdit ? 'Edit' : 'New'})`, result.usageMetadata.promptTokenCount || 0, result.usageMetadata.candidatesTokenCount || 0);
         }
 
         const candidate = result.candidates?.[0];
@@ -87,7 +87,7 @@ PROMPT: ${prompt}
         
         if (imagePart && (imagePart as any).inlineData) {
             const base64Image = `data:${(imagePart as any).inlineData.mimeType};base64,${(imagePart as any).inlineData.data}`;
-            await logImageUsage(1, modelName); // Track high-res image cost
+            await logImageUsageAsync(1, modelName); // Track high-res image cost
             const telemetry = await getTelemetryAsync();
             return NextResponse.json({ 
                 success: true, 

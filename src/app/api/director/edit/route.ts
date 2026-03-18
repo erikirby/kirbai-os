@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
-import { getRow, saveMissionAsync, logApiUsage, getTelemetryAsync } from "@/lib/db";
+import { getRow, saveMissionAsync, getTelemetryAsync } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
     try {

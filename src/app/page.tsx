@@ -15,10 +15,11 @@ import PromptBank from "@/components/PromptBank";
 import CreativeHub from "@/components/CreativeHub";
 import DirectorSuite from "@/components/DirectorSuite";
 import MuseDeck from "@/components/MuseDeck";
+import Boardroom from "@/components/Boardroom";
 import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Share2, Menu, X, Home as HomeIcon, Clapperboard, Layers, Sparkles, Wallet, Brain } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
-type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director" | "muse";
+type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director" | "muse" | "boardroom";
 type Theme = "dark" | "light" | "pink" | "snes" | "gbc" | "pokopia";
 
 export default function Home() {
@@ -135,7 +136,7 @@ export default function Home() {
         {/* MODULES PILL */}
         <div className={`flex items-center gap-1 p-1 relative z-50 ${theme === 'pokopia' ? '' : 'bg-surface/20 backdrop-blur-md rounded-full border border-border/10 shadow-2xl'}`}>
           {[
-            { id: "command", label: "Command", items: [{ id: "roadmap", label: "Home" }, { id: "intel", label: "Intel" }, { id: "muse", label: "Muse" }] },
+            { id: "command", label: "Command", items: [{ id: "roadmap", label: "Home" }, { id: "intel", label: "Intel" }, { id: "muse", label: "Muse" }, { id: "boardroom", label: "Boardroom" }] },
             { id: "pipeline", label: "Pipeline", items: [{ id: "creative", label: "Brainstorm" }, { id: "director", label: "Director" }] },
             { id: "archive", label: "Archive", items: [{ id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "prompts", label: "Prompts" }, { id: "core", label: "Core" }] },
             { id: "performance", label: "Performance", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "api-health", label: "API" }] },
@@ -207,6 +208,7 @@ export default function Home() {
                 {activeModule === "creative" && <CreativeHub theme={theme} mode={activeTab} />}
                 {activeModule === "prompts" && <PromptBank mode={activeTab} />}
                 {activeModule === "muse" && <MuseDeck mode={activeTab} />}
+                {activeModule === "boardroom" && <Boardroom mode={activeTab} />}
               </div>
             </div>
 

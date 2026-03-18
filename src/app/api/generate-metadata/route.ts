@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
-import { addMetadataPack, getDb, logApiUsage } from "@/lib/db";
+import { addMetadataPackAsync, getDbAsync, logApiUsageAsync } from "@/lib/db";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
         `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-lite",
+            model: "gemini-2.5-flash",
             contents: `Core Keyword: ${keyword}\nAlias: ${alias}`,
             config: {
                 systemInstruction: systemInstruction,
@@ -53,14 +53,14 @@ export async function POST(req: Request) {
         });
 
         if (response.usageMetadata) {
-            logApiUsage("/api/generate-metadata", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsageAsync("/api/generate-metadata", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
         if (response.text) {
             const generatedData = JSON.parse(response.text);
 
             // Save to persistence
-            addMetadataPack({
+            await addMetadataPackAsync({
                 alias,
                 keyword,
                 titles: generatedData.map((d: any) => d.title),
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
 
 export async function GET() {
     try {
-        const db = getDb();
+        const db = await getDbAsync();
         return NextResponse.json({ history: db.metadataHistory });
     } catch (e: any) {
         return NextResponse.json({ error: "Failed to fetch history" }, { status: 500 });

@@ -96,7 +96,7 @@ export async function GET(req: Request) {
                 text = text.slice(0, 4000);
 
                 const response = await ai.models.generateContent({
-                    model: "gemini-2.5-flash-lite",
+                    model: "gemini-2.5-flash",
                     contents: `ACT AS A MARKETING ANALYST. Summarize this YouTube content for a music creator named Kirbai.
                     
                     Video Title: ${video.title}

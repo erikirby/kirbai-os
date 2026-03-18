@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { saveRoadmapAsync, getRoadmapAsync, logApiUsage } from '@/lib/db';
+import { saveRoadmapAsync, getRoadmapAsync, logApiUsageAsync } from '@/lib/db';
 
 export async function POST(request: Request) {
     try {
@@ -59,7 +59,7 @@ Schema:
         try {
             const inputTokens = systemPrompt.length + rawText.length;
             const outputTokens = textOutput.length;
-            logApiUsage('/api/parse-roadmap', inputTokens, outputTokens);
+            await logApiUsageAsync('/api/parse-roadmap', inputTokens, outputTokens);
 
             const structuredData = JSON.parse(textOutput);
 
@@ -84,7 +84,7 @@ Schema:
             const finalData = { phases: structuredData.phases, tasks: taskObjects };
 
             // Use async save so it actually persists on Vercel
-            await saveRoadmapAsync(finalData, mode);
+            await saveRoadmapAsync(mode || 'kirbai', finalData);
 
             return NextResponse.json({ success: true, data: finalData });
         } catch (parseError) {
@@ -101,7 +101,7 @@ export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const mode = searchParams.get('mode') || undefined;
-        const roadmap = await getRoadmapAsync(mode);
+        const roadmap = await getRoadmapAsync(mode || 'kirbai');
         return NextResponse.json({ success: true, data: roadmap });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: "Failed to load roadmap" }, { status: 500 });
@@ -113,12 +113,12 @@ export async function PATCH(request: Request) {
         const { searchParams } = new URL(request.url);
         const mode = searchParams.get('mode') || undefined;
         const { taskId, status } = await request.json();
-        const roadmap = await getRoadmapAsync(mode);
-        const tasks = roadmap.tasks as any[];
+        const roadmap = await getRoadmapAsync(mode || 'kirbai');
+        const tasks = roadmap.phases?.[0]?.tasks || []; // Assuming tasks are in the first phase for now
         const idx = tasks.findIndex((t: any) => t.id === taskId);
         if (idx === -1) return NextResponse.json({ success: false, error: "Task not found" }, { status: 404 });
         tasks[idx].status = status;
-        await saveRoadmapAsync({ phases: roadmap.phases, tasks }, mode);
+        await saveRoadmapAsync(mode || 'kirbai', roadmap);
         return NextResponse.json({ success: true });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: "Failed to update task status" }, { status: 500 });

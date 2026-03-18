@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
-import { logApiUsage, getRow, setRow } from "@/lib/db";
+import { logApiUsageAsync, getRow, setRow } from "@/lib/db";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
         });
 
         if (response.usageMetadata) {
-            logApiUsage("/api/parse-csv", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsageAsync("/api/parse-csv", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
         // Use robust text extraction

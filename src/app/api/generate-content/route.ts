@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { getRow } from "@/lib/db";
+import { getRow, logApiUsageAsync } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 import { aiTools, save_to_vault, save_to_lore, save_to_concepts } from "@/lib/ai-actions";
-import { logApiUsage } from "@/lib/db";
 
 // Load Context Files
 // Helper to pull context from Supabase persistence
@@ -57,6 +56,100 @@ const getLoreContext = async (mode: string) => {
     return "No lore continuity defined.";
 };
 
+// Specialized Finance Fetcher
+const getFinanceContext = async () => {
+    try {
+        const db = await getRow('main_db');
+        const finance = db?.financeAnalysis;
+        if (!finance) return "No financial data available yet.";
+
+        const { totals, platforms, tracks, persistedAt } = finance;
+        const topPlatforms = platforms?.slice(0, 3).map((p: any) => `- ${p.store}: $${p.revenue.toFixed(2)} (${p.streams} streams)`).join('\n');
+        const topTracks = tracks?.slice(0, 5).map((t: any) => `- ${t.title}: $${t.revenue.toFixed(2)}`).join('\n');
+
+        return `
+Revenue Data (Uploaded: ${persistedAt || 'Unknown'}):
+TOTAL REVENUE: $${totals?.revenue?.toFixed(2) || '0.00'}
+TOTAL STREAMS: ${totals?.streams || '0'}
+
+Top Platforms:
+${topPlatforms}
+
+Top Tracks:
+${topTracks}
+        `.trim();
+    } catch (e) {
+        return "Error fetching finance context.";
+    }
+};
+
+// Specialized Analytics Fetcher
+const getAnalyticsContext = async (mode: string) => {
+    try {
+        const key = mode === 'factory' ? 'pulse_state_factory' : 'pulse_state_kirbai';
+        const state = await getRow(key);
+        if (!state) return "No social analytics data available.";
+
+        const { lastUpdated, instagram, youtube } = state;
+        const igSummary = instagram ? `IG: ${instagram.followers || 0} followers, ${instagram.reach || 0} reach.` : "IG Data missing.";
+        const ytSummary = youtube ? `YT: ${youtube.subscribers || 0} subs, ${youtube.views || 0} views.` : "YT Data missing.";
+
+        return `Last Pulse Sync: ${lastUpdated || 'Never'}\n${igSummary}\n${ytSummary}`;
+    } catch (e) {
+        return "Error fetching analytics context.";
+    }
+};
+
+// Specialized Roadmap Fetcher
+const getRoadmapContext = async (mode: string) => {
+    try {
+        const key = mode === 'factory' ? 'roadmap_factory' : 'roadmap_kirbai';
+        const roadmap = await getRow(key);
+        if (!roadmap || !roadmap.phases) return "No roadmap defined.";
+
+        const currentPhase = roadmap.phases.find((p: any) => p.status === 'Current Objective');
+        const pendingPhases = roadmap.phases.filter((p: any) => p.status === 'Pending Trajectory').map((p: any) => `- ${p.title}`).join('\n');
+
+        return `
+CURRENT OBJECTIVE: ${currentPhase ? currentPhase.title + ' - ' + currentPhase.description : 'None set'}
+FUTURE TRAJECTORY:
+${pendingPhases || 'TBD'}
+        `.trim();
+    } catch (e) {
+        return "Error fetching roadmap context.";
+    }
+};
+
+// Specialized Muse Fetcher (Cards & Psyche)
+const getMuseContext = async () => {
+    try {
+        const [cards, psyche] = await Promise.all([
+            getRow('muse_cards'),
+            getRow('user_psyche')
+        ]);
+
+        const activeCards = (cards || [])
+            .filter((c: any) => c.status === 'pending')
+            .slice(0, 3)
+            .map((c: any) => `- [${c.type.toUpperCase()}] ${c.title}: ${c.reason}`)
+            .join('\n');
+
+        const psycheStr = psyche ? 
+            `MOOD: ${psyche.mood || 'Unknown'} | MOTIVATION: ${psyche.motivationLevel || 0}/100 | BURNOUT RISK: ${psyche.burnoutRisk || 0}/100` : 
+            "No psyche data tracked.";
+
+        return `
+CREATIVE DEBATES (Active):
+${activeCards || 'No active debates.'}
+
+USER PSYCHE:
+${psycheStr}
+        `.trim();
+    } catch (e) {
+        return "Error fetching muse context.";
+    }
+};
+
 export async function POST(req: NextRequest) {
     try {
         const { messages, activeTab = 'kirbai' } = await req.json();
@@ -68,11 +161,15 @@ export async function POST(req: NextRequest) {
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
         // Gather all native OS context from Supabase (mode-aware)
-        const [identityData, styleBaseData, projectsData, loreContext] = await Promise.all([
+        const [identityData, styleBaseData, projectsData, loreContext, financeContext, analyticsContext, roadmapContext, museContext] = await Promise.all([
             getSupabaseContext('brand_identity', activeTab).then(d => d || "No specific brand identity defined."),
             getSupabaseContext('instagram_style_base', activeTab).then(d => d || "No historical style data available."),
             getSupabaseContext('vault_projects', activeTab).then(d => d || "No project data available."),
-            getLoreContext(activeTab)
+            getLoreContext(activeTab),
+            getFinanceContext(),
+            getAnalyticsContext(activeTab),
+            getRoadmapContext(activeTab),
+            getMuseContext()
         ]);
 
         const systemInstruction = `
@@ -85,6 +182,18 @@ export async function POST(req: NextRequest) {
 
             === ARTIST CORE IDENTITY ===
             ${identityData}
+
+            === FINANCIAL INTELLIGENCE (DISTROKID EARNINGS) ===
+            ${financeContext}
+
+            === PERFORMANCE PULSE (SOCIAL ANALYTICS) ===
+            ${analyticsContext}
+
+            === STRATEGIC ROADMAP ===
+            ${roadmapContext}
+
+            === MUSE SANCTUARY (CREATIVE DEBATES & PSYCHE) ===
+            ${museContext}
 
             === HISTORICAL STYLE DNA ===
             ${styleBaseData}
@@ -121,7 +230,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (response.usageMetadata) {
-            logApiUsage("/api/generate-content (pre-tool)", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsageAsync("/api/generate-content (pre-tool)", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
         // Handle Function Calling Loop
@@ -161,7 +270,7 @@ export async function POST(req: NextRequest) {
             });
 
             if (response.usageMetadata) {
-                logApiUsage("/api/generate-content (final)", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+                await logApiUsageAsync("/api/generate-content (final)", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
             }
         }
 

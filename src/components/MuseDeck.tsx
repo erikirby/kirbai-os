@@ -73,24 +73,30 @@ const MuseDeck = ({ mode }: { mode: string }) => {
         
         let updatedHistory = history;
         
-        if (status === 'yes') {
-            setClefairyEmotion('starry-eyed');
-            setClefairyMessage(`I knew you'd like that! "${currentCard.title}" has so much soul.`);
-            await addRoadmapTaskAsync(mode, currentCard.title, currentCard.description);
-            updatedHistory = [{ ...currentCard, status: 'yes' }, ...history];
-        } else if (status === 'no') {
-            setClefairyEmotion('annoyed');
-            setClefairyMessage(currentCard.actionMatrix.revenue === 'high' ? "Oh? Are you sure? That one seemed really promising..." : "Understood. I'll make sure we don't suggest that again.");
-            updatedHistory = [{ ...currentCard, status: 'no' }, ...history];
-        } else {
-            setClefairyEmotion('cheerful');
-            setClefairyMessage("Saving it for later in the Idea Vault.");
-            updatedHistory = [{ ...currentCard, status: 'maybe' }, ...history];
-        }
+        try {
+            if (status === 'yes') {
+                setClefairyEmotion('starry-eyed');
+                setClefairyMessage(`I knew you'd like that! "${currentCard.title}" has so much soul.`);
+                await addRoadmapTaskAsync(mode, currentCard.title, currentCard.description);
+                updatedHistory = [{ ...currentCard, status: 'yes' }, ...history];
+            } else if (status === 'no') {
+                setClefairyEmotion('annoyed');
+                setClefairyMessage(currentCard.actionMatrix.revenue === 'high' ? "Oh? Are you sure? That one seemed really promising..." : "Understood. I'll make sure we don't suggest that again.");
+                updatedHistory = [{ ...currentCard, status: 'no' }, ...history];
+            } else {
+                setClefairyEmotion('cheerful');
+                setClefairyMessage("Saving it for later in the Idea Vault.");
+                updatedHistory = [{ ...currentCard, status: 'maybe' }, ...history];
+            }
 
-        setCards(updatedPending);
-        setHistory(updatedHistory);
-        await saveMuseCardsAsync([...updatedPending, ...updatedHistory]);
+            setCards(updatedPending);
+            setHistory(updatedHistory);
+            await saveMuseCardsAsync([...updatedPending, ...updatedHistory]);
+        } catch (error: any) {
+            console.error("Muse Action Error:", error);
+            setClefairyEmotion('worried');
+            setClefairyMessage("Something went wrong when trying to save that idea... Check the console.");
+        }
 
         setTimeout(() => setClefairyEmotion('idle'), 3000);
     };

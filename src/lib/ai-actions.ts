@@ -1,4 +1,5 @@
 import { getRow, setRow, addMetadataPackAsync, MetadataPack } from './db';
+import crypto from 'crypto';
 import { supabase } from './supabase';
 import { Type } from '@google/genai';
 
@@ -25,7 +26,7 @@ export async function save_to_vault(params: { project: any }, mode?: string) {
             projects[index] = { ...projects[index], ...project, updatedAt: Date.now() };
         } else {
             // Create
-            if (!project.id) project.id = crypto.randomUUID();
+            if (!project.id) project.id = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `proj_${Date.now()}`;
             project.createdAt = Date.now();
             projects.unshift(project);
         }

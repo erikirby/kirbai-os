@@ -188,7 +188,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
     // --- Project Actions ---
     const createProject = () => {
         const p: Project = {
-            id: crypto.randomUUID(),
+            id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `proj_${Date.now()}`,
             title: "New Transmission",
             alias: mode === "kirbai" ? "Kirbai" : "AELOW",
             status: "Draft",
@@ -311,7 +311,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
             newLyrics = lyrics.map(l => l.id === existing.id ? { ...l, content, updatedAt: Date.now() } : l);
         } else {
             const newLyric: Lyric = {
-                id: crypto.randomUUID(),
+                id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `lyric_${Date.now()}`,
                 projectId: activeProject.id,
                 trackName,
                 content,

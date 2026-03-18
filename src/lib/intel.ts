@@ -37,7 +37,7 @@ export async function getLatestNewslettersAsync(): Promise<IntelItem[]> {
             `;
 
             const response = await ai.models.generateContent({
-                model: "gemini-2.5-flash-lite",
+                model: "gemini-2.5-flash",
                 contents: `Analyze this newsletter post for a music creator.
                 
                 Title: ${post.web_title}

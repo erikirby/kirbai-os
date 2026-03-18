@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from "@google/genai";
-import { setFinanceAnalysis, getFinanceAnalysis, logApiUsage } from "@/lib/db";
+import { setFinanceAnalysisAsync, getFinanceAnalysisAsync, logApiUsageAsync } from "@/lib/db";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY as string });
 
 export async function GET() {
     try {
-        const { getFinanceAnalysisAsync } = await import("@/lib/db");
         const stored = await getFinanceAnalysisAsync();
         return NextResponse.json({ analysis: stored });
     } catch (err: any) {
@@ -188,7 +187,7 @@ CRITICAL FORMATTING INSTRUCTIONS:
 
             const usage = response.usageMetadata;
             if (usage) {
-                await logApiUsage("/api/analyze-finance", usage.promptTokenCount || 0, usage.candidatesTokenCount || 0);
+                await logApiUsageAsync("/api/analyze-finance", usage.promptTokenCount || 0, usage.candidatesTokenCount || 0);
             }
 
             const analysisWithAdvice = {
@@ -197,7 +196,7 @@ CRITICAL FORMATTING INSTRUCTIONS:
             };
 
             // PERSIST result for dashboard longevity
-            setFinanceAnalysis(analysisWithAdvice);
+            await setFinanceAnalysisAsync(analysisWithAdvice);
 
             return NextResponse.json({
                 analysis: analysisWithAdvice
@@ -206,7 +205,7 @@ CRITICAL FORMATTING INSTRUCTIONS:
             console.error("LLM Analysis Failed:", llmErr);
             // Even if AI fails, return the raw data and persist what we have
             const fallback = { ...analysisData, advice: "<p>Strategic narrative generation failed. Raw metrics aggregated successfully.</p>" };
-            setFinanceAnalysis(fallback);
+            await setFinanceAnalysisAsync(fallback);
             return NextResponse.json({
                 analysis: fallback
             });

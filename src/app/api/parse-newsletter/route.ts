@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
-import { getDb, setIntelCache, IntelItem, logApiUsage } from "@/lib/db";
+import { getDbAsync, setIntelCacheAsync, IntelItem, logApiUsageAsync } from "@/lib/db";
 import crypto from "crypto";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-1.5-flash",
+            model: "gemini-2.5-flash",
             contents: `Analyze this raw newsletter text and extract music/marketing/IP insights:
             
             Raw Text:
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
         });
 
         if (response.usageMetadata) {
-            logApiUsage("/api/parse-newsletter", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsageAsync("/api/parse-newsletter", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
         if (!response.text) {
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
         const parsed = JSON.parse(response.text);
 
         const newIntelItem: IntelItem = {
-            id: `manual-${crypto.randomUUID().split('-')[0]}`,
+            id: `manual-${(typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36)).split('-')[0]}`,
             tag: "FACTORY",
             date: "Just Now",
             title: "AIGuerrilla: Manual Intel Drop",
@@ -73,11 +73,11 @@ export async function POST(req: Request) {
         };
 
         // Prepend to database cache if it exists, so manual intel stays at the top
-        const db = getDb();
+        const db = await getDbAsync();
         const currentCache = db.intelCache || [];
         const updatedCache = [newIntelItem, ...currentCache].slice(0, 15); // keep last 15 items
 
-        setIntelCache(updatedCache);
+        await setIntelCacheAsync(updatedCache);
 
         return NextResponse.json({ intel: newIntelItem, success: true });
     } catch (e: any) {

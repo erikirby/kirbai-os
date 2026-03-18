@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { getRow, getMissionsAsync, getRoadmapAsync, getUserPsycheAsync, MuseCard, UserPsyche, getPulseStateAsync } from "@/lib/db";
+import { getRow, getMissionsAsync, getRoadmapAsync, getUserPsycheAsync, MuseCard, UserPsyche, getPulseStateAsync, logApiUsageAsync } from "@/lib/db";
+import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
     try {
@@ -13,22 +14,28 @@ export async function POST(req: NextRequest) {
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
         
         // 1. Gather Context
-        const [lore, missions, roadmap, psyche, pulse] = await Promise.all([
+        const [lore, missions, roadmap, psyche, pulse, liveNews] = await Promise.all([
             getRow(mode === 'factory' ? 'lore_factory' : 'lore_kirbai'),
             getMissionsAsync(mode),
             getRoadmapAsync(mode),
             getUserPsycheAsync(),
-            getPulseStateAsync(mode)
+            getPulseStateAsync(mode),
+            getRow('pokemon_news')
         ]);
 
         const contextSummary = `
+            CURRENT DATE: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             LORE: ${JSON.stringify(lore?.nodes?.slice(0, 10) || "Empty")}
             RECENT MISSIONS: ${JSON.stringify(missions?.slice(0, 3) || "None")}
             CURRENT ROADMAP: ${JSON.stringify(roadmap?.phases?.find((p: any) => p.status === 'Current Objective') || "None")}
             USER PSYCHE: ${JSON.stringify(psyche || "No memory yet")}
             ANALYTICS: ${JSON.stringify(pulse?.summary || "No data")}
             ALREADY SUGGESTED (DO NOT REPEAT): ${JSON.stringify(existingTitles)}
-            SCOUT INTEL (TRENDS): "Pokémon Pokopia" sandbox mode is viral. "2026 is the New 2016" nostalgia trend is peaking on TikTok. AI grading of cards is a hot topic.
+            LIVE PLATFORM INTEL (NEWS): ${JSON.stringify(liveNews || "No news data")}
+            SCOUT INTEL (TRENDS): 
+            - "Pokémon Pokopia" (released March 2026) is viral. Players control transformation-capable Ditto in a post-apocalyptic Kanto life-sim.
+            - "Throwback TikTok" trend: "2026 is the New 2016" nostalgia is peaking.
+            - AI Music: Suno v3 and Meta JASCO are industry standard, enabling chord-to-track and 2-minute high-fidelity generations.
         `;
 
         // 2. Define the Symposium Prompt
@@ -83,7 +90,7 @@ export async function POST(req: NextRequest) {
             }
         `;
 
-        const model = ai.models.generateContent({
+        const modelResponse = await ai.models.generateContent({
             model: 'gemini-2.5-pro',
             contents: [{ role: 'user', parts: [{ text: `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.` }] }],
             config: {
@@ -93,13 +100,17 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        const responseText = (await model).text || "";
+        if (modelResponse.usageMetadata) {
+            await logApiUsageAsync("/api/muse/generate", modelResponse.usageMetadata.promptTokenCount || 0, modelResponse.usageMetadata.candidatesTokenCount || 0);
+        }
+
+        const responseText = modelResponse.text || "";
         const parsed = JSON.parse(responseText);
 
         // Store the cards (pending status)
         const cards: MuseCard[] = parsed.cards.map((c: any) => ({
             ...c,
-            id: crypto.randomUUID(),
+            id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `muse_${Date.now()}_${Math.random()}`,
             status: 'pending',
             createdAt: new Date().toISOString()
         }));

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { logApiUsage } from "@/lib/db";
+import { logApiUsageAsync } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
     try {
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
         // Log usage (Flash token rates)
         if (result.usageMetadata) {
-            logApiUsage(`/api/director/video-prompt`, result.usageMetadata.promptTokenCount || 0, result.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsageAsync(`/api/director/video-prompt`, result.usageMetadata.promptTokenCount || 0, result.usageMetadata.candidatesTokenCount || 0);
         }
 
         return NextResponse.json({ success: true, prompt: videoPrompt });

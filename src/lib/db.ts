@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 
 // Server-side Supabase client (used in lib/db.ts which runs only on server)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -25,17 +26,24 @@ export interface IntelItem {
     url: string;
 }
 
+export interface RoadmapTask {
+    id: string;
+    title: string;
+    description: string;
+    status: "Todo" | "In Progress" | "Done";
+    priority: "Low" | "Medium" | "High";
+}
+
 export interface RoadmapPhase {
     id: string;
     title: string;
     description: string;
     status: "Current Objective" | "Pending Trajectory" | "Completed" | "Archived";
+    tasks?: RoadmapTask[];
 }
 
-export interface RoadmapTask {
-    id: string;
-    text: string;
-    status: "todo" | "wip" | "done";
+export interface RoadmapData {
+    phases: RoadmapPhase[];
 }
 
 export interface Shot {
@@ -95,10 +103,7 @@ interface DatabaseSchema {
     intelCache: IntelItem[];
     pokemonNews: any[];
     financeAnalysis: any | null;
-    roadmap: {
-        phases: RoadmapPhase[];
-        tasks: RoadmapTask[];
-    };
+    roadmap: RoadmapData;
     missions: Mission[];
 }
 
@@ -107,7 +112,7 @@ const DEFAULT_DB: DatabaseSchema = {
     intelCache: [],
     pokemonNews: [],
     financeAnalysis: null,
-    roadmap: { phases: [], tasks: [] },
+    roadmap: { phases: [] },
     missions: []
 };
 
@@ -154,19 +159,8 @@ export async function saveDbAsync(data: DatabaseSchema): Promise<void> {
     await setRow('main_db', data);
 }
 
-// Synchronous shims for compatibility with existing callers.
-// These work by scheduling async operations in the background.
-// For Vercel (stateless), the async versions are preferred.
-
-export function getDb(): DatabaseSchema {
-    // Return cached default; callers should migrate to getDbAsync
-    return DEFAULT_DB;
-}
-
-export function saveDb(data: DatabaseSchema): void {
-    // Fire and forget
-    saveDbAsync(data).catch(console.error);
-}
+// NOTE: All synchronous shims have been removed in favor of async/await 
+// to ensure consistency in serverless environments.
 
 export async function addMetadataPackAsync(pack: MetadataPack) {
     const db = await getDbAsync();
@@ -195,42 +189,14 @@ export async function setFinanceAnalysisAsync(analysis: any) {
     await saveDbAsync(db);
 }
 
-export function setFinanceAnalysis(analysis: any) {
-    setFinanceAnalysisAsync(analysis).catch(console.error);
-}
-
 export async function getFinanceAnalysisAsync() {
     const db = await getDbAsync();
     return db.financeAnalysis;
 }
 
-export function getFinanceAnalysis() {
-    return null; // legacy synchronous call
-}
-
-export interface RoadmapData {
-    phases: {
-        id: string;
-        title: string;
-        description: string;
-        status: "Current Objective" | "Pending Trajectory" | "Completed" | "Archived";
-        tasks?: {
-            id: string;
-            title: string;
-            description: string;
-            status: "Todo" | "In Progress" | "Done";
-            priority: "Low" | "Medium" | "High";
-        }[];
-    }[];
-}
-
-export async function saveRoadmapAsync(mode: string, roadmap: RoadmapData | { phases: RoadmapPhase[], tasks: RoadmapTask[] }) {
+export async function saveRoadmapAsync(mode: string, roadmap: RoadmapData) {
     const key = mode === 'factory' ? 'roadmap_factory' : 'roadmap_kirbai';
     await setRow(key, roadmap);
-}
-
-export function saveRoadmap(roadmapData: { phases: RoadmapPhase[], tasks: RoadmapTask[] }, mode: string = 'kirbai') {
-    saveRoadmapAsync(mode, roadmapData).catch(console.error);
 }
 
 export async function getRoadmapAsync(mode: string): Promise<RoadmapData> {
@@ -241,12 +207,14 @@ export async function getRoadmapAsync(mode: string): Promise<RoadmapData> {
 
 export async function addRoadmapTaskAsync(mode: string, title: string, description: string) {
     const roadmap = await getRoadmapAsync(mode);
-    const currentPhase = (roadmap.phases as any[]).find(p => p.status === 'Current Objective') || roadmap.phases[0];
+    const phases = roadmap.phases || [];
+    const currentPhase = phases.find(p => p.status === 'Current Objective') || phases[0];
     
     if (currentPhase) {
         if (!currentPhase.tasks) currentPhase.tasks = [];
+        const taskId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `task_${Date.now()}`;
         currentPhase.tasks.push({
-            id: crypto.randomUUID(),
+            id: taskId,
             title,
             description,
             status: 'Todo',
@@ -254,10 +222,6 @@ export async function addRoadmapTaskAsync(mode: string, title: string, descripti
         });
         await saveRoadmapAsync(mode, roadmap);
     }
-}
-
-export function getRoadmap() {
-    return { phases: [], tasks: [] }; // async callers use getRoadmapAsync
 }
 
 export async function saveMissionAsync(mission: Mission) {
@@ -412,23 +376,8 @@ export async function getTelemetryAsync(): Promise<TelemetryData> {
     };
 }
 
-export function getTelemetry(): TelemetryData {
-    return { 
-        lifetimeInputTokens: 0, 
-        lifetimeOutputTokens: 0, 
-        lifetimeCost: 0, 
-        imageCount: 0,
-        lifetimeImageCost: 0,
-        logs: [] 
-    };
-}
-
 export async function saveTelemetryAsync(data: TelemetryData): Promise<void> {
     await setRow('telemetry', data);
-}
-
-export function saveTelemetry(data: TelemetryData) {
-    saveTelemetryAsync(data).catch(console.error);
 }
 
 export async function logApiUsageAsync(route: string, inputTokens: number, outputTokens: number) {
@@ -461,14 +410,6 @@ export async function logImageUsageAsync(count: number = 1, model: string = "nan
     tl.logs = tl.logs.slice(0, 100);
     await saveTelemetryAsync(tl);
 }
-
-export function logApiUsage(route: string, inputTokens: number, outputTokens: number) {
-    logApiUsageAsync(route, inputTokens, outputTokens).catch(console.error);
-}
-
-export function logImageUsage(count: number = 1, model: string = "nano-banana") {
-    logImageUsageAsync(count, model).catch(console.error);
-}
 export async function resetTelemetryAsync() {
     const initial = { 
         lifetimeInputTokens: 0, 
@@ -480,10 +421,6 @@ export async function resetTelemetryAsync() {
     };
     await saveTelemetryAsync(initial);
     return initial;
-}
-
-export function resetTelemetry() {
-    return resetTelemetryAsync().catch(console.error);
 }
 
 // --- MUSE ADVISORY SUITE ---
@@ -529,4 +466,63 @@ export async function saveUserPsycheAsync(psyche: UserPsyche) {
 
 export async function getUserPsycheAsync(): Promise<UserPsyche | null> {
     return await getRow('user_psyche');
+}
+
+// --- BOARDROOM STRATEGIC ARCHIVE ---
+
+export interface BoardroomBrief {
+    id: string;
+    timestamp: string;
+    prompt: string;
+    brief: string;
+    agents: string[];
+}
+
+export async function saveBoardroomBriefAsync(brief: BoardroomBrief) {
+    const history = await getBoardroomHistoryAsync();
+    history.unshift(brief);
+    await setRow('boardroom_history', history.slice(0, 50)); // Keep last 50 briefs
+}
+
+export async function getBoardroomHistoryAsync(): Promise<BoardroomBrief[]> {
+    return await getRow('boardroom_history') || [];
+}
+
+// --- BOARDROOM 5.4: LAYER 2 MEMORY (AUDIT LEDGER) ---
+
+export interface AuditLedgerEntry {
+    id: string;
+    timestamp: string;
+    decision: string;
+    context: string;
+    type: 'fact' | 'decision';
+}
+
+export interface HeartScaleNode {
+    id: string;
+    entity: string; // e.g., "Pheromosa"
+    truth: string; // e.g., "Is a Ditto"
+    updatedAt: string;
+}
+
+export async function saveAuditLedgerEntryAsync(entry: AuditLedgerEntry) {
+    const ledger = await getAuditLedgerAsync();
+    ledger.unshift(entry);
+    await setRow('audit_ledger', ledger.slice(0, 100));
+}
+
+export async function getAuditLedgerAsync(): Promise<AuditLedgerEntry[]> {
+    return await getRow('audit_ledger') || [];
+}
+
+export async function saveHeartScaleNodeAsync(node: HeartScaleNode) {
+    const nodes = await getHeartScaleDbAsync();
+    const idx = nodes.findIndex(n => n.entity === node.entity);
+    if (idx !== -1) nodes[idx] = node;
+    else nodes.push(node);
+    await setRow('heart_scale_db', nodes);
+}
+
+export async function getHeartScaleDbAsync(): Promise<HeartScaleNode[]> {
+    return await getRow('heart_scale_db') || [];
 }

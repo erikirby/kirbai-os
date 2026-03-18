@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
-import { logApiUsage } from '@/lib/db';
+import { logApiUsageAsync } from '@/lib/db';
+import crypto from 'crypto';
 
 // Initialize the Gemini client using the existing key from the environment
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -69,7 +70,7 @@ ${rawText}
         });
 
         if (response.usageMetadata) {
-            logApiUsage("/api/batch-lyrics", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsageAsync("/api/batch-lyrics", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
         // Bypass strict typing to handle both SDK version returns
@@ -95,7 +96,7 @@ ${rawText}
 
         // Map the parsed data back to the local database Lyric schema so the frontend can just save it
         const newLyrics = parsedContexts.map((item: any) => ({
-            id: crypto.randomUUID(),
+            id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `lyric_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             projectId,
             trackName: item.trackName || "Unknown Track",
             content: item.content || "",

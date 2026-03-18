@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { logApiUsage } from '@/lib/db';
+import { logApiUsageAsync } from '@/lib/db';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -80,7 +80,7 @@ Required JSON schema:
 `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-lite",
+            model: "gemini-2.5-flash",
             contents: prompt,
             config: {
                 responseMimeType: "application/json",
@@ -88,7 +88,7 @@ Required JSON schema:
         });
 
         if (response.usageMetadata) {
-            logApiUsage("/api/ingest-sheet", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsageAsync("/api/ingest-sheet", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
         // Robustly strip any markdown wrapping

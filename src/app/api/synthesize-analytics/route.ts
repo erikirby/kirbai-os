@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
-import { logApiUsage } from "@/lib/db";
+import { logApiUsageAsync } from "@/lib/db";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
         });
 
         if (response.usageMetadata) {
-            logApiUsage("/api/synthesize-analytics", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            await logApiUsageAsync("/api/synthesize-analytics", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
         // Use robust text extraction

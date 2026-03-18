@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDb, saveDb } from "@/lib/db";
+import { getDbAsync, saveDbAsync } from "@/lib/db";
 
 const COMPLIANCE_RSS_URL = "https://news.google.com/rss/search?q=Spotify+OR+DistroKid+OR+%22editorial+discretion%22+OR+%22AI+music%22+ban+when:60d&hl=en-US&gl=US&ceid=US:en";
 
@@ -33,13 +33,13 @@ async function fetchComplianceNews() {
 
 export async function GET() {
     try {
-        const db = getDb();
+        const db = await getDbAsync();
 
         // Fetch Music Platform Compliance News
         const complianceIntel = await fetchComplianceNews();
 
         db.pokemonNews = complianceIntel;
-        saveDb(db);
+        await saveDbAsync(db);
 
         return NextResponse.json({ news: complianceIntel });
     } catch (e: any) {

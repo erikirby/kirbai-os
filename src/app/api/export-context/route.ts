@@ -31,25 +31,19 @@ export async function GET() {
 
         // --- Roadmap ---
         try {
-            const roadmap = await getRoadmapAsync();
-            if (roadmap.phases?.length || roadmap.tasks?.length) {
+            const roadmap = await getRoadmapAsync('kirbai');
+            if (roadmap.phases?.length) {
                 lines.push('--- MASTER ROADMAP ---');
-                if (roadmap.phases?.length) {
-                    lines.push('PHASES:');
-                    roadmap.phases.forEach((p: any) => {
-                        lines.push(`  [${p.status}] ${p.title}: ${p.description}`);
-                    });
+                roadmap.phases.forEach((p: any) => {
+                    lines.push(`PHASE: [${p.status}] ${p.title}: ${p.description}`);
+                    if (p.tasks?.length) {
+                        lines.push('  TASKS:');
+                        p.tasks.forEach((t: any) => {
+                            lines.push(`    - [${t.status.toUpperCase()}] ${t.title}: ${t.description}`);
+                        });
+                    }
                     lines.push('');
-                }
-                if (roadmap.tasks?.length) {
-                    lines.push('TASKS:');
-                    roadmap.tasks.forEach((t: any) => {
-                        const text = typeof t === 'string' ? t : t.text;
-                        const status = typeof t === 'string' ? 'todo' : t.status;
-                        lines.push(`  [${status.toUpperCase()}] ${text}`);
-                    });
-                    lines.push('');
-                }
+                });
             }
         } catch (e) {}
 
