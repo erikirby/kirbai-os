@@ -49,6 +49,12 @@ export async function POST(req: NextRequest) {
         ]);
 
         const context = `
+            STRATEGIC CONSTRAINTS (MANDATORY):
+            1. USER (Erik Henry) is an AI-NATIVE BRAND.
+            2. Workflow: Suno/Udio/Logic Pro for music, AI engines for visuals/video.
+            3. WE DO NOT OUTSOURCE. Never recommend "commissioning" videos or "hiring" human producers/studios. We do everything in-house with AI.
+            4. Decisions must leverage the "Music Factory" (Quantity/SEO) or "Kirbai" (High-Fidelity AI Lore) models.
+
             Identity: ${JSON.stringify(identity)}
             Finance: ${JSON.stringify({ totals: finance?.totals, topTracks: finance?.tracks?.slice(0, 10) })}
             Analytics: ${JSON.stringify(pulse)}
