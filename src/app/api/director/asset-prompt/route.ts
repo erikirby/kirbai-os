@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
             
             RULES (STRICT):
             1. Output ONLY the finalized prompt. NO conversational text.
-            2. MANDATORY PREFIX: You MUST start every response with "generate image of a ".
+            2. MANDATORY PREFIX: You MUST start every response with "A professional studio product isolation of ".
             3. **ISOLATION & BACKGROUND**: 
                - If Category is "Character" or "Object": You MUST generate an isolated model in a "neutral standing pose" or "T-pose" on a "plain grey studio background". NO environment, NO props.
                - If Category is "Location": You MUST generate a "full-screen environmental wide shot" with "NO characters, NO pokemon, and NO people". It must be a completely empty architectural or natural space.

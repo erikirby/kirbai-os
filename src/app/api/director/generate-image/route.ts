@@ -70,9 +70,19 @@ PROMPT: ${prompt}
             if (p.text) console.log(`Part ${i}: TEXT (${p.text.substring(0, 50)}...)`);
         });
 
+        const systemInstruction = `You are "Nano Banana", an elite high-fidelity image generation engine.
+Your EXCLUSIVE task is to output a single, high-quality image based on the provided prompt and reference images.
+STRICT RULE: You MUST NOT return any text, descriptions, or conversation. 
+If you generate a response, it MUST contain an 'inlineData' part with the image data. 
+Focus entirely on visual fidelity, art-style consistency, and premium 8k rendering. No people. 9:16 aspect ratio.`;
+
         const result = await ai.models.generateContent({
             model: modelName,
-            contents: [{ role: 'user', parts }]
+            contents: [{ role: 'user', parts }],
+            config: {
+                systemInstruction: systemInstruction,
+                temperature: 0.4, // Lower temperature for more consistent style adherence
+            }
         });
 
         if (result.usageMetadata) {
@@ -81,9 +91,15 @@ PROMPT: ${prompt}
 
         const candidate = result.candidates?.[0];
         if (!candidate) throw new Error("Nano Banana returned no candidates. Try a different prompt.");
-        if (candidate.finishReason === 'SAFETY') throw new Error("Generation blocked by Safety Filters.");
+        
+        // Check for safety block
+        if (candidate.finishReason === 'SAFETY') {
+            throw new Error("Generation blocked by Safety Filters. Try a less suggestive or complex prompt.");
+        }
 
+        // Logic check: If the model returned text but no image, we log it for the prompt bank
         const imagePart = candidate.content?.parts?.find(p => (p as any).inlineData);
+        const textPart = candidate.content?.parts?.find(p => (p as any).text);
         
         if (imagePart && (imagePart as any).inlineData) {
             const base64Image = `data:${(imagePart as any).inlineData.mimeType};base64,${(imagePart as any).inlineData.data}`;
@@ -96,7 +112,9 @@ PROMPT: ${prompt}
                 telemetry
             });
         } else {
-            throw new Error("Nano Banana generated text but no image. Ensure the prompt is focused on visual output.");
+            const returnedText = (textPart as any)?.text || "No text description provided.";
+            console.error("AI returned text instead of image:", returnedText);
+            throw new Error(`Nano Banana generated text but no image. AI Response: "${returnedText.substring(0, 50)}...". Ensure your prompt is a direct visual command.`);
         }
 
     } catch (e: any) {

@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
             1. Output ONLY the finalized prompt. NO conversational text.
             2. MANDATORY PREFIX: You MUST start every response with "Based on the [labels] sources, ".
             3. **STRICTLY STATIC**: Forbid "motion blur", "speed lines", "motion trails", or "blurring past".
-            4. **NO EDITING TERMINOLOGY**: NEVER use terms like "match cut", "transition", "split screen".
-            5. **ONE FRAME**: Describe a single, frozen moment. If the Legacy Vision describes an action (sprinting), describe the character in a dynamic but FROZEN pose (e.g. "mid-stride").
+            4. **MANDATORY PREFIX**: You MUST start every response with "A high-fidelity cinematic 8k render of ".
+            5. **NO EDITING TERMINOLOGY**: NEVER use terms like "match cut", "transition", "split screen".
             6. **PROMPT SYNC**: Reference labels in brackets exactly (e.g. "[Pheromosa Character]").
             7. **LENS & LIGHTING**: Specify cinematic lighting (e.g. "35mm lens, rim lighting, 8k resolution").
             8. **NO PEOPLE**: Include "no people". 9:16 aspect ratio.

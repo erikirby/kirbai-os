@@ -131,6 +131,11 @@ export async function POST(req: NextRequest) {
                         model: 'gemini-2.5-flash',
                         contents: [{ role: 'user', parts: [{ text: specPrompt }] }]
                     });
+
+                    if (res.usageMetadata) {
+                        await logApiUsageAsync(`/api/boardroom (${id})`, res.usageMetadata.promptTokenCount || 0, res.usageMetadata.candidatesTokenCount || 0);
+                    }
+
                     const text = res.text || "Skipping.";
                     
                     // Handle [INVOKE:AgentName]
@@ -267,6 +272,9 @@ export async function POST(req: NextRequest) {
                     model: 'gemini-2.5-pro',
                     contents: [{ role: 'user', parts: [{ text: finalPrompt }] }]
                 });
+                if (finalRes.usageMetadata) {
+                    await logApiUsageAsync("/api/boardroom (Final Ruling)", finalRes.usageMetadata.promptTokenCount || 0, finalRes.usageMetadata.candidatesTokenCount || 0);
+                }
                 const finalBriefText = finalRes.text || "Strategy Brief preparation failed.";
                 
                 await saveBoardroomBriefAsync({
