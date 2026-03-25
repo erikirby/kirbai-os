@@ -15,17 +15,22 @@ export async function POST(req: NextRequest) {
 
         const ai = new GoogleGenAI({ apiKey });
         
-        // 2.5-flash is now the standard for all speed-sensitive multimodal tasks
-        const modelName = "gemini-2.5-flash"; 
+        // gemini-2.0-flash-exp-image-generation is the ONLY model that outputs image data
+        const modelName = "gemini-2.0-flash-exp-image-generation";
 
         const prompt = customPrompt || shot.bananaPromptV2 || shot.bananaPrompt;
 
         const parts: any[] = [{ 
-            text: `ACTION: Generate a high-fidelity image accurately representing the prompt below.
-STRICT REQUIREMENT: You MUST mirror the exact art style, character design, and line-work found in the provided REFERENCE images.
-CORE STYLE: Vibrant, high-fashion, premium aesthetic. Use the visual references as the ABSOLUTE PRIMARY source for the final render's style and details. See ref image for model and art style.
+            text: `Generate a high-fidelity image of the following:
 
-PROMPT: ${prompt}
+${prompt}
+
+STYLE REQUIREMENTS:
+- Mirror the exact art style, character design, and line-work from any provided REFERENCE images with strict accuracy.
+- Vibrant, high-fashion, premium Pokémon aesthetic.
+- 8k resolution, ultra-detailed.
+- 9:16 aspect ratio.
+- No human people.
 `
         }];
 
@@ -70,18 +75,12 @@ PROMPT: ${prompt}
             if (p.text) console.log(`Part ${i}: TEXT (${p.text.substring(0, 50)}...)`);
         });
 
-        const systemInstruction = `You are "Nano Banana", an elite high-fidelity image generation engine.
-Your EXCLUSIVE task is to output a single, high-quality image based on the provided prompt and reference images.
-STRICT RULE: You MUST NOT return any text, descriptions, or conversation. 
-If you generate a response, it MUST contain an 'inlineData' part with the image data. 
-Focus entirely on visual fidelity, art-style consistency, and premium 8k rendering. No people. 9:16 aspect ratio.`;
-
         const result = await ai.models.generateContent({
             model: modelName,
             contents: [{ role: 'user', parts }],
             config: {
-                systemInstruction: systemInstruction,
-                temperature: 0.4, // Lower temperature for more consistent style adherence
+                // CRITICAL: This tells the image-generation model to output image data
+                responseModalities: ["IMAGE", "TEXT"]
             }
         });
 
