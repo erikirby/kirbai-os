@@ -4,5 +4,10 @@
       "path": "/api/admin/backup?secret=kirbai_backup_safe",
       "schedule": "0 0 * * 0"
     }
-  ]
+  ],
+  "functions": {
+    "src/app/api/director/generate-image/route.ts": {
+      "maxDuration": 60
+    }
+  }
 }

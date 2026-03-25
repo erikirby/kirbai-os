@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
-import { logApiUsageAsync, logImageUsageAsync, getTelemetryAsync } from "@/lib/db";
+import { GoogleGenAI, SubjectReferenceImage } from '@google/genai';
+import { logImageUsageAsync, getTelemetryAsync } from "@/lib/db";
+
+// Increase Vercel function timeout — image generation takes 15-40s
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
     try {
@@ -14,107 +17,96 @@ export async function POST(req: NextRequest) {
         if (!apiKey) throw new Error("GEMINI_API_KEY is not set");
 
         const ai = new GoogleGenAI({ apiKey });
-        
-        // gemini-2.0-flash-exp-image-generation is the ONLY model that outputs image data
-        const modelName = "gemini-2.0-flash-exp-image-generation";
 
         const prompt = customPrompt || shot.bananaPromptV2 || shot.bananaPrompt;
+        if (!prompt) {
+            return NextResponse.json({ error: "No prompt found for this shot. Please generate a shot prompt first." }, { status: 400 });
+        }
 
-        const parts: any[] = [{ 
-            text: `Generate a high-fidelity image of the following:
+        const fullPrompt = `${prompt}\n\nVibrant, high-fashion, premium Pokémon aesthetic. Ultra-detailed, 8k resolution. 9:16 aspect ratio. No humans or real people.`;
 
-${prompt}
+        // Collect reference images
+        const refImages: SubjectReferenceImage[] = [];
 
-STYLE REQUIREMENTS:
-- Mirror the exact art style, character design, and line-work from any provided REFERENCE images with strict accuracy.
-- Vibrant, high-fashion, premium Pokémon aesthetic.
-- 8k resolution, ultra-detailed.
-- 9:16 aspect ratio.
-- No human people.
-`
-        }];
-
-        // 1. Add predetermined reference images based on refLabels
-        console.log("--- MULTIMODAL PAYLOAD PREP ---");
         if (shot.refLabels && mission.requiredReferences && mission.references) {
-            console.log(`Found ${shot.refLabels.length} refLabels for this shot:`, shot.refLabels);
-            shot.refLabels.forEach((label: string) => {
-                const req = mission.requiredReferences.find((r: any) => r.label === label);
-                if (req && req.uploadedIndex !== undefined && mission.references[req.uploadedIndex]) {
-                    console.log(`[VERIFIED] Attaching reference image for: ${label} (index ${req.uploadedIndex})`);
-                    console.log(`[DEBUG] Reference details: label=${label}, uploadedIndex=${req.uploadedIndex}, reference_length=${mission.references[req.uploadedIndex].length}`);
-                    const base64Data = mission.references[req.uploadedIndex].split(',')[1] || mission.references[req.uploadedIndex];
-                    parts.push({
-                        inlineData: {
-                            mimeType: "image/jpeg",
-                            data: base64Data
-                        }
-                    });
+            console.log(`--- BUILDING REFERENCE PAYLOAD (${shot.refLabels.length} labels) ---`);
+            shot.refLabels.forEach((label: string, idx: number) => {
+                const reqRef = mission.requiredReferences.find((r: any) => r.label === label);
+                if (reqRef && reqRef.uploadedIndex !== undefined && mission.references[reqRef.uploadedIndex]) {
+                    const rawRef = mission.references[reqRef.uploadedIndex];
+                    const base64Data = rawRef.startsWith('data:') ? rawRef.split(',')[1] : rawRef;
+                    console.log(`[ATTACHED] ${label} (ref index ${reqRef.uploadedIndex})`);
+                    
+                    // SubjectReferenceImage properties are set directly (no constructor args)
+                    const subjectRef = new SubjectReferenceImage();
+                    subjectRef.referenceId = idx + 1;
+                    subjectRef.referenceImage = { imageBytes: base64Data };
+                    subjectRef.config = { subjectDescription: label };
+                    refImages.push(subjectRef);
                 } else {
-                    console.log(`[WARNING] Missing reference image for label: ${label}`);
-                    console.log(`[DEBUG] req: ${JSON.stringify(req)}, uploadedIndex: ${req?.uploadedIndex}, mission.references[req?.uploadedIndex] exists: ${!!mission.references[req?.uploadedIndex]}`);
+                    console.log(`[SKIPPED] ${label} — no uploaded image`);
                 }
             });
         }
 
-        // 2. Add "Edit" context if requested
+        // Add previous generation as reference for edits
         if (isEdit && shot.thumbnailUrl) {
-            const base64Prev = shot.thumbnailUrl.split(',')[1] || shot.thumbnailUrl;
-            parts.push({
-                inlineData: {
-                    mimeType: "image/jpeg",
-                    data: base64Prev
+            const base64Prev = shot.thumbnailUrl.startsWith('data:') ? shot.thumbnailUrl.split(',')[1] : shot.thumbnailUrl;
+            const editRef = new SubjectReferenceImage();
+            editRef.referenceId = refImages.length + 1;
+            editRef.referenceImage = { imageBytes: base64Prev };
+            editRef.config = { subjectDescription: "Previous generation to refine" };
+            refImages.push(editRef);
+        }
+
+        let imageBytes: string;
+        const mimeType = 'image/png';
+
+        if (refImages.length > 0) {
+            // PATH A: editImage — reference-conditioned generation (style + character consistency)
+            console.log(`--- CALLING IMAGEN editImage (${refImages.length} references) ---`);
+            const editPrompt = `${fullPrompt}\n\nIMPORTANT: Mirror the exact art style, character design, and line-work from the provided reference images with strict accuracy.`;
+
+            const result = await ai.models.editImage({
+                model: 'imagen-3.0-capability-001',
+                prompt: editPrompt,
+                referenceImages: refImages,
+                config: {
+                    numberOfImages: 1,
+                    aspectRatio: '9:16',
                 }
             });
-            parts[0].text += "\n\nNOTE: I have provided the previous generation. Please refine it based on the prompt while maintaining structural consistency.";
-        }
 
-        console.log(`--- CALLING NANO BANANA (Total Parts: ${parts.length}) ---`);
-        parts.forEach((p, i) => {
-            if (p.inlineData) console.log(`Part ${i}: IMAGE (${p.inlineData.mimeType}, ${p.inlineData.data.length} bytes)`);
-            if (p.text) console.log(`Part ${i}: TEXT (${p.text.substring(0, 50)}...)`);
-        });
-
-        const result = await ai.models.generateContent({
-            model: modelName,
-            contents: [{ role: 'user', parts }],
-            config: {
-                // CRITICAL: This tells the image-generation model to output image data
-                responseModalities: ["IMAGE", "TEXT"]
-            }
-        });
-
-        if (result.usageMetadata) {
-            await logApiUsageAsync(`/api/director/generate-image (${isEdit ? 'Edit' : 'New'})`, result.usageMetadata.promptTokenCount || 0, result.usageMetadata.candidatesTokenCount || 0);
-        }
-
-        const candidate = result.candidates?.[0];
-        if (!candidate) throw new Error("Nano Banana returned no candidates. Try a different prompt.");
-        
-        // Check for safety block
-        if (candidate.finishReason === 'SAFETY') {
-            throw new Error("Generation blocked by Safety Filters. Try a less suggestive or complex prompt.");
-        }
-
-        // Logic check: If the model returned text but no image, we log it for the prompt bank
-        const imagePart = candidate.content?.parts?.find(p => (p as any).inlineData);
-        const textPart = candidate.content?.parts?.find(p => (p as any).text);
-        
-        if (imagePart && (imagePart as any).inlineData) {
-            const base64Image = `data:${(imagePart as any).inlineData.mimeType};base64,${(imagePart as any).inlineData.data}`;
-            await logImageUsageAsync(1, modelName); // Track high-res image cost
-            const telemetry = await getTelemetryAsync();
-            return NextResponse.json({ 
-                success: true, 
-                thumbnailUrl: base64Image,
-                prompt: prompt,
-                telemetry
-            });
+            const img = result.generatedImages?.[0]?.image?.imageBytes;
+            if (!img) throw new Error("Imagen returned no images. The references may be too complex or the prompt may conflict with safety filters. Try removing some references.");
+            imageBytes = img;
         } else {
-            const returnedText = (textPart as any)?.text || "No text description provided.";
-            console.error("AI returned text instead of image:", returnedText);
-            throw new Error(`Nano Banana generated text but no image. AI Response: "${returnedText.substring(0, 50)}...". Ensure your prompt is a direct visual command.`);
+            // PATH B: generateImages — pure text-to-image
+            console.log(`--- CALLING IMAGEN generateImages (text-only) ---`);
+            const result = await ai.models.generateImages({
+                model: 'imagen-3.0-generate-002',
+                prompt: fullPrompt,
+                config: {
+                    numberOfImages: 1,
+                    aspectRatio: '9:16',
+                    negativePrompt: 'humans, real people, text, watermark, blurry, low quality',
+                }
+            });
+
+            const img = result.generatedImages?.[0]?.image?.imageBytes;
+            if (!img) throw new Error("Imagen returned no images. Please adjust the prompt or try again.");
+            imageBytes = img;
         }
+
+        const base64Image = `data:${mimeType};base64,${imageBytes}`;
+        await logImageUsageAsync(1, 'imagen-3.0');
+        const telemetry = await getTelemetryAsync();
+        return NextResponse.json({ 
+            success: true, 
+            thumbnailUrl: base64Image,
+            prompt: prompt,
+            telemetry
+        });
 
     } catch (e: any) {
         console.error("Generation Error:", e);
