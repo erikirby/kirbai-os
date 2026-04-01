@@ -53,7 +53,14 @@
 
 ---
 
-## 6. Hand-off Instructions
+## 6. AI Autonomy & Command Permissions
+- **[AUTO-RUN: ON]**: `git status`, `git diff`, `ls`, `grep`, `find_by_name`.
+- **[AUTO-RUN: ON]**: `git add .` and `git commit` (if changes are explained first).
+- **[AUTO-RUN: OFF]**: `git push`, `npm install`, file deletions, or any command impacting production state.
+
+---
+
+## 7. Hand-off Instructions
 If you are taking over this project:
 1. **Check Environment**: Ensure `YOUTUBE_API_KEY`, `GEMINI_API_KEY`, and Supabase credentials are in `.env.local`.
 2. **Persistence First**: Before adding any new persistent feature, add a helper to `src/lib/db.ts`.
