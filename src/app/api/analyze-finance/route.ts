@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from "@google/genai";
 import { setFinanceAnalysisAsync, getFinanceAnalysisAsync, logApiUsageAsync } from "@/lib/db";
+import { safeCallGemini } from "@/lib/intel";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY as string });
+
 
 export async function GET() {
     try {
@@ -173,8 +174,7 @@ CRITICAL FORMATTING INSTRUCTIONS:
 6. Tone: Cybernetic, professional, concise.
 7. Return ONLY the safe HTML fragment. NO markdown code blocks. NO TRIPLE BACKTICKS.`;
 
-            const response = await ai.models.generateContent({
-                model: "gemini-2.5-flash",
+            const response = await safeCallGemini("gemini-2.5-flash", {
                 contents: prompt,
             });
 

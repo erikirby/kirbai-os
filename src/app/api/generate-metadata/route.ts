@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { addMetadataPackAsync, getDbAsync, logApiUsageAsync } from "@/lib/db";
+import { safeCallGemini } from "@/lib/intel";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
 
 export async function POST(req: Request) {
     try {
@@ -25,8 +26,7 @@ export async function POST(req: Request) {
             2. A description featuring a strong hook, the target keyword, and an SEO-optimized tag block at the bottom (max 5 hashtags).
         `;
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+        const response = await safeCallGemini("gemini-2.5-flash", {
             contents: `Core Keyword: ${keyword}\nAlias: ${alias}`,
             config: {
                 systemInstruction: systemInstruction,

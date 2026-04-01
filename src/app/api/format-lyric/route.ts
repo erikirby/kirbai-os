@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { logApiUsageAsync } from '@/lib/db';
+import { safeCallGemini } from '@/lib/intel';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
 
 export async function POST(req: Request) {
     if (!process.env.GEMINI_API_KEY) {
@@ -38,8 +39,7 @@ ${rawText}
 ---
 `;
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+        const response = await safeCallGemini("gemini-2.5-flash", {
             contents: prompt,
             config: {
                 responseMimeType: "application/json",

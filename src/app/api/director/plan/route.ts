@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { saveMissionAsync, logApiUsageAsync, getTelemetryAsync } from "@/lib/db";
+import { safeCallGemini } from "@/lib/intel";
 
 export async function POST(req: NextRequest) {
     try {
@@ -15,8 +16,6 @@ export async function POST(req: NextRequest) {
             throw new Error("GEMINI_API_KEY is not set");
         }
 
-        const ai = new GoogleGenAI({ apiKey });
-
         // Phase 0: Asset Extraction (Fast Flash Step)
         const extractorPrompt = `
             You are "The Asset Scanner". Identify every Pokemon name mentioned in the following concept and lyrics.
@@ -25,8 +24,7 @@ export async function POST(req: NextRequest) {
             
             Return ONLY a JSON array of names. e.g. ["Pikachu", "Munchlax", "Trubbish", "Ditto"].
         `;
-        const extractorResult = await ai.models.generateContent({
-             model: "gemini-2.5-flash",
+        const extractorResult = await safeCallGemini("gemini-2.5-flash", {
              contents: [{ role: 'user', parts: [{ text: extractorPrompt }] }],
              config: { 
                  responseMimeType: "application/json",
@@ -66,8 +64,7 @@ export async function POST(req: NextRequest) {
             directorParts[0].text = directorPrompt;
         }
 
-        const directorResult = await ai.models.generateContent({
-            model: "gemini-2.5-pro",
+        const directorResult = await safeCallGemini("gemini-2.5-flash", {
             contents: [{ role: 'user', parts: directorParts }]
         });
         const directorDraft = directorResult.text;
@@ -79,8 +76,7 @@ export async function POST(req: NextRequest) {
         // Phase 2 & 3: Parallel Critiques (Strategist & Audience Critic)
         // Switch to Flash for subsidiary reviews to save time/cost
         const [strategistResult, audienceResult] = await Promise.all([
-            ai.models.generateContent({
-                model: "gemini-2.5-flash",
+            safeCallGemini("gemini-2.5-flash", {
                 contents: [{ role: 'user', parts: [{ text: `
                     You are "The Retention Strategist". You specialize in TikTok/Reels and high-engagement social content.
                     The Director has proposed this plan:
@@ -94,8 +90,7 @@ export async function POST(req: NextRequest) {
                     Suggest specific improvements.
                 ` }] }]
             }),
-            ai.models.generateContent({
-                model: "gemini-2.5-flash",
+            safeCallGemini("gemini-2.5-flash", {
                 contents: [{ role: 'user', parts: [{ text: `
                     You are "The Audience Critic", representing the core niche: Pokemon fans, Drag Race enthusiasts, and high-fashion/camp enjoyers.
                     DIRECTOR DRAFT: ${directorDraft}
@@ -128,8 +123,7 @@ export async function POST(req: NextRequest) {
             Ensure the "Build vs Payoff" is balanced.
         `;
 
-        const refinedResult = await ai.models.generateContent({
-            model: "gemini-2.5-pro",
+        const refinedResult = await safeCallGemini("gemini-2.5-flash", {
             contents: [{ role: 'user', parts: [{ text: refinementPrompt }] }]
         });
         const finalCut = refinedResult.text;
@@ -181,8 +175,7 @@ export async function POST(req: NextRequest) {
             2. shots: Array of shot objects with "refLabels" array.
         `;
 
-        const visualistResult = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+        const visualistResult = await safeCallGemini("gemini-2.5-flash", {
             contents: [{ role: 'user', parts: [{ text: visualistPrompt }] }],
             config: {
                 responseMimeType: "application/json",

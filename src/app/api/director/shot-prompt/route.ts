@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { safeCallGemini } from '@/lib/intel';
 
 export async function POST(req: NextRequest) {
     try {
@@ -11,8 +12,6 @@ export async function POST(req: NextRequest) {
 
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) throw new Error("GEMINI_API_KEY is not set");
-
-        const ai = new GoogleGenAI({ apiKey });
 
         const prompt = `
             You are "The Visualist". Your goal is to EXCISE and RETHINK a single frame from a Director's vision.
@@ -41,8 +40,7 @@ export async function POST(req: NextRequest) {
             [ENTROPY: ${entropy}]
         `;
 
-        const result = await ai.models.generateContent({
-            model: "gemini-2.5-pro",
+        const result = await safeCallGemini("gemini-2.5-flash", {
             contents: [{ role: 'user', parts: [{ text: prompt }] }]
         });
         const generatedPrompt = result.text;

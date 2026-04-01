@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { getRow, saveMissionAsync, getTelemetryAsync } from "@/lib/db";
+import { safeCallGemini } from "@/lib/intel";
 
 export async function POST(req: NextRequest) {
     try {
@@ -15,8 +16,6 @@ export async function POST(req: NextRequest) {
             throw new Error("GEMINI_API_KEY is not set");
         }
 
-        const ai = new GoogleGenAI({ apiKey });
-
         // Phase 1: The Director evaluates the instruction in context of the mission
         const directorPrompt = `
             You are "The Director". A user has given an instruction to modify an existing mission.
@@ -30,8 +29,7 @@ export async function POST(req: NextRequest) {
             If it's about the shots, describe the necessary changes.
         `;
 
-        const directorResult = await ai.models.generateContent({
-            model: "gemini-2.5-pro",
+        const directorResult = await safeCallGemini("gemini-2.5-flash", {
             contents: [{ role: 'user', parts: [{ text: directorPrompt }] }]
         });
         const directorAnalysis = directorResult.text;
@@ -54,8 +52,7 @@ export async function POST(req: NextRequest) {
             6. Output the UPDATED MISSION object in JSON.
         `;
 
-        const visualistResult = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+        const visualistResult = await safeCallGemini("gemini-2.5-flash", {
             contents: [{ role: 'user', parts: [{ text: visualistPrompt }] }],
             config: {
                 responseMimeType: "application/json",

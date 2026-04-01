@@ -11,6 +11,7 @@ import {
     saveHeartScaleNodeAsync
 } from "@/lib/db";
 import { AGENTS } from "@/config/agents";
+import { safeCallGemini } from "@/lib/intel";
 
 export async function POST(req: NextRequest) {
     const encoder = new TextEncoder();
@@ -25,7 +26,6 @@ export async function POST(req: NextRequest) {
         const { prompt, mode, history: conversationHistory, forceRuling } = await req.json();
         
         if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY missing");
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
         // Keyword trigger for ruling
         const forceKeywords = ["rule", "decide", "enough", "final", "brief", "ruling"];
@@ -82,8 +82,7 @@ export async function POST(req: NextRequest) {
                     Return ONLY JSON: { "selected": ["id1", "id2", "id3"], "md_initial": "One blunt sentence." }
                 `;
                 
-                const triageResponse = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash',
+                const triageResponse = await safeCallGemini('gemini-2.5-flash', {
                     contents: [{ role: 'user', parts: [{ text: triagePrompt }] }]
                 });
                 const triageText = triageResponse.text || "{}";
@@ -127,8 +126,7 @@ export async function POST(req: NextRequest) {
                         CONSTRAINT: Speak like you're in a Slack thread. Max 1-2 blunt sentences.
                     `;
 
-                    const res = await ai.models.generateContent({
-                        model: 'gemini-2.5-flash',
+                    const res = await safeCallGemini('gemini-2.5-flash', {
                         contents: [{ role: 'user', parts: [{ text: specPrompt }] }]
                     });
 
@@ -145,8 +143,7 @@ export async function POST(req: NextRequest) {
                         if (invokedAgent) {
                             await writeStream('System', `PULLING CONTEXT: ${invokedAgent.name}`, 'action');
                             const invokePrompt = `${invokedAgent.persona}\nProvide context for: "${text}"\nBANNED SLOP: ${BANNED_SLOP}\nMax 1 sentence.`;
-                            const invokeRes = await ai.models.generateContent({
-                                model: 'gemini-2.5-flash',
+                            const invokeRes = await safeCallGemini('gemini-2.5-flash', {
                                 contents: [{ role: 'user', parts: [{ text: invokePrompt }] }]
                             });
                             await writeStream(invokedAgent.name, invokeRes.text || "...", 'thought', invokedId);
@@ -170,8 +167,7 @@ export async function POST(req: NextRequest) {
                         BANNED SLOP: ${BANNED_SLOP}
                         TASK: Internal critique. NO JARGON.
                     `;
-                    const res = await ai.models.generateContent({
-                        model: 'gemini-2.5-flash',
+                    const res = await safeCallGemini('gemini-2.5-flash', {
                         contents: [{ role: 'user', parts: [{ text: critiquePrompt }] }]
                     });
                 }));
@@ -204,8 +200,7 @@ export async function POST(req: NextRequest) {
                         "outcomes": ["If this hits: x", "If we fail: y", "The pivot: z"] 
                     }
                 `;
-                const mdRes = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash',
+                const mdRes = await safeCallGemini('gemini-2.5-flash', {
                     contents: [{ role: 'user', parts: [{ text: mdSynthesisPrompt }] }]
                 });
                 const mdText = mdRes.text || "{}";
@@ -237,8 +232,7 @@ export async function POST(req: NextRequest) {
                     NO FLUFF.
                     Return ONLY JSON: { "entity": "Subject", "truth": "The hard fact" }
                 `;
-                const loreRes = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash',
+                const loreRes = await safeCallGemini('gemini-2.5-flash', {
                     contents: [{ role: 'user', parts: [{ text: lorePrompt }] }]
                 });
                 const loreText = loreRes.text || "{}";
@@ -268,8 +262,8 @@ export async function POST(req: NextRequest) {
                     
                     End with the 3 "Producer Instinct" outcomes from ${JSON.stringify(mdData.outcomes)}.
                 `;
-                const finalRes = await ai.models.generateContent({
-                    model: 'gemini-2.5-pro',
+                // Final MD Ruling (Flash for RPM safety)
+                const finalRes = await safeCallGemini('gemini-2.5-flash', {
                     contents: [{ role: 'user', parts: [{ text: finalPrompt }] }]
                 });
                 if (finalRes.usageMetadata) {

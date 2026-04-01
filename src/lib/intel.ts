@@ -1,7 +1,32 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { IntelItem, logApiUsageAsync } from "@/lib/db";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+
+/**
+ * Utility to call Gemini with basic 429 (Rate Limit) handling.
+ * On the Free Tier, we hit 429s often (especially on Pro).
+ */
+export async function safeCallGemini(
+    modelName: "gemini-2.5-flash" | "gemini-2.5-pro",
+    options: any,
+    retries = 2
+): Promise<any> {
+    try {
+        const res = await (ai.models as any).generateContent({
+            model: modelName,
+            ...options
+        });
+        return res;
+    } catch (e: any) {
+        if (e.message?.includes("429") && retries > 0) {
+            console.warn(`[Gemini 429] Rate limit hit for ${modelName}. Retrying in 2s...`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            return safeCallGemini(modelName, options, retries - 1);
+        }
+        throw e;
+    }
+}
 
 export async function getLatestNewslettersAsync(): Promise<IntelItem[]> {
     try {
@@ -36,8 +61,7 @@ export async function getLatestNewslettersAsync(): Promise<IntelItem[]> {
                 2. 'actionItems': An array of EXACTLY 2 specific, aggressive tasks the user must physically do inside their OS or workflow to leverage this info.
             `;
 
-            const response = await ai.models.generateContent({
-                model: "gemini-2.5-flash",
+            const response = await safeCallGemini("gemini-2.5-flash", {
                 contents: `Analyze this newsletter post for a music creator.
                 
                 Title: ${post.web_title}

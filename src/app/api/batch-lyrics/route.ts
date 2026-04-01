@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { logApiUsageAsync } from '@/lib/db';
+import { safeCallGemini } from '@/lib/intel';
 import crypto from 'crypto';
 
 // Initialize the Gemini client using the existing key from the environment
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export async function POST(req: Request) {
     if (!process.env.GEMINI_API_KEY) {
         return NextResponse.json({ error: "Gemini API Key missing in environment." }, { status: 500 });
@@ -50,8 +49,7 @@ ${rawText}
 ---
 `;
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+        const response = await safeCallGemini("gemini-2.5-flash", {
             contents: prompt,
             config: {
                 responseMimeType: "application/json",

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
+import { safeCallGemini } from '@/lib/intel';
 
 export async function POST(req: NextRequest) {
     try {
@@ -8,8 +9,6 @@ export async function POST(req: NextRequest) {
         if (!process.env.GEMINI_API_KEY) {
             throw new Error("GEMINI_API_KEY is not set");
         }
-
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
         // Only pass a slim summary of nodes/edges to the AI — no positions, no history
         // This prevents the context from getting bloated and the AI losing focus
@@ -65,8 +64,7 @@ EXAMPLE — adding two characters and an edge:
   { "action": "ADD_EDGE", "edge": { "source": "ditto", "target": "meowscarada", "label": "allied with" } }
 ]`;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+        const response = await safeCallGemini('gemini-2.5-flash', {
             contents: prompt,
             config: {
                 systemInstruction,

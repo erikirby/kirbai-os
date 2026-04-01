@@ -3,6 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 import { getRow, logApiUsageAsync } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 import { aiTools, save_to_vault, save_to_lore, save_to_concepts } from "@/lib/ai-actions";
+import { safeCallGemini } from "@/lib/intel";
 
 // Load Context Files
 // Helper to pull context from Supabase persistence
@@ -158,8 +159,6 @@ export async function POST(req: NextRequest) {
             throw new Error("GEMINI_API_KEY is not set");
         }
 
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
         // Gather all native OS context from Supabase (mode-aware)
         const [identityData, styleBaseData, projectsData, loreContext, financeContext, analyticsContext, roadmapContext, museContext] = await Promise.all([
             getSupabaseContext('brand_identity', activeTab).then(d => d || "No specific brand identity defined."),
@@ -218,9 +217,8 @@ export async function POST(req: NextRequest) {
             parts: [{ text: msg.text }]
         }));
 
-        // Initial Generation
-        let response = await ai.models.generateContent({
-            model: 'gemini-2.5-pro',
+        // Initial Generation (Using Flash for better Free Tier RPM)
+        let response = await safeCallGemini("gemini-2.5-flash", {
             contents: formattedHistory,
             config: {
                 systemInstruction: systemInstruction,
@@ -234,7 +232,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Handle Function Calling Loop
-        const toolCalls = response.candidates?.[0]?.content?.parts?.filter(p => (p as any).functionCall);
+        const toolCalls = response.candidates?.[0]?.content?.parts?.filter((p: any) => (p as any).functionCall);
         
         if (toolCalls && toolCalls.length > 0) {
             const toolResults = [];
@@ -263,8 +261,7 @@ export async function POST(req: NextRequest) {
                 { role: 'user', parts: toolResults } // The execution results
             ];
 
-            response = await ai.models.generateContent({
-                model: 'gemini-2.5-pro',
+            response = await safeCallGemini("gemini-2.5-flash", {
                 contents: finalContents,
                 config: { systemInstruction, tools: aiTools }
             });

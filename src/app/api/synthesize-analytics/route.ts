@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { logApiUsageAsync } from "@/lib/db";
+import { safeCallGemini } from "@/lib/intel";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
 
 export async function POST(req: Request) {
     try {
@@ -21,8 +22,7 @@ export async function POST(req: Request) {
             2. 'actionItems': An array of EXACTLY 3 specific, imperative tasks on where to shift budget, content focus, or release bandwidth this week.
         `;
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+        const response = await safeCallGemini("gemini-2.5-flash", {
             contents: `Analyze these cross-platform stats:
             YouTube: ${JSON.stringify(youtubeStats)}
             TikTok: ${JSON.stringify(tiktokStats)}

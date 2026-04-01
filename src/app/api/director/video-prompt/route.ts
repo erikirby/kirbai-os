@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { logApiUsageAsync } from "@/lib/db";
+import { safeCallGemini } from "@/lib/intel";
 
 export async function POST(req: NextRequest) {
     try {
@@ -12,8 +13,6 @@ export async function POST(req: NextRequest) {
 
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) throw new Error("GEMINI_API_KEY is not set");
-
-        const ai = new GoogleGenAI({ apiKey });
         const base64Data = thumbnailUrl.split(',')[1] || thumbnailUrl;
 
         const prompt = `
@@ -38,8 +37,7 @@ export async function POST(req: NextRequest) {
             Just the raw prompt string.
         `;
 
-        const result = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+        const result = await safeCallGemini("gemini-2.5-flash", {
             contents: [{
                 role: 'user',
                 parts: [

@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { YoutubeTranscript } from "@danielxceron/youtube-transcript";
 import { getDbAsync, setIntelCacheAsync, IntelItem, logApiUsageAsync } from "@/lib/db";
-import { getLatestNewslettersAsync } from "@/lib/intel";
+import { getLatestNewslettersAsync, safeCallGemini } from "@/lib/intel";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const CHANNEL_ID = "UCnsL7Nh-e09D1W5TmC6Yklw"; // Jesse from AI Guerrilla
 
 export async function GET(req: Request) {
@@ -81,9 +80,6 @@ export async function GET(req: Request) {
             let actionItems = ["Review the video manually for insights."];
 
             try {
-                if (intelFeed.length > 0) {
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                }
 
                 let text = "";
                 try {
@@ -95,8 +91,7 @@ export async function GET(req: Request) {
 
                 text = text.slice(0, 4000);
 
-                const response = await ai.models.generateContent({
-                    model: "gemini-2.5-flash",
+                const response = await safeCallGemini("gemini-2.5-flash", {
                     contents: `ACT AS A MARKETING ANALYST. Summarize this YouTube content for a music creator named Kirbai.
                     
                     Video Title: ${video.title}

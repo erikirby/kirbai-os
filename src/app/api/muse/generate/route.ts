@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { getRow, getMissionsAsync, getRoadmapAsync, getUserPsycheAsync, MuseCard, UserPsyche, getPulseStateAsync, logApiUsageAsync } from "@/lib/db";
+import { safeCallGemini } from "@/lib/intel";
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
@@ -10,8 +11,6 @@ export async function POST(req: NextRequest) {
         if (!process.env.GEMINI_API_KEY) {
             throw new Error("GEMINI_API_KEY is not set");
         }
-
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
         
         // 1. Gather Context
         const [lore, missions, roadmap, psyche, pulse, liveNews] = await Promise.all([
@@ -90,8 +89,7 @@ export async function POST(req: NextRequest) {
             }
         `;
 
-        const modelResponse = await ai.models.generateContent({
-            model: 'gemini-2.5-pro',
+        const modelResponse = await safeCallGemini('gemini-2.5-flash', {
             contents: [{ role: 'user', parts: [{ text: `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.` }] }],
             config: {
                 systemInstruction: symposiumPrompt,
