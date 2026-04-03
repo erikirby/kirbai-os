@@ -3,8 +3,6 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { getDbAsync, setIntelCacheAsync, IntelItem, logApiUsageAsync } from "@/lib/db";
 import crypto from "crypto";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export async function POST(req: Request) {
     try {
         const { text } = await req.json();
@@ -29,8 +27,9 @@ export async function POST(req: Request) {
             2. 'actionItems': An array of EXACTLY 2-3 specific tasks the user must physically do based on the news (e.g., audit metadata, backup files, change release cadence). Be highly imperative.
         `;
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+        const { safeCallGemini } = await import("@/lib/intel");
+
+        const response = await safeCallGemini("gemini-2.5-flash", {
             contents: `Analyze this raw newsletter text and extract music/marketing/IP insights:
             
             Raw Text:

@@ -42,16 +42,14 @@ Schema:
   ]
 }`;
 
-        const { GoogleGenAI } = await import('@google/genai');
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        const { safeCallGemini } = await import('@/lib/intel');
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+        const response = await safeCallGemini('gemini-2.5-flash', {
+            config: { responseMimeType: "application/json" },
             contents: [
                 { role: 'user', parts: [{ text: systemPrompt }] },
                 { role: 'user', parts: [{ text: `${existingContext}NEW INPUT:\n\n${rawText}` }] }
-            ],
-            config: { responseMimeType: "application/json" }
+            ]
         });
 
         const textOutput = response.text || "";

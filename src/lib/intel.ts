@@ -1,8 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { IntelItem, logApiUsageAsync } from "@/lib/db";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
-
 /**
  * Utility to call Gemini with basic 429 (Rate Limit) handling.
  * On the Free Tier, we hit 429s often (especially on Pro).
@@ -12,6 +10,17 @@ export async function safeCallGemini(
     options: any,
     retries = 2
 ): Promise<any> {
+    const apiKey = process.env.GEMINI_API_KEY;
+    
+    // Masked logging for debugging
+    const keyHint = apiKey ? `[${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 3)}] (Len: ${apiKey.length})` : 'MISSING';
+    console.log(`🤖 [Gemini] Key Check: ${keyHint} | Model: ${modelName}`);
+
+    if (!apiKey) {
+        throw new Error("GEMINI_API_KEY is not set in environment. Use 'npm run dev' locally or check Vercel Environment Variables.");
+    }
+    const ai = new GoogleGenAI({ apiKey });
+
     try {
         const res = await (ai.models as any).generateContent({
             model: modelName,
