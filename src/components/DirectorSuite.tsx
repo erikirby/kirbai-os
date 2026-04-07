@@ -37,17 +37,18 @@ interface Mission {
     conceptDescription?: string;
     alias: string;
     mode: "kirbai" | "factory";
-    targetRuntime?: string;
+    targetRuntime: string;
     shots: Shot[];
     references?: string[];
-    requiredReferences?: { 
+    requiredReferences: { 
         label: string; 
         description: string; 
         category: "Character" | "Location" | "Object";
         uploadedIndex?: number;
         manualCheck?: boolean;
     }[];
-    cameos?: string[];
+    cameos: string[];
+    shotCount?: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -1207,21 +1208,23 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                         {isFullMissionLoading === m.id ? <Loader2 className="w-3 h-3 animate-spin text-accent" /> : null}
                                     </div>
                                     <span className="text-xs font-bold truncate pr-6">{m.title}</span>
-                                    <span className="text-[9px] font-mono text-foreground/30 uppercase">{m.shots.length} SHOTS</span>
+                                    <span className="text-[9px] font-mono text-foreground/30 uppercase">
+                                        {m.shotCount !== undefined ? m.shotCount : (m.shots?.length || 0)} SHOTS
+                                    </span>
                                 </button>
                                 
                                 <div className="absolute top-4 right-4 flex items-center gap-2">
                                     {deletingMissionId === m.id ? (
                                         <div className="flex items-center gap-1 animate-in fade-in slide-in-from-right-2">
                                             <button 
-                                                onClick={() => deleteMission(m.id)}
+                                                onClick={(e) => { e.stopPropagation(); deleteMission(m.id); }}
                                                 className="p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 shadow-xl"
                                                 title="Confirm Delete"
                                             >
                                                 <Check className="w-3 h-3" />
                                             </button>
                                             <button 
-                                                onClick={() => setDeletingMissionId(null)}
+                                                onClick={(e) => { e.stopPropagation(); setDeletingMissionId(null); }}
                                                 className="p-1.5 bg-surface border border-border/20 text-foreground/40 rounded-lg hover:text-white"
                                             >
                                                 <X className="w-3 h-3" />

@@ -35,6 +35,7 @@ export async function DELETE(req: NextRequest) {
         await deleteMissionAsync(id);
         return NextResponse.json({ success: true });
     } catch (e: any) {
-        return NextResponse.json({ success: false, error: e.message }, { status: 500 });
+        console.error("Mission Delete API error:", e);
+        return NextResponse.json({ success: false, error: e.message || "Failed to delete mission from vault." }, { status: 500 });
     }
 }

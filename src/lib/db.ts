@@ -78,6 +78,7 @@ export interface Mission {
     mode: "kirbai" | "factory";
     targetRuntime?: string; // in seconds
     shots: Shot[];
+    shotCount?: number; // Metadata for slim index
     references?: string[]; // Array of Base64 strings (compressed)
     requiredReferences?: { 
         label: string; 
@@ -95,7 +96,8 @@ export function slimMission(m: Mission): Mission {
     return {
         ...m,
         references: [], 
-        shots: [] // COMPLETELY remove shots from the index to prevent master-list bloat
+        shots: [], // REMOVE shots from the index to prevent master-list bloat
+        shotCount: m.shots.length // Preserve the count for the list view
     };
 }
 
@@ -143,7 +145,7 @@ export async function setRow(key: string, value: any): Promise<void> {
         .upsert({ key, value }, { onConflict: 'key' });
     if (error) {
         console.error(`Supabase persistence Error [Key: ${key}] Size: ${sizeKB}KB:`, error);
-        throw new Error(`Vault Write Error: ${error.message}`);
+        throw error; // Propagate for API Route 500s
     }
 }
 
