@@ -93,7 +93,7 @@ export default function IntelInbox({ mode = "full", theme = "dark", activeTab = 
         return (
             <div className="flex flex-col gap-6">
                 {/* Assistant Clefairy */}
-                <div className="flex justify-center -ml-4" style={{ transform: 'scale(0.85)' }}>
+                <div className="flex flex-col items-center -ml-4 mb-4">
                     <MuseClefairy emotion="happy" message="Review the latest demographic splits from your new TikTok pipeline!" />
                 </div>
 

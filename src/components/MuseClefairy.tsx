@@ -103,16 +103,16 @@ const MuseClefairy: React.FC<MuseClefairyProps> = ({ emotion = 'idle', message }
                         className="w-full h-full object-contain scale-[1.4] origin-center relative z-10 transition-all duration-500 hover:scale-[1.5]"
                     />
                 </div>
-
-                {/* Speech Bubble - Artistic Float Style (Option 2) */}
-                {displayedMessage && (
-                    <div className="absolute top-[105%] left-0 w-48 md:w-56 bg-white/95 backdrop-blur-3xl p-4 rounded-[32px] shadow-[0_30px_70px_rgba(255,51,102,0.15)] border-2 border-accent/10 animate-in zoom-in slide-in-from-top-4 duration-300 z-[100]">
-                        <p className="text-[11px] font-black text-accent uppercase tracking-widest leading-relaxed text-center italic drop-shadow-sm">
-                            {displayedMessage}
-                        </p>
-                    </div>
-                )}
             </div>
+
+            {/* Speech Bubble - Now in the stack below the avatar */}
+            {displayedMessage && (
+                <div className="mt-6 w-48 md:w-56 bg-white/95 backdrop-blur-3xl p-4 rounded-[32px] shadow-[0_20px_40px_rgba(255,51,102,0.1)] border-2 border-accent/10 animate-in zoom-in slide-in-from-top-4 duration-300 z-50">
+                    <p className="text-[11px] font-black text-accent uppercase tracking-widest leading-relaxed text-center italic drop-shadow-sm">
+                        {displayedMessage}
+                    </p>
+                </div>
+            )}
 
             <style jsx>{`
                 @keyframes float {
