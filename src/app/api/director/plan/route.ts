@@ -227,13 +227,16 @@ export async function POST(req: NextRequest) {
         const shots = responseData.shots || [];
         const requiredReferences = responseData.requiredReferences || [];
 
+        // Determine the actual brainstorm text
+        const brainstormContent = concept.description || concept.body || "";
+
         // Format into a Mission
         const missionId = `mission-${Date.now()}`;
         const mission = {
             id: missionId,
-            conceptId: concept.id,
-            title: concept.title,
-            conceptDescription: concept.description || concept.body, // Use description or body
+            conceptId: concept.id || `promoted-${Date.now()}`,
+            title: concept.title || "Untitled Mission",
+            conceptDescription: brainstormContent, // Direct mapping from brainstorm
             alias: alias || (mode === 'kirbai' ? 'Kirbai' : 'AELOW'),
             mode: mode,
             references: references || [],

@@ -778,7 +778,9 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
 
     useEffect(() => {
         if (activeMission) {
-            setOutlineDraft(activeMission.conceptDescription || "");
+            // Priority: conceptDescription (full mission) -> body/description (potential legacy)
+            const draft = activeMission.conceptDescription || (activeMission as any).body || (activeMission as any).description || "";
+            setOutlineDraft(draft);
         }
     }, [activeMission]);
 
@@ -1372,7 +1374,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                             />
                                         ) : (
                                             <div className="p-8 bg-black/40 border border-white/5 rounded-[32px] font-medium text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap max-w-4xl">
-                                                {activeMission.conceptDescription || "No concept description available."}
+                                                {activeMission.conceptDescription || (activeMission as any).body || (activeMission as any).description || "No concept description available."}
                                             </div>
                                         )}
                                     </div>
