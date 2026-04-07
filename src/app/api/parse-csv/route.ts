@@ -15,19 +15,22 @@ export async function POST(req: Request) {
         }
 
         const systemInstruction = `
-            You are a tactical data scientist for an elite music brand.
+            You are a Master Tactical Strategist for an elite music brand.
             Your goal is to extract deep patterns from messy Meta Business Suite CSV exports to inform content strategy.
             
-            USER GOAL: 
-            1. Total Metrics: Sum Reach, Follows, Likes, and Shares across all rows.
-            2. Strategic Sweet Spots:
-               - Detect 'Top 3 Windows': Identify the 3 specific Day/Time combinations (e.g., 'Sunday 6PM-8PM') that correlate with highest Reach.
-               - Detect 'Top 3 Magnets': The 3 posts with highest follows-per-1k-reach. 
-               - Detect 'Top 3 Anchors': The 3 posts with most interactions per 1k reach.
-               - Stylistic DNA: Identify common keywords, emojis, or tones across high-performing descriptions.
-            3. Style Mapping: Create a list of all unique descriptions.
-
-            CRITICAL: If no 'Total' row is present, YOU MUST SUM THE COLUMNS MANUALLY for every single post row provided.
+            RULES FOR FLEXIBLE INTELLIGENCE:
+            1. DO NOT give up if a specific column name (like 'Reach' or 'Followers') is missing. 
+            2. SCAN ALL ROWS to triangulate values. If a 'Total' row is missing, YOU MUST SUM THE COLUMNS MANUALLY.
+            3. If a specific metric is completely missing, use a STRATEGIC PROXY. For example, use 'Engaged Accounts' or 'Impressions' to determine general virality.
+            4. If interaction rates aren't pre-calculated, calculate them yourself (Interactions / Reach).
+            
+            EXTRACTION GOALS:
+            - Totals: Reach, Follows, Likes, Shares.
+            - The Hook (Video Length): Determine the duration range that most correlates with high performance (if video length data exists).
+            - The Windows: Top 3 Day/Time segments (e.g., 'Sunday 6PM-8PM') that correlate with highest Reach.
+            - The Voice: Top keywords, emojis, and tones extracted from post descriptions.
+            - The Magnets: Top 3 posts with highest Follows-per-1k-Reach.
+            - The Anchors: Top 3 posts with most interactions per 1k Reach.
             
             Return exactly a JSON object:
             {
@@ -36,11 +39,11 @@ export async function POST(req: Request) {
                     "optimalLengthRange": string, 
                     "topWindows": Array<{ "time": string, "reach": number }>, 
                     "topKeywords": string[], 
-                    "topMagnets": Array<{ "text": string, "rate": number }>, // Follows per 1k reach
-                    "topAnchors": Array<{ "text": string, "rate": number }>  // Interactions per 1k reach
+                    "topMagnets": Array<{ "text": string, "rate": number }>, 
+                    "topAnchors": Array<{ "text": string, "rate": number }>
                 },
                 "descriptions": string[],
-                "narrative": string (2-sentence tactical recommendation)
+                "narrative": string (2-sentence direct tactical recommendation)
             }
         `;
 

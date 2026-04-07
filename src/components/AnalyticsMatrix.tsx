@@ -10,48 +10,66 @@ interface AnalyticsMatrixProps {
 
 export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: AnalyticsMatrixProps) {
     const [ytStats, setYtStats] = useState<any[]>([]);
-    const [igFollowers, setIgFollowers] = useState<string>("0");
-    const [igReach, setIgReach] = useState<string>("0");
-    const [ttFollowers, setTtFollowers] = useState<string>("0");
-    const [ttViews, setTtViews] = useState<string>("0");
-    const [ttLastUpdated, setTtLastUpdated] = useState<string>("");
-    const [igLastUpdated, setIgLastUpdated] = useState<string>("");
     const [ytLastUpdated, setYtLastUpdated] = useState<string>("");
-
+    const [isUploadingCSV, setIsUploadingCSV] = useState<'tiktok' | 'instagram' | null>(null);
     const [isLoadingYT, setIsLoadingYT] = useState(true);
     const [isSynthesizing, setIsSynthesizing] = useState(false);
-    const [isUploadingCSV, setIsUploadingCSV] = useState<'tiktok' | 'instagram' | null>(null);
-    const [analysis, setAnalysis] = useState<any>(null);
-    const [trends, setTrends] = useState<any>(null);
-    const [narrative, setNarrative] = useState<string>("");
-    const [demographics, setDemographics] = useState<any>(null);
     
-    // Pending states for manual inputs
+    // Partitioned Platform Data
+    const [igData, setIgData] = useState<any>({
+        followers: "0",
+        reach: "0",
+        lastUpdated: "",
+        trends: null,
+        narrative: "",
+        analysis: null
+    });
+    
+    const [ttData, setTtData] = useState<any>({
+        followers: "0",
+        reach: "0",
+        lastUpdated: "",
+        trends: null,
+        narrative: "",
+        demographics: null
+    });
+
+    // Manual input buffers
     const [pendingTtFollowers, setPendingTtFollowers] = useState<string>("");
     const [pendingIgFollowers, setPendingIgFollowers] = useState<string>("");
 
     useEffect(() => {
-        // Fetch Pulse State from Supabase
         const fetchPulse = async () => {
             try {
                 const res = await fetch(`/api/pulse?mode=${mode}`);
                 const data = await res.json();
                 if (data.success && data.state) {
                     const s = data.state;
-                    setIgFollowers(s.igFollowers || "0");
-                    setIgReach(s.igReach || "0");
-                    setTtFollowers(s.ttFollowers || "0");
-                    setTtViews(s.ttViews || "0");
-                    setTtLastUpdated(s.ttLastUpdated || "");
-                    setIgLastUpdated(s.igLastUpdated || "");
-                    setTrends(s.trends || null);
-                    setNarrative(s.narrative || "");
-                    setDemographics(s.demographics || null);
-                    setAnalysis(s.analysis || null); // Persist synthesis results
                     
-                    // Also sync pending manual inputs
-                    setPendingIgFollowers(s.igFollowers || "0");
-                    setPendingTtFollowers(s.ttFollowers || "0");
+                    // Support legacy migration if keys are flat
+                    const ig = s.instagram || {
+                        followers: s.igFollowers || "0",
+                        reach: s.igReach || "0",
+                        lastUpdated: s.igLastUpdated || "",
+                        trends: s.trends, // Note: legacy shared these
+                        narrative: s.narrative,
+                        analysis: s.analysis
+                    };
+                    
+                    const tt = s.tiktok || {
+                        followers: s.ttFollowers || "0",
+                        reach: s.ttViews || "0",
+                        lastUpdated: s.ttLastUpdated || "",
+                        trends: s.trends,
+                        narrative: s.narrative,
+                        demographics: s.demographics
+                    };
+
+                    setIgData(ig);
+                    setTtData(tt);
+                    
+                    setPendingIgFollowers(ig.followers);
+                    setPendingTtFollowers(tt.followers);
                 }
             } catch (e) {
                 console.error("Pulse Load Error:", e);
@@ -82,43 +100,6 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
         fetchYT();
     }, [mode]);
 
-    const handleSynthesize = async () => {
-        setIsSynthesizing(true);
-        try {
-            const res = await fetch('/api/synthesize-analytics', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    youtubeStats: ytStats,
-                    instagramStats: { followers: parseInt(igFollowers), reach: parseInt(igReach) },
-                    tiktokStats: { followers: parseInt(ttFollowers), views: parseInt(ttViews) }
-                })
-            });
-            const data = await res.json();
-            if (data.analysis) {
-                setAnalysis(data.analysis);
-                
-                // Sync the new analysis to Supabase immediately
-                await syncToSupabase({
-                    igFollowers,
-                    igReach,
-                    ttFollowers,
-                    ttViews,
-                    ttLastUpdated,
-                    igLastUpdated,
-                    trends,
-                    demographics,
-                    narrative,
-                    analysis: data.analysis
-                });
-            }
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setIsSynthesizing(false);
-        }
-    };
-
     const syncToSupabase = async (newState: any) => {
         try {
             await fetch('/api/pulse', {
@@ -131,33 +112,47 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
         }
     };
 
-    const updateAndSave = async (setter: any, key: string, value: string, dateSetter?: any, dateKey?: string) => {
-        setter(value);
-        
-        // Construct new state for sync
-        const currentState = {
-            igFollowers,
-            igReach,
-            ttFollowers,
-            ttViews,
-            ttLastUpdated,
-            igLastUpdated,
-            trends,
-            demographics,
-            narrative,
-            analysis // Include analysis in every sync
-        };
-
-        const newState = { ...currentState };
-        (newState as any)[key] = value;
-
-        if (dateSetter && dateKey) {
-            const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            dateSetter(now);
-            (newState as any)[dateKey] = now;
+    const handleSynthesize = async () => {
+        setIsSynthesizing(true);
+        try {
+            const res = await fetch('/api/synthesize-analytics', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    youtubeStats: ytStats,
+                    instagramStats: { followers: parseInt(igData.followers), reach: parseInt(igData.reach) },
+                    tiktokStats: { followers: parseInt(ttData.followers), views: parseInt(ttData.reach) }
+                })
+            });
+            const data = await res.json();
+            if (data.analysis) {
+                const updatedIg = { ...igData, analysis: data.analysis };
+                setIgData(updatedIg);
+                
+                await syncToSupabase({
+                    instagram: updatedIg,
+                    tiktok: ttData
+                });
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsSynthesizing(false);
         }
+    };
 
-        await syncToSupabase(newState);
+    const updateAndSave = async (platform: 'instagram' | 'tiktok', key: string, value: string) => {
+        const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        
+        if (platform === 'instagram') {
+            const updated = { ...igData, [key]: value, lastUpdated: now };
+            setIgData(updated);
+            await syncToSupabase({ instagram: updated, tiktok: ttData });
+        } else {
+            const updated = { ...ttData, [key]: value, lastUpdated: now };
+            setTtData(updated);
+            await syncToSupabase({ instagram: igData, tiktok: updated });
+        }
     };
 
     const handleCSVUpload = async (platform: 'tiktok' | 'instagram', event: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,40 +189,34 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
             const json = await res.json();
 
             if (json.success && json.data) {
-                const { followers, reach, trends: newTrends, demographics: newDemographics, narrative: newNarrative } = json.data;
+                const { followers, reach, trends, demographics, narrative } = json.data;
                 const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-                // Update UI state
-                if (newTrends) setTrends(newTrends);
-                if (newDemographics) setDemographics(newDemographics);
-                if (newNarrative) setNarrative(newNarrative);
-
-                let updatedFollowers = followers?.toString() || (platform === 'tiktok' ? ttFollowers : igFollowers);
-                let updatedReach = reach?.toString() || (platform === 'tiktok' ? ttViews : igReach);
-                
                 if (platform === 'tiktok') {
-                    setTtFollowers(updatedFollowers);
-                    setTtViews(updatedReach);
-                    setTtLastUpdated(now);
+                    const updated = {
+                        followers: followers?.toString() || ttData.followers,
+                        reach: reach?.toString() || ttData.reach,
+                        lastUpdated: now,
+                        trends: trends || ttData.trends,
+                        demographics: demographics || ttData.demographics,
+                        narrative: narrative || ttData.narrative
+                    };
+                    setTtData(updated);
+                    setPendingTtFollowers(updated.followers);
+                    await syncToSupabase({ instagram: igData, tiktok: updated });
                 } else {
-                    setIgFollowers(updatedFollowers);
-                    setIgReach(updatedReach);
-                    setIgLastUpdated(now);
+                    const updated = {
+                        followers: followers?.toString() || igData.followers,
+                        reach: reach?.toString() || igData.reach,
+                        lastUpdated: now,
+                        trends: trends || igData.trends,
+                        narrative: narrative || igData.narrative,
+                        analysis: igData.analysis
+                    };
+                    setIgData(updated);
+                    setPendingIgFollowers(updated.followers);
+                    await syncToSupabase({ instagram: updated, tiktok: ttData });
                 }
-
-                // Sync everything to Supabase
-                await syncToSupabase({
-                    igFollowers: platform === 'instagram' ? updatedFollowers : igFollowers,
-                    igReach: platform === 'instagram' ? updatedReach : igReach,
-                    ttFollowers: platform === 'tiktok' ? updatedFollowers : ttFollowers,
-                    ttViews: platform === 'tiktok' ? updatedReach : ttViews,
-                    ttLastUpdated: platform === 'tiktok' ? now : ttLastUpdated,
-                    igLastUpdated: platform === 'instagram' ? now : igLastUpdated,
-                    trends: newTrends || trends,
-                    demographics: newDemographics || demographics,
-                    narrative: newNarrative || narrative,
-                    analysis // Preserve existing analysis if it exists
-                });
 
             } else {
                 console.error("AI Parser Failed:", json.error);
@@ -247,12 +236,153 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
         return num.toString();
     };
 
+    const renderTacticalBrief = (platform: 'instagram' | 'tiktok', data: any) => {
+        if (!data.narrative && !data.trends) return null;
+
+        const isIG = platform === 'instagram';
+        const accentColor = isIG ? 'text-pink-500' : 'text-accent';
+        const dotColor = isIG ? 'bg-pink-500' : 'bg-accent';
+        const glowColor = isIG ? 'rgba(236,72,153,0.8)' : 'rgba(255,51,102,0.8)';
+
+        return (
+            <div className="animate-in slide-in-from-bottom-4 zoom-in-95 duration-500 mt-4">
+                <div className={`p-10 border squircle specular-reflect shadow-2xl relative overflow-hidden group ${theme === 'snes' ? 'bg-surface/60 border-b-4 border-r-4 border-accent' : 'bg-accent/[0.04] border-accent/30'}`}>
+                    <div className={`absolute top-0 right-0 w-80 h-80 ${isIG ? 'bg-pink-500/5' : 'bg-accent/5'} blur-[100px] rounded-full -mr-40 -mt-40 group-hover:scale-125 transition-transform duration-2000`} />
+
+                    <div className="flex items-center justify-between mb-6 relative z-10 w-full">
+                        <div className="flex items-center gap-3">
+                            <span className={`w-3 h-3 rounded-full ${dotColor}`} style={{ boxShadow: `0 0 15px ${glowColor}` }}></span>
+                            <h3 className={`text-sm font-black uppercase tracking-[0.4em] ${accentColor}`}>{platform} Tactical Brief</h3>
+                        </div>
+                        {data.lastUpdated && (
+                            <span className="text-[8px] flex items-center gap-2 font-mono uppercase tracking-widest text-foreground/40">
+                                <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                Data current as of {data.lastUpdated} 
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="flex flex-col gap-8 relative z-10">
+                        <p className="text-xl font-black text-foreground tracking-tighter leading-tight max-w-4xl">{data.narrative}</p>
+
+                        {data.trends && (
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
+                                <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-2">
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Hook</span>
+                                    <span className={`text-sm font-black ${accentColor}`}>{data.trends.optimalLengthRange || "Flexible"}</span>
+                                    <span className="text-[7px] uppercase font-bold text-foreground/30">Target Video Length</span>
+                                </div>
+                                
+                                <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-3 min-w-[200px]">
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Windows (Top 3)</span>
+                                    <div className="flex flex-col gap-2">
+                                        {(data.trends.topWindows || []).slice(0, 3).map((w: any, i: number) => (
+                                            <div key={i} className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
+                                                <span className={`text-[9px] font-black ${accentColor}`}>{w.time}</span>
+                                                {w.reach > 0 && <span className="text-[7px] font-bold text-foreground/40 uppercase">{formatNumber(w.reach)} {isIG ? 'Reach' : 'Views'}</span>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Peak Virality Timing</span>
+                                </div>
+
+                                <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-3 min-w-[240px]">
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Magnets (Top 3)</span>
+                                    <div className="flex flex-col gap-2">
+                                        {(data.trends.topMagnets || []).length > 0 ? (
+                                            data.trends.topMagnets.slice(0, 3).map((m: any, i: number) => (
+                                                <div key={i} className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
+                                                    <span className="text-[7px] font-bold text-foreground/80 leading-tight line-clamp-2 italic">"{m.text}"</span>
+                                                    <span className={`text-[9px] font-black ${accentColor} mt-0.5`}>{m.rate ? m.rate.toFixed(1) : "N/A"} <span className="text-[6px] opacity-50">Follows / 1k</span></span>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
+                                                <span className="text-[7px] font-bold text-foreground/80 leading-tight italic">"No data identified"</span>
+                                                <span className={`text-[9px] font-black ${accentColor} mt-0.5`}>N/A</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Peak Follower Conversion</span>
+                                </div>
+
+                                <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-3 min-w-[240px]">
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Anchors (Top 3)</span>
+                                    <div className="flex flex-col gap-2">
+                                        {(data.trends.topAnchors || []).length > 0 ? (
+                                            data.trends.topAnchors.slice(0, 3).map((m: any, i: number) => (
+                                                <div key={i} className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
+                                                    <span className="text-[7px] font-bold text-foreground/80 leading-tight line-clamp-2 italic">"{m.text}"</span>
+                                                    <span className={`text-[9px] font-black ${isIG ? 'text-pink-400' : 'text-accent'} mt-0.5`}>{m.rate ? m.rate.toFixed(1) : "N/A"} <span className="text-[6px] opacity-50">Hits / 1k</span></span>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
+                                                <span className="text-[7px] font-bold text-foreground/80 leading-tight italic">"No data identified"</span>
+                                                <span className={`text-[9px] font-black ${isIG ? 'text-pink-400' : 'text-accent'} mt-0.5`}>N/A</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Total Interaction Leaders</span>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex flex-wrap gap-4 mt-2">
+                             {/* The Voice */}
+                            {data.trends?.topKeywords && (
+                                <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-2 flex-1">
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Voice</span>
+                                    <div className="flex flex-wrap gap-1">
+                                        {data.trends.topKeywords.map((k: string, i: number) => (
+                                            <span key={i} className={`text-[8px] font-mono bg-accent/10 border border-accent/20 px-1 rounded ${accentColor}`}>{k}</span>
+                                        ))}
+                                    </div>
+                                    <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Target Keywords</span>
+                                </div>
+                            )}
+
+                            {/* The Crowd (TT Only) */}
+                            {!isIG && data.demographics && (
+                                <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-2 flex-1">
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Crowd</span>
+                                    <span className={`text-sm font-black ${accentColor}`}>{data.demographics.topGender || "Mixed"}</span>
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                        {data.demographics.topTerritories?.map((t: string, i: number) => (
+                                            <span key={i} className={`text-[8px] font-mono bg-accent/10 border border-accent/20 px-1 rounded ${accentColor}`}>{t}</span>
+                                        ))}
+                                    </div>
+                                    <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Core Demographics</span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Executive Action Items (IG Only - via Synthesis) */}
+                        {isIG && data.analysis?.actionItems && (
+                            <div className="bg-black/30 border border-white/5 rounded-[2rem] p-8 flex flex-col gap-6 shadow-inner">
+                                <span className={`text-[11px] uppercase font-black tracking-[0.5em] ${accentColor}`}>Executive Strategy Directives:</span>
+                                <ul className="flex flex-col gap-5">
+                                    {data.analysis.actionItems.map((item: string, idx: number) => (
+                                        <li key={idx} className="text-sm font-bold flex gap-4 items-start tracking-tight leading-snug text-foreground/90">
+                                            <span className={`${accentColor} font-black`}>0{idx + 1}</span>
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="flex flex-col gap-10">
             <div className="flex justify-between items-center ml-1">
                 <div className="flex flex-col gap-1">
                     <h2 className="text-2xl font-black tracking-tighter text-foreground uppercase">Analytics Matrix</h2>
-                    <p className="text-[10px] text-foreground/50 uppercase tracking-[0.5em] font-black">Cross-Platform Growth Synthesis</p>
+                    <p className="text-[10px] text-foreground/50 uppercase tracking-[0.5em] font-black">Tactical Growth Synthesis</p>
                 </div>
                 <button
                     onClick={handleSynthesize}
@@ -302,7 +432,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                         <div className="flex items-center gap-3">
                             <div className="flex flex-col">
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground">TikTok</h3>
-                                {ttLastUpdated && <span className="text-[8px] font-mono text-foreground/40 tracking-widest uppercase mt-0.5">Updated: {ttLastUpdated}</span>}
+                                {ttData.lastUpdated && <span className="text-[8px] font-mono text-foreground/40 tracking-widest uppercase mt-0.5">Updated: {ttData.lastUpdated}</span>}
                             </div>
                         </div>
                         <a href="https://www.tiktok.com/analytics" target="_blank" className="text-[8px] uppercase tracking-widest font-bold text-foreground/40 hover:text-accent transition-colors">Open Portal ↗</a>
@@ -318,8 +448,8 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                                     className="flex-1 p-3 font-mono text-sm border rounded-xl focus:outline-none focus:border-accent bg-black/10 border-border/20 text-foreground placeholder:text-foreground/50"
                                 />
                                 <button 
-                                    onClick={() => updateAndSave(setTtFollowers, "tt_followers", pendingTtFollowers, setTtLastUpdated, "tt_last_updated")}
-                                    className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${pendingTtFollowers !== ttFollowers ? 'bg-accent text-white shadow-lg' : 'bg-surface border border-border/10 text-foreground/40'}`}
+                                    onClick={() => updateAndSave('tiktok', "followers", pendingTtFollowers)}
+                                    className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${pendingTtFollowers !== ttData.followers ? 'bg-accent text-white shadow-lg' : 'bg-surface border border-border/10 text-foreground/40'}`}
                                 >
                                     Save
                                 </button>
@@ -347,7 +477,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                         <div className="flex items-center gap-3">
                             <div className="flex flex-col">
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground">Instagram</h3>
-                                {igLastUpdated && <span className="text-[8px] font-mono text-foreground/40 tracking-widest uppercase mt-0.5">Updated: {igLastUpdated}</span>}
+                                {igData.lastUpdated && <span className="text-[8px] font-mono text-foreground/40 tracking-widest uppercase mt-0.5">Updated: {igData.lastUpdated}</span>}
                             </div>
                         </div>
                         <a href="https://business.facebook.com/latest/insights" target="_blank" className="text-[8px] uppercase tracking-widest font-bold text-foreground/40 hover:text-accent transition-colors">Open Portal ↗</a>
@@ -363,8 +493,8 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                                     className="flex-1 p-3 font-mono text-sm border rounded-xl focus:outline-none focus:border-accent bg-black/10 border-border/20 text-foreground placeholder:text-foreground/50"
                                 />
                                 <button 
-                                    onClick={() => updateAndSave(setIgFollowers, "ig_followers", pendingIgFollowers, setIgLastUpdated, "ig_last_updated")}
-                                    className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${pendingIgFollowers !== igFollowers ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/20' : 'bg-surface border border-border/10 text-foreground/40'}`}
+                                    onClick={() => updateAndSave('instagram', "followers", pendingIgFollowers)}
+                                    className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${pendingIgFollowers !== igData.followers ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/20' : 'bg-surface border border-border/10 text-foreground/40'}`}
                                 >
                                     Save
                                 </button>
@@ -387,131 +517,11 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                 </div>
             </div>
 
-            {/* AI SYNTHESIS OUTPUT */}
-            {(analysis || narrative) && (
-                <div className="animate-in slide-in-from-bottom-4 zoom-in-95 duration-500 mt-4">
-                    <div className={`p-10 border squircle specular-reflect shadow-2xl relative overflow-hidden group ${theme === 'snes' ? 'bg-surface/60 border-b-4 border-r-4 border-accent' : 'bg-accent/[0.04] border-accent/30'}`}>
-                        <div className="absolute top-0 right-0 w-80 h-80 bg-accent/5 blur-[100px] rounded-full -mr-40 -mt-40 group-hover:scale-125 transition-transform duration-2000" />
-
-                        <div className="flex items-center justify-between mb-6 relative z-10 w-full">
-                            <div className="flex items-center gap-3">
-                                <span className="w-3 h-3 rounded-full bg-accent shadow-[0_0_15px_rgba(255,51,102,0.8)]"></span>
-                                <h3 className="text-sm font-black uppercase tracking-[0.4em] text-accent">Cross-Platform Tactical Brief</h3>
-                            </div>
-                            {(igLastUpdated || ttLastUpdated) && (
-                                <span className="text-[8px] flex items-center gap-2 font-mono uppercase tracking-widest text-foreground/40">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                                    Data current as of {igLastUpdated || ttLastUpdated} 
-                                </span>
-                            )}
-                        </div>
-
-                        <div className="flex flex-col gap-8 relative z-10">
-                            <p className="text-xl font-black text-foreground tracking-tighter leading-tight max-w-4xl">{narrative || (analysis && analysis.summary)}</p>
-
-                            {/* Tactical Suggestion Cards */}
-                            {trends && (
-                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
-                                    <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-2">
-                                        <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Hook</span>
-                                        <span className="text-sm font-black text-accent">{trends.optimalLengthRange}</span>
-                                        <span className="text-[7px] uppercase font-bold text-foreground/30">Target Video Length</span>
-                                    </div>
-                                    <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-3 min-w-[200px]">
-                                        <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Windows (Top 3)</span>
-                                        <div className="flex flex-col gap-2">
-                                            {(trends.topWindows || [{ time: trends.peakPostingWindows, reach: 0 }]).slice(0, 3).map((w: any, i: number) => (
-                                                <div key={i} className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
-                                                    <span className="text-[9px] font-black text-accent">{w.time}</span>
-                                                    {w.reach > 0 && <span className="text-[7px] font-bold text-foreground/40 uppercase">{formatNumber(w.reach)} Reach</span>}
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Peak Virality Timing</span>
-                                    </div>
-
-                                    <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-3 min-w-[240px]">
-                                        <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Magnets (Top 3)</span>
-                                        <div className="flex flex-col gap-2">
-                                            {(trends.topMagnets || []).length > 0 ? (
-                                                trends.topMagnets.slice(0, 3).map((m: any, i: number) => (
-                                                    <div key={i} className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
-                                                        <span className="text-[7px] font-bold text-foreground/80 leading-tight line-clamp-2 italic">"{m.text}"</span>
-                                                        <span className="text-[9px] font-black text-accent mt-0.5">{m.rate ? m.rate.toFixed(1) : "N/A"} <span className="text-[6px] opacity-50">Follows / 1k</span></span>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
-                                                    <span className="text-[7px] font-bold text-foreground/80 leading-tight italic">"{trends.followerMagnet || 'No data'}"</span>
-                                                    <span className="text-[9px] font-black text-accent mt-0.5">N/A <span className="text-[6px] opacity-50">Follows / 1k</span></span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Peak Follower Conversion</span>
-                                    </div>
-
-                                    <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-3 min-w-[240px]">
-                                        <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Anchors (Top 3)</span>
-                                        <div className="flex flex-col gap-2">
-                                            {(trends.topAnchors || []).length > 0 ? (
-                                                trends.topAnchors.slice(0, 3).map((m: any, i: number) => (
-                                                    <div key={i} className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
-                                                        <span className="text-[7px] font-bold text-foreground/80 leading-tight line-clamp-2 italic">"{m.text}"</span>
-                                                        <span className="text-[9px] font-black text-pink-400 mt-0.5">{m.rate ? m.rate.toFixed(1) : "N/A"} <span className="text-[6px] opacity-50">Hits / 1k</span></span>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div className="flex flex-col border-b border-white/5 last:border-0 pb-1.5 last:pb-0">
-                                                    <span className="text-[7px] font-bold text-foreground/80 leading-tight italic">"{trends.engagementLeader || 'No data'}"</span>
-                                                    <span className="text-[9px] font-black text-pink-400 mt-0.5">N/A <span className="text-[6px] opacity-50">Hits / 1k</span></span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Total Interaction Leaders</span>
-                                    </div>
-
-                                    <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-2">
-                                        <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Voice</span>
-                                        <div className="flex flex-wrap gap-1">
-                                            {trends.topKeywords?.map((k: string, i: number) => (
-                                                <span key={i} className="text-[8px] font-mono bg-accent/10 border border-accent/20 px-1 rounded text-accent">{k}</span>
-                                            ))}
-                                        </div>
-                                        <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Target Keywords</span>
-                                    </div>
-
-                                    {demographics && (
-                                        <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-2">
-                                            <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Crowd</span>
-                                            <span className="text-sm font-black text-accent">{demographics.topGender || "Mixed"}</span>
-                                            <div className="flex flex-wrap gap-1 mt-1">
-                                                {demographics.topTerritories?.map((t: string, i: number) => (
-                                                    <span key={i} className="text-[8px] font-mono bg-accent/10 border border-accent/20 px-1 rounded text-accent">{t}</span>
-                                                ))}
-                                            </div>
-                                            <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Core Demographics</span>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {analysis && analysis.actionItems && (
-                                <div className="bg-black/30 border border-white/5 rounded-[2rem] p-8 flex flex-col gap-6 shadow-inner">
-                                    <span className="text-[11px] uppercase font-black text-accent tracking-[0.5em]">Executive Strategy Directives:</span>
-                                    <ul className="flex flex-col gap-5">
-                                        {analysis.actionItems.map((item: string, idx: number) => (
-                                            <li key={idx} className="text-sm font-bold flex gap-4 items-start tracking-tight leading-snug text-foreground/90">
-                                                <span className="text-accent font-black">0{idx + 1}</span>
-                                                {item}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* AI BRIEF OUTPUTS (Now Separated) */}
+            <div className="flex flex-col gap-6">
+                {renderTacticalBrief('tiktok', ttData)}
+                {renderTacticalBrief('instagram', igData)}
+            </div>
         </div>
     );
 }

@@ -12,20 +12,24 @@ export async function POST(req: Request) {
         }
 
         const systemInstruction = `
-            You are a tactical data scientist for an elite music brand.
-            Your goal is to extract deep patterns from messy TikTok CSV exports to inform content strategy.
-            You have been provided with multiple CSV files exported from TikTok.
-
-            USER GOAL: 
-            1. Total Metrics: Synthesize total Reach (Views), Followers, Likes, and Shares across the dataset. Use the most accurate macro file (like Overview or FollowerHistory) for totals.
-            2. Strategic Sweet Spots:
-               - Detect 'Top 3 Windows': Identify the 3 specific Day/Time combinations that correlate with highest engagement or active followers (from FollowerActivity).
-               - Detect 'Top 3 Magnets': The 3 posts with highest follows-per-1k-views (use Content.csv and triangulate). 
-               - Detect 'Top 3 Anchors': The 3 posts with most interactions (likes+comments+shares) per 1k views.
-               - Stylistic DNA: Identify common keywords, video length ranges, emojis, or tones across high-performing videos.
-            3. Demographics: Extract the Top Gender variation and Top 3 Territories.
-            4. Style Mapping: Create a list of all unique descriptions/titles.
-
+            You are a Master Tactical Strategist for an elite music brand.
+            Your goal is to perform a deep-scan of all provided TikTok CSV exports and extract a cohesive strategy.
+            
+            RULES FOR FLEXIBLE INTELLIGENCE:
+            1. DO NOT give up if a specific column name (like 'Reach' or 'Followers') is missing. 
+            2. SCAN ALL FILES to triangulate values. If 'Follower Count' isn't in a summary, look at the last entry in 'FollowerHistory.csv'.
+            3. If a specific metric is completely missing, use a STRATEGIC PROXY. For example, use 'Video Views' or 'Total Play Time' to determine 'The Hook' performance.
+            4. If interaction rates aren't pre-calculated, calculate them yourself (Interactions / Views).
+            
+            EXTRACTION GOALS:
+            - Totals: Reach (Views), Followers, Likes, Shares.
+            - The Hook (Video Length): Determine the duration range that most correlates with high completion/views.
+            - The Windows: Top 3 Day/Time segments for posting based on engagement or follower activity.
+            - The Voice: Top keywords, emojis, and tones extracted from video descriptions.
+            - The Magnets: Top 3 videos that converted the most 'Followers' (or had highest relative engagement).
+            - The Anchors: Top 3 videos with the most Interaction density (Likes+Comments+Shares per view).
+            - The Crowd: Top Gender and Top 3 Territories.
+            
             Return exactly a JSON object:
             {
                 "totals": { "reach": number, "followers": number, "likes": number, "shares": number },
@@ -33,15 +37,15 @@ export async function POST(req: Request) {
                     "optimalLengthRange": string, 
                     "topWindows": Array<{ "time": string, "reach": number }>, 
                     "topKeywords": string[], 
-                    "topMagnets": Array<{ "text": string, "rate": number }>, // Follows per 1k views
-                    "topAnchors": Array<{ "text": string, "rate": number }>  // Interactions per 1k views
+                    "topMagnets": Array<{ "text": string, "rate": number }>,
+                    "topAnchors": Array<{ "text": string, "rate": number }>
                 },
                 "demographics": {
                     "topGender": string,
                     "topTerritories": string[]
                 },
                 "descriptions": string[],
-                "narrative": string (2-sentence tactical recommendation)
+                "narrative": string (2-sentence direct tactical recommendation)
             }
         `;
 
