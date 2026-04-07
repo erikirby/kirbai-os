@@ -22,107 +22,148 @@ export async function POST(req: NextRequest) {
         const totalSec = parseInt(targetRuntime || "60");
         const missionId = `mission-${Date.now()}`;
         
-        // --- PHASE 1: ATTEMPT FULL MULTI-AGENT PLANNING ---
-        let shots = [];
-        let requiredReferences = [];
-        let allCameos = cameos || [];
-        let isFallback = false;
+        // --- PHASE 0: ASSET EXTRACTION ---
+        const extractorPrompt = `
+            You are "The Asset Scanner". Identify every Pokemon name mentioned in the following concept and lyrics.
+            CONCEPT: ${concept.title} - ${brainstormContent}
+            LYRICS: ${lyrics}
+            Return ONLY a JSON array of names.
+        `;
+        const extractorResult = await safeCallGemini("gemini-2.5-flash", { 
+            contents: [{ role: 'user', parts: [{ text: extractorPrompt }] }],
+            config: { 
+                responseMimeType: "application/json",
+                responseSchema: { type: Type.ARRAY, items: { type: Type.STRING } } 
+            }
+        });
+        const extractedCameos = JSON.parse(extractorResult.text || "[]");
+        const allCameos = Array.from(new Set([...(cameos || []), ...extractedCameos]));
 
-        try {
-            // Step 0: Asset Extraction
-            const extractorPrompt = `
-                You are "The Asset Scanner". Identify every Pokemon name mentioned in the following concept and lyrics.
-                CONCEPT: ${concept.title} - ${brainstormContent}
-                LYRICS: ${lyrics}
-                Return ONLY a JSON array of names.
-            `;
-            const extractorResult = await safeCallGemini("gemini-2.5-flash", {
-                contents: [{ role: 'user', parts: [{ text: extractorPrompt }] }],
-                config: { 
-                    responseMimeType: "application/json",
-                    responseSchema: { type: Type.ARRAY, items: { type: Type.STRING } } 
-                }
+        // --- PHASE 1: THE DIRECTOR DRAFTS THE VISION ---
+        let directorPrompt = `
+            You are "The Director", a specialist in narrative music videos for Kirbai OS.
+            CONCEPT: ${concept.title} - ${brainstormContent}
+            LYRICS: ${lyrics}
+            MODE: ${mode}
+            CAMEOS: ${allCameos.join(", ") || "None"}
+
+            Your goal is to draft a cinematic shot list. Each shot must have a timestamp and a clear visual description.
+            Focus on camera angles (Wide, Medium, Close-up), lighting, and character emotion.
+            Ensure the narrative is clear even without the lyrics.
+        `;
+        const directorParts: any[] = [{ text: directorPrompt }];
+        if (references && references.length > 0) {
+            references.forEach((ref: string) => {
+                const base64Data = ref.split(',')[1] || ref;
+                directorParts.push({ inlineData: { mimeType: "image/jpeg", data: base64Data } });
             });
-            const extractedCameos = JSON.parse(extractorResult.text || "[]");
-            allCameos = Array.from(new Set([...allCameos, ...extractedCameos]));
-
-            // Step 1: Sequential Planning (Combined for Speed)
-            const masterPrompt = `
-                You are "The Director". Take this brainstorm and lyrics and produce a final shot list.
-                CONCEPT: ${concept.title} - ${brainstormContent}
-                LYRICS: ${lyricLines.join('\n')}
-                CAMEOS: ${allCameos.join(", ")}
-                
-                Produce exactly ${expectedShotCount} shots. Each shot must map to one lyric line.
-                Return a JSON object: { requiredReferences: [], shots: [] }
-                Shots must have: timestamp, visualDescription, bananaPromptV2, grokPromptV2, syncedLyrics, refLabels.
-            `;
-
-            const masterResult = await safeCallGemini("gemini-2.5-flash", {
-                contents: [{ role: 'user', parts: [{ text: masterPrompt }] }],
-                config: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            requiredReferences: {
-                                type: Type.ARRAY,
-                                items: {
-                                    type: Type.OBJECT,
-                                    properties: {
-                                        label: { type: Type.STRING },
-                                        description: { type: Type.STRING },
-                                        category: { type: Type.STRING, enum: ["Character", "Location", "Object"] }
-                                    },
-                                    required: ["label", "description", "category"]
-                                }
-                            },
-                            shots: {
-                                type: Type.ARRAY,
-                                items: {
-                                    type: Type.OBJECT,
-                                    properties: {
-                                        timestamp: { type: Type.STRING },
-                                        visualDescription: { type: Type.STRING },
-                                        bananaPromptV2: { type: Type.STRING },
-                                        grokPromptV2: { type: Type.STRING },
-                                        syncedLyrics: { type: Type.STRING },
-                                        refLabels: { type: Type.ARRAY, items: { type: Type.STRING } }
-                                    },
-                                    required: ["timestamp", "visualDescription", "bananaPromptV2", "grokPromptV2", "syncedLyrics", "refLabels"]
-                                }
-                            }
-                        },
-                        required: ["shots", "requiredReferences"]
-                    }
-                }
-            });
-
-            const responseData = JSON.parse(masterResult.text || "{}");
-            shots = responseData.shots || [];
-            requiredReferences = responseData.requiredReferences || [];
-            
-            if (masterResult.usageMetadata) await logApiUsageAsync("/api/director/plan (Master)", masterResult.usageMetadata.promptTokenCount || 0, masterResult.usageMetadata.candidatesTokenCount || 0);
-
-        } catch (planningError) {
-            console.error("Full Planning Failed, Falling back to Draft Mode:", planningError);
-            isFallback = true;
-            // --- FALLBACK: DETERMINISTIC DRAFT ---
-            // Just map the lyrics to basic shots based on description
-            shots = lyricLines.map((line: string, i: number) => ({
-                timestamp: `${Math.round((i * (totalSec / expectedShotCount)) * 10) / 10}s`,
-                visualDescription: `Automatic Draft: ${line} - Based on ${concept.title}`,
-                bananaPromptV2: `A cinematic scene for ${concept.title}. ${line}. Based on ${brainstormContent}. Style: 90s aesthetic. [High Fidelity]`,
-                grokPromptV2: `models stay consistent and do not morph. no music. ${line}`,
-                syncedLyrics: line,
-                refLabels: []
-            }));
-            requiredReferences = [
-                { label: alias || "Protagonist", description: `Primary actor for ${concept.title}`, category: "Character" as const }
-            ];
+            directorPrompt += "\nNote: I have provided reference images for the Art Style and Character Poses. Please ensure the vision matches these exactly.";
+            directorParts[0].text = directorPrompt;
         }
 
-        // --- PHASE 2: PERSISTENCE ---
+        const directorResult = await safeCallGemini("gemini-2.5-flash", { contents: [{ role: 'user', parts: directorParts }] });
+        const directorDraft = directorResult.text;
+        if (directorResult.usageMetadata) await logApiUsageAsync("/api/director/plan (Director)", directorResult.usageMetadata.promptTokenCount || 0, directorResult.usageMetadata.candidatesTokenCount || 0);
+
+        // --- PHASE 2 & 3: PARALLEL CRITIQUES (Strategist & Audience) ---
+        const [strategistResult, audienceResult] = await Promise.all([
+            safeCallGemini("gemini-2.5-flash", {
+                contents: [{ role: 'user', parts: [{ text: `
+                    You are "The Retention Strategist". You specialize in TikTok/Reels and high-engagement social content.
+                    The Director has proposed this plan:
+                    ${directorDraft}
+
+                    Critique this plan for SOCIAL SUCCESS. Focus on Hooks, Pacing, and Clarity. Suggest specific improvements.
+                ` }] }]
+            }),
+            safeCallGemini("gemini-2.5-flash", {
+                contents: [{ role: 'user', parts: [{ text: `
+                    You are "The Audience Critic", representing Pokemon fans and camp/drag enthusiasts.
+                    DIRECTOR DRAFT: ${directorDraft}
+                    Evaluate if this mission hits the "Cunt/Slay" aesthetic. Focus on Niche Appeal and Emotional Climax. Provide a blunt critique.
+                ` }] }]
+            })
+        ]);
+        const strategistCritique = strategistResult.text;
+        const audienceCritique = audienceResult.text;
+
+        // --- PHASE 4: THE REFINED "FINAL CUT" ---
+        const refinementPrompt = `
+            You are "The Director". Refine your vision based on feedback.
+            ORIGINAL VISION: ${directorDraft}
+            SOCIAL CRITIQUE: ${strategistCritique}
+            AUDIENCE CRITIQUE: ${audienceCritique}
+            Produce your REVISED FINAL CUT. Resolve the narrative confusion and implement the pacing requested.
+        `;
+        const refinedResult = await safeCallGemini("gemini-2.5-flash", { contents: [{ role: 'user', parts: [{ text: refinementPrompt }] }] });
+        const finalCut = refinedResult.text;
+
+        // --- PHASE 5: THE VISUALIST (SHOT MATRIX) ---
+        const visualistPrompt = `
+            You are "The Visualist". Take the Director's FINAL CUT and produce a structured Shot Matrix.
+            FINAL CUT: ${finalCut}
+            LYRICS: ${lyricLines.join('\n')}
+            TARGET RUNTIME: ${totalSec} seconds
+            EXPECTED SHOT COUNT: ${expectedShotCount}
+            CAMEOS: ${allCameos.join(", ")}
+            
+            RULES:
+            1. MANDATORY: EXACTLY ${expectedShotCount} shots.
+            2. Each shot MUST map to exactly one lyric line.
+            3. CATEGORIZED SOURCES: Identify needed "Character", "Location", "Object" refs. Character rule: and outfit/pose is a "Character" ref.
+            4. CAMEO RULE: MUST create a Character requirement for every cameo: [${allCameos.join(", ")}].
+            5. PROMPTS: bananaPromptV2 for 9:16 high-fidelity images. grokPromptV2 for movement. 
+
+            Return a JSON object: { requiredReferences: [], shots: [] }
+        `;
+        const visualistResult = await safeCallGemini("gemini-2.5-flash", {
+            contents: [{ role: 'user', parts: [{ text: visualistPrompt }] }],
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        requiredReferences: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    label: { type: Type.STRING },
+                                    description: { type: Type.STRING },
+                                    category: { type: Type.STRING, enum: ["Character", "Location", "Object"] }
+                                },
+                                required: ["label", "description", "category"]
+                            }
+                        },
+                        shots: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    timestamp: { type: Type.STRING },
+                                    visualDescription: { type: Type.STRING },
+                                    bananaPromptV2: { type: Type.STRING },
+                                    grokPromptV2: { type: Type.STRING },
+                                    syncedLyrics: { type: Type.STRING },
+                                    refLabels: { type: Type.ARRAY, items: { type: Type.STRING } },
+                                    directorNote: { type: Type.STRING },
+                                    strategistNote: { type: Type.STRING },
+                                    audienceNote: { type: Type.STRING }
+                                },
+                                required: ["timestamp", "visualDescription", "bananaPromptV2", "grokPromptV2", "syncedLyrics", "refLabels"]
+                            }
+                        }
+                    },
+                    required: ["shots", "requiredReferences"]
+                }
+            }
+        });
+
+        const responseData = JSON.parse(visualistResult.text || "{}");
+        const shotsData = responseData.shots || [];
+        const requiredReferencesData = responseData.requiredReferences || [];
+
+        // --- PHASE 6: PERSISTENCE ---
         const mission = {
             id: missionId,
             conceptId: concept.id || `promoted-${Date.now()}`,
@@ -131,15 +172,15 @@ export async function POST(req: NextRequest) {
             alias: alias || (mode === 'kirbai' ? 'Kirbai' : 'AELOW'),
             mode: mode,
             references: references || [],
-            requiredReferences: requiredReferences,
+            requiredReferences: requiredReferencesData,
             cameos: allCameos,
-            shots: shots.map((s: any, i: number) => ({
+            shots: shotsData.map((s: any, i: number) => ({
                 id: `${missionId}-shot-${i}`,
                 timestamp: s.timestamp,
                 lyric: s.syncedLyrics,
                 visualDescription: s.visualDescription,
                 personaCritiques: {
-                    director: s.directorNote || (isFallback ? "Draft Mode triggered (High Traffic fallback)" : ""),
+                    director: s.directorNote || "",
                     strategist: s.strategistNote || "",
                     audience: s.audienceNote || ""
                 },
@@ -155,7 +196,7 @@ export async function POST(req: NextRequest) {
 
         await saveMissionAsync(mission as any);
         const telemetry = await getTelemetryAsync();
-        return NextResponse.json({ success: true, mission, telemetry, isFallback });
+        return NextResponse.json({ success: true, mission, telemetry });
 
     } catch (e: any) {
         console.error("Director Plan Fatal Error:", e);
