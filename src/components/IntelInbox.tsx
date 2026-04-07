@@ -93,7 +93,7 @@ export default function IntelInbox({ mode = "full", theme = "dark", activeTab = 
         return (
             <div className="flex flex-col gap-6">
                 {/* Assistant Clefairy */}
-                <div className="flex justify-center -ml-4 overflow-hidden" style={{ transform: 'scale(0.85)' }}>
+                <div className="flex justify-center -ml-4" style={{ transform: 'scale(0.85)' }}>
                     <MuseClefairy emotion="happy" message="Review the latest demographic splits from your new TikTok pipeline!" />
                 </div>
 
@@ -101,6 +101,7 @@ export default function IntelInbox({ mode = "full", theme = "dark", activeTab = 
                 <div className="flex flex-col gap-3 mt-2">
                     <h4 className="text-[10px] uppercase tracking-[0.3em] text-foreground/50 font-black">Command Hub Links</h4>
                     <div className="flex flex-col gap-2">
+                        <a href="https://www.skool.com/aimusic" target="_blank" className="p-3 border rounded-2xl text-[10px] font-bold text-center transition-all bg-accent/10 border-accent/30 hover:border-accent text-accent">Skool: AI Music</a>
                         <a href="https://www.tiktok.com/tiktokstudio/analytics/" target="_blank" className="p-3 border rounded-2xl text-[10px] font-bold text-center transition-all bg-surface border-border/10 hover:border-accent/40 text-foreground/80">TikTok Studio Stats</a>
                         <a href="https://business.facebook.com/latest/posts/published_posts?business_id=1524540791867233&asset_id=959080893962864" target="_blank" className="p-3 border rounded-2xl text-[10px] font-bold text-center transition-all bg-surface border-border/10 hover:border-accent/40 text-foreground/80">Meta Business Suite</a>
                         <a href="https://distrokid.com/stats/?data=streams" target="_blank" className="p-3 border rounded-2xl text-[10px] font-bold text-center transition-all bg-surface border-border/10 hover:border-accent/40 text-foreground/80">DistroKid Reporting</a>

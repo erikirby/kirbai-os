@@ -106,17 +106,10 @@ const MuseClefairy: React.FC<MuseClefairyProps> = ({ emotion = 'idle', message }
 
                 {/* Speech Bubble - Artistic Float Style (Option 2) */}
                 {displayedMessage && (
-                    <div className="absolute -top-12 -left-20 w-48 md:w-56 bg-white/95 backdrop-blur-3xl p-4 rounded-[32px] shadow-[0_30px_70px_rgba(255,51,102,0.15)] border-2 border-accent/10 animate-in zoom-in slide-in-from-bottom-4 duration-300 z-[100]">
+                    <div className="absolute top-[105%] left-0 w-48 md:w-56 bg-white/95 backdrop-blur-3xl p-4 rounded-[32px] shadow-[0_30px_70px_rgba(255,51,102,0.15)] border-2 border-accent/10 animate-in zoom-in slide-in-from-top-4 duration-300 z-[100]">
                         <p className="text-[11px] font-black text-accent uppercase tracking-widest leading-relaxed text-center italic drop-shadow-sm">
                             {displayedMessage}
                         </p>
-                        
-                        {/* Organic SVG Bubble Tail - Matches Curvature */}
-                        <div className="absolute -bottom-5 right-10 w-10 h-8 text-white/95 drop-shadow-[0_10px_20px_rgba(255,51,102,0.1)]">
-                            <svg viewBox="0 0 40 40" fill="currentColor" className="w-full h-full transform scale-x-[-1]">
-                                <path d="M0,0 Q10,0 20,20 Q30,40 40,40 Q25,35 15,15 Q5,0 0,0" />
-                            </svg>
-                        </div>
                     </div>
                 )}
             </div>
