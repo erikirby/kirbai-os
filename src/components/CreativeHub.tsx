@@ -149,7 +149,10 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
     };
 
     const handlePromote = async (concept: Concept) => {
-        if (!lyrics.trim()) return;
+        if (!lyrics.trim()) {
+            alert("Please paste lyrics or a script before promoting.");
+            return;
+        }
         setIsPlanning(true);
         try {
             const res = await fetch('/api/director/plan', {
@@ -167,11 +170,13 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
             if (data.success) {
                 setPromotingId(null);
                 setLyrics("");
-                // Optionally switch to Director tab or show success
                 alert("Mission Created! Head to Director Suite.");
+            } else {
+                alert(`Director's Block: ${data.error || "The AI mission planning failed."}`);
             }
         } catch (e) {
             console.error(e);
+            alert("Connection Error: The Director is currently offline or timing out. Please try again in a few seconds.");
         } finally {
             setIsPlanning(false);
         }
