@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Loader2 } from "@/components/Icons";
+import MuseClefairy from './MuseClefairy';
 
 interface IntelInboxProps {
     mode?: "compact" | "full";
@@ -91,70 +92,18 @@ export default function IntelInbox({ mode = "full", theme = "dark", activeTab = 
     if (mode === "compact") {
         return (
             <div className="flex flex-col gap-6">
-                {/* Compact Pulse Alerts */}
-                <div className="flex flex-col gap-3">
-                    <div className="flex justify-between items-center mb-1">
-                        <h4 className="text-[10px] uppercase tracking-[0.3em] text-accent font-black">Pulse Alerts</h4>
-                    </div>
-                    {isLoading ? (
-                        <div className="flex items-center gap-2 py-4 opacity-50">
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                            <span className="text-[9px] uppercase tracking-widest">Scanning...</span>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col gap-2">
-                            {/* Only show Social Pulse and top 1-line signal in compact mode */}
-                            {news.filter(n => n.source === "Social Pulse").slice(0, 1).map((item, idx) => (
-                                <div key={idx} className="p-3 border squircle flex flex-col gap-1 bg-accent/5 border-accent/20">
-                                    <span className="text-[10px] font-black text-accent leading-tight line-clamp-2">{item.title}</span>
-                                    <span className="text-[8px] font-mono uppercase tracking-tighter mt-1 text-foreground/50">High Prio Signal</span>
-                                </div>
-                            ))}
-                            {intel.slice(0, 1).map((item: any) => (
-                                <div key={item.id} className="p-3 border squircle flex flex-col gap-1 bg-surface/40 border-border/10">
-                                    <span className="text-[10px] font-bold leading-tight line-clamp-2 text-foreground/90">{item.title.replace("AIGuerrilla: ", "")}</span>
-                                    <span className="text-[8px] font-mono uppercase tracking-tighter mt-1 text-foreground/50">Video Digest</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* Daily Quests / To-Dos */}
-                <div className="flex flex-col gap-3">
-                    <h4 className="text-[10px] uppercase tracking-[0.3em] text-foreground/50 font-black">Daily Quests</h4>
-                    <div className="flex flex-col gap-2">
-                        {[
-                            { task: "Execute SEO Synthesis", xp: "+50 XP" },
-                            { task: "Log Weekly IG/TT Metrics", xp: "+40 XP" },
-                            { task: "Verify Payout Matrix", xp: "+20 XP" },
-                            { task: "Update Roadmap", xp: "+10 XP" }
-                        ].map((q, i) => (
-                            <div key={i} className="group flex justify-between items-center p-3 transition-all cursor-pointer gap-2 bg-black/10 border border-border/10 hover:border-accent/30 rounded-2xl">
-                                <span className="text-[10px] font-bold leading-tight text-foreground/80 group-hover:text-foreground">{q.task}</span>
-                                <span className="text-[8px] font-mono font-black whitespace-nowrap text-accent">{q.xp}</span>
-                            </div>
-                        ))}
-                    </div>
+                {/* Assistant Clefairy */}
+                <div className="flex justify-center -ml-4 overflow-hidden" style={{ transform: 'scale(0.85)' }}>
+                    <MuseClefairy emotion="happy" message="Review the latest demographic splits from your new TikTok pipeline!" />
                 </div>
 
                 {/* Command Hub Links */}
                 <div className="flex flex-col gap-3 mt-2">
-                    <h4 className="text-[10px] uppercase tracking-[0.3em] text-foreground/50 font-black">Command Hub</h4>
+                    <h4 className="text-[10px] uppercase tracking-[0.3em] text-foreground/50 font-black">Command Hub Links</h4>
                     <div className="flex flex-col gap-2">
-                        <a href="https://skool.com" target="_blank" className="p-3 border rounded-2xl text-[10px] font-bold text-center transition-all bg-surface border-border/10 hover:border-accent/40 text-foreground/80">Skool Community</a>
-                        <a href="https://youtube.com" target="_blank" className="p-3 border rounded-2xl text-[10px] font-bold text-center transition-all bg-surface border-border/10 hover:border-accent/40 text-foreground/80">YouTube Studio</a>
-                    </div>
-                </div>
-
-                {/* XP / Level Indicator */}
-                <div className="mt-4 pt-4 border-t border-border/10 flex flex-col gap-2">
-                    <div className="flex justify-between items-end">
-                        <span className="text-[10px] font-black text-foreground tracking-widest uppercase">Level 14</span>
-                        <span className="text-[8px] font-mono text-foreground/50 font-bold">450 / 1000 XP</span>
-                    </div>
-                    <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden">
-                        <div className="h-full xp-bar-inner" style={{ width: '45%' }}></div>
+                        <a href="https://www.tiktok.com/tiktokstudio/analytics/" target="_blank" className="p-3 border rounded-2xl text-[10px] font-bold text-center transition-all bg-surface border-border/10 hover:border-accent/40 text-foreground/80">TikTok Studio Stats</a>
+                        <a href="https://business.facebook.com/latest/posts/published_posts?business_id=1524540791867233&asset_id=959080893962864" target="_blank" className="p-3 border rounded-2xl text-[10px] font-bold text-center transition-all bg-surface border-border/10 hover:border-accent/40 text-foreground/80">Meta Business Suite</a>
+                        <a href="https://distrokid.com/stats/?data=streams" target="_blank" className="p-3 border rounded-2xl text-[10px] font-bold text-center transition-all bg-surface border-border/10 hover:border-accent/40 text-foreground/80">DistroKid Reporting</a>
                     </div>
                 </div>
             </div>

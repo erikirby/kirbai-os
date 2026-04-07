@@ -24,6 +24,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
     const [analysis, setAnalysis] = useState<any>(null);
     const [trends, setTrends] = useState<any>(null);
     const [narrative, setNarrative] = useState<string>("");
+    const [demographics, setDemographics] = useState<any>(null);
     
     // Pending states for manual inputs
     const [pendingTtFollowers, setPendingTtFollowers] = useState<string>("");
@@ -45,6 +46,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                     setIgLastUpdated(s.igLastUpdated || "");
                     setTrends(s.trends || null);
                     setNarrative(s.narrative || "");
+                    setDemographics(s.demographics || null);
                     setAnalysis(s.analysis || null); // Persist synthesis results
                     
                     // Also sync pending manual inputs
@@ -105,6 +107,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                     ttLastUpdated,
                     igLastUpdated,
                     trends,
+                    demographics,
                     narrative,
                     analysis: data.analysis
                 });
@@ -140,6 +143,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
             ttLastUpdated,
             igLastUpdated,
             trends,
+            demographics,
             narrative,
             analysis // Include analysis in every sync
         };
@@ -157,28 +161,45 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
     };
 
     const handleCSVUpload = async (platform: 'tiktok' | 'instagram', event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
+        const filesSelect = event.target.files;
+        if (!filesSelect || filesSelect.length === 0) return;
 
         setIsUploadingCSV(platform);
 
         try {
-            const text = await file.text();
+            let res;
+            if (platform === 'tiktok') {
+                const filePromises = Array.from(filesSelect).map(async (f) => ({
+                    name: f.name,
+                    content: await f.text()
+                }));
+                const filesData = await Promise.all(filePromises);
 
-            const res = await fetch('/api/parse-csv', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ platform, csvText: text })
-            });
+                res = await fetch('/api/parse-tiktok', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ files: filesData })
+                });
+            } else {
+                const file = filesSelect[0];
+                const text = await file.text();
+
+                res = await fetch('/api/parse-csv', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ platform, csvText: text })
+                });
+            }
 
             const json = await res.json();
 
             if (json.success && json.data) {
-                const { followers, reach, trends: newTrends, narrative: newNarrative } = json.data;
+                const { followers, reach, trends: newTrends, demographics: newDemographics, narrative: newNarrative } = json.data;
                 const now = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
                 // Update UI state
                 if (newTrends) setTrends(newTrends);
+                if (newDemographics) setDemographics(newDemographics);
                 if (newNarrative) setNarrative(newNarrative);
 
                 let updatedFollowers = followers?.toString() || (platform === 'tiktok' ? ttFollowers : igFollowers);
@@ -203,6 +224,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                     ttLastUpdated: platform === 'tiktok' ? now : ttLastUpdated,
                     igLastUpdated: platform === 'instagram' ? now : igLastUpdated,
                     trends: newTrends || trends,
+                    demographics: newDemographics || demographics,
                     narrative: newNarrative || narrative,
                     analysis // Preserve existing analysis if it exists
                 });
@@ -312,7 +334,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                                         <>[ Drop Followers or Views CSV ]</>
                                     )}
                                 </label>
-                                <input id="tiktok-csv" type="file" accept=".csv" className="hidden" disabled={!!isUploadingCSV} onChange={(e) => handleCSVUpload('tiktok', e)} />
+                                <input id="tiktok-csv" type="file" multiple accept=".csv" className="hidden" disabled={!!isUploadingCSV} onChange={(e) => handleCSVUpload('tiktok', e)} />
                             </div>
                             <span className="text-[7px] uppercase tracking-widest text-foreground/30 font-bold block">AI extracts available stats • Drop multiple files</span>
                         </div>
@@ -457,6 +479,19 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                                         </div>
                                         <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Target Keywords</span>
                                     </div>
+
+                                    {demographics && (
+                                        <div className="bg-black/20 border border-white/5 p-5 rounded-3xl flex flex-col gap-2">
+                                            <span className="text-[8px] font-black uppercase tracking-widest text-foreground/40">The Crowd</span>
+                                            <span className="text-sm font-black text-accent">{demographics.topGender || "Mixed"}</span>
+                                            <div className="flex flex-wrap gap-1 mt-1">
+                                                {demographics.topTerritories?.map((t: string, i: number) => (
+                                                    <span key={i} className="text-[8px] font-mono bg-accent/10 border border-accent/20 px-1 rounded text-accent">{t}</span>
+                                                ))}
+                                            </div>
+                                            <span className="text-[7px] uppercase font-bold text-foreground/30 mt-auto">Core Demographics</span>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
