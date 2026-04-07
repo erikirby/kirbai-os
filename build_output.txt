@@ -1,0 +1,31 @@
+
+> kirbai-os@0.1.0 build
+> next build
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.8s
+  Skipping validation of types
+  Collecting page data using 11 workers ...
+Error: supabaseKey is required.
+    at module evaluation (.next/server/chunks/[root-of-the-server]__a33d6508._.js:1:1169)
+    at instantiateModule (.next/server/chunks/[turbopack]_runtime.js:740:9)
+    at getOrInstantiateModuleFromParent (.next/server/chunks/[turbopack]_runtime.js:763:12)
+    at Context.esmImport [as i] (.next/server/chunks/[turbopack]_runtime.js:228:20)
+    at module evaluation (.next/server/chunks/[root-of-the-server]__a33d6508._.js:1:7851)
+    at instantiateModule (.next/server/chunks/[turbopack]_runtime.js:740:9)
+    at instantiateRuntimeModule (.next/server/chunks/[turbopack]_runtime.js:768:12)
+    at getOrInstantiateRuntimeModule (.next/server/chunks/[turbopack]_runtime.js:781:12)
+
+> Build error occurred
+Error: Failed to collect page data for /api/admin/restore
+    at ignore-listed frames {
+  type: 'Error'
+}
+npm notice
+npm notice New minor version of npm available! 11.11.0 -> 11.12.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.12.1
+npm notice To update run: npm install -g npm@11.12.1
+npm notice

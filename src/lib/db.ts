@@ -3,9 +3,10 @@ import crypto from 'crypto';
 
 // Server-side Supabase client (used in lib/db.ts which runs only on server)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Switching to Service Role Key (secret) to bypass RLS internally while locking public access.
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'dummy_build_key';
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl || 'https://dummy.supabase.co', supabaseKey);
 
 export interface MetadataPack {
     alias: string;
