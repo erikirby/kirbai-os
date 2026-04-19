@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const PUBLIC_PATHS = ['/login', '/api/auth'];
 
 // AI routes to rate limit (protects Gemini API from abuse)
 const AI_ROUTES = [
@@ -34,18 +33,7 @@ function isRateLimited(ip: string): boolean {
 export function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
-    // Allow login page and auth API through
-    if (PUBLIC_PATHS.some(p => pathname.startsWith(p))) {
-        return NextResponse.next();
-    }
-
-    // Check for valid auth cookie
-    const auth = req.cookies.get('kirbai_auth');
-    if (auth?.value !== process.env.SITE_PASSWORD) {
-        const loginUrl = req.nextUrl.clone();
-        loginUrl.pathname = '/login';
-        return NextResponse.redirect(loginUrl);
-    }
+    // Password protection removed for open access
 
     // Rate limit AI endpoints
     if (AI_ROUTES.some(r => pathname.startsWith(r))) {
