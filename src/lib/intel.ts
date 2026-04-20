@@ -42,17 +42,17 @@ export async function safeCallGemini(
  * Fallback AI call via OpenRouter using free-tier models.
  * Used when all Gemini quota is exhausted.
  */
-export async function callOpenRouter(prompt: string, systemInstruction: string): Promise<string> {
+export async function callOpenRouter(prompt: string, systemInstruction: string, jsonMode = false): Promise<string> {
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) throw new Error("OPENROUTER_API_KEY is not set");
 
     const FREE_MODELS = [
-        "google/gemma-4-31b-it:free",           // 262k ctx, newest Gemma, strong JSON
-        "nvidia/nemotron-3-super-120b-a12b:free", // 262k ctx, large NVIDIA model
-        "openai/gpt-oss-120b:free",              // 131k ctx, OpenAI open-source
-        "nousresearch/hermes-3-llama-3.1-405b:free", // 131k ctx, excellent instruction following
-        "meta-llama/llama-3.3-70b-instruct:free", // 65k ctx, reliable fallback
-        "google/gemma-3-27b-it:free",            // 131k ctx, proven working
+        "google/gemma-4-31b-it:free",
+        "nvidia/nemotron-3-super-120b-a12b:free",
+        "openai/gpt-oss-120b:free",
+        "nousresearch/hermes-3-llama-3.1-405b:free",
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "google/gemma-3-27b-it:free",
     ];
 
     let lastError: any;
@@ -60,7 +60,15 @@ export async function callOpenRouter(prompt: string, systemInstruction: string):
         try {
             console.log(`[OpenRouter] Trying ${model}`);
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 10000); // 10s per model
+            const timeout = setTimeout(() => controller.abort(), 10000);
+            const body: any = {
+                model,
+                messages: [
+                    { role: "system", content: systemInstruction },
+                    { role: "user", content: prompt },
+                ],
+            };
+            if (jsonMode) body.response_format = { type: "json_object" };
             const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
                 signal: controller.signal,
@@ -70,14 +78,7 @@ export async function callOpenRouter(prompt: string, systemInstruction: string):
                     "HTTP-Referer": "https://kirbai-os.vercel.app",
                     "X-Title": "Kirbai OS",
                 },
-                body: JSON.stringify({
-                    model,
-                    messages: [
-                        { role: "system", content: systemInstruction },
-                        { role: "user", content: prompt },
-                    ],
-                    response_format: { type: "json_object" },
-                }),
+                body: JSON.stringify(body),
             });
             clearTimeout(timeout);
 
@@ -89,16 +90,6 @@ export async function callOpenRouter(prompt: string, systemInstruction: string):
             const data = await res.json();
             const text = data.choices?.[0]?.message?.content;
             if (!text) throw new Error("OpenRouter returned empty content");
-
-            // Validate it's parseable JSON with expected shape
-            const parsed = JSON.parse(text);
-            if (!parsed.cards || !Array.isArray(parsed.cards) || parsed.cards.length === 0) {
-                throw new Error(`OpenRouter ${model} returned malformed structure`);
-            }
-            const firstCard = parsed.cards[0];
-            if (!firstCard.title || !firstCard.type || !firstCard.description) {
-                throw new Error(`OpenRouter ${model} returned cards missing required fields`);
-            }
 
             console.log(`[OpenRouter] Success with ${model}`);
             return text;
@@ -114,7 +105,7 @@ export async function callOpenRouter(prompt: string, systemInstruction: string):
  * Fallback AI call via Groq's free tier.
  * Fast inference, separate quota pool from Gemini and OpenRouter.
  */
-export async function callGroq(prompt: string, systemInstruction: string): Promise<string> {
+export async function callGroq(prompt: string, systemInstruction: string, jsonMode = false): Promise<string> {
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) throw new Error("GROQ_API_KEY is not set");
 
@@ -130,6 +121,15 @@ export async function callGroq(prompt: string, systemInstruction: string): Promi
             console.log(`[Groq] Trying ${model}`);
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 15000);
+            const body: any = {
+                model,
+                messages: [
+                    { role: "system", content: systemInstruction },
+                    { role: "user", content: prompt },
+                ],
+                temperature: 0.8,
+            };
+            if (jsonMode) body.response_format = { type: "json_object" };
             const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
                 signal: controller.signal,
@@ -137,15 +137,7 @@ export async function callGroq(prompt: string, systemInstruction: string): Promi
                     "Authorization": `Bearer ${apiKey}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    model,
-                    messages: [
-                        { role: "system", content: systemInstruction },
-                        { role: "user", content: prompt },
-                    ],
-                    response_format: { type: "json_object" },
-                    temperature: 0.8,
-                }),
+                body: JSON.stringify(body),
             });
             clearTimeout(timeout);
 
@@ -157,15 +149,6 @@ export async function callGroq(prompt: string, systemInstruction: string): Promi
             const data = await res.json();
             const text = data.choices?.[0]?.message?.content;
             if (!text) throw new Error("Groq returned empty content");
-
-            const parsed = JSON.parse(text);
-            if (!parsed.cards || !Array.isArray(parsed.cards) || parsed.cards.length === 0) {
-                throw new Error(`Groq ${model} returned malformed structure`);
-            }
-            const firstCard = parsed.cards[0];
-            if (!firstCard.title || !firstCard.type || !firstCard.description) {
-                throw new Error(`Groq ${model} returned cards missing required fields`);
-            }
 
             console.log(`[Groq] Success with ${model}`);
             return text;

@@ -33,10 +33,13 @@ export async function POST(req: NextRequest) {
                 tracklist: p.tracklist,
             }));
 
+        const primaryProject = kirbaiProjects.find((p: any) => p.status === 'Primary') || null;
+
         const contextSummary = `
             CURRENT DATE: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            CURRENT ERA (PRIMARY PROJECT — focus suggestions here): ${JSON.stringify(primaryProject || "None set")}
             LORE: ${JSON.stringify(lore?.nodes?.slice(0, 10) || "Empty")}
-            ACTIVE KIRBAI PROJECTS (Vault): ${JSON.stringify(kirbaiProjects.slice(0, 5) || "None")}
+            ALL KIRBAI PROJECTS (Vault): ${JSON.stringify(kirbaiProjects.slice(0, 5) || "None")}
             RECENT MISSIONS: ${JSON.stringify(missions?.slice(0, 3) || "None")}
             CURRENT ROADMAP: ${JSON.stringify(roadmap?.phases?.find((p: any) => p.status === 'Current Objective') || "None")}
             USER PSYCHE: ${JSON.stringify(psyche || "No memory yet")}
@@ -71,7 +74,7 @@ export async function POST(req: NextRequest) {
             - Mental health/Motivation check-ins.
 
             SPECIFIC INSTRUCTIONS:
-            - THE LOREKEEPER: Ground every suggestion in the actual lore nodes and active projects from the context. Do not invent or default to generic Pokémon themes.
+            - THE LOREKEEPER: Ground every suggestion in the CURRENT ERA project and lore nodes from the context. Do not reference other vault projects unless directly relevant.
             - THE ADVOCATE: If Erik's motivation is low, PUSH for low-effort, high-reward "rest weeks" or "automation wins".
             - THE STRATEGIST: Base trend suggestions on the LIVE PLATFORM INTEL in the context, not hardcoded assumptions.
             - THE MUSE: Provide a high-level "Clefairy Comment" for the entire session.
@@ -103,7 +106,7 @@ export async function POST(req: NextRequest) {
         // Primary: OpenRouter free tier (no quota drain on Gemini)
         try {
             console.log('[Muse] Trying OpenRouter...');
-            responseText = await callOpenRouter(musePrompt, symposiumPrompt);
+            responseText = await callOpenRouter(musePrompt, symposiumPrompt, true);
         } catch (orErr: any) {
             console.warn(`[Muse] OpenRouter failed: ${orErr.message?.slice(0, 80)}`);
             let resolved = false;
@@ -111,7 +114,7 @@ export async function POST(req: NextRequest) {
             // Second: Groq free tier
             try {
                 console.log('[Muse] Trying Groq...');
-                responseText = await callGroq(musePrompt, symposiumPrompt);
+                responseText = await callGroq(musePrompt, symposiumPrompt, true);
                 resolved = true;
             } catch (groqErr: any) {
                 console.warn(`[Muse] Groq failed: ${groqErr.message?.slice(0, 80)}`);
@@ -142,6 +145,9 @@ export async function POST(req: NextRequest) {
         }
 
         const parsed = JSON.parse(responseText);
+        if (!parsed.cards || !Array.isArray(parsed.cards) || parsed.cards.length === 0) {
+            throw new Error("AI response missing cards array");
+        }
 
         // Store the cards (pending status)
         const cards: MuseCard[] = parsed.cards.map((c: any) => ({

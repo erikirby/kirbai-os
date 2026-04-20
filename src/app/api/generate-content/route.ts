@@ -246,11 +246,11 @@ export async function POST(req: NextRequest) {
                 usingFallback = true;
                 const lastUserMessage = formattedHistory[formattedHistory.length - 1]?.parts?.[0]?.text || '';
                 try {
-                    const orText = await callOpenRouter(lastUserMessage, systemInstruction);
+                    const orText = await callOpenRouter(lastUserMessage, systemInstruction, false);
                     return NextResponse.json({ result: orText });
                 } catch (orErr: any) {
                     console.warn(`[Chat] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
-                    const groqText = await callGroq(lastUserMessage, systemInstruction);
+                    const groqText = await callGroq(lastUserMessage, systemInstruction, false);
                     return NextResponse.json({ result: groqText });
                 }
             }
