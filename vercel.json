@@ -8,6 +8,9 @@
   "functions": {
     "src/app/api/director/generate-image/route.ts": {
       "maxDuration": 60
+    },
+    "src/app/api/muse/generate/route.ts": {
+      "maxDuration": 45
     }
   }
 }

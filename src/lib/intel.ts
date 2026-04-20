@@ -6,7 +6,7 @@ import { IntelItem, logApiUsageAsync } from "@/lib/db";
  * On the Free Tier, we hit 429s often (especially on Pro).
  */
 export async function safeCallGemini(
-    modelName: "gemini-2.5-flash" | "gemini-2.5-pro",
+    modelName: "gemini-2.5-flash" | "gemini-2.5-pro" | "gemini-2.0-flash",
     options: any,
     retries = 2
 ): Promise<any> {

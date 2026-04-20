@@ -97,7 +97,9 @@ export async function POST(req: NextRequest) {
             }
         `;
 
-        const modelResponse = await safeCallGemini('gemini-2.5-flash', {
+        let modelResponse: any;
+        try {
+            modelResponse = await safeCallGemini('gemini-2.5-flash', {
             contents: [{ role: 'user', parts: [{ text: `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.` }] }],
             config: {
                 systemInstruction: symposiumPrompt,
@@ -105,6 +107,21 @@ export async function POST(req: NextRequest) {
                 responseMimeType: 'application/json'
             }
         });
+        } catch (e: any) {
+            if (e.message?.includes("503")) {
+                console.warn('[Muse] gemini-2.5-flash unavailable, falling back to gemini-2.0-flash');
+                modelResponse = await safeCallGemini('gemini-2.0-flash', {
+                    contents: [{ role: 'user', parts: [{ text: `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.` }] }],
+                    config: {
+                        systemInstruction: symposiumPrompt,
+                        temperature: 0.8,
+                        responseMimeType: 'application/json'
+                    }
+                });
+            } else {
+                throw e;
+            }
+        }
 
         if (modelResponse.usageMetadata) {
             await logApiUsageAsync("/api/muse/generate", modelResponse.usageMetadata.promptTokenCount || 0, modelResponse.usageMetadata.candidatesTokenCount || 0);
