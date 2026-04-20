@@ -47,10 +47,12 @@ export async function callOpenRouter(prompt: string, systemInstruction: string):
     if (!apiKey) throw new Error("OPENROUTER_API_KEY is not set");
 
     const FREE_MODELS = [
-        "google/gemma-3-27b-it:free",
-        "meta-llama/llama-3.3-70b-instruct:free",
-        "nousresearch/hermes-3-llama-3.1-405b:free",
-        "google/gemma-3-12b-it:free",
+        "google/gemma-4-31b-it:free",           // 262k ctx, newest Gemma, strong JSON
+        "nvidia/nemotron-3-super-120b-a12b:free", // 262k ctx, large NVIDIA model
+        "openai/gpt-oss-120b:free",              // 131k ctx, OpenAI open-source
+        "nousresearch/hermes-3-llama-3.1-405b:free", // 131k ctx, excellent instruction following
+        "meta-llama/llama-3.3-70b-instruct:free", // 65k ctx, reliable fallback
+        "google/gemma-3-27b-it:free",            // 131k ctx, proven working
     ];
 
     let lastError: any;
