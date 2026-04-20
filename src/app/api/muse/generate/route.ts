@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { getRow, getMissionsAsync, getRoadmapAsync, getUserPsycheAsync, MuseCard, UserPsyche, getPulseStateAsync, logApiUsageAsync } from "@/lib/db";
-import { safeCallGemini, callOpenRouter } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
@@ -106,27 +106,39 @@ export async function POST(req: NextRequest) {
             responseText = await callOpenRouter(musePrompt, symposiumPrompt);
         } catch (orErr: any) {
             console.warn(`[Muse] OpenRouter failed: ${orErr.message?.slice(0, 80)}`);
+            let resolved = false;
 
-            // Fallback: Gemini models in sequence, fail fast (retries=0)
-            const geminiModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'] as const;
-            let geminiResponse: any = null;
-            for (const model of geminiModels) {
-                try {
-                    console.warn(`[Muse] Trying Gemini fallback: ${model}`);
-                    geminiResponse = await safeCallGemini(model, {
-                        contents: [{ role: 'user', parts: [{ text: musePrompt }] }],
-                        config: { systemInstruction: symposiumPrompt, temperature: 0.8, responseMimeType: 'application/json' }
-                    }, 0);
-                    break;
-                } catch (e: any) {
-                    console.warn(`[Muse] ${model} failed: ${e.message?.slice(0, 60)}`);
+            // Second: Groq free tier
+            try {
+                console.log('[Muse] Trying Groq...');
+                responseText = await callGroq(musePrompt, symposiumPrompt);
+                resolved = true;
+            } catch (groqErr: any) {
+                console.warn(`[Muse] Groq failed: ${groqErr.message?.slice(0, 80)}`);
+            }
+
+            // Third: Gemini models in sequence, fail fast
+            if (!resolved) {
+                const geminiModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'] as const;
+                let geminiResponse: any = null;
+                for (const model of geminiModels) {
+                    try {
+                        console.warn(`[Muse] Trying Gemini fallback: ${model}`);
+                        geminiResponse = await safeCallGemini(model, {
+                            contents: [{ role: 'user', parts: [{ text: musePrompt }] }],
+                            config: { systemInstruction: symposiumPrompt, temperature: 0.8, responseMimeType: 'application/json' }
+                        }, 0);
+                        break;
+                    } catch (e: any) {
+                        console.warn(`[Muse] ${model} failed: ${e.message?.slice(0, 60)}`);
+                    }
                 }
+                if (!geminiResponse) throw orErr; // All models exhausted
+                if (geminiResponse.usageMetadata) {
+                    await logApiUsageAsync("/api/muse/generate", geminiResponse.usageMetadata.promptTokenCount || 0, geminiResponse.usageMetadata.candidatesTokenCount || 0);
+                }
+                responseText = geminiResponse.text || "";
             }
-            if (!geminiResponse) throw orErr; // All models exhausted
-            if (geminiResponse.usageMetadata) {
-                await logApiUsageAsync("/api/muse/generate", geminiResponse.usageMetadata.promptTokenCount || 0, geminiResponse.usageMetadata.candidatesTokenCount || 0);
-            }
-            responseText = geminiResponse.text || "";
         }
 
         const parsed = JSON.parse(responseText);

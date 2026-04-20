@@ -3,7 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 import { getRow, logApiUsageAsync } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 import { aiTools, save_to_vault, save_to_lore, save_to_concepts } from "@/lib/ai-actions";
-import { safeCallGemini, callOpenRouter } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 
 // Load Context Files
 // Helper to pull context from Supabase persistence
@@ -242,11 +242,17 @@ export async function POST(req: NextRequest) {
                 }
             }
             if (!geminiSuccess) {
-                console.warn('[Chat] All Gemini models failed, falling back to OpenRouter (no tool calls)');
+                console.warn('[Chat] All Gemini models failed, trying OpenRouter then Groq...');
                 usingFallback = true;
                 const lastUserMessage = formattedHistory[formattedHistory.length - 1]?.parts?.[0]?.text || '';
-                const orText = await callOpenRouter(lastUserMessage, systemInstruction);
-                return NextResponse.json({ result: orText });
+                try {
+                    const orText = await callOpenRouter(lastUserMessage, systemInstruction);
+                    return NextResponse.json({ result: orText });
+                } catch (orErr: any) {
+                    console.warn(`[Chat] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
+                    const groqText = await callGroq(lastUserMessage, systemInstruction);
+                    return NextResponse.json({ result: groqText });
+                }
             }
         }
 

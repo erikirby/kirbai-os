@@ -110,6 +110,73 @@ export async function callOpenRouter(prompt: string, systemInstruction: string):
     throw lastError;
 }
 
+/**
+ * Fallback AI call via Groq's free tier.
+ * Fast inference, separate quota pool from Gemini and OpenRouter.
+ */
+export async function callGroq(prompt: string, systemInstruction: string): Promise<string> {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) throw new Error("GROQ_API_KEY is not set");
+
+    const GROQ_MODELS = [
+        "llama-3.3-70b-versatile",
+        "llama-3.1-8b-instant",
+        "gemma2-9b-it",
+    ];
+
+    let lastError: any;
+    for (const model of GROQ_MODELS) {
+        try {
+            console.log(`[Groq] Trying ${model}`);
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 15000);
+            const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                signal: controller.signal,
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    model,
+                    messages: [
+                        { role: "system", content: systemInstruction },
+                        { role: "user", content: prompt },
+                    ],
+                    response_format: { type: "json_object" },
+                    temperature: 0.8,
+                }),
+            });
+            clearTimeout(timeout);
+
+            if (!res.ok) {
+                const err = await res.text();
+                throw new Error(`Groq ${res.status}: ${err}`);
+            }
+
+            const data = await res.json();
+            const text = data.choices?.[0]?.message?.content;
+            if (!text) throw new Error("Groq returned empty content");
+
+            const parsed = JSON.parse(text);
+            if (!parsed.cards || !Array.isArray(parsed.cards) || parsed.cards.length === 0) {
+                throw new Error(`Groq ${model} returned malformed structure`);
+            }
+            const firstCard = parsed.cards[0];
+            if (!firstCard.title || !firstCard.type || !firstCard.description) {
+                throw new Error(`Groq ${model} returned cards missing required fields`);
+            }
+
+            console.log(`[Groq] Success with ${model}`);
+            return text;
+        } catch (e: any) {
+            console.warn(`[Groq] ${model} failed: ${e.message?.slice(0, 80)}`);
+            lastError = e;
+        }
+    }
+    throw lastError;
+}
+
 export async function getLatestNewslettersAsync(): Promise<IntelItem[]> {
     try {
         const postsRes = await fetch("https://aiguerrilla.com/posts", {
