@@ -64,16 +64,16 @@ export async function POST(req: NextRequest) {
             STRICT RULE: Do NOT repeat any titles from the ALREADY SUGGESTED list. We need fresh, evolving inspiration every day.
 
             DEBATE TOPICS:
-            - Content ideas for IG/TikTok (e.g. "Pokémon Pokopia" sandbox builds, Route 101 recreations, "2016 is the New 2016" nostalgia posts).
+            - Content ideas for IG/TikTok rooted in the ACTIVE KIRBAI PROJECTS and LORE provided in the context. Draw from the actual characters, narratives, and visual vibes present there — not generic Pokémon references.
             - Workflow improvements for Kirbai OS (Autopilot features, better analytics parsing).
-            - Monetization strategies (AI Grading of cards discussion, merch, DistroKid spikes).
-            - Competitive pivots based on the "Sandbox Era" of Pokemon gaming.
+            - Monetization strategies tied to the current active projects (DistroKid, merch, content).
+            - Competitive pivots based on the current era of Erik's work as shown in the context.
             - Mental health/Motivation check-ins.
 
             SPECIFIC INSTRUCTIONS:
-            - THE LOREKEEPER: Advocate for "soulful" content that tells a story, not just "AI art".
+            - THE LOREKEEPER: Ground every suggestion in the actual lore nodes and active projects from the context. Do not invent or default to generic Pokémon themes.
             - THE ADVOCATE: If Erik's motivation is low, PUSH for low-effort, high-reward "rest weeks" or "automation wins".
-            - THE STRATEGIST: Use the provided SCOUT INTEL to suggest specific Pokopia island themes.
+            - THE STRATEGIST: Base trend suggestions on the LIVE PLATFORM INTEL in the context, not hardcoded assumptions.
             - THE MUSE: Provide a high-level "Clefairy Comment" for the entire session.
 
             OUTPUT FORMAT (JSON ONLY):
