@@ -42,26 +42,8 @@ export async function POST(req: Request) {
         const response = await safeCallGemini("gemini-2.5-flash", {
             contents: lastMessage,
             config: {
-                systemInstruction: systemInstruction,
+                systemInstruction: systemInstruction + "\n\nCRITICAL: You MUST return your response as a RAW JSON object. DO NOT include markdown code blocks. DO NOT include triple backticks. Return ONLY the JSON.",
                 tools: [{ googleSearch: {} }],
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        reply: { type: Type.STRING, description: "Your conversational response to the user, formatted in markdown." },
-                        platforms: {
-                            type: Type.OBJECT,
-                            properties: {
-                                tiktok: { type: Type.STRING },
-                                youtube: { type: Type.STRING },
-                                instagram: { type: Type.STRING },
-                                facebook: { type: Type.STRING },
-                            },
-                            required: ["tiktok", "youtube", "instagram", "facebook"]
-                        }
-                    },
-                    required: ["reply", "platforms"]
-                }
             }
         });
 
@@ -69,11 +51,14 @@ export async function POST(req: Request) {
             await logApiUsageAsync("/api/distro/chat", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
-        const textResponse = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
+        let textResponse = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
         
         if (!textResponse) {
              throw new Error("AI returned no text.");
         }
+
+        // Clean any accidental markdown wrap
+        textResponse = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
 
         const parsedResponse = JSON.parse(textResponse);
 

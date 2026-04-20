@@ -112,7 +112,7 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                             <Bot className="w-5 h-5 text-accent" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-black tracking-tight">Distro Optimizer</h2>
+                            <h2 className="text-xl font-black tracking-tight">Description Generator</h2>
                             <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-foreground/50 mt-0.5 text-green-400">
                                 Live Search Active
                             </p>
