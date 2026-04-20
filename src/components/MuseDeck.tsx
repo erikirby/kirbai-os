@@ -43,11 +43,14 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                 body: JSON.stringify({ mode, existingTitles })
             });
             const data = await res.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
             if (data.cards) {
                 const combined = [...cards, ...data.cards];
                 setCards(combined);
                 await saveMuseCardsAsync(combined);
-                
+
                 // Soulful Synthesis
                 setClefairyEmotion(data.clefairyEmotion || 'happy');
                 setClefairyMessage(data.clefairyComment || "Done! We've found some interesting directions for Kirbai.");

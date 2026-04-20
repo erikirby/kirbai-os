@@ -28,9 +28,10 @@ export async function safeCallGemini(
         });
         return res;
     } catch (e: any) {
-        if (e.message?.includes("429") && retries > 0) {
-            console.warn(`[Gemini 429] Rate limit hit for ${modelName}. Retrying in 2s...`);
-            await new Promise(resolve => setTimeout(resolve, 2000));
+        if (retries > 0 && (e.message?.includes("429") || e.message?.includes("503"))) {
+            const label = e.message?.includes("429") ? "429 Rate limit" : "503 Unavailable";
+            console.warn(`[Gemini ${label}] hit for ${modelName}. Retrying in 3s...`);
+            await new Promise(resolve => setTimeout(resolve, 3000));
             return safeCallGemini(modelName, options, retries - 1);
         }
         throw e;

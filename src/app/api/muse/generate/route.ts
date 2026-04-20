@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
             .map((p: any) => ({
                 title: p.title,
                 status: p.status,
-                lore: p.lore,
+                lore: p.lore ? String(p.lore).slice(0, 400) : '',
                 visualVibe: p.visualVibe,
                 tracklist: p.tracklist,
             }));
