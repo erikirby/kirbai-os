@@ -3,7 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 import { getRow, logApiUsageAsync } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 import { aiTools, save_to_vault, save_to_lore, save_to_concepts } from "@/lib/ai-actions";
-import { safeCallGemini } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter } from "@/lib/intel";
 
 // Load Context Files
 // Helper to pull context from Supabase persistence
@@ -217,15 +217,38 @@ export async function POST(req: NextRequest) {
             parts: [{ text: msg.text }]
         }));
 
-        // Initial Generation (Using Flash for better Free Tier RPM)
-        let response = await safeCallGemini("gemini-2.5-flash", {
-            contents: formattedHistory,
-            config: {
-                systemInstruction: systemInstruction,
-                tools: aiTools,
-                temperature: 0.7,
+        // Initial Generation — try Gemini first (needed for tool calling)
+        // Fall back to OpenRouter (no tool calls, but still responds) if quota exhausted
+        let response: any;
+        let usingFallback = false;
+        try {
+            response = await safeCallGemini("gemini-2.5-flash", {
+                contents: formattedHistory,
+                config: { systemInstruction: systemInstruction, tools: aiTools, temperature: 0.7 }
+            }, 0);
+        } catch (e: any) {
+            console.warn('[Chat] gemini-2.5-flash failed, trying fallback models...');
+            let geminiSuccess = false;
+            for (const model of ['gemini-2.0-flash', 'gemini-1.5-flash'] as const) {
+                try {
+                    response = await safeCallGemini(model, {
+                        contents: formattedHistory,
+                        config: { systemInstruction: systemInstruction, tools: aiTools, temperature: 0.7 }
+                    }, 0);
+                    geminiSuccess = true;
+                    break;
+                } catch (fe: any) {
+                    console.warn(`[Chat] ${model} failed: ${fe.message?.slice(0, 60)}`);
+                }
             }
-        });
+            if (!geminiSuccess) {
+                console.warn('[Chat] All Gemini models failed, falling back to OpenRouter (no tool calls)');
+                usingFallback = true;
+                const lastUserMessage = formattedHistory[formattedHistory.length - 1]?.parts?.[0]?.text || '';
+                const orText = await callOpenRouter(lastUserMessage, systemInstruction);
+                return NextResponse.json({ result: orText });
+            }
+        }
 
         if (response.usageMetadata) {
             await logApiUsageAsync("/api/generate-content (pre-tool)", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);

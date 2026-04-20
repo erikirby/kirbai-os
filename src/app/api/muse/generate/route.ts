@@ -97,63 +97,38 @@ export async function POST(req: NextRequest) {
             }
         `;
 
-        let modelResponse: any;
+        const musePrompt = `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.`;
+        let responseText = "";
+
+        // Primary: OpenRouter free tier (no quota drain on Gemini)
         try {
-            modelResponse = await safeCallGemini('gemini-2.5-flash', {
-            contents: [{ role: 'user', parts: [{ text: `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.` }] }],
-            config: {
-                systemInstruction: symposiumPrompt,
-                temperature: 0.8,
-                responseMimeType: 'application/json'
-            }
-        });
-        } catch (primaryErr: any) {
-            const fallbackModels = ['gemini-2.0-flash', 'gemini-1.5-flash'] as const;
-            let succeeded = false;
-            for (const fallback of fallbackModels) {
+            console.log('[Muse] Trying OpenRouter...');
+            responseText = await callOpenRouter(musePrompt, symposiumPrompt);
+        } catch (orErr: any) {
+            console.warn(`[Muse] OpenRouter failed: ${orErr.message?.slice(0, 80)}`);
+
+            // Fallback: Gemini models in sequence, fail fast (retries=0)
+            const geminiModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'] as const;
+            let geminiResponse: any = null;
+            for (const model of geminiModels) {
                 try {
-                    console.warn(`[Muse] Primary model failed, trying ${fallback}`);
-                    modelResponse = await safeCallGemini(fallback, {
-                        contents: [{ role: 'user', parts: [{ text: `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.` }] }],
-                        config: {
-                            systemInstruction: symposiumPrompt,
-                            temperature: 0.8,
-                            responseMimeType: 'application/json'
-                        }
-                    }, 0); // retries=0: fail fast, don't wait
-                    succeeded = true;
+                    console.warn(`[Muse] Trying Gemini fallback: ${model}`);
+                    geminiResponse = await safeCallGemini(model, {
+                        contents: [{ role: 'user', parts: [{ text: musePrompt }] }],
+                        config: { systemInstruction: symposiumPrompt, temperature: 0.8, responseMimeType: 'application/json' }
+                    }, 0);
                     break;
-                } catch (fallbackErr: any) {
-                    console.warn(`[Muse] ${fallback} also failed: ${fallbackErr.message?.slice(0, 60)}`);
+                } catch (e: any) {
+                    console.warn(`[Muse] ${model} failed: ${e.message?.slice(0, 60)}`);
                 }
             }
-            if (!succeeded) {
-                // Final fallback: OpenRouter free tier
-                console.warn('[Muse] All Gemini models failed, falling back to OpenRouter');
-                const openRouterText = await callOpenRouter(
-                    `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.`,
-                    symposiumPrompt
-                );
-                const parsed = JSON.parse(openRouterText);
-                const cards: MuseCard[] = parsed.cards.map((c: any) => ({
-                    ...c,
-                    id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `muse_${Date.now()}_${Math.random()}`,
-                    status: 'pending',
-                    createdAt: new Date().toISOString()
-                }));
-                return NextResponse.json({
-                    cards,
-                    clefairyComment: parsed.clefairyComment,
-                    clefairyEmotion: parsed.clefairyEmotion
-                });
+            if (!geminiResponse) throw orErr; // All models exhausted
+            if (geminiResponse.usageMetadata) {
+                await logApiUsageAsync("/api/muse/generate", geminiResponse.usageMetadata.promptTokenCount || 0, geminiResponse.usageMetadata.candidatesTokenCount || 0);
             }
+            responseText = geminiResponse.text || "";
         }
 
-        if (modelResponse.usageMetadata) {
-            await logApiUsageAsync("/api/muse/generate", modelResponse.usageMetadata.promptTokenCount || 0, modelResponse.usageMetadata.candidatesTokenCount || 0);
-        }
-
-        const responseText = modelResponse.text || "";
         const parsed = JSON.parse(responseText);
 
         // Store the cards (pending status)
