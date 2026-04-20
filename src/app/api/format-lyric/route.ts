@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { logApiUsageAsync } from '@/lib/db';
-import { safeCallGemini } from '@/lib/intel';
+import { safeCallGemini, callOpenRouter, callGroq } from '@/lib/intel';
 
 
 
@@ -39,28 +39,32 @@ ${rawText}
 ---
 `;
 
-        const response = await safeCallGemini("gemini-2.5-flash", {
-            contents: prompt,
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        formattedLyrics: {
-                            type: Type.STRING,
-                            description: "The pristine, formatted lyric sheet with all noise removed and structural tags standardized."
-                        }
-                    },
-                    required: ["formattedLyrics"]
+        let textResponse = "";
+        try {
+            const response = await safeCallGemini("gemini-2.5-flash", {
+                contents: prompt,
+                config: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: Type.OBJECT,
+                        properties: {
+                            formattedLyrics: { type: Type.STRING, description: "The pristine, formatted lyric sheet with all noise removed and structural tags standardized." }
+                        },
+                        required: ["formattedLyrics"]
+                    }
                 }
+            });
+            if (response.usageMetadata) await logApiUsageAsync("/api/format-lyric", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            textResponse = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
+        } catch (geminiErr: any) {
+            console.warn(`[format-lyric] Gemini failed: ${geminiErr.message?.slice(0, 60)}`);
+            try {
+                textResponse = await callOpenRouter(prompt, "", true);
+            } catch (orErr: any) {
+                console.warn(`[format-lyric] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
+                textResponse = await callGroq(prompt, "", true);
             }
-        });
-
-        if (response.usageMetadata) {
-            await logApiUsageAsync("/api/format-lyric", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
-
-        let textResponse = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
         if (!textResponse) throw new Error("Empty response from AI");
 
         textResponse = textResponse.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();

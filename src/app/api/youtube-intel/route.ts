@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { YoutubeTranscript } from "@danielxceron/youtube-transcript";
 import { getDbAsync, setIntelCacheAsync, IntelItem, logApiUsageAsync } from "@/lib/db";
-import { getLatestNewslettersAsync, safeCallGemini } from "@/lib/intel";
+import { getLatestNewslettersAsync, safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 
 const CHANNEL_ID = "UCnsL7Nh-e09D1W5TmC6Yklw"; // Jesse from AI Guerrilla
 
@@ -91,34 +91,36 @@ export async function GET(req: Request) {
 
                 text = text.slice(0, 4000);
 
-                const response = await safeCallGemini("gemini-2.5-flash", {
-                    contents: `ACT AS A MARKETING ANALYST. Summarize this YouTube content for a music creator named Kirbai.
-                    
-                    Video Title: ${video.title}
-                    Content: ${text}`,
-                    config: {
-                        systemInstruction: systemInstruction,
-                        responseMimeType: "application/json",
-                        responseSchema: {
-                            type: Type.OBJECT,
-                            properties: {
-                                summary: { type: Type.STRING },
-                                actionItems: {
-                                    type: Type.ARRAY,
-                                    items: { type: Type.STRING }
-                                }
-                            },
-                            required: ["summary", "actionItems"]
+                const videoUserPrompt = `ACT AS A MARKETING ANALYST. Summarize this YouTube content for a music creator named Kirbai.\n\nVideo Title: ${video.title}\nContent: ${text}`;
+                let videoResponseText = "";
+                try {
+                    const response = await safeCallGemini("gemini-2.5-flash", {
+                        contents: videoUserPrompt,
+                        config: {
+                            systemInstruction: systemInstruction,
+                            responseMimeType: "application/json",
+                            responseSchema: {
+                                type: Type.OBJECT,
+                                properties: {
+                                    summary: { type: Type.STRING },
+                                    actionItems: { type: Type.ARRAY, items: { type: Type.STRING } }
+                                },
+                                required: ["summary", "actionItems"]
+                            }
                         }
+                    });
+                    if (response.usageMetadata) await logApiUsageAsync("/api/youtube-intel", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+                    videoResponseText = response.text || "";
+                } catch (geminiErr: any) {
+                    console.warn(`[youtube-intel] Gemini failed: ${geminiErr.message?.slice(0, 60)}`);
+                    try {
+                        videoResponseText = await callOpenRouter(videoUserPrompt, systemInstruction, true);
+                    } catch (orErr: any) {
+                        videoResponseText = await callGroq(videoUserPrompt, systemInstruction, true);
                     }
-                });
-
-                if (response.usageMetadata) {
-                    await logApiUsageAsync("/api/youtube-intel", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
                 }
-
-                if (response.text) {
-                    const parsed = JSON.parse(response.text);
+                if (videoResponseText) {
+                    const parsed = JSON.parse(videoResponseText);
                     summary = parsed.summary;
                     actionItems = parsed.actionItems;
                 }

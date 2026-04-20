@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { getDbAsync, setIntelCacheAsync, IntelItem, logApiUsageAsync } from "@/lib/db";
+import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
@@ -27,39 +28,39 @@ export async function POST(req: Request) {
             2. 'actionItems': An array of EXACTLY 2-3 specific tasks the user must physically do based on the news (e.g., audit metadata, backup files, change release cadence). Be highly imperative.
         `;
 
-        const { safeCallGemini } = await import("@/lib/intel");
-
-        const response = await safeCallGemini("gemini-2.5-flash", {
-            contents: `Analyze this raw newsletter text and extract music/marketing/IP insights:
-            
-            Raw Text:
-            ${text.slice(0, 10000)}`,
-            config: {
-                systemInstruction: systemInstruction,
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        summary: { type: Type.STRING },
-                        actionItems: {
-                            type: Type.ARRAY,
-                            items: { type: Type.STRING }
-                        }
-                    },
-                    required: ["summary", "actionItems"]
+        const userPrompt = `Analyze this raw newsletter text and extract music/marketing/IP insights:\n\nRaw Text:\n${text.slice(0, 10000)}`;
+        let responseText = "";
+        try {
+            const response = await safeCallGemini("gemini-2.5-flash", {
+                contents: userPrompt,
+                config: {
+                    systemInstruction: systemInstruction,
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: Type.OBJECT,
+                        properties: {
+                            summary: { type: Type.STRING },
+                            actionItems: { type: Type.ARRAY, items: { type: Type.STRING } }
+                        },
+                        required: ["summary", "actionItems"]
+                    }
                 }
+            });
+            if (response.usageMetadata) await logApiUsageAsync("/api/parse-newsletter", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            responseText = response.text || "";
+        } catch (geminiErr: any) {
+            console.warn(`[parse-newsletter] Gemini failed: ${geminiErr.message?.slice(0, 60)}`);
+            try {
+                responseText = await callOpenRouter(userPrompt, systemInstruction, true);
+            } catch (orErr: any) {
+                console.warn(`[parse-newsletter] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
+                responseText = await callGroq(userPrompt, systemInstruction, true);
             }
-        });
-
-        if (response.usageMetadata) {
-            await logApiUsageAsync("/api/parse-newsletter", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
-        if (!response.text) {
-            throw new Error("No response from Gemini");
-        }
+        if (!responseText) throw new Error("No response from AI providers");
 
-        const parsed = JSON.parse(response.text);
+        const parsed = JSON.parse(responseText);
 
         const newIntelItem: IntelItem = {
             id: `manual-${(typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36)).split('-')[0]}`,

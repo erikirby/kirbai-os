@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { safeCallGemini } from '@/lib/intel';
+import { safeCallGemini, callOpenRouter, callGroq } from '@/lib/intel';
 
 export async function POST(req: NextRequest) {
     try {
@@ -40,10 +40,21 @@ export async function POST(req: NextRequest) {
             The goal is for this prompt to generate a high-fidelity "ingredient" (an isolated asset or an empty room) that serves as the visual anchor for future video shots. It should NOT be a cinematic story-driven shot itself.
         `;
 
-        const result = await safeCallGemini("gemini-2.5-flash", {
-            contents: [{ role: 'user', parts: [{ text: prompt }] }]
-        });
-        const generatedPrompt = result.text;
+        let generatedPrompt = "";
+        try {
+            const result = await safeCallGemini("gemini-2.5-flash", {
+                contents: [{ role: 'user', parts: [{ text: prompt }] }]
+            });
+            generatedPrompt = result.text || "";
+        } catch (geminiErr: any) {
+            console.warn(`[asset-prompt] Gemini failed: ${geminiErr.message?.slice(0, 60)}`);
+            try {
+                generatedPrompt = await callOpenRouter(prompt, "", false);
+            } catch (orErr: any) {
+                console.warn(`[asset-prompt] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
+                generatedPrompt = await callGroq(prompt, "", false);
+            }
+        }
 
         return NextResponse.json({ prompt: generatedPrompt });
     } catch (e: any) {

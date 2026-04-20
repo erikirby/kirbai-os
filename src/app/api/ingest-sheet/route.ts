@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { logApiUsageAsync } from '@/lib/db';
-import { safeCallGemini } from '@/lib/intel';
+import { safeCallGemini, callOpenRouter, callGroq } from '@/lib/intel';
 
 
 
@@ -80,19 +80,23 @@ Required JSON schema:
 }
 `;
 
-        const response = await safeCallGemini("gemini-2.5-flash", {
-            contents: prompt,
-            config: {
-                responseMimeType: "application/json",
+        let textResponse = "";
+        try {
+            const response = await safeCallGemini("gemini-2.5-flash", {
+                contents: prompt,
+                config: { responseMimeType: "application/json" }
+            });
+            if (response.usageMetadata) await logApiUsageAsync("/api/ingest-sheet", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            textResponse = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
+        } catch (geminiErr: any) {
+            console.warn(`[ingest-sheet] Gemini failed: ${geminiErr.message?.slice(0, 60)}`);
+            try {
+                textResponse = await callOpenRouter(prompt, "", true);
+            } catch (orErr: any) {
+                console.warn(`[ingest-sheet] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
+                textResponse = await callGroq(prompt, "", true);
             }
-        });
-
-        if (response.usageMetadata) {
-            await logApiUsageAsync("/api/ingest-sheet", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
-
-        // Robustly strip any markdown wrapping
-        let textResponse = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
         if (!textResponse) textResponse = "";
         textResponse = textResponse.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
 

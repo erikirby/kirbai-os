@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { safeCallGemini } from '@/lib/intel';
+import { safeCallGemini, callOpenRouter, callGroq } from '@/lib/intel';
 
 export async function POST(req: NextRequest) {
     try {
@@ -64,17 +64,27 @@ EXAMPLE — adding two characters and an edge:
   { "action": "ADD_EDGE", "edge": { "source": "ditto", "target": "meowscarada", "label": "allied with" } }
 ]`;
 
-        const response = await safeCallGemini('gemini-2.5-flash', {
-            contents: prompt,
-            config: {
-                systemInstruction,
-                responseMimeType: "application/json",
-                temperature: 0.1,
-                thinkingConfig: { thinkingBudget: 5000 }
+        let rawText = "[]";
+        try {
+            const response = await safeCallGemini('gemini-2.5-flash', {
+                contents: prompt,
+                config: {
+                    systemInstruction,
+                    responseMimeType: "application/json",
+                    temperature: 0.1,
+                    thinkingConfig: { thinkingBudget: 5000 }
+                }
+            });
+            rawText = response.text || "[]";
+        } catch (geminiErr: any) {
+            console.warn(`[generate-lore-action] Gemini failed: ${geminiErr.message?.slice(0, 60)}`);
+            try {
+                rawText = await callOpenRouter(prompt, systemInstruction, true);
+            } catch (orErr: any) {
+                console.warn(`[generate-lore-action] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
+                rawText = await callGroq(prompt, systemInstruction, true);
             }
-        });
-
-        const rawText = response.text || "[]";
+        }
         let actions;
         try {
             actions = JSON.parse(rawText);

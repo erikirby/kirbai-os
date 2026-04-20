@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { logApiUsageAsync } from '@/lib/db';
-import { safeCallGemini } from '@/lib/intel';
+import { safeCallGemini, callOpenRouter, callGroq } from '@/lib/intel';
 import crypto from 'crypto';
 
 // Initialize the Gemini client using the existing key from the environment
@@ -49,32 +49,37 @@ ${rawText}
 ---
 `;
 
-        const response = await safeCallGemini("gemini-2.5-flash", {
-            contents: prompt,
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.ARRAY,
-                    items: {
-                        type: Type.OBJECT,
-                        properties: {
-                            trackName: { type: Type.STRING, description: "The exact name of the track from the official tracklist." },
-                            content: { type: Type.STRING, description: "The parsed, decoded, and cleanly formatted lyrics for this track." }
-                        },
-                        required: ["trackName", "content"]
+        let textResponse = "";
+        try {
+            const response = await safeCallGemini("gemini-2.5-flash", {
+                contents: prompt,
+                config: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: Type.ARRAY,
+                        items: {
+                            type: Type.OBJECT,
+                            properties: {
+                                trackName: { type: Type.STRING, description: "The exact name of the track from the official tracklist." },
+                                content: { type: Type.STRING, description: "The parsed, decoded, and cleanly formatted lyrics for this track." }
+                            },
+                            required: ["trackName", "content"]
+                        }
                     }
                 }
+            });
+            if (response.usageMetadata) await logApiUsageAsync("/api/batch-lyrics", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            textResponse = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
+            if (!textResponse) textResponse = "";
+        } catch (geminiErr: any) {
+            console.warn(`[batch-lyrics] Gemini failed: ${geminiErr.message?.slice(0, 60)}`);
+            try {
+                textResponse = await callOpenRouter(prompt, "", true);
+            } catch (orErr: any) {
+                console.warn(`[batch-lyrics] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
+                textResponse = await callGroq(prompt, "", true);
             }
-        });
-
-        if (response.usageMetadata) {
-            await logApiUsageAsync("/api/batch-lyrics", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
-
-        // Bypass strict typing to handle both SDK version returns
-        let textResponse = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
-
-        if (!textResponse) textResponse = "";
 
         if (!textResponse) {
             throw new Error("Empty response from AI");

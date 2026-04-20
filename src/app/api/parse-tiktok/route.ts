@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { logApiUsageAsync, getRow, setRow } from "@/lib/db";
-import { safeCallGemini } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 
 export async function POST(req: Request) {
     try {
@@ -52,23 +52,27 @@ export async function POST(req: Request) {
         // Concatenate all files into a single prompt
         const combinedContent = files.map((f: any) => `--- File: ${f.name} ---\n${f.content}\n`).join('\n');
 
-        const response = await safeCallGemini("gemini-2.5-flash", {
-            contents: `Parse these raw TikTok CSVs:\n\n${combinedContent}`,
-            config: {
-                systemInstruction: systemInstruction,
-                responseMimeType: "application/json",
+        const userPrompt = `Parse these raw TikTok CSVs:\n\n${combinedContent}`;
+        let text = "";
+        try {
+            const response = await safeCallGemini("gemini-2.5-flash", {
+                contents: userPrompt,
+                config: { systemInstruction: systemInstruction, responseMimeType: "application/json" }
+            });
+            if (response.usageMetadata) await logApiUsageAsync("/api/parse-tiktok", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            text = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
+        } catch (geminiErr: any) {
+            console.warn(`[parse-tiktok] Gemini failed: ${geminiErr.message?.slice(0, 60)}`);
+            try {
+                text = await callOpenRouter(userPrompt, systemInstruction, true);
+            } catch (orErr: any) {
+                console.warn(`[parse-tiktok] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
+                text = await callGroq(userPrompt, systemInstruction, true);
             }
-        });
-
-        if (response.usageMetadata) {
-            await logApiUsageAsync("/api/parse-tiktok", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
-        const text = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
-
         if (!text) {
-            console.error("Gemini Response Empty:", response);
-            throw new Error("No response from Gemini");
+            throw new Error("No response from AI providers");
         }
 
         let parsed;

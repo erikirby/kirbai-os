@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { saveRoadmapAsync, getRoadmapAsync, logApiUsageAsync } from '@/lib/db';
+import { safeCallGemini, callOpenRouter, callGroq } from '@/lib/intel';
 
 export async function POST(request: Request) {
     try {
@@ -42,17 +43,26 @@ Schema:
   ]
 }`;
 
-        const { safeCallGemini } = await import('@/lib/intel');
-
-        const response = await safeCallGemini('gemini-2.5-flash', {
-            config: { responseMimeType: "application/json" },
-            contents: [
-                { role: 'user', parts: [{ text: systemPrompt }] },
-                { role: 'user', parts: [{ text: `${existingContext}NEW INPUT:\n\n${rawText}` }] }
-            ]
-        });
-
-        const textOutput = response.text || "";
+        const combinedPrompt = `${systemPrompt}\n\n${existingContext}NEW INPUT:\n\n${rawText}`;
+        let textOutput = "";
+        try {
+            const response = await safeCallGemini('gemini-2.5-flash', {
+                config: { responseMimeType: "application/json" },
+                contents: [
+                    { role: 'user', parts: [{ text: systemPrompt }] },
+                    { role: 'user', parts: [{ text: `${existingContext}NEW INPUT:\n\n${rawText}` }] }
+                ]
+            });
+            textOutput = response.text || "";
+        } catch (geminiErr: any) {
+            console.warn(`[parse-roadmap] Gemini failed: ${geminiErr.message?.slice(0, 60)}`);
+            try {
+                textOutput = await callOpenRouter(combinedPrompt, "", true);
+            } catch (orErr: any) {
+                console.warn(`[parse-roadmap] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
+                textOutput = await callGroq(combinedPrompt, "", true);
+            }
+        }
 
         try {
             const inputTokens = systemPrompt.length + rawText.length;

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { logApiUsageAsync } from "@/lib/db";
-import { safeCallGemini } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 
 
 
@@ -22,37 +22,41 @@ export async function POST(req: Request) {
             2. 'actionItems': An array of EXACTLY 3 specific, imperative tasks on where to shift budget, content focus, or release bandwidth this week.
         `;
 
-        const response = await safeCallGemini("gemini-2.5-flash", {
-            contents: `Analyze these cross-platform stats:
+        const userPrompt = `Analyze these cross-platform stats:
             YouTube: ${JSON.stringify(youtubeStats)}
             TikTok: ${JSON.stringify(tiktokStats)}
-            Instagram: ${JSON.stringify(instagramStats)}`,
-            config: {
-                systemInstruction: systemInstruction,
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        summary: { type: Type.STRING },
-                        actionItems: {
-                            type: Type.ARRAY,
-                            items: { type: Type.STRING }
-                        }
-                    },
-                    required: ["summary", "actionItems"]
+            Instagram: ${JSON.stringify(instagramStats)}`;
+        let text = "";
+        try {
+            const response = await safeCallGemini("gemini-2.5-flash", {
+                contents: userPrompt,
+                config: {
+                    systemInstruction: systemInstruction,
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: Type.OBJECT,
+                        properties: {
+                            summary: { type: Type.STRING },
+                            actionItems: { type: Type.ARRAY, items: { type: Type.STRING } }
+                        },
+                        required: ["summary", "actionItems"]
+                    }
                 }
+            });
+            if (response.usageMetadata) await logApiUsageAsync("/api/synthesize-analytics", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            text = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
+        } catch (geminiErr: any) {
+            console.warn(`[synthesize-analytics] Gemini failed: ${geminiErr.message?.slice(0, 60)}`);
+            try {
+                text = await callOpenRouter(userPrompt, systemInstruction, true);
+            } catch (orErr: any) {
+                console.warn(`[synthesize-analytics] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
+                text = await callGroq(userPrompt, systemInstruction, true);
             }
-        });
-
-        if (response.usageMetadata) {
-            await logApiUsageAsync("/api/synthesize-analytics", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
-        // Use robust text extraction
-        const text = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
-
         if (!text) {
-            throw new Error("No response from Gemini");
+            throw new Error("No response from AI providers");
         }
 
         const parsed = JSON.parse(text.replace(/\`\`\`(json)?/g, '').trim());

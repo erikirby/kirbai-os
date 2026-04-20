@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from "@google/genai";
 import { setFinanceAnalysisAsync, getFinanceAnalysisAsync, logApiUsageAsync } from "@/lib/db";
-import { safeCallGemini } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 
 
 
@@ -174,21 +174,24 @@ CRITICAL FORMATTING INSTRUCTIONS:
 6. Tone: Cybernetic, professional, concise.
 7. Return ONLY the safe HTML fragment. NO markdown code blocks. NO TRIPLE BACKTICKS.`;
 
-            const response = await safeCallGemini("gemini-2.5-flash", {
-                contents: prompt,
-            });
-
-            // Handle both potential SDK response formats (property vs function)
-            let textResponse = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
+            let textResponse = "";
+            try {
+                const response = await safeCallGemini("gemini-2.5-flash", { contents: prompt });
+                textResponse = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
+                if (response.usageMetadata) await logApiUsageAsync("/api/analyze-finance", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            } catch (geminiErr: any) {
+                console.warn(`[analyze-finance] Gemini failed: ${geminiErr.message?.slice(0, 60)}`);
+                try {
+                    textResponse = await callOpenRouter(prompt, "", false);
+                } catch (orErr: any) {
+                    console.warn(`[analyze-finance] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
+                    textResponse = await callGroq(prompt, "", false);
+                }
+            }
 
             if (!textResponse) throw new Error("AI returned empty content");
 
             adviceHtml = textResponse.replace(/\`\`\`(html)?/g, '').trim();
-
-            const usage = response.usageMetadata;
-            if (usage) {
-                await logApiUsageAsync("/api/analyze-finance", usage.promptTokenCount || 0, usage.candidatesTokenCount || 0);
-            }
 
             const analysisWithAdvice = {
                 ...analysisData,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { getRow, saveMissionAsync, getTelemetryAsync } from "@/lib/db";
-import { safeCallGemini } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 
 export async function POST(req: NextRequest) {
     try {
@@ -29,10 +29,20 @@ export async function POST(req: NextRequest) {
             If it's about the shots, describe the necessary changes.
         `;
 
-        const directorResult = await safeCallGemini("gemini-2.5-flash", {
-            contents: [{ role: 'user', parts: [{ text: directorPrompt }] }]
-        });
-        const directorAnalysis = directorResult.text;
+        let directorAnalysis = "";
+        try {
+            const directorResult = await safeCallGemini("gemini-2.5-flash", {
+                contents: [{ role: 'user', parts: [{ text: directorPrompt }] }]
+            });
+            directorAnalysis = directorResult.text || "";
+        } catch (geminiErr: any) {
+            console.warn(`[director/edit] Director call failed: ${geminiErr.message?.slice(0, 60)}`);
+            try {
+                directorAnalysis = await callOpenRouter(directorPrompt, "", false);
+            } catch (orErr: any) {
+                directorAnalysis = await callGroq(directorPrompt, "", false);
+            }
+        }
 
         // Phase 2: Combined Critique & Visualist Mapping (Flash for speed)
         const visualistPrompt = `
@@ -52,7 +62,9 @@ export async function POST(req: NextRequest) {
             6. Output the UPDATED MISSION object in JSON.
         `;
 
-        const visualistResult = await safeCallGemini("gemini-2.5-flash", {
+        let visualistText = "{}";
+        try {
+            const visualistResult = await safeCallGemini("gemini-2.5-flash", {
             contents: [{ role: 'user', parts: [{ text: visualistPrompt }] }],
             config: {
                 responseMimeType: "application/json",
@@ -113,8 +125,17 @@ export async function POST(req: NextRequest) {
                 }
             }
         });
+            visualistText = visualistResult.text || "{}";
+        } catch (geminiErr: any) {
+            console.warn(`[director/edit] Visualist call failed: ${geminiErr.message?.slice(0, 60)}`);
+            try {
+                visualistText = await callOpenRouter(visualistPrompt, "", true);
+            } catch (orErr: any) {
+                visualistText = await callGroq(visualistPrompt, "", true);
+            }
+        }
 
-        const updatedData = JSON.parse(visualistResult.text || "{}");
+        const updatedData = JSON.parse(visualistText);
         const aiMission = updatedData.mission;
 
         if (aiMission) {

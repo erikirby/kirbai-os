@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { addMetadataPackAsync, getDbAsync, logApiUsageAsync } from "@/lib/db";
-import { safeCallGemini } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 
 
 
@@ -26,38 +26,42 @@ export async function POST(req: Request) {
             2. A description featuring a strong hook, the target keyword, and an SEO-optimized tag block at the bottom (max 5 hashtags).
         `;
 
-        const response = await safeCallGemini("gemini-2.5-flash", {
-            contents: `Core Keyword: ${keyword}\nAlias: ${alias}`,
-            config: {
-                systemInstruction: systemInstruction,
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.ARRAY,
-                    description: "An array of exactly 5 generated YouTube metadata items.",
-                    items: {
-                        type: Type.OBJECT,
-                        properties: {
-                            title: {
-                                type: Type.STRING,
-                                description: "The optimized YouTube video title."
+        const userPrompt = `Core Keyword: ${keyword}\nAlias: ${alias}`;
+        let responseText = "";
+        try {
+            const response = await safeCallGemini("gemini-2.5-flash", {
+                contents: userPrompt,
+                config: {
+                    systemInstruction: systemInstruction,
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: Type.ARRAY,
+                        description: "An array of exactly 5 generated YouTube metadata items.",
+                        items: {
+                            type: Type.OBJECT,
+                            properties: {
+                                title: { type: Type.STRING, description: "The optimized YouTube video title." },
+                                description: { type: Type.STRING, description: "The optimized description including hashtags." }
                             },
-                            description: {
-                                type: Type.STRING,
-                                description: "The optimized description including hashtags."
-                            }
-                        },
-                        required: ["title", "description"]
+                            required: ["title", "description"]
+                        }
                     }
                 }
+            });
+            if (response.usageMetadata) await logApiUsageAsync("/api/generate-metadata", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+            responseText = response.text || "";
+        } catch (geminiErr: any) {
+            console.warn(`[generate-metadata] Gemini failed: ${geminiErr.message?.slice(0, 60)}`);
+            try {
+                responseText = await callOpenRouter(userPrompt, systemInstruction, true);
+            } catch (orErr: any) {
+                console.warn(`[generate-metadata] OpenRouter failed: ${orErr.message?.slice(0, 60)}`);
+                responseText = await callGroq(userPrompt, systemInstruction, true);
             }
-        });
-
-        if (response.usageMetadata) {
-            await logApiUsageAsync("/api/generate-metadata", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
         }
 
-        if (response.text) {
-            const generatedData = JSON.parse(response.text);
+        if (responseText) {
+            const generatedData = JSON.parse(responseText);
 
             // Save to persistence
             await addMetadataPackAsync({
@@ -72,7 +76,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ metadata: generatedData });
         }
 
-        throw new Error("Empty response from AI");
+        throw new Error("Empty response from AI providers");
 
     } catch (e: any) {
         console.error("Metadata Generation Error:", e);
