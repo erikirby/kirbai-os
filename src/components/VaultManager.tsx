@@ -18,7 +18,7 @@ interface Project {
     id: string;
     title: string;
     alias: "Kirbai" | "AELOW" | "KURAO";
-    status?: "Draft" | "WIP" | "Released";
+    status?: "Draft" | "Active" | "WIP" | "Released" | "Primary";
     targetTrackCount?: number;
     lore: string;
     visualVibe: string;
@@ -297,7 +297,13 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
             if (!prevActive) return prevActive;
             const updated = { ...prevActive, [field]: value };
             setProjects(prevProjects => {
-                const newProjects = prevProjects.map(p => p.id === updated.id ? updated : p);
+                let newProjects = prevProjects.map(p => p.id === updated.id ? updated : p);
+                // Enforce single Primary — demote any existing Primary to Active
+                if (field === 'status' && value === 'Primary') {
+                    newProjects = newProjects.map(p =>
+                        p.id !== updated.id && p.status === 'Primary' ? { ...p, status: 'Active' } : p
+                    );
+                }
                 queueProjectsSave(newProjects);
                 return newProjects;
             });
@@ -671,7 +677,9 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                         onClick={() => { setActiveProject(p); setExpandedTrack(null); }}
                                         className={`w-full text-left p-3 rounded-xl border transition-all ${activeProject?.id === p.id
                                             ? 'border-cyan-400 bg-cyan-400/5 shadow-[0_0_20px_rgba(34,211,238,0.08)]'
-                                            : 'border-white/5 bg-black/10 hover:border-white/10'
+                                            : p.status === 'Primary'
+                                                ? 'border-yellow-400 bg-yellow-400/5 shadow-[0_0_20px_rgba(250,204,21,0.10)]'
+                                                : 'border-white/5 bg-black/10 hover:border-white/10'
                                             }`}
                                     >
                                         <div className="flex items-center gap-2 mb-2">
@@ -684,10 +692,13 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                             <span className="text-xs font-black tracking-tight text-foreground truncate pr-6">{p.title}</span>
                                         </div>
                                         <div className="flex gap-1.5 flex-wrap">
-                                            <span className={`text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${p.status === 'Released' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
+                                            <span className={`text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${
+                                                p.status === 'Primary' ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/40' :
+                                                p.status === 'Released' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
                                                 p.status === 'WIP' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' :
-                                                    'bg-foreground/10 text-foreground/40 border border-foreground/10'
-                                                }`}>
+                                                p.status === 'Active' ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' :
+                                                'bg-foreground/10 text-foreground/40 border border-foreground/10'
+                                            }`}>
                                                 {p.status || 'Draft'}
                                             </span>
                                             <span className={`text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${p.alias === 'KURAO' ? 'bg-indigo-500/20 text-indigo-400' : p.alias === 'AELOW' ? 'bg-green-500/20 text-green-400' : 'bg-foreground/10 text-foreground/60'}`}>
@@ -788,14 +799,19 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                         <select
                                             value={activeProject.status || 'Draft'}
                                             onChange={(e) => updateActiveProject('status', e.target.value)}
-                                            className={`p-1.5 px-3 font-black text-[9px] uppercase tracking-widest border rounded-full focus:outline-none appearance-none cursor-pointer ${activeProject.status === 'Released' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
+                                            className={`p-1.5 px-3 font-black text-[9px] uppercase tracking-widest border rounded-full focus:outline-none appearance-none cursor-pointer ${
+                                                activeProject.status === 'Primary' ? 'bg-yellow-400/20 text-yellow-400 border-yellow-400/40' :
+                                                activeProject.status === 'Released' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
                                                 activeProject.status === 'WIP' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
-                                                    'bg-black/10 text-foreground border-transparent'
-                                                }`}
+                                                activeProject.status === 'Active' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
+                                                'bg-black/10 text-foreground border-transparent'
+                                            }`}
                                         >
                                             <option value="Draft">Draft</option>
+                                            <option value="Active">Active</option>
                                             <option value="WIP">WIP</option>
                                             <option value="Released">Released</option>
+                                            <option value="Primary">Primary</option>
                                         </select>
                                         <select
                                             value={activeProject.alias}

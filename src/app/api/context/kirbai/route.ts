@@ -21,7 +21,10 @@ export async function GET() {
             (phase: { status: string }) => phase.status !== 'Archived'
         );
 
+        const currentEra = projects.find((p: { status: string }) => p.status === 'Primary') ?? null;
+
         const KirbaiContext = {
+            current_era: currentEra,
             projects,
             roadmap: { phases: activePhases },
             lore: lore ?? { nodes: [], edges: [], history: [] },
