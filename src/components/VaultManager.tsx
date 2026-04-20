@@ -443,12 +443,44 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
         updateActiveProject('externalLinks', (activeProject.externalLinks || []).filter((_, i) => i !== index));
     };
 
-    // --- Cover Art ---
+    // --- Cover Art (Auto-Compressor) ---
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file || !activeProject) return;
         const reader = new FileReader();
-        reader.onloadend = () => updateActiveProject('coverArt', reader.result as string);
+        reader.onloadend = () => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                const MAX_SIZE = 500;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_SIZE) {
+                        height *= MAX_SIZE / width;
+                        width = MAX_SIZE;
+                    }
+                } else {
+                    if (height > MAX_SIZE) {
+                        width *= MAX_SIZE / height;
+                        height = MAX_SIZE;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d");
+                if (ctx) {
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+                    updateActiveProject('coverArt', compressedBase64);
+                } else {
+                    updateActiveProject('coverArt', reader.result as string);
+                }
+            };
+            img.src = reader.result as string;
+        };
         reader.readAsDataURL(file);
     };
 
