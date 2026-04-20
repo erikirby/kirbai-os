@@ -43,10 +43,6 @@ export async function POST(req: NextRequest) {
             ANALYTICS: ${JSON.stringify(pulse?.summary || "No data")}
             ALREADY SUGGESTED (DO NOT REPEAT): ${JSON.stringify(existingTitles)}
             LIVE PLATFORM INTEL (NEWS): ${JSON.stringify(liveNews || "No news data")}
-            SCOUT INTEL (TRENDS):
-            - "Pokémon Pokopia" (released March 2026) is viral. Players control transformation-capable Ditto in a post-apocalyptic Kanto life-sim.
-            - "Throwback TikTok" trend: "2026 is the New 2016" nostalgia is peaking.
-            - AI Music: Suno v3 and Meta JASCO are industry standard, enabling chord-to-track and 2-minute high-fidelity generations.
         `;
 
         // 2. Define the Symposium Prompt
