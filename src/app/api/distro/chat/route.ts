@@ -47,18 +47,20 @@ export async function POST(req: Request) {
             
             ${compContext}
             
-            1. You MUST use the Google Search tool to look up CURRENT algorithm trends and active hashtags. 
-            2. Cross-reference the user's concept with the COMPETITOR RADAR data matches if relevant.
-            3. Return your response as a RAW JSON object. DO NOT include markdown code blocks.Return ONLY the JSON.
-            
-            JSON STRUCTURE:
+            CRITICAL OUTPUT RULES:
+            1. You MUST use the Google Search tool to look up CURRENT algorithm trends if using Gemini.
+            2. You MUST return your response as a RAW JSON object.
+            3. EVERY PLATFORM (tiktok, youtube, instagram, facebook) MUST HAVE A CAPTION. Never leave them empty.
+            4. If the user doesn't specify details, generate a high-quality "First Draft" based on common best practices for the concept.
+
+            JSON SCHEMA (MANDATORY):
             {
-              "reply": "Conversational reply in markdown",
+              "reply": "Your conversational reply in markdown",
               "platforms": {
-                "tiktok": "caption",
-                "youtube": "caption",
-                "instagram": "caption",
-                "facebook": "caption"
+                "tiktok": "TikTok caption + tags",
+                "youtube": "YouTube Shorts description + tags",
+                "instagram": "Instagram Reels caption + hashtags",
+                "facebook": "Facebook post caption"
               }
             }
         `;
@@ -97,21 +99,41 @@ export async function POST(req: Request) {
 
         if (!textResponse) throw new Error("All AI providers failed to return a response.");
 
-        // Clean any accidental markdown wrap
-        textResponse = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
-        const parsedResponse = JSON.parse(textResponse);
+        // ROBUST JSON EXTRACTION
+        let jsonStr = textResponse.trim();
+        const firstBrace = jsonStr.indexOf('{');
+        const lastBrace = jsonStr.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1) {
+            jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+        }
+
+        let parsedResponse: any;
+        try {
+            parsedResponse = JSON.parse(jsonStr);
+        } catch (parseErr) {
+            console.error("JSON Parse Error. Raw text:", textResponse);
+            throw new Error("AI returned malformed data. Try re-sending.");
+        }
+
+        // Schema Validation / Normalization
+        const sanitizedPlatforms = {
+            tiktok: parsedResponse.platforms?.tiktok || "",
+            youtube: parsedResponse.platforms?.youtube || parsedResponse.platforms?.shorts || "",
+            instagram: parsedResponse.platforms?.instagram || parsedResponse.platforms?.reels || "",
+            facebook: parsedResponse.platforms?.facebook || ""
+        };
 
         // PERSIST the session immediately
         const finalSession = {
             messages: [...messages, { role: 'ai', text: parsedResponse.reply }],
-            platforms: parsedResponse.platforms
+            platforms: sanitizedPlatforms
         };
         await saveDistroSessionAsync(mode, finalSession);
 
         return NextResponse.json({ 
             success: true, 
             reply: (attempt !== "Gemini") ? `[${attempt}] ${parsedResponse.reply}` : parsedResponse.reply,
-            platforms: parsedResponse.platforms
+            platforms: sanitizedPlatforms
         });
 
     } catch (error: any) {
