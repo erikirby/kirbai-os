@@ -27,6 +27,15 @@ export interface IntelItem {
     url: string;
 }
 
+export interface CompetitorProfile {
+    id: string;
+    name: string;
+    platform: 'youtube' | 'instagram' | 'tiktok' | 'other';
+    handleUrl: string;
+    notes: string;
+    createdAt: string;
+}
+
 export interface RoadmapTask {
     id: string;
     title: string;
@@ -184,6 +193,16 @@ export async function setIntelCacheAsync(items: IntelItem[]) {
 
 export function setIntelCache(items: IntelItem[]) {
     setIntelCacheAsync(items).catch(console.error);
+}
+
+export async function getCompetitorsAsync(mode: string): Promise<CompetitorProfile[]> {
+    const key = mode === 'factory' ? 'competitors_factory' : 'competitors_kirbai';
+    return await getRow(key) || [];
+}
+
+export async function saveCompetitorsAsync(mode: string, competitors: CompetitorProfile[]) {
+    const key = mode === 'factory' ? 'competitors_factory' : 'competitors_kirbai';
+    await setRow(key, competitors);
 }
 
 export async function setFinanceAnalysisAsync(analysis: any) {

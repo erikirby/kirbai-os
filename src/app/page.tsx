@@ -16,10 +16,12 @@ import CreativeHub from "@/components/CreativeHub";
 import DirectorSuite from "@/components/DirectorSuite";
 import MuseDeck from "@/components/MuseDeck";
 import Boardroom from "@/components/Boardroom";
+import DistroOptimizer from "@/components/DistroOptimizer";
+import CompetitorTracker from "@/components/CompetitorTracker";
 import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Share2, Menu, X, Home as HomeIcon, Clapperboard, Layers, Sparkles, Wallet, Brain } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
-type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director" | "muse" | "boardroom";
+type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors";
 type Theme = "dark" | "light" | "pink" | "snes" | "gbc" | "pokopia";
 
 export default function Home() {
@@ -136,8 +138,8 @@ export default function Home() {
         {/* MODULES PILL */}
         <div className={`flex items-center gap-1 p-1 relative z-50 ${theme === 'pokopia' ? '' : 'bg-surface/20 backdrop-blur-md rounded-full border border-border/10 shadow-2xl'}`}>
           {[
-            { id: "command", label: "Command", items: [{ id: "roadmap", label: "Home" }, { id: "intel", label: "Intel" }, { id: "muse", label: "Muse" }, { id: "boardroom", label: "Boardroom" }] },
-            { id: "pipeline", label: "Pipeline", items: [{ id: "creative", label: "Brainstorm" }, { id: "director", label: "Director" }] },
+            { id: "command", label: "Command", items: [{ id: "roadmap", label: "Home" }, { id: "intel", label: "Intel" }, { id: "competitors", label: "Competitors" }, { id: "muse", label: "Muse" }, { id: "boardroom", label: "Boardroom" }] },
+            { id: "pipeline", label: "Pipeline", items: [{ id: "creative", label: "Brainstorm" }, { id: "director", label: "Director" }, { id: "distro", label: "Desc Gen" }] },
             { id: "archive", label: "Archive", items: [{ id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "prompts", label: "Prompts" }, { id: "core", label: "Core" }] },
             { id: "performance", label: "Performance", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "api-health", label: "API" }] },
           ].map((group) => (
@@ -186,8 +188,8 @@ export default function Home() {
 
       {/* 4. Main Body Color Blocking (Sectional based on group) */}
       <section className={`flex-1 w-full transition-colors duration-700 ${theme === 'pokopia' ? (
-        activeModule === 'roadmap' || activeModule === 'intel' || activeModule === 'muse' ? 'bg-section-green' :
-        activeModule === 'creative' || activeModule === 'director' ? 'bg-section-blue' :
+        activeModule === 'roadmap' || activeModule === 'intel' || activeModule === 'competitors' || activeModule === 'muse' ? 'bg-section-green' :
+        activeModule === 'creative' || activeModule === 'director' || activeModule === 'distro' ? 'bg-section-blue' :
         activeModule === 'lore' || activeModule === 'vault' || activeModule === 'core' ? 'bg-section-purple' :
         'bg-section-wood'
       ) : ''}`}>
@@ -207,8 +209,10 @@ export default function Home() {
                 {activeModule === "lore" && <LoreMatrix theme={theme} mode={activeTab} />}
                 {activeModule === "creative" && <CreativeHub theme={theme} mode={activeTab} />}
                 {activeModule === "prompts" && <PromptBank mode={activeTab} />}
-                {activeModule === "muse" && <MuseDeck mode={activeTab} />}
-                {activeModule === "boardroom" && <Boardroom mode={activeTab} />}
+                { activeModule === "muse" && <MuseDeck mode={activeTab} /> }
+                { activeModule === "boardroom" && <Boardroom mode={activeTab} /> }
+                { activeModule === "distro" && <DistroOptimizer theme={theme} mode={activeTab} /> }
+                { activeModule === "competitors" && <CompetitorTracker theme={theme} mode={activeTab} /> }
               </div>
             </div>
 
