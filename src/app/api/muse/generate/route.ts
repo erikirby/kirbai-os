@@ -107,20 +107,27 @@ export async function POST(req: NextRequest) {
                 responseMimeType: 'application/json'
             }
         });
-        } catch (e: any) {
-            if (e.message?.includes("503")) {
-                console.warn('[Muse] gemini-2.5-flash unavailable, falling back to gemini-2.0-flash');
-                modelResponse = await safeCallGemini('gemini-2.0-flash', {
-                    contents: [{ role: 'user', parts: [{ text: `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.` }] }],
-                    config: {
-                        systemInstruction: symposiumPrompt,
-                        temperature: 0.8,
-                        responseMimeType: 'application/json'
-                    }
-                });
-            } else {
-                throw e;
+        } catch (primaryErr: any) {
+            const fallbackModels = ['gemini-2.0-flash', 'gemini-1.5-flash'] as const;
+            let succeeded = false;
+            for (const fallback of fallbackModels) {
+                try {
+                    console.warn(`[Muse] Primary model failed (${primaryErr.message?.slice(0, 60)}), trying ${fallback}`);
+                    modelResponse = await safeCallGemini(fallback, {
+                        contents: [{ role: 'user', parts: [{ text: `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.` }] }],
+                        config: {
+                            systemInstruction: symposiumPrompt,
+                            temperature: 0.8,
+                            responseMimeType: 'application/json'
+                        }
+                    });
+                    succeeded = true;
+                    break;
+                } catch (fallbackErr: any) {
+                    console.warn(`[Muse] ${fallback} also failed: ${fallbackErr.message?.slice(0, 60)}`);
+                }
             }
+            if (!succeeded) throw primaryErr;
         }
 
         if (modelResponse.usageMetadata) {

@@ -55,9 +55,23 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                 setClefairyEmotion(data.clefairyEmotion || 'happy');
                 setClefairyMessage(data.clefairyComment || "Done! We've found some interesting directions for Kirbai.");
             }
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
-            setClefairyMessage("Something went wrong with the brain-sync...");
+            let errorMsg = "Something went wrong with the brain-sync...";
+            try {
+                const inner = JSON.parse(e.message);
+                const code = inner?.error?.code;
+                const status = inner?.error?.status;
+                if (code === 429 || status === 'RESOURCE_EXHAUSTED') {
+                    errorMsg = "AI quota limit reached. The neural net needs a few minutes to recover — try again shortly.";
+                } else if (code === 503 || status === 'UNAVAILABLE') {
+                    errorMsg = "AI is overloaded right now. Give it a moment and try again.";
+                } else if (inner?.error?.message) {
+                    errorMsg = inner.error.message.slice(0, 120);
+                }
+            } catch {}
+            setClefairyEmotion('worried');
+            setClefairyMessage(errorMsg);
         } finally {
             setLoading(false);
             setTimeout(() => {
