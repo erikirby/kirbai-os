@@ -167,8 +167,15 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
         setIsSaving(true);
         if (saveProjectsRef.current) clearTimeout(saveProjectsRef.current);
         saveProjectsRef.current = setTimeout(async () => {
-            const payload = pendingProjectsSave.current;
-            if (!payload) return;
+            const rawPayload = pendingProjectsSave.current;
+            if (!rawPayload) return;
+
+            // DEFUSE PAYLOAD: Strip legacy massive Base64 strings before sending to prevent 413 error
+            const payload = rawPayload.map(p => ({
+                ...p,
+                coverArt: p.coverArt && p.coverArt.length > 500000 ? "" : p.coverArt
+            }));
+
             try {
                 const res = await fetch('/api/vault', {
                     method: 'POST',
@@ -223,11 +230,17 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
         try {
             const promises = [];
             if (pendingProjectsSave.current) {
+                // DEFUSE PAYLOAD: Strip legacy massive Base64 strings before sending to prevent 413 error
+                const safeProjectPayload = pendingProjectsSave.current.map(p => ({
+                    ...p,
+                    coverArt: p.coverArt && p.coverArt.length > 500000 ? "" : p.coverArt
+                }));
+
                 promises.push(
                     fetch('/api/vault', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ type: 'projects', payload: pendingProjectsSave.current })
+                        body: JSON.stringify({ type: 'projects', payload: safeProjectPayload })
                     }).then((res) => {
                         if (!res.ok) throw new Error("Payload limit exceeded");
                         pendingProjectsSave.current = null;
