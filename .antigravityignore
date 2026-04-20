@@ -1,0 +1,20 @@
+# Ignore standard Next.js / Node.js
+.next/
+node_modules/
+.npm-cache/
+.broken_modules/
+build_output.txt
+
+# Disregard heavy data folders & archives
+data/
+tiktokdatacsvs/
+_archive/
+
+# Ignore massive log files
+.dev_log*
+
+# Temporaries
+tmp/
+*.tsv
+*.csv
+*.xml

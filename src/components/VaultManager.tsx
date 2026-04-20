@@ -156,34 +156,78 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
         fetchVault();
     }, []);
 
-    // --- Persistence ---
-    const saveProjects = async (newProjects: Project[]) => {
+    // --- Persistence & Debouncing ---
+    const saveProjectsRef = useRef<NodeJS.Timeout | null>(null);
+    const pendingProjectsSave = useRef<Project[] | null>(null);
+
+    const queueProjectsSave = (data: Project[]) => {
+        pendingProjectsSave.current = data;
         setIsSaving(true);
-        try {
-            await fetch('/api/vault', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type: 'projects', payload: newProjects })
-            });
-            setProjects(newProjects);
-        } finally {
-            setIsSaving(false);
-        }
+        if (saveProjectsRef.current) clearTimeout(saveProjectsRef.current);
+        saveProjectsRef.current = setTimeout(async () => {
+            const payload = pendingProjectsSave.current;
+            if (!payload) return;
+            try {
+                await fetch('/api/vault', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    keepalive: true,
+                    body: JSON.stringify({ type: 'projects', payload })
+                });
+                pendingProjectsSave.current = null;
+            } finally {
+                setIsSaving(false);
+            }
+        }, 1000);
     };
 
-    const saveLyrics = async (newLyrics: Lyric[]) => {
+    const saveLyricsRef = useRef<NodeJS.Timeout | null>(null);
+    const pendingLyricsSave = useRef<Lyric[] | null>(null);
+
+    const queueLyricsSave = (data: Lyric[]) => {
+        pendingLyricsSave.current = data;
         setIsSaving(true);
-        try {
-            await fetch('/api/vault', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type: 'lyrics', payload: newLyrics })
-            });
-            setLyrics(newLyrics);
-        } finally {
-            setIsSaving(false);
-        }
+        if (saveLyricsRef.current) clearTimeout(saveLyricsRef.current);
+        saveLyricsRef.current = setTimeout(async () => {
+            const payload = pendingLyricsSave.current;
+            if (!payload) return;
+            try {
+                await fetch('/api/vault', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    keepalive: true,
+                    body: JSON.stringify({ type: 'lyrics', payload })
+                });
+                pendingLyricsSave.current = null;
+            } finally {
+                setIsSaving(false);
+            }
+        }, 1000);
     };
+
+    // Unmount safe flush
+    useEffect(() => {
+        return () => {
+            if (saveProjectsRef.current && pendingProjectsSave.current) {
+                clearTimeout(saveProjectsRef.current);
+                fetch('/api/vault', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    keepalive: true,
+                    body: JSON.stringify({ type: 'projects', payload: pendingProjectsSave.current })
+                }).catch(() => {});
+            }
+            if (saveLyricsRef.current && pendingLyricsSave.current) {
+                clearTimeout(saveLyricsRef.current);
+                fetch('/api/vault', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    keepalive: true,
+                    body: JSON.stringify({ type: 'lyrics', payload: pendingLyricsSave.current })
+                }).catch(() => {});
+            }
+        };
+    }, []);
 
     // --- Project Actions ---
     const createProject = () => {
@@ -199,38 +243,56 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
             externalLinks: [],
             createdAt: Date.now()
         };
-        saveProjects([p, ...projects]);
+        setProjects(prev => {
+            const newProjects = [p, ...prev];
+            queueProjectsSave(newProjects);
+            return newProjects;
+        });
         setActiveProject(p);
         setExpandedTrack(null);
     };
 
     const updateActiveProject = (field: keyof Project, value: any) => {
-        if (!activeProject) return;
-        const updated = { ...activeProject, [field]: value };
-        setActiveProject(updated);
-        saveProjects(projects.map(p => p.id === updated.id ? updated : p));
+        setActiveProject(prevActive => {
+            if (!prevActive) return prevActive;
+            const updated = { ...prevActive, [field]: value };
+            setProjects(prevProjects => {
+                const newProjects = prevProjects.map(p => p.id === updated.id ? updated : p);
+                queueProjectsSave(newProjects);
+                return newProjects;
+            });
+            return updated;
+        });
     };
 
     const deleteProject = (id: string) => {
-        saveProjects(projects.filter(p => p.id !== id));
-        saveLyrics(lyrics.filter(l => l.projectId !== id));
-        if (activeProject?.id === id) {
-            setActiveProject(null);
-            setExpandedTrack(null);
-        }
+        setProjects(prev => {
+            const next = prev.filter(p => p.id !== id);
+            queueProjectsSave(next);
+            return next;
+        });
+        setLyrics(prev => {
+            const next = prev.filter(l => l.projectId !== id);
+            queueLyricsSave(next);
+            return next;
+        });
+        setActiveProject(prev => prev?.id === id ? null : prev);
+        if (activeProject?.id === id) setExpandedTrack(null);
         setConfirmingDeleteId(null);
     };
 
     const reorderProject = (id: string, direction: 'up' | 'down') => {
-        const index = projects.findIndex(p => p.id === id);
-        if (index === -1) return;
-        const newIndex = direction === 'up' ? index - 1 : index + 1;
-        if (newIndex < 0 || newIndex >= projects.length) return;
-
-        const newProjects = [...projects];
-        const [removed] = newProjects.splice(index, 1);
-        newProjects.splice(newIndex, 0, removed);
-        saveProjects(newProjects);
+        setProjects(prev => {
+            const index = prev.findIndex(p => p.id === id);
+            if (index === -1) return prev;
+            const newIndex = direction === 'up' ? index - 1 : index + 1;
+            if (newIndex < 0 || newIndex >= prev.length) return prev;
+            const newProjects = [...prev];
+            const [removed] = newProjects.splice(index, 1);
+            newProjects.splice(newIndex, 0, removed);
+            queueProjectsSave(newProjects);
+            return newProjects;
+        });
     };
 
     // --- Tracklist ---
@@ -269,7 +331,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
         updateActiveProject('tracklist', currentList);
     };
 
-    // --- DistroKid Tracklist Parser (pure regex, no AI needed) ---
+    // --- DistroKid Tracklist Parser ---
     const parseDistrokid = () => {
         if (!activeProject || !distrokidText.trim()) return;
 
@@ -299,35 +361,41 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
         setDistrokidText("");
     };
 
-    // --- Lyrics (inline per-track editor) ---
+    // --- Lyrics ---
     const getLyricForTrack = (trackName: string) =>
         lyrics.find(l => l.projectId === activeProject?.id && l.trackName === trackName);
 
     const updateOrCreateLyric = async (trackName: string, content: string) => {
         if (!activeProject) return;
-        const existing = getLyricForTrack(trackName);
-        let newLyrics: Lyric[];
-        if (existing) {
-            newLyrics = lyrics.map(l => l.id === existing.id ? { ...l, content, updatedAt: Date.now() } : l);
-        } else {
-            const newLyric: Lyric = {
-                id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `lyric_${Date.now()}`,
-                projectId: activeProject.id,
-                trackName,
-                content,
-                updatedAt: Date.now()
-            };
-            newLyrics = [...lyrics, newLyric];
-        }
-        await saveLyrics(newLyrics);
+        setLyrics(prev => {
+            const existing = prev.find(l => l.projectId === activeProject.id && l.trackName === trackName);
+            let newLyrics: Lyric[];
+            if (existing) {
+                newLyrics = prev.map(l => l.id === existing.id ? { ...l, content, updatedAt: Date.now() } : l);
+            } else {
+                const newLyric: Lyric = {
+                    id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `lyric_${Date.now()}`,
+                    projectId: activeProject.id,
+                    trackName,
+                    content,
+                    updatedAt: Date.now()
+                };
+                newLyrics = [...prev, newLyric];
+            }
+            queueLyricsSave(newLyrics);
+            return newLyrics;
+        });
     };
 
     const clearLyric = async (trackName: string) => {
         if (!activeProject) return;
-        const existing = getLyricForTrack(trackName);
-        if (existing) {
-            await saveLyrics(lyrics.filter(l => l.id !== existing.id));
-        }
+        setLyrics(prev => {
+            const existing = prev.find(l => l.projectId === activeProject.id && l.trackName === trackName);
+            if (!existing) return prev;
+            const newLyrics = prev.filter(l => l.id !== existing.id);
+            queueLyricsSave(newLyrics);
+            return newLyrics;
+        });
     };
 
     // --- External Links ---
@@ -395,13 +463,10 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
         const reader = new FileReader();
         reader.onload = async (event) => {
             const rawText = event.target?.result as string;
-            // Update the text box immediately with raw text
             await updateOrCreateLyric(trackName, rawText);
-            // Auto-trigger the AI formatting
             await handleFormatLyric(trackName, rawText);
         };
         reader.readAsText(file);
-        // Reset input
         e.target.value = '';
     };
 
@@ -418,16 +483,23 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
             const json = await res.json();
             if (json.success && json.data) {
                 const { title, visualVibe, lore, tracklist } = json.data;
-                const updated = {
-                    ...activeProject,
-                    title: title || activeProject.title,
-                    visualVibe: visualVibe || activeProject.visualVibe,
-                    lore: lore || activeProject.lore,
-                    tracklist: tracklist || activeProject.tracklist,
-                    externalLinks: [...(activeProject.externalLinks || []), { name: "Master Sheet", url: sheetUrl }]
-                };
-                setActiveProject(updated);
-                saveProjects(projects.map(p => p.id === updated.id ? updated : p));
+                setActiveProject(prevActive => {
+                    if (!prevActive) return prevActive;
+                    const updated = {
+                        ...prevActive,
+                        title: title || prevActive.title,
+                        visualVibe: visualVibe || prevActive.visualVibe,
+                        lore: lore || prevActive.lore,
+                        tracklist: tracklist || prevActive.tracklist,
+                        externalLinks: [...(prevActive.externalLinks || []), { name: "Master Sheet", url: sheetUrl }]
+                    };
+                    setProjects(prevProjects => {
+                        const newProjects = prevProjects.map(p => p.id === updated.id ? updated : p);
+                        queueProjectsSave(newProjects);
+                        return newProjects;
+                    });
+                    return updated;
+                });
                 setSheetUrl("");
                 setNotice({ message: `Sync complete: "${title}" updated with ${tracklist?.length || 0} tracks.`, type: 'success' });
             } else {

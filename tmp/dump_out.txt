@@ -1,0 +1,198 @@
+=== KIRBAI OS SYSTEM DUMP ===
+
+--- BRAND IDENTITY ---
+KIRBAI ALIAS:
+{
+  "ultimateGoal": "Make the project profitable (driving streaming traffic) while maintaining artistic integrity. Creatively fulfilling, achieving viral videos.",
+  "brandIdentity": "Gaymer millennial aesthetic. Deep cut nerdy lines and dark psychological themes without R-rated gore. Character psychological profiles with problematic tendencies/fatal flaws (selfishness, delusional, jealousy). 'Diva' pop elements appealing to Drag Race fans; sounds like Lady Gaga. Lyrics are sharp, clever, focus on character development (never cliche or sappy). Pop culture references in visual elements/videos.",
+  "workflowTools": "Photos: Gemini Pro (base) -> LM Arena (upscale).\nVideos: Grok (start frame animation, warps >1 character, free+upscale), Veo 3 (conservative use, 3D transformations), LM Arena (when Grok fails).\nConsults: Claude (better Grok prompts), Gemini (deeper brand knowledge).",
+  "aestheticRules": "Shiny = pink when applicable. Realistic textures paired faithfully with original Pokémon silhouettes, shapes, and proportions (NOT Detective Pikachu style proportions). The real world around them is rendered hyper-realistically.",
+  "narrativeRules": "Fan fiction / alternate reality metaphors. Complex emotions that elicit viewer responses. Strong understanding of character's psychological motivations before building art."
+}
+
+MUSIC FACTORY ALIAS:
+null
+
+--- PULSE & ANALYTICS ---
+Kirbai Analytics:
+{
+  "tiktok": {
+    "reach": "1561558",
+    "trends": {
+      "topAnchors": [
+        {
+          "rate": 0.2192,
+          "text": "machoke control yourself… but like 👀 u free tonight? 🎵 Your Boyfriend is so Shady – Kirbai #PokemonLegendsZA #gaytiktok #pokemontok #kirbai #pokemon"
+        },
+        {
+          "rate": 0.1633,
+          "text": "Tsareena, the grass type diva 👑🌿 🎵: Power Whip (Tsareena Step) - Kirbai I spent way too much time getting the texture right on the pink boots, but if she's going to be banned from the league she might as well look expensive doing it. Added 12 cameos, see if you can spot them all. Hatterene is up next, then Gardevoir has to deal with the mess they've made. #pokemonmusic #tsareena #bannedbadge #kirbai #pokemontiktok #pokemon #dragrace #rpdr #gaymer"
+        },
+        {
+          "rate": 0.136,
+          "text": "You requested the upgrade? 💎✨ The Baddie 4 running wild... but Gardevoir isn't having it 😤💅 Now she's Sailor Gardevoir, ready to end it all 🌙 💫 Full song + drama extension as the finale to the Banned Badge series, with as many callbacks as I could fitMoon Gardevoir Power, MAKE UP!!!!! ✨💖🌙 Track: \"Pixilate\" by Kirbai 🎧 (video version hit different... should i do a remix EP?) Duet if you're team Gardevoir, or tell me which of the 5 was your fav #Kirbai #SailorMoon #Gardevoir #Pokemon #ShinyGardevoir #MagicalGirl #PokemonAnimation #Gaymer #FYP #Animation #NewMusic"
+        }
+      ],
+      "topMagnets": [
+        {
+          "rate": 431923,
+          "text": "Gothitelle is a fashion serial killer 🥀⛓️ To be honest, I wasn’t a fan of her before I started this project, but seeing her tie up and humiliate Machoke changed that. You’re bringing physical, she’s bringing magic✨ Featuring Gothorita dance crew and a dead Chandelure. Poor Sylveon never stood a chance 🎀💀 Track: Mean Look (Gothitelle Cut) - Kirbai #BannedBadge #Gothitelle #Machoke #PokemonTikTok #Kirbai #MeanLook #Gaymer #PokemonMusic"
+        },
+        {
+          "rate": 228506,
+          "text": "Jynx is a star and I'm tired of her getting shafted❄️👄🔮 So I made this, Lovely Kiss.  Lmk if I should release the full version.  #jynx #pokemonmusic #pokemontiktok #justiceforjynx #villainera #kirbai"
+        },
+        {
+          "rate": 191518,
+          "text": "She's just a Pokemon in love, and can't be held responsible for her actions. 🎀🔪 They say love makes you crazy, therefore you can't call her crazy. 'Cause when you call her crazy, you're just calling her \"in love.\" BLAM!! 💥 Because if Golurk really didn't want her back, why would he have talked to her in the first place? 👀 Chapter 2 of the #HeartScales project. Her favorite Spice Girl is Scary Spice, but she'll tell you it's Baby. She may be dabbling in a light histrionic personality disorder, but that's just what makes her so special. Meowscarada, Pheromosa, and Meloetta are helping out. Prepare to surrender to the power of friendship. 💅 Who do I do next? 👇 🎧 Full lyric video for \"Scrappy Klutz\" is on my YouTube (Link in bio) #Lopunny #PokemonMusic #PokemonArt #3DAnimation #OriginalMusic #gaymer #Kirbai #pokemontiktok"
+        }
+      ],
+      "topWindows": [
+        {
+          "time": "Sunday",
+          "reach": 619730
+        },
+        {
+          "time": "Monday",
+          "reach": 554371
+        },
+        {
+          "time": "Saturday",
+          "reach": 513337
+        }
+      ],
+      "topKeywords": [
+        "pokemon",
+        "music",
+        "heartscales",
+        "banned",
+        "badge"
+      ],
+      "optimalLengthRange": "N/A - Video length data not available."
+    },
+    "followers": "7554",
+    "narrative": "The most successful content involves reinterpreting popular Pokemon characters through dramatic and glamorous music narratives, driving both high views and strong engagement. Tactical recommendation is to focus content creation and posting on Sundays and Mondays to maximize initial reach and audience interaction.",
+    "lastUpdated": "Apr 7, 2026",
+    "demographics": {
+      "topGender": "N/A - Data not available.",
+      "topTerritories": [
+        "N/A - Data not available."
+      ]
+    }
+  },
+  "instagram": {
+    "reach": "2341490",
+    "trends": {
+      "topAnchors": [
+        {
+          "rate": 240.24,
+          "text": "Jynx is a star and I'm tired of her getting shafted❄️👄🔮 So I made this, Lovely Kiss.  Lmk if I should release the full version.  #jynx #pokemonmusic #pokemontiktok #justiceforjynx #villainera #kirbai"
+        },
+        {
+          "rate": 128.52,
+          "text": "Gothitelle is a fashion serial killer 🥀⛓️ To be honest, I wasn’t a fan of her before I started this project, but seeing her tie up and humiliate Machoke changed that. You’re bringing physical, she’s bringing magic✨ Featuring Gothorita dance crew and a dead Chandelure. Poor Sylveon never stood a chance 🎀💀 Track: Mean Look (Gothitelle Cut) - Kirbai #BannedBadge #Gothitelle #Machoke #PokemonTikTok #Kirbai #MeanLook #Gaymer #PokemonMusic"
+        },
+        {
+          "rate": 50.36,
+          "text": "machoke control yourself… but like 👀 u free tonight? 🎵 Your Boyfriend is so Shady – Kirbai #PokemonLegendsZA #gaytiktok #pokemontok #kirbai #pokemon"
+        }
+      ],
+      "topMagnets": [],
+      "topWindows": [
+        {
+          "time": "January 14",
+          "reach": 89969
+        },
+        {
+          "time": "February 25",
+          "reach": 84385
+        },
+        {
+          "time": "January 15",
+          "reach": 43453
+        }
+      ],
+      "topKeywords": [
+        "gothitelle",
+        "machoke",
+        "heartscales",
+        "jynx",
+        "bannedbadge"
+      ],
+      "optimalLengthRange": "Data not available in provided CSVs"
+    },
+    "analysis": null,
+    "followers": "10586",
+    "narrative": "Analysis of account data highlights peak engagement on specific days like January 14, February 25, and January 15 and successful content featuring themes such as gothitelle, machoke, and heartscales that generate high interactions per 1k views, as seen in \"Jynx is a star and I'm tired of her getting shafted❄️👄🔮 So I made this, Lovely Kiss.  Lmk if I should release the full version.  #jynx #pokemonmusic #pokemontiktok #justiceforjynx #villainera #kirbai\". To further enhance strategy, it is crucial to acquire follower growth metrics for 'magnet' content identification and comprehensive demographic data to precisely target audiences and refine posting times.",
+    "lastUpdated": "Mar 16, 2026"
+  }
+}
+
+Factory Analytics:
+{
+  "trends": {
+    "topWindows": [
+      {
+        "time": "Tuesday 10am",
+        "reach": 0
+      },
+      {
+        "time": "Wednesday 10am",
+        "reach": 0
+      }
+    ],
+    "topKeywords": [
+      "gothitelle",
+      "jynx",
+      "lopunny",
+      "ditto",
+      "pokopia"
+    ],
+    "peakPostingWindows": "Tuesday, Wednesday (Peak 10am)"
+  },
+  "igReach": "0",
+  "ttViews": "1.9M",
+  "analysis": {
+    "summary": "TikTok is the primary growth engine for Music Factory right now, driven by high-engagement Pokémon content.",
+    "actionItems": [
+      "Schedule high-impact releases for Tuesday/Wednesday at 10am to capture peak active windows.",
+      "Prioritize Gothitelle and Jynx themed content for the next sprint given their top-tier performance."
+    ]
+  },
+  "narrative": "TikTok performance is surging with 1.9M views over the last 4 months. Core demographics are 25-34 (58%) and predominantly male (7%?), with strongest presence in US and Mexico. Best performing content includes Gothitelle, Jynx, and Lopunny music videos, plus Ditto Pokopia quick videos.",
+  "igFollowers": "0",
+  "ttFollowers": "0",
+  "igLastUpdated": "",
+  "ttLastUpdated": "Mar 23, 2026"
+}
+
+--- MISSIONS / RELEASES ---
+Kirbai Missions:
+[
+  {
+    "title": "Golden Liquidation",
+    "alias": "Kirbai",
+    "concept": "Opulent, high-fashion K-Pop performance blended with the chilling reality of corporate control. Shiny golds, corrupted pinks, and hyper-realistic textures. Gholdengo and the Heart Scales Girl Group."
+  },
+  {
+    "title": "Meloetta Video Plan: The Mansion Reset",
+    "alias": "Meloetta",
+    "concept": "### Meloetta Video Concept: \"The Mansion Reset\"\n\n**Act 1: The Interruption (0-15 seconds)**\n*   (0-5 sec) HOOK: Meloetta (Aria form) floats serenely in a sun-drenched, opulent solarium.\n*   (6-10 sec) TENSION: A frantic Smoochum runs in, holding out Meloetta's glowing Rotom Phone.\n*   (11-15 sec) ACTIVATION: Meloetta takes the phone with an annoyed sigh. Close-up on the screen: a text from \"G ✨\" reads `Problem in the foyer. Handle it.`\n\n**Act 2: The Descent & The Damage (16-30 seconds)**\n*   (16-23 sec): Meloetta glides down a massive, curving staircase.\n*   (24-30 sec): At the bottom, Meowscarada is crouched on the marble floor, glitching violently. Her Destiny Knot sparks. Her Heart Scale locket flashes a corrupted, critical red. A quick, reversed flashback shows her sacrificing her Vileplume friend.\n\n**Act 3: The Echo Chamber (Performance Anchor) (31-50 seconds)**\n*   (31-35 sec): Meloetta leads the broken Meowscarada into her private studio, the \"Echo Chamber.\"\n*   (36-42 sec): Meloetta (Pirouette form) sings. Sonic code from her microphone connects to the sparking Destiny Knot, forcing Meowscarada's glitches to subside and locking her body into form.\n*   (43-50 sec): The song's energy flows into the red Heart Scale locket. Traumatic memories play in reverse before being overwritten by K-pop stardom flashes. The locket's light turns a stable, healed pink.\n\n**Act 4: The Aftermath (51-60 seconds)**\n*   (51-55 sec): Meowscarada stands with a vacant, perfect smile. The camera pans to reveal Mew on a velvet couch, completely entranced by the lingering notes.\n*   (56-60 sec) FINAL SHOT: Meloetta checks her Rotom Phone. A new text from \"G ✨\" pops up: `that's my girl`. She gives a small, triumphant smile."
+  },
+  {
+    "title": "I'm the Pheromosa MV",
+    "alias": "Pheromosa",
+    "concept": "Video Creative Brief: \"I'm the Pheromosa\"\nLogline: An obsessively sterile Pheromosa goes on a high-speed hunt for a single piece of trash, remaining blissfully ignorant of the horrifying truths about her own existence that she encounters along the way.\n\nCore Concept: \"The Hunt for Filth\"\n\nThe video is a high-energy dance piece framed by a narrative chase. Pheromosa's motivation is not malice or curiosity, but a cunty, pathological need for cleanliness. The audience is shown critical lore elements, but Pheromosa, the \"oblivious investigator,\" is blind to them, creating a powerful dramatic irony that serves both casual viewers and lore followers. There has to be one single \"blink and youll miss it\" frame where its hinted at that pheromosa is actually a ditto. The other members of the Heart Scales (meloetta, lopunny, meowscarada) should also make an appearance, but only as posters on the wall or data on a computer screen/hologram screen. So physically they arent there, they are just referenced in the background. You decide where this fits best. \n\nVisual Structure (90 seconds):\n\nThe video will be built on rapid intercutting between two states:\n\n•\nTHE STAGE (A-Roll): Pheromosa's flawless dance performance. The anchor for virality.\n•\nTHE CHASE (B-Roll): Her high-speed narrative pursuit through the lab. The vehicle for lore.\nCharacter & Wardrobe\n•\nPheromosa (The Star / The Queen)\n•\nThe Stage Look: \"Crystal Carapace\"\nA spectacular, shimmering bodysuit resembling crystalline insect armor. This high-fashion look is reserved exclusively for her dance sequences on the Hexagon Stage, elevating the performance into a true diva spectacle.\n\n•\nThe Chase Look: Base Form\nHer iconic, recognizable base form will be used for all narrative scenes during her hunt through the lab. This grounds her in her \"off-stage\" reality as the queen patrolling her domain.\n\nScene-by-Scene Breakdown\n•\n(0-15s) INTRO - THE STAGE / THE CHASE\n•\nAction: We open on Pheromosa in her Crystal Carapace on the Hexagon Stage, executing flawless choreography. On a security monitor, she spots a Trubbish leaving a smudge. Her expression hardens with disgust. In her Base Form, she bursts from the stage to begin the hunt.\n•\n(15-35s) VERSE - THE DITTO VATS\n•\nAction: In her Base Form, Pheromosa sprints through the Ditto Vat Lineup, ignoring the amorphous forms within. Her focus is on the faint trail of grime. She leaps over a puddle, her disgust aimed at the mess, not the source.\n•\n(35-55s) CHORUS - THE STAGE\n•\nAction: Hard cut back to Pheromosa in her Crystal Carapace on the Hexagon Stage. This is the main dance break. Munchlax wanders on stage. Pheromosa seamlessly integrates a \"Triple Kick\" to punt him and his crumbs away before returning to her routine.\n•\n(55-75s) BRIDGE - THE DESTINY KNOT FORGE\n•\nAction: The chase leads to the Destiny Knot Forge. In the background, a Ditto is forcibly locked into a generic, crystalline humanoid shape by a spectral hand tightening a Destiny Knot. Pheromosa, in her Base Form, is completely oblivious. She corners the Trubbish, her mission's objective.\n•\n(75-90s) OUTRO - THE PURIFICATION\n•\nAction: Pheromosa traps the Trubbish in a sanitation airlock and hits the \"PURGE\" button. The chamber fills with shimmering energy. The door opens, revealing a Purified Trubbish—sparkling, white, and crystalline. Pheromosa gives it a single, dismissive glance of approval and turns away.\n•\nFinal Shot: A hard cut to her back on the Hexagon Stage in her Crystal Carapace, hitting a final, triumphant pose. Her world is clean."
+  }
+]
+
+Factory Missions:
+[]
+
+--- ROADMAP (PROGRESS) ---
+Kirbai Roadmap:
+"kirbai"
+
+Factory Roadmap:
+null
+
