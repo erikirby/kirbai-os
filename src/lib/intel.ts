@@ -59,8 +59,11 @@ export async function callOpenRouter(prompt: string, systemInstruction: string):
     for (const model of FREE_MODELS) {
         try {
             console.log(`[OpenRouter] Trying ${model}`);
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 10000); // 10s per model
             const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
+                signal: controller.signal,
                 headers: {
                     "Authorization": `Bearer ${apiKey}`,
                     "Content-Type": "application/json",
@@ -76,6 +79,7 @@ export async function callOpenRouter(prompt: string, systemInstruction: string):
                     response_format: { type: "json_object" },
                 }),
             });
+            clearTimeout(timeout);
 
             if (!res.ok) {
                 const err = await res.text();
