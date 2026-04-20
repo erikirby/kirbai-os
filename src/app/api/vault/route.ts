@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getRow, setRow } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 const VALID_TYPES = ['projects', 'lyrics'];
 
 export async function GET(req: Request) {

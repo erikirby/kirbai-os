@@ -141,8 +141,8 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
         const fetchVault = async () => {
             try {
                 const [projRes, lyrRes] = await Promise.all([
-                    fetch('/api/vault?type=projects'),
-                    fetch('/api/vault?type=lyrics')
+                    fetch('/api/vault?type=projects', { cache: 'no-store' }),
+                    fetch('/api/vault?type=lyrics', { cache: 'no-store' })
                 ]);
                 const projData = await projRes.json();
                 const lyrData = await lyrRes.json();
@@ -170,13 +170,16 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
             const payload = pendingProjectsSave.current;
             if (!payload) return;
             try {
-                await fetch('/api/vault', {
+                const res = await fetch('/api/vault', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ type: 'projects', payload }) // keepalive removed to prevent 64KB block on base64
                 });
+                if (!res.ok) throw new Error(`Vault API Error: ${res.status}`);
                 pendingProjectsSave.current = null;
                 if (!pendingLyricsSave.current) setHasUnsavedChanges(false);
+            } catch (err) {
+                console.error("AutoSave Error:", err);
             } finally {
                 setIsSaving(false);
             }
@@ -195,13 +198,16 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
             const payload = pendingLyricsSave.current;
             if (!payload) return;
             try {
-                await fetch('/api/vault', {
+                const res = await fetch('/api/vault', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ type: 'lyrics', payload })
                 });
+                if (!res.ok) throw new Error(`Vault API Error: ${res.status}`);
                 pendingLyricsSave.current = null;
                 if (!pendingProjectsSave.current) setHasUnsavedChanges(false);
+            } catch (err) {
+                console.error("AutoSave Error:", err);
             } finally {
                 setIsSaving(false);
             }
@@ -222,7 +228,10 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ type: 'projects', payload: pendingProjectsSave.current })
-                    }).then(() => { pendingProjectsSave.current = null; })
+                    }).then((res) => {
+                        if (!res.ok) throw new Error("Payload limit exceeded");
+                        pendingProjectsSave.current = null;
+                    })
                 );
             }
             if (pendingLyricsSave.current) {
@@ -231,14 +240,17 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ type: 'lyrics', payload: pendingLyricsSave.current })
-                    }).then(() => { pendingLyricsSave.current = null; })
+                    }).then((res) => {
+                        if (!res.ok) throw new Error("Payload limit exceeded");
+                        pendingLyricsSave.current = null;
+                    })
                 );
             }
             await Promise.all(promises);
             setHasUnsavedChanges(false);
             setNotice({ message: "Vault safely locked. All changes synced.", type: "success" });
         } catch (e) {
-            setNotice({ message: "Failed to force save data.", type: "error" });
+            setNotice({ message: "Failed to force save data. Payload may be too large.", type: "error" });
         } finally {
             setIsSaving(false);
         }
