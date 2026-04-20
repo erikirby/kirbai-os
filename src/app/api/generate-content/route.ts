@@ -299,6 +299,13 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         console.error('Error generating AI content:', error);
-        return NextResponse.json({ error: error.message || 'Failed to generate content' }, { status: 500 });
+        let userMessage = 'Failed to generate content.';
+        const msg = error.message || '';
+        if (msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED')) {
+            userMessage = 'AI quota limit reached across all available models. Quotas reset every few minutes — please try again shortly.';
+        } else if (msg.includes('503') || msg.includes('UNAVAILABLE')) {
+            userMessage = 'AI is overloaded right now. Try again in a moment.';
+        }
+        return NextResponse.json({ error: userMessage }, { status: 500 });
     }
 }
