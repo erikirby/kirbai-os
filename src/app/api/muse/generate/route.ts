@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { getRow, getMissionsAsync, getRoadmapAsync, getUserPsycheAsync, MuseCard, UserPsyche, getPulseStateAsync, logApiUsageAsync } from "@/lib/db";
-import { safeCallGemini } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter } from "@/lib/intel";
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
@@ -127,7 +127,26 @@ export async function POST(req: NextRequest) {
                     console.warn(`[Muse] ${fallback} also failed: ${fallbackErr.message?.slice(0, 60)}`);
                 }
             }
-            if (!succeeded) throw primaryErr;
+            if (!succeeded) {
+                // Final fallback: OpenRouter free tier
+                console.warn('[Muse] All Gemini models failed, falling back to OpenRouter');
+                const openRouterText = await callOpenRouter(
+                    `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.`,
+                    symposiumPrompt
+                );
+                const parsed = JSON.parse(openRouterText);
+                const cards: MuseCard[] = parsed.cards.map((c: any) => ({
+                    ...c,
+                    id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `muse_${Date.now()}_${Math.random()}`,
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
+                }));
+                return NextResponse.json({
+                    cards,
+                    clefairyComment: parsed.clefairyComment,
+                    clefairyEmotion: parsed.clefairyEmotion
+                });
+            }
         }
 
         if (modelResponse.usageMetadata) {

@@ -38,6 +38,60 @@ export async function safeCallGemini(
     }
 }
 
+/**
+ * Fallback AI call via OpenRouter using free-tier models.
+ * Used when all Gemini quota is exhausted.
+ */
+export async function callOpenRouter(prompt: string, systemInstruction: string): Promise<string> {
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) throw new Error("OPENROUTER_API_KEY is not set");
+
+    const FREE_MODELS = [
+        "google/gemini-2.0-flash-exp:free",
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "mistralai/mistral-7b-instruct:free",
+    ];
+
+    let lastError: any;
+    for (const model of FREE_MODELS) {
+        try {
+            console.log(`[OpenRouter] Trying ${model}`);
+            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://kirbai-os.vercel.app",
+                    "X-Title": "Kirbai OS",
+                },
+                body: JSON.stringify({
+                    model,
+                    messages: [
+                        { role: "system", content: systemInstruction },
+                        { role: "user", content: prompt },
+                    ],
+                    response_format: { type: "json_object" },
+                }),
+            });
+
+            if (!res.ok) {
+                const err = await res.text();
+                throw new Error(`OpenRouter ${res.status}: ${err}`);
+            }
+
+            const data = await res.json();
+            const text = data.choices?.[0]?.message?.content;
+            if (!text) throw new Error("OpenRouter returned empty content");
+            console.log(`[OpenRouter] Success with ${model}`);
+            return text;
+        } catch (e: any) {
+            console.warn(`[OpenRouter] ${model} failed: ${e.message?.slice(0, 80)}`);
+            lastError = e;
+        }
+    }
+    throw lastError;
+}
+
 export async function getLatestNewslettersAsync(): Promise<IntelItem[]> {
     try {
         const postsRes = await fetch("https://aiguerrilla.com/posts", {
