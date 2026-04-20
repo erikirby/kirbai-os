@@ -13,25 +13,37 @@ export async function POST(req: NextRequest) {
         }
         
         // 1. Gather Context
-        const [lore, missions, roadmap, psyche, pulse, liveNews] = await Promise.all([
+        const [lore, missions, roadmap, psyche, pulse, liveNews, allVaultProjects] = await Promise.all([
             getRow(mode === 'factory' ? 'lore_factory' : 'lore_kirbai'),
             getMissionsAsync(mode),
             getRoadmapAsync(mode),
             getUserPsycheAsync(),
             getPulseStateAsync(mode),
-            getRow('pokemon_news')
+            getRow('pokemon_news'),
+            getRow('vault_projects')
         ]);
+
+        const kirbaiProjects = (allVaultProjects ?? [])
+            .filter((p: any) => p.alias === 'Kirbai')
+            .map((p: any) => ({
+                title: p.title,
+                status: p.status,
+                lore: p.lore,
+                visualVibe: p.visualVibe,
+                tracklist: p.tracklist,
+            }));
 
         const contextSummary = `
             CURRENT DATE: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             LORE: ${JSON.stringify(lore?.nodes?.slice(0, 10) || "Empty")}
+            ACTIVE KIRBAI PROJECTS (Vault): ${JSON.stringify(kirbaiProjects.slice(0, 5) || "None")}
             RECENT MISSIONS: ${JSON.stringify(missions?.slice(0, 3) || "None")}
             CURRENT ROADMAP: ${JSON.stringify(roadmap?.phases?.find((p: any) => p.status === 'Current Objective') || "None")}
             USER PSYCHE: ${JSON.stringify(psyche || "No memory yet")}
             ANALYTICS: ${JSON.stringify(pulse?.summary || "No data")}
             ALREADY SUGGESTED (DO NOT REPEAT): ${JSON.stringify(existingTitles)}
             LIVE PLATFORM INTEL (NEWS): ${JSON.stringify(liveNews || "No news data")}
-            SCOUT INTEL (TRENDS): 
+            SCOUT INTEL (TRENDS):
             - "Pokémon Pokopia" (released March 2026) is viral. Players control transformation-capable Ditto in a post-apocalyptic Kanto life-sim.
             - "Throwback TikTok" trend: "2026 is the New 2016" nostalgia is peaking.
             - AI Music: Suno v3 and Meta JASCO are industry standard, enabling chord-to-track and 2-minute high-fidelity generations.
