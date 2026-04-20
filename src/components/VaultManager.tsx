@@ -79,6 +79,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
     const [activeProject, setActiveProject] = useState<Project | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     // Which track's lyrics are expanded inline
     const [expandedTrack, setExpandedTrack] = useState<string | null>(null);
@@ -162,6 +163,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
 
     const queueProjectsSave = (data: Project[]) => {
         pendingProjectsSave.current = data;
+        setHasUnsavedChanges(true);
         setIsSaving(true);
         if (saveProjectsRef.current) clearTimeout(saveProjectsRef.current);
         saveProjectsRef.current = setTimeout(async () => {
@@ -171,10 +173,10 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                 await fetch('/api/vault', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    keepalive: true,
-                    body: JSON.stringify({ type: 'projects', payload })
+                    body: JSON.stringify({ type: 'projects', payload }) // keepalive removed to prevent 64KB block on base64
                 });
                 pendingProjectsSave.current = null;
+                if (!pendingLyricsSave.current) setHasUnsavedChanges(false);
             } finally {
                 setIsSaving(false);
             }
@@ -186,6 +188,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
 
     const queueLyricsSave = (data: Lyric[]) => {
         pendingLyricsSave.current = data;
+        setHasUnsavedChanges(true);
         setIsSaving(true);
         if (saveLyricsRef.current) clearTimeout(saveLyricsRef.current);
         saveLyricsRef.current = setTimeout(async () => {
@@ -195,39 +198,51 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                 await fetch('/api/vault', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    keepalive: true,
                     body: JSON.stringify({ type: 'lyrics', payload })
                 });
                 pendingLyricsSave.current = null;
+                if (!pendingProjectsSave.current) setHasUnsavedChanges(false);
             } finally {
                 setIsSaving(false);
             }
         }, 1000);
     };
 
-    // Unmount safe flush
-    useEffect(() => {
-        return () => {
-            if (saveProjectsRef.current && pendingProjectsSave.current) {
-                clearTimeout(saveProjectsRef.current);
-                fetch('/api/vault', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    keepalive: true,
-                    body: JSON.stringify({ type: 'projects', payload: pendingProjectsSave.current })
-                }).catch(() => {});
+    const handleManualSave = async () => {
+        if (!hasUnsavedChanges) return;
+        setIsSaving(true);
+        if (saveProjectsRef.current) clearTimeout(saveProjectsRef.current);
+        if (saveLyricsRef.current) clearTimeout(saveLyricsRef.current);
+
+        try {
+            const promises = [];
+            if (pendingProjectsSave.current) {
+                promises.push(
+                    fetch('/api/vault', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'projects', payload: pendingProjectsSave.current })
+                    }).then(() => { pendingProjectsSave.current = null; })
+                );
             }
-            if (saveLyricsRef.current && pendingLyricsSave.current) {
-                clearTimeout(saveLyricsRef.current);
-                fetch('/api/vault', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    keepalive: true,
-                    body: JSON.stringify({ type: 'lyrics', payload: pendingLyricsSave.current })
-                }).catch(() => {});
+            if (pendingLyricsSave.current) {
+                promises.push(
+                    fetch('/api/vault', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'lyrics', payload: pendingLyricsSave.current })
+                    }).then(() => { pendingLyricsSave.current = null; })
+                );
             }
-        };
-    }, []);
+            await Promise.all(promises);
+            setHasUnsavedChanges(false);
+            setNotice({ message: "Vault safely locked. All changes synced.", type: "success" });
+        } catch (e) {
+            setNotice({ message: "Failed to force save data.", type: "error" });
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     // --- Project Actions ---
     const createProject = () => {
@@ -553,11 +568,26 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                     <h2 className="text-2xl font-black tracking-tighter text-foreground uppercase">The Vault</h2>
                     <p className="text-[10px] text-foreground/50 uppercase tracking-[0.5em] font-black mt-0.5">Persistent Project Memory</p>
                 </div>
-                {isSaving && (
-                    <span className="text-[9px] font-black uppercase tracking-[0.4em] text-cyan-400 animate-pulse flex items-center gap-2">
-                        <Loader2 className="w-3 h-3 animate-spin" /> Writing to Disk...
-                    </span>
-                )}
+                <div className="flex items-center gap-4">
+                    {/* Manual Save Button */}
+                    <button 
+                        onClick={handleManualSave}
+                        disabled={!hasUnsavedChanges || isSaving}
+                        className={`px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-[0.3em] transition-all flex items-center gap-2 border focus:outline-none
+                            ${hasUnsavedChanges 
+                                ? 'bg-yellow-400 text-black border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.3)] hover:scale-105' 
+                                : 'bg-white/5 text-foreground/30 border-white/10'
+                            }`}
+                    >
+                        <Save className="w-3 h-3" /> 
+                        {hasUnsavedChanges ? "Pending Sync" : "Synced"}
+                    </button>
+                    {isSaving && (
+                        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-cyan-400 animate-pulse flex items-center gap-2 shrink-0">
+                            <Loader2 className="w-3 h-3 animate-spin" /> Writing...
+                        </span>
+                    )}
+                </div>
             </div>
 
             {/* Main Layout: Project List + Detail */}
