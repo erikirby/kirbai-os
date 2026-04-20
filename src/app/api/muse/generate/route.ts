@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
             let succeeded = false;
             for (const fallback of fallbackModels) {
                 try {
-                    console.warn(`[Muse] Primary model failed (${primaryErr.message?.slice(0, 60)}), trying ${fallback}`);
+                    console.warn(`[Muse] Primary model failed, trying ${fallback}`);
                     modelResponse = await safeCallGemini(fallback, {
                         contents: [{ role: 'user', parts: [{ text: `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.` }] }],
                         config: {
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
                             temperature: 0.8,
                             responseMimeType: 'application/json'
                         }
-                    });
+                    }, 0); // retries=0: fail fast, don't wait
                     succeeded = true;
                     break;
                 } catch (fallbackErr: any) {
