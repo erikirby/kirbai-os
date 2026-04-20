@@ -85,6 +85,17 @@ export async function callOpenRouter(prompt: string, systemInstruction: string):
             const data = await res.json();
             const text = data.choices?.[0]?.message?.content;
             if (!text) throw new Error("OpenRouter returned empty content");
+
+            // Validate it's parseable JSON with expected shape
+            const parsed = JSON.parse(text);
+            if (!parsed.cards || !Array.isArray(parsed.cards) || parsed.cards.length === 0) {
+                throw new Error(`OpenRouter ${model} returned malformed structure`);
+            }
+            const firstCard = parsed.cards[0];
+            if (!firstCard.title || !firstCard.type || !firstCard.description) {
+                throw new Error(`OpenRouter ${model} returned cards missing required fields`);
+            }
+
             console.log(`[OpenRouter] Success with ${model}`);
             return text;
         } catch (e: any) {
