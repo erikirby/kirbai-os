@@ -351,6 +351,18 @@ export async function getPulseStateAsync(mode: string) {
     return await getRow(key);
 }
 
+// --- DISTRO / DESCRIPTION GENERATOR SESSIONS ---
+
+export async function saveDistroSessionAsync(mode: string, session: { messages: any[], platforms: any }) {
+    const key = mode === 'factory' ? 'distro_session_factory' : 'distro_session_kirbai';
+    await setRow(key, session);
+}
+
+export async function getDistroSessionAsync(mode: string) {
+    const key = mode === 'factory' ? 'distro_session_factory' : 'distro_session_kirbai';
+    return await getRow(key);
+}
+
 // --- YOUTUBE STATS CACHE ---
 
 export async function saveYouTubeStatsAsync(mode: string, stats: any[]) {
