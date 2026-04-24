@@ -300,7 +300,13 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        const outputText = response.text || "I have processed your request.";
+        let outputText: string;
+        try {
+            outputText = response.text;
+        } catch {
+            const parts = response.candidates?.[0]?.content?.parts || [];
+            outputText = parts.find((p: any) => p.text)?.text || "I have processed your request.";
+        }
         return NextResponse.json({ result: outputText });
 
     } catch (error: any) {
@@ -311,6 +317,8 @@ export async function POST(req: NextRequest) {
             userMessage = 'AI quota limit reached across all available models. Quotas reset every few minutes — please try again shortly.';
         } else if (msg.includes('503') || msg.includes('UNAVAILABLE')) {
             userMessage = 'AI is overloaded right now. Try again in a moment.';
+        } else if (msg.includes('API_KEY') || msg.includes('api key') || msg.includes('API key')) {
+            userMessage = `AI provider config error: ${msg}`;
         }
         return NextResponse.json({ error: userMessage }, { status: 500 });
     }

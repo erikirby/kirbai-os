@@ -6,6 +6,8 @@ import StatusButton from './StatusButton';
 
 // Basic markdown parser
 const MarkdownRenderer = ({ content }: { content: string }) => {
+    if (!content || typeof content !== 'string') return <p className="text-sm italic opacity-40">Empty content</p>;
+    
     const lines = content.split('\n');
     return (
         <div className="space-y-3">
@@ -181,10 +183,10 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                                             : 'bg-white/5 border border-white/10 text-foreground/90 rounded-tl-none font-sans leading-relaxed'
                                     }`}>
                                         {msg.role === 'user' ? (
-                                            <p className="text-base font-medium">{msg.text}</p>
+                                            <p className="text-base font-medium">{msg.text || ""}</p>
                                         ) : (
                                             <div className="space-y-1">
-                                                <MarkdownRenderer content={msg.text} />
+                                                <MarkdownRenderer content={msg.text || ""} />
                                             </div>
                                         )}
                                     </div>

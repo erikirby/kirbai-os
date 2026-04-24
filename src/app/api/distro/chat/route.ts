@@ -84,7 +84,12 @@ export async function POST(req: Request) {
                 }
             });
             if (response.usageMetadata) await logApiUsageAsync("/api/distro/chat", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
-            textResponse = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
+            try {
+                textResponse = typeof (response as any).text === 'function' ? (response as any).text() : response.text;
+            } catch {
+                const parts = response.candidates?.[0]?.content?.parts || [];
+                textResponse = parts.find((p: any) => p.text)?.text || "";
+            }
         } catch (geminiErr: any) {
             console.warn(`[Distro API] Gemini Failed: ${geminiErr.message?.slice(0, 80)}. Switching to Fallback...`);
             attempt = "OpenRouter Fallback";
@@ -123,16 +128,18 @@ export async function POST(req: Request) {
             facebook: parsedResponse.platforms?.facebook || ""
         };
 
+        const replyText = parsedResponse.reply || "Strategy updated. See the matrix for details.";
+
         // PERSIST the session immediately
         const finalSession = {
-            messages: [...messages, { role: 'ai', text: parsedResponse.reply }],
+            messages: [...messages, { role: 'ai', text: replyText }],
             platforms: sanitizedPlatforms
         };
         await saveDistroSessionAsync(mode, finalSession);
 
         return NextResponse.json({ 
             success: true, 
-            reply: (attempt !== "Gemini") ? `[${attempt}] ${parsedResponse.reply}` : parsedResponse.reply,
+            reply: (attempt !== "Gemini") ? `[${attempt}] ${replyText}` : replyText,
             platforms: sanitizedPlatforms
         });
 
