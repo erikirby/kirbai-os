@@ -159,9 +159,16 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        const responseData = JSON.parse(visualistResult.text || "{}");
-        const shotsData = responseData.shots || [];
-        const requiredReferencesData = responseData.requiredReferences || [];
+        const rawText = visualistResult.text || "{}";
+        let responseData: any = { shots: [], requiredReferences: [] };
+        try {
+            responseData = JSON.parse(rawText.replace(/```json|```/g, '').trim());
+        } catch (e) {
+            console.error("Visualist Parse Error:", e);
+        }
+        
+        const shotsData = Array.isArray(responseData.shots) ? responseData.shots : [];
+        const requiredReferencesData = Array.isArray(responseData.requiredReferences) ? responseData.requiredReferences : [];
 
         // --- PHASE 6: PERSISTENCE ---
         const mission = {
@@ -176,17 +183,17 @@ export async function POST(req: NextRequest) {
             cameos: allCameos,
             shots: shotsData.map((s: any, i: number) => ({
                 id: `${missionId}-shot-${i}`,
-                timestamp: s.timestamp,
-                lyric: s.syncedLyrics,
-                visualDescription: s.visualDescription,
+                timestamp: s?.timestamp || `${i * 5}s`,
+                lyric: s?.syncedLyrics || "",
+                visualDescription: s?.visualDescription || "A clear visual path.",
                 personaCritiques: {
-                    director: s.directorNote || "",
-                    strategist: s.strategistNote || "",
-                    audience: s.audienceNote || ""
+                    director: s?.directorNote || "",
+                    strategist: s?.strategistNote || "",
+                    audience: s?.audienceNote || ""
                 },
-                bananaPromptV2: s.bananaPromptV2,
-                grokPromptV2: s.grokPromptV2,
-                refLabels: s.refLabels,
+                bananaPromptV2: s?.bananaPromptV2 || "",
+                grokPromptV2: s?.grokPromptV2 || "",
+                refLabels: s?.refLabels || [],
                 status: "planned"
             })),
             targetRuntime: totalSec.toString(),

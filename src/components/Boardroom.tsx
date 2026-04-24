@@ -103,9 +103,9 @@ export default function Boardroom({ mode }: { mode: string }) {
                                     setShowRefereePanel(true);
                                 }
                                 if (data.type === 'brief') {
-                                    setLatestBrief(data.text);
+                                    setLatestBrief(data.text || "");
                                 }
-                                if (data.type === 'brief') setLatestBrief(data.text);
+                                if (data.type === 'brief') setLatestBrief(data.text || "");
                                 if (data.agent === 'System' && data.text.startsWith('PHASE 4')) {
                                     // Refresh ledger after lore logging
                                     const res = await fetch('/api/boardroom/ledger');
@@ -320,7 +320,7 @@ export default function Boardroom({ mode }: { mode: string }) {
                                                     ? 'bg-accent/10 text-accent italic border-accent/20'
                                                     : 'bg-white/5 text-white/80 border-white/5 rounded-tl-none backdrop-blur-sm'
                                     }`}>
-                                        {line.text}
+                                        {line.text || ""}
                                     </div>
                                 </div>
                             );
@@ -464,7 +464,7 @@ export default function Boardroom({ mode }: { mode: string }) {
                 
                 {latestBrief ? (
                     <div className="flex flex-col gap-6 brief-content animate-in fade-in duration-1000">
-                        {latestBrief.split('\n').map((para, pIdx) => {
+                        {(latestBrief || "").split('\n').map((para, pIdx) => {
                             if (para.startsWith('# ')) return <h1 key={pIdx} className="text-xl font-black text-accent mb-4 border-b border-accent/20 pb-4">{para.replace('# ', '')}</h1>;
                             if (para.startsWith('## ')) return <h2 key={pIdx} className="text-[13px] font-black tracking-widest text-foreground/80 mt-6 mb-2 uppercase">{para.replace('## ', '')}</h2>;
                             if (para.startsWith('- ')) return <div key={pIdx} className="flex gap-2 items-start pl-2"><div className="w-1 h-1 rounded-full bg-accent mt-2 shrink-0"></div><p className="text-[11px] text-foreground/70 font-medium leading-relaxed">{para.replace('- ', '')}</p></div>;

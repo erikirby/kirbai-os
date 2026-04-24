@@ -135,7 +135,6 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
 
         return err.length > 120 ? err.substring(0, 120) + "..." : err;
     };
-
     // --- Data Loading ---
     useEffect(() => {
         const fetchVault = async () => {
@@ -146,8 +145,8 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                 ]);
                 const projData = await projRes.json();
                 const lyrData = await lyrRes.json();
-                if (projData.data) setProjects(projData.data);
-                if (lyrData.data) setLyrics(lyrData.data);
+                if (projData && Array.isArray(projData.data)) setProjects(projData.data);
+                if (lyrData && Array.isArray(lyrData.data)) setLyrics(lyrData.data);
             } catch (e) {
                 console.error("Failed to load vault");
             } finally {

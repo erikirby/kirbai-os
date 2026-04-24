@@ -6,6 +6,7 @@ import StatusButton from './StatusButton';
 
 // Basic zero-dependency markdown parser for AI Responses
 const MarkdownRenderer = ({ content }: { content: string }) => {
+    if (!content || typeof content !== 'string') return null;
     // Split by lines to handle block elements (headers, lists)
     const lines = content.split('\n');
     let inList = false;
@@ -70,6 +71,7 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
 
 // Helper: Parse inline bold (**text**) and italics (*text* or _text_)
 const parseInlineLinks = (text: string) => {
+    if (!text || typeof text !== 'string') return text;
     // 1. Bold: **text**
     let parts = text.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, index) => {
@@ -280,10 +282,10 @@ export default function AIHub({ theme }: { theme?: string }) {
                                         : 'bg-white/5 border border-white/10 text-foreground/90 font-sans text-[15px] leading-relaxed rounded-tl-none'
                                 }`}>
                                     {msg.role === 'user' ? (
-                                        <p className="text-lg">{msg.text}</p>
+                                        <p className="text-lg">{msg.text || ""}</p>
                                     ) : (
                                         <div className="pr-8">
-                                            <MarkdownRenderer content={msg.text} />
+                                            <MarkdownRenderer content={msg.text || ""} />
                                             <button 
                                                 onClick={() => handleCopy(msg.text, idx)}
                                                 className="absolute top-4 right-4 p-2 bg-black/40 border border-white/10 rounded-lg opacity-0 group-hover/msg:opacity-100 hover:text-accent transition-all text-foreground/40"

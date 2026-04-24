@@ -88,7 +88,10 @@ export async function POST(req: NextRequest) {
                 const triageText = triageResponse.text || "{}";
                 let triageData: { selected: string[], md_initial: string } = { selected: [], md_initial: "" };
                 try {
-                    triageData = JSON.parse(triageText.replace(/```json|```/g, '').trim());
+                    const cleanTriage = triageText.replace(/```json|```/g, '').trim();
+                    const parsed = JSON.parse(cleanTriage);
+                    triageData.selected = Array.isArray(parsed.selected) ? parsed.selected : [];
+                    triageData.md_initial = parsed.md_initial || "";
                 } catch (e) {
                     // Fallback to random selection if AI fails JSON
                     triageData.selected = AGENTS.filter(a => a.id !== 'md').slice(0, 3).map(a => a.id);
@@ -206,7 +209,14 @@ export async function POST(req: NextRequest) {
                 const mdText = mdRes.text || "{}";
                 let mdData = { ready: true, binary: true, clash: "Continue?", outcomes: ["Analyzing..."] };
                 try {
-                    mdData = JSON.parse(mdText.replace(/```json|```/g, '').trim());
+                    const cleanMd = mdText.replace(/```json|```/g, '').trim();
+                    const parsed = JSON.parse(cleanMd);
+                    mdData = {
+                        ready: typeof parsed.ready === 'boolean' ? parsed.ready : true,
+                        binary: typeof parsed.binary === 'boolean' ? parsed.binary : true,
+                        clash: parsed.clash || "Continue?",
+                        outcomes: Array.isArray(parsed.outcomes) ? parsed.outcomes : ["Analyzing..."]
+                    };
                 } catch (e) {
                     mdData.clash = mdText;
                 }
@@ -238,7 +248,10 @@ export async function POST(req: NextRequest) {
                 const loreText = loreRes.text || "{}";
                 let loreData = { entity: "Session", truth: "Strategy updated." };
                 try {
-                    loreData = JSON.parse(loreText.replace(/```json|```/g, '').trim());
+                    const cleanLore = loreText.replace(/```json|```/g, '').trim();
+                    const parsed = JSON.parse(cleanLore);
+                    loreData.entity = parsed.entity || "Session";
+                    loreData.truth = parsed.truth || "Strategy updated.";
                 } catch (e) {
                     console.error("Lore Parse Error:", e);
                 }

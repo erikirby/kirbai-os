@@ -355,7 +355,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                         <h3 className="text-lg font-bold text-white leading-tight">{concept.title}</h3>
                                         {!isExpanded && (
                                             <p className="text-sm text-foreground/40 line-clamp-2 font-mono leading-relaxed">
-                                                {concept.body}
+                                                {concept.body || "No description."}
                                             </p>
                                         )}
                                     </div>
@@ -446,7 +446,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                             </>
                                         ) : (
                                             <p className="text-sm text-foreground/70 font-mono leading-relaxed whitespace-pre-wrap">
-                                                {concept.body}
+                                                {concept.body || "No description."}
                                             </p>
                                         )}
 
