@@ -32,7 +32,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
         e.preventDefault();
         setIsDragging(false);
         const file = e.dataTransfer.files[0];
-        if (file && file.name.endsWith(".tsv")) {
+        if (file && (file.name.endsWith(".tsv") || file.name.endsWith(".csv"))) {
             setAttachedFile(file);
         }
     };
@@ -41,7 +41,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
         if (!attachedFile) return;
         setIsLoading(true);
         try {
-            // DistroKid TSVs are notoriously encoded in UTF-16LE. A standard await file.text()
+            // DistroKid files are notoriously encoded in UTF-16LE. A standard await file.text()
             // will often read it as garbled chinese characters. We must explicitly handle encoding.
             const buffer = await attachedFile.arrayBuffer();
 
@@ -61,7 +61,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
             const res = await fetch("/api/analyze-finance", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tsv: text }),
+                body: JSON.stringify({ rawData: text }),
             });
             const data = await res.json();
 
@@ -146,9 +146,9 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                             </div>
                             <div className="flex flex-col items-center gap-2">
                                 <p className="text-xl font-black text-[var(--fg-color)]/90 tracking-tighter uppercase italic">Ingest Intelligence Feed</p>
-                                <p className="text-[10px] text-neutral-600 uppercase tracking-[0.4em] font-black">Drop DistroKid .TSV Matrix_</p>
+                                <p className="text-[10px] text-neutral-600 uppercase tracking-[0.4em] font-black">Drop DistroKid .CSV/.TSV Matrix_</p>
                             </div>
-                            <input type="file" accept=".tsv" onChange={(e) => e.target.files?.[0] && setAttachedFile(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer" />
+                            <input type="file" accept=".tsv,.csv" onChange={(e) => e.target.files?.[0] && setAttachedFile(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer" />
                         </div>
                     )}
 

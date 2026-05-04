@@ -17,25 +17,46 @@ export async function GET() {
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { tsv } = body;
+        const { tsv, rawData } = body;
+        const fileContent = rawData || tsv;
 
-        if (!tsv) {
-            return NextResponse.json({ error: "No TSV data provided." }, { status: 400 });
+        if (!fileContent) {
+            return NextResponse.json({ error: "No data provided." }, { status: 400 });
         }
 
-        // Native TSV Parsing
+        // Native TSV/CSV Parsing
         // Handle varying newline formats (\r\n, \n, \r)
-        const lines = tsv.split(/\r\n|\n|\r/).filter((line: string) => line.trim() !== '');
+        const lines = fileContent.split(/\r\n|\n|\r/).filter((line: string) => line.trim() !== '');
 
         if (lines.length < 2) {
-            return NextResponse.json({ error: "Invalid TSV format. Not enough rows." }, { status: 400 });
+            return NextResponse.json({ error: "Invalid format. Not enough rows." }, { status: 400 });
         }
 
         // Detect Delimiter (TSV vs CSV)
         const firstLine = lines[0];
         const delimiter = firstLine.includes('\t') ? '\t' : (firstLine.includes(',') ? ',' : '\t');
 
-        const headers = firstLine.split(delimiter).map((h: string) => h.trim().toLowerCase());
+        function parseLine(line: string, delim: string) {
+            if (delim !== ',') return line.split(delim);
+            const cols = [];
+            let inQuotes = false;
+            let currentVal = '';
+            for (let j = 0; j < line.length; j++) {
+                const char = line[j];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    cols.push(currentVal.replace(/^"|"$/g, ''));
+                    currentVal = '';
+                } else {
+                    currentVal += char;
+                }
+            }
+            cols.push(currentVal.replace(/^"|"$/g, ''));
+            return cols;
+        }
+
+        const headers = parseLine(firstLine, delimiter).map((h: string) => h.trim().toLowerCase());
 
         // DistroKid and other standard distributors often utilize these variations
         const storeIdx = headers.findIndex((h: string) => h === 'store' || h.includes('service') || h.includes('platform'));
@@ -54,7 +75,7 @@ export async function POST(req: Request) {
 
         if (storeIdx === -1 || titleIdx === -1 || quantityIdx === -1 || earningsIdx === -1) {
             console.error("Finance Analysis Missing Columns. Headers:", headers);
-            return NextResponse.json({ error: `TSV missing core columns. Found: ${headers.slice(0, 8).join(', ')}...` }, { status: 400 });
+            return NextResponse.json({ error: `File missing core columns. Found: ${headers.slice(0, 8).join(', ')}...` }, { status: 400 });
         }
 
         let totalRevenue = 0;
@@ -66,15 +87,7 @@ export async function POST(req: Request) {
         let parsedRows = 0;
         for (let i = 1; i < lines.length; i++) {
             const rowStr = lines[i];
-            // Basic CSV parsing to handle quoted commas (e.g. "1,000") if it's a CSV
-            let cols = [];
-            if (delimiter === ',') {
-                // Regex to split CSV correctly with quotes
-                const matches = rowStr.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-                cols = matches ? matches.map((s: string) => s.replace(/^"|"$/g, '')) : rowStr.split(',');
-            } else {
-                cols = rowStr.split(delimiter);
-            }
+            const cols = parseLine(rowStr, delimiter);
 
             // If the row is malformed and doesn't reach the needed columns, skip it
             if (cols.length <= Math.max(storeIdx, titleIdx, quantityIdx, earningsIdx)) continue;
