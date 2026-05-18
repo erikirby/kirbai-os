@@ -267,7 +267,7 @@ export async function POST(req: NextRequest) {
             const toolResults = [];
             
             for (const call of toolCalls as any[]) {
-                const { name, args } = call.functionCall;
+                const { name, args, id } = call.functionCall;
                 console.log(`🤖 AI Triggering Tool: ${name}`, args);
                 
                 let result;
@@ -277,6 +277,7 @@ export async function POST(req: NextRequest) {
                 
                 toolResults.push({
                     functionResponse: {
+                        ...(id ? { id } : {}),
                         name,
                         response: result || { error: "Unknown tool" }
                     }
@@ -319,6 +320,10 @@ export async function POST(req: NextRequest) {
             userMessage = 'AI is overloaded right now. Try again in a moment.';
         } else if (msg.includes('API_KEY') || msg.includes('api key') || msg.includes('API key')) {
             userMessage = `AI provider config error: ${msg}`;
+        } else if (msg.includes('fetch failed') || msg.includes('ENOTFOUND') || msg.includes('unreachable') || msg.includes('connect')) {
+            userMessage = 'Network connection offline: The system was unable to reach any AI providers (Gemini, OpenRouter, or Groq). Please check your internet connection.';
+        } else if (msg) {
+            userMessage = `Error: ${msg}`;
         }
         return NextResponse.json({ error: userMessage }, { status: 500 });
     }
