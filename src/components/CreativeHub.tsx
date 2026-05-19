@@ -170,7 +170,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
             if (data.success) {
                 setPromotingId(null);
                 setLyrics("");
-                alert("Mission Created! Head to Director Suite.");
+                alert("Mission Created! Head to Director's Suite.");
             } else {
                 alert(`Director's Block: ${data.error || "The AI mission planning failed."}`);
             }
@@ -500,7 +500,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                                     onClick={() => setPromotingId(concept.id)}
                                                     className="w-fit flex items-center gap-2 px-4 py-2 border border-border/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-foreground/40 hover:text-white hover:border-accent transition-all group/btn"
                                                 >
-                                                    <Clapperboard className="w-4 h-4 text-accent/50 group-hover/btn:text-accent" /> Promote to Director Suite
+                                                    <Clapperboard className="w-4 h-4 text-accent/50 group-hover/btn:text-accent" /> Promote to Director's Suite
                                                 </button>
                                             )}
                                         </div>

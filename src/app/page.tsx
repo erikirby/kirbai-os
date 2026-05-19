@@ -139,7 +139,7 @@ export default function Home() {
         <div className={`flex items-center gap-1 p-1 relative z-50 ${theme === 'pokopia' ? '' : 'bg-surface/20 backdrop-blur-md rounded-full border border-border/10 shadow-2xl'}`}>
           {[
             { id: "command", label: "Command", items: [{ id: "roadmap", label: "Home" }, { id: "intel", label: "Intel" }, { id: "competitors", label: "Competitors" }, { id: "muse", label: "Muse" }, { id: "boardroom", label: "Boardroom" }] },
-            { id: "pipeline", label: "Pipeline", items: [{ id: "creative", label: "Brainstorm" }, { id: "director", label: "Director" }, { id: "distro", label: "Description Generator" }] },
+            { id: "pipeline", label: "Pipeline", items: [{ id: "creative", label: "Brainstorm" }, { id: "director", label: "Director's Suite" }, { id: "distro", label: "Description Generator" }] },
             { id: "archive", label: "Archive", items: [{ id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "prompts", label: "Prompts" }, { id: "core", label: "Core" }] },
             { id: "performance", label: "Performance", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "api-health", label: "API" }] },
           ].map((group) => (

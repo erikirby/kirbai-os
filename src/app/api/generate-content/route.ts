@@ -219,9 +219,10 @@ export async function POST(req: NextRequest) {
         // Initial Generation — try Gemini first (needed for tool calling)
         // Fall back to OpenRouter (no tool calls, but still responds) if quota exhausted
         let response: any;
+        let chosenModel: "gemini-2.5-flash" | "gemini-2.5-pro" | "gemini-2.0-flash" | "gemini-1.5-flash" = "gemini-2.5-flash";
         let usingFallback = false;
         try {
-            response = await safeCallGemini("gemini-2.5-flash", {
+            response = await safeCallGemini(chosenModel, {
                 contents: formattedHistory,
                 config: { systemInstruction: systemInstruction, tools: aiTools, temperature: 0.7 }
             }, 0);
@@ -234,6 +235,7 @@ export async function POST(req: NextRequest) {
                         contents: formattedHistory,
                         config: { systemInstruction: systemInstruction, tools: aiTools, temperature: 0.7 }
                     }, 0);
+                    chosenModel = model;
                     geminiSuccess = true;
                     break;
                 } catch (fe: any) {
@@ -283,17 +285,57 @@ export async function POST(req: NextRequest) {
                 });
             }
 
+            // Clean/Sanitize candidate content to a plain JSON object to avoid serialization issues with SDK classes/getters
+            const rawModelContent = response.candidates?.[0]?.content;
+            const modelContent = rawModelContent ? {
+                role: rawModelContent.role || 'model',
+                parts: (rawModelContent.parts || []).map((part: any) => {
+                    const cleanPart: any = {};
+                    if (part.text !== undefined) cleanPart.text = part.text;
+                    if (part.inlineData !== undefined) cleanPart.inlineData = part.inlineData;
+                    if (part.functionCall !== undefined) {
+                        cleanPart.functionCall = {
+                            name: part.functionCall.name,
+                            args: part.functionCall.args,
+                            ...(part.functionCall.id ? { id: part.functionCall.id } : {})
+                        };
+                    }
+                    return cleanPart;
+                })
+            } : null;
+
             // Send results back for final summary
             const finalContents = [
                 ...formattedHistory,
-                response.candidates?.[0]?.content, // Model's call
+                modelContent, // Plain JSON model call
                 { role: 'user', parts: toolResults } // The execution results
-            ];
+            ].filter(Boolean);
 
-            response = await safeCallGemini("gemini-2.5-flash", {
-                contents: finalContents,
-                config: { systemInstruction, tools: aiTools }
-            });
+            try {
+                response = await safeCallGemini(chosenModel, {
+                    contents: finalContents,
+                    config: { systemInstruction, tools: aiTools }
+                });
+            } catch (secError: any) {
+                console.warn(`[Chat] Second call failed with ${chosenModel}, trying fallback models...`);
+                let secondCallSuccess = false;
+                for (const model of ['gemini-2.0-flash', 'gemini-1.5-flash'] as const) {
+                    if (model === chosenModel) continue;
+                    try {
+                        response = await safeCallGemini(model, {
+                            contents: finalContents,
+                            config: { systemInstruction, tools: aiTools }
+                        });
+                        secondCallSuccess = true;
+                        break;
+                    } catch (fe: any) {
+                        console.warn(`[Chat] Second call fallback ${model} failed: ${fe.message?.slice(0, 60)}`);
+                    }
+                }
+                if (!secondCallSuccess) {
+                    throw secError;
+                }
+            }
 
             if (response.usageMetadata) {
                 await logApiUsageAsync("/api/generate-content (final)", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
