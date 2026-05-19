@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { saveMissionAsync, logApiUsageAsync, getTelemetryAsync } from "@/lib/db";
-import { safeCallGemini } from "@/lib/intel";
+import { safeCallGemini, extractJsonFromText } from "@/lib/intel";
 
 export async function POST(req: NextRequest) {
     try {
@@ -22,86 +22,74 @@ export async function POST(req: NextRequest) {
         const totalSec = parseInt(targetRuntime || "60");
         const missionId = `mission-${Date.now()}`;
         
-        // --- PHASE 0: ASSET EXTRACTION ---
-        const extractorPrompt = `
-            You are "The Asset Scanner". Identify every Pokemon name mentioned in the following concept and lyrics.
-            CONCEPT: ${concept.title} - ${brainstormContent}
-            LYRICS: ${lyrics}
-            Return ONLY a JSON array of names.
-        `;
-        const extractorResult = await safeCallGemini("gemini-2.5-flash", { 
-            contents: [{ role: 'user', parts: [{ text: extractorPrompt }] }],
-            config: { 
-                responseMimeType: "application/json",
-                responseSchema: { type: Type.ARRAY, items: { type: Type.STRING } } 
-            }
-        });
-        const extractedCameos = JSON.parse(extractorResult.text || "[]");
-        const allCameos = Array.from(new Set([...(cameos || []), ...extractedCameos]));
-
-        // --- PHASE 1: THE DIRECTOR DRAFTS THE VISION ---
-        let directorPrompt = `
-            You are "The Director", a specialist in narrative music videos for Kirbai OS.
+        // --- PHASE 1: DRAFT & CRITIQUE (DIRECTOR, STRATEGIST & AUDIENCE COLLABORATION) ---
+        const mainPlanningPrompt = `
+            You are a collaborative team consisting of:
+            1. "The Director": Specialized in narrative music videos for Kirbai OS (mode: ${mode}, alias: ${alias}).
+            2. "The Retention Strategist": Specialized in TikTok/Reels high-engagement pacing, hooks, and social trends.
+            3. "The Audience Critic": Representing Pokemon fans and the camp/slay/drag aesthetic.
+            
+            We are planning a narrative music video based on:
             CONCEPT: ${concept.title} - ${brainstormContent}
             LYRICS: ${lyrics}
             MODE: ${mode}
-            CAMEOS: ${allCameos.join(", ") || "None"}
 
-            Your goal is to draft a cinematic shot list. Each shot must have a timestamp and a clear visual description.
-            Focus on camera angles (Wide, Medium, Close-up), lighting, and character emotion.
-            Ensure the narrative is clear even without the lyrics.
+            Provide a collaborative final script, shot plan draft, and critiques.
+            Also, identify all Pokemon name cameos mentioned in the concept or lyrics.
+            
+            Return a JSON object with this exact structure:
+            {
+              "cameos": ["List of Pokemon names found in the concept/lyrics"],
+              "directorDraft": "Detailed cinematic shot-by-shot draft of the video, describing visual flow and character emotion.",
+              "strategistCritique": "Retention and engagement notes for the plan.",
+              "audienceCritique": "Blunt critique on how to maximize the camp and fan appeal."
+            }
         `;
-        const directorParts: any[] = [{ text: directorPrompt }];
+
+        const directorParts: any[] = [{ text: mainPlanningPrompt }];
         if (references && references.length > 0) {
             references.forEach((ref: string) => {
                 const base64Data = ref.split(',')[1] || ref;
                 directorParts.push({ inlineData: { mimeType: "image/jpeg", data: base64Data } });
             });
-            directorPrompt += "\nNote: I have provided reference images for the Art Style and Character Poses. Please ensure the vision matches these exactly.";
-            directorParts[0].text = directorPrompt;
+            const updatedPrompt = mainPlanningPrompt + "\nNote: Reference images for the Art Style and Character Poses are provided. Ensure the vision matches these exactly.";
+            directorParts[0].text = updatedPrompt;
         }
 
-        const directorResult = await safeCallGemini("gemini-2.5-flash", { contents: [{ role: 'user', parts: directorParts }] });
-        const directorDraft = directorResult.text;
-        if (directorResult.usageMetadata) await logApiUsageAsync("/api/director/plan (Director)", directorResult.usageMetadata.promptTokenCount || 0, directorResult.usageMetadata.candidatesTokenCount || 0);
+        const mainPlanningResult = await safeCallGemini("gemini-2.5-flash", { 
+            contents: [{ role: 'user', parts: directorParts }],
+            config: { 
+                responseMimeType: "application/json",
+                responseSchema: { 
+                    type: Type.OBJECT, 
+                    properties: {
+                        cameos: { type: Type.ARRAY, items: { type: Type.STRING } },
+                        directorDraft: { type: Type.STRING },
+                        strategistCritique: { type: Type.STRING },
+                        audienceCritique: { type: Type.STRING }
+                    },
+                    required: ["cameos", "directorDraft", "strategistCritique", "audienceCritique"]
+                } 
+            }
+        });
 
-        // --- PHASE 2 & 3: PARALLEL CRITIQUES (Strategist & Audience) ---
-        const [strategistResult, audienceResult] = await Promise.all([
-            safeCallGemini("gemini-2.5-flash", {
-                contents: [{ role: 'user', parts: [{ text: `
-                    You are "The Retention Strategist". You specialize in TikTok/Reels and high-engagement social content.
-                    The Director has proposed this plan:
-                    ${directorDraft}
+        if (mainPlanningResult.usageMetadata) {
+            await logApiUsageAsync("/api/director/plan (Planning)", mainPlanningResult.usageMetadata.promptTokenCount || 0, mainPlanningResult.usageMetadata.candidatesTokenCount || 0);
+        }
 
-                    Critique this plan for SOCIAL SUCCESS. Focus on Hooks, Pacing, and Clarity. Suggest specific improvements.
-                ` }] }]
-            }),
-            safeCallGemini("gemini-2.5-flash", {
-                contents: [{ role: 'user', parts: [{ text: `
-                    You are "The Audience Critic", representing Pokemon fans and camp/drag enthusiasts.
-                    DIRECTOR DRAFT: ${directorDraft}
-                    Evaluate if this mission hits the "Cunt/Slay" aesthetic. Focus on Niche Appeal and Emotional Climax. Provide a blunt critique.
-                ` }] }]
-            })
-        ]);
-        const strategistCritique = strategistResult.text;
-        const audienceCritique = audienceResult.text;
+        const parsedPlanning = JSON.parse(extractJsonFromText(mainPlanningResult.text || "{}"));
+        const extractedCameos = parsedPlanning.cameos || [];
+        const allCameos = Array.from(new Set([...(cameos || []), ...extractedCameos]));
+        const directorDraft = parsedPlanning.directorDraft || "";
+        const strategistCritique = parsedPlanning.strategistCritique || "";
+        const audienceCritique = parsedPlanning.audienceCritique || "";
 
-        // --- PHASE 4: THE REFINED "FINAL CUT" ---
-        const refinementPrompt = `
-            You are "The Director". Refine your vision based on feedback.
-            ORIGINAL VISION: ${directorDraft}
+        // --- PHASE 2: THE VISUALIST (SHOT MATRIX) ---
+        const visualistPrompt = `
+            You are "The Visualist". Take the Director's FINAL CUT and critiques, and produce a structured Shot Matrix.
+            FINAL CUT: ${directorDraft}
             SOCIAL CRITIQUE: ${strategistCritique}
             AUDIENCE CRITIQUE: ${audienceCritique}
-            Produce your REVISED FINAL CUT. Resolve the narrative confusion and implement the pacing requested.
-        `;
-        const refinedResult = await safeCallGemini("gemini-2.5-flash", { contents: [{ role: 'user', parts: [{ text: refinementPrompt }] }] });
-        const finalCut = refinedResult.text;
-
-        // --- PHASE 5: THE VISUALIST (SHOT MATRIX) ---
-        const visualistPrompt = `
-            You are "The Visualist". Take the Director's FINAL CUT and produce a structured Shot Matrix.
-            FINAL CUT: ${finalCut}
             LYRICS: ${lyricLines.join('\n')}
             TARGET RUNTIME: ${totalSec} seconds
             EXPECTED SHOT COUNT: ${expectedShotCount}
@@ -109,13 +97,15 @@ export async function POST(req: NextRequest) {
             
             RULES:
             1. MANDATORY: EXACTLY ${expectedShotCount} shots.
-            2. Each shot MUST map to exactly one lyric line.
-            3. CATEGORIZED SOURCES: Identify needed "Character", "Location", "Object" refs. Character rule: and outfit/pose is a "Character" ref.
+            2. Each shot MUST map to exactly one lyric line from the provided lyrics.
+            3. CATEGORIZED SOURCES: Identify needed "Character", "Location", "Object" refs. Character rule: any outfit/pose is a "Character" ref.
             4. CAMEO RULE: MUST create a Character requirement for every cameo: [${allCameos.join(", ")}].
             5. PROMPTS: bananaPromptV2 for 9:16 high-fidelity images. grokPromptV2 for movement. 
+            6. NOTES: Populate directorNote, strategistNote, and audienceNote for each shot based on the final cut and critiques.
 
             Return a JSON object: { requiredReferences: [], shots: [] }
         `;
+
         const visualistResult = await safeCallGemini("gemini-2.5-flash", {
             contents: [{ role: 'user', parts: [{ text: visualistPrompt }] }],
             config: {
@@ -159,10 +149,14 @@ export async function POST(req: NextRequest) {
             }
         });
 
+        if (visualistResult.usageMetadata) {
+            await logApiUsageAsync("/api/director/plan (Visualist)", visualistResult.usageMetadata.promptTokenCount || 0, visualistResult.usageMetadata.candidatesTokenCount || 0);
+        }
+
         const rawText = visualistResult.text || "{}";
         let responseData: any = { shots: [], requiredReferences: [] };
         try {
-            responseData = JSON.parse(rawText.replace(/```json|```/g, '').trim());
+            responseData = JSON.parse(extractJsonFromText(rawText));
         } catch (e) {
             console.error("Visualist Parse Error:", e);
         }
