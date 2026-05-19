@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Type } from '@google/genai';
-import { safeCallGemini, callOpenRouter, callGroq } from '@/lib/intel';
+import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from '@/lib/intel';
 import { logApiUsageAsync, getCompetitorsAsync, saveDistroSessionAsync } from '@/lib/db';
 import { supabase } from '@/lib/supabase';
 
@@ -65,19 +65,19 @@ export async function POST(req: Request) {
             }
         `;
 
-        const history = messages.map(m => ({
+        const formattedHistory = messages.map(m => ({
             role: m.role === 'ai' ? 'model' : 'user',
             parts: [{ text: m.text }]
         }));
 
-        const lastMessage = history.pop()?.parts[0]?.text || "Hello";
+        const lastMessage = messages[messages.length - 1]?.text || "Hello";
         let textResponse = "";
         let attempt = "Gemini";
 
         // --- 3-TIER FALLBACK CHAIN ---
         try {
             const response = await safeCallGemini("gemini-2.5-flash", {
-                contents: lastMessage,
+                contents: formattedHistory,
                 config: {
                     systemInstruction: systemInstruction,
                     tools: [{ googleSearch: {} }],
@@ -105,12 +105,7 @@ export async function POST(req: Request) {
         if (!textResponse) throw new Error("All AI providers failed to return a response.");
 
         // ROBUST JSON EXTRACTION
-        let jsonStr = textResponse.trim();
-        const firstBrace = jsonStr.indexOf('{');
-        const lastBrace = jsonStr.lastIndexOf('}');
-        if (firstBrace !== -1 && lastBrace !== -1) {
-            jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
-        }
+        let jsonStr = extractJsonFromText(textResponse);
 
         let parsedResponse: any;
         try {

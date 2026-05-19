@@ -130,11 +130,16 @@ const DEFAULT_DB: DatabaseSchema = {
 
 // --- Generic persistence helpers ---
 export async function getRow(key: string): Promise<any> {
-    const { data } = await supabase
+    const { data, error } = await supabase
         .from('persistence')
         .select('value')
         .eq('key', key)
         .maybeSingle();
+    
+    if (error) {
+        console.error(`[Supabase Read Error] Key: ${key}:`, error);
+        throw new Error(`Database connection failed: ${error.message}`);
+    }
     return data?.value ?? null;
 }
 
@@ -415,34 +420,44 @@ export async function saveTelemetryAsync(data: TelemetryData): Promise<void> {
 }
 
 export async function logApiUsageAsync(route: string, inputTokens: number, outputTokens: number) {
-    const tl = await getTelemetryAsync();
-    const cost = (inputTokens / 1_000_000) * 0.10 + (outputTokens / 1_000_000) * 0.40;
-    tl.lifetimeInputTokens += inputTokens;
-    tl.lifetimeOutputTokens += outputTokens;
-    tl.lifetimeCost += cost;
-    tl.logs.unshift({ timestamp: Date.now(), route, inputTokens, outputTokens, estimatedCost: cost });
-    tl.logs = tl.logs.slice(0, 100);
-    await saveTelemetryAsync(tl);
+    try {
+        const tl = await getTelemetryAsync();
+        const cost = (inputTokens / 1_000_000) * 0.10 + (outputTokens / 1_000_000) * 0.40;
+        tl.lifetimeInputTokens += inputTokens;
+        tl.lifetimeOutputTokens += outputTokens;
+        tl.lifetimeCost += cost;
+        tl.logs = tl.logs || [];
+        tl.logs.unshift({ timestamp: Date.now(), route, inputTokens, outputTokens, estimatedCost: cost });
+        tl.logs = tl.logs.slice(0, 100);
+        await saveTelemetryAsync(tl);
+    } catch (error) {
+        console.error("Failed to log API usage. Telemetry skipped.", error);
+    }
 }
 
 export async function logImageUsageAsync(count: number = 1, model: string = "nano-banana") {
-    const tl = await getTelemetryAsync();
-    const perImageCost = model.includes("pro") ? 0.09 : 0.045; // Defaulting to Nate Herk's mention for banana
-    const cost = count * perImageCost;
-    
-    tl.imageCount = (tl.imageCount || 0) + count;
-    tl.lifetimeImageCost = (tl.lifetimeImageCost || 0) + cost;
-    tl.lifetimeCost += cost;
-    
-    tl.logs.unshift({ 
-        timestamp: Date.now(), 
-        route: `/image-gen/${model}`, 
-        inputTokens: 0, 
-        outputTokens: 0, 
-        estimatedCost: cost 
-    });
-    tl.logs = tl.logs.slice(0, 100);
-    await saveTelemetryAsync(tl);
+    try {
+        const tl = await getTelemetryAsync();
+        const perImageCost = model.includes("pro") ? 0.09 : 0.045; // Defaulting to Nate Herk's mention for banana
+        const cost = count * perImageCost;
+        
+        tl.imageCount = (tl.imageCount || 0) + count;
+        tl.lifetimeImageCost = (tl.lifetimeImageCost || 0) + cost;
+        tl.lifetimeCost += cost;
+        
+        tl.logs = tl.logs || [];
+        tl.logs.unshift({ 
+            timestamp: Date.now(), 
+            route: `/image-gen/${model}`, 
+            inputTokens: 0, 
+            outputTokens: 0, 
+            estimatedCost: cost 
+        });
+        tl.logs = tl.logs.slice(0, 100);
+        await saveTelemetryAsync(tl);
+    } catch (error) {
+        console.error("Failed to log Image usage. Telemetry skipped.", error);
+    }
 }
 export async function resetTelemetryAsync() {
     const initial = { 
