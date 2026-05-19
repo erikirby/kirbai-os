@@ -1,6 +1,5 @@
 import { getRow, setRow, addMetadataPackAsync, MetadataPack } from './db';
 import crypto from 'crypto';
-import { supabase } from './supabase';
 import { Type } from '@google/genai';
 
 /**

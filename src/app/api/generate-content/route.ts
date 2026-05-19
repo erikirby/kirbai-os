@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { getRow, logApiUsageAsync } from "@/lib/db";
-import { supabase } from "@/lib/supabase";
 import { aiTools, save_to_vault, save_to_lore, save_to_concepts } from "@/lib/ai-actions";
 import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 

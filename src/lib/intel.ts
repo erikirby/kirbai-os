@@ -39,6 +39,40 @@ export async function safeCallGemini(
 }
 
 /**
+ * Robust utility to extract JSON from AI text output, ignoring conversational fluff or markdown.
+ */
+export function extractJsonFromText(text: string): string {
+    if (!text) return "{}";
+    
+    // Remove markdown codeblock backticks if present
+    let cleanText = text.replace(/```(?:json)?\s*/gi, '').replace(/\s*```/gi, '').trim();
+    
+    const firstBrace = cleanText.indexOf('{');
+    const firstBracket = cleanText.indexOf('[');
+    
+    let startIndex = -1;
+    if (firstBrace !== -1 && firstBracket !== -1) {
+        startIndex = Math.min(firstBrace, firstBracket);
+    } else if (firstBrace !== -1) {
+        startIndex = firstBrace;
+    } else if (firstBracket !== -1) {
+        startIndex = firstBracket;
+    }
+    
+    if (startIndex === -1) return cleanText;
+    
+    const isObject = cleanText[startIndex] === '{';
+    const closeChar = isObject ? '}' : ']';
+    const endIndex = cleanText.lastIndexOf(closeChar);
+    
+    if (endIndex !== -1 && endIndex >= startIndex) {
+        return cleanText.substring(startIndex, endIndex + 1);
+    }
+    
+    return cleanText;
+}
+
+/**
  * Fallback AI call via OpenRouter using free-tier models.
  * Used when all Gemini quota is exhausted.
  */
@@ -60,7 +94,7 @@ export async function callOpenRouter(prompt: string, systemInstruction: string, 
         try {
             console.log(`[OpenRouter] Trying ${model}`);
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 10000);
+            const timeout = setTimeout(() => controller.abort(), 30000);
             const body: any = {
                 model,
                 messages: [
@@ -83,13 +117,21 @@ export async function callOpenRouter(prompt: string, systemInstruction: string, 
             clearTimeout(timeout);
 
             if (!res.ok) {
-                const err = await res.text();
+                const err = await res.text().catch(() => "Unknown network error");
                 throw new Error(`OpenRouter ${res.status}: ${err}`);
             }
 
-            const data = await res.json();
-            const text = data.choices?.[0]?.message?.content;
-            if (!text) throw new Error("OpenRouter returned empty content");
+            let data;
+            try {
+                data = await res.json();
+            } catch (jsonErr: any) {
+                throw new Error(`OpenRouter JSON Parse Error: ${jsonErr.message}`);
+            }
+
+            const text = data?.choices?.[0]?.message?.content;
+            if (!text) {
+                throw new Error(`OpenRouter returned empty content. Full response: ${JSON.stringify(data).slice(0, 200)}`);
+            }
 
             console.log(`[OpenRouter] Success with ${model}`);
             return text;
@@ -98,7 +140,7 @@ export async function callOpenRouter(prompt: string, systemInstruction: string, 
             lastError = e;
         }
     }
-    throw lastError;
+    throw new Error(lastError ? lastError.message : "All OpenRouter models failed without specific errors");
 }
 
 /**
@@ -120,7 +162,7 @@ export async function callGroq(prompt: string, systemInstruction: string, jsonMo
         try {
             console.log(`[Groq] Trying ${model}`);
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 15000);
+            const timeout = setTimeout(() => controller.abort(), 30000);
             const body: any = {
                 model,
                 messages: [
@@ -142,13 +184,21 @@ export async function callGroq(prompt: string, systemInstruction: string, jsonMo
             clearTimeout(timeout);
 
             if (!res.ok) {
-                const err = await res.text();
+                const err = await res.text().catch(() => "Unknown network error");
                 throw new Error(`Groq ${res.status}: ${err}`);
             }
 
-            const data = await res.json();
-            const text = data.choices?.[0]?.message?.content;
-            if (!text) throw new Error("Groq returned empty content");
+            let data;
+            try {
+                data = await res.json();
+            } catch (jsonErr: any) {
+                throw new Error(`Groq JSON Parse Error: ${jsonErr.message}`);
+            }
+
+            const text = data?.choices?.[0]?.message?.content;
+            if (!text) {
+                throw new Error(`Groq returned empty content. Full response: ${JSON.stringify(data).slice(0, 200)}`);
+            }
 
             console.log(`[Groq] Success with ${model}`);
             return text;
@@ -157,7 +207,7 @@ export async function callGroq(prompt: string, systemInstruction: string, jsonMo
             lastError = e;
         }
     }
-    throw lastError;
+    throw new Error(lastError ? lastError.message : "All Groq models failed without specific errors");
 }
 
 export async function getLatestNewslettersAsync(): Promise<IntelItem[]> {
