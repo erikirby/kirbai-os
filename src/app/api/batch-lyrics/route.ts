@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { logApiUsageAsync } from '@/lib/db';
-import { safeCallGemini, callOpenRouter, callGroq } from '@/lib/intel';
+import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from '@/lib/intel';
 import crypto from 'crypto';
 
 // Initialize the Gemini client using the existing key from the environment
@@ -89,7 +89,7 @@ ${rawText}
         try {
             // Because we are using responseSchema + application/json, 
             // the response text is guaranteed to be a structurally valid JSON array.
-            textResponse = textResponse.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+            textResponse = extractJsonFromText(textResponse);
             parsedContexts = JSON.parse(textResponse);
             console.log("[Batch Lyrics] Structured generation mapping successful.");
         } catch (initialError) {

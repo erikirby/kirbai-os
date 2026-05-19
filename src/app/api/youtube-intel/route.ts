@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { YoutubeTranscript } from "@danielxceron/youtube-transcript";
 import { getDbAsync, setIntelCacheAsync, IntelItem, logApiUsageAsync } from "@/lib/db";
-import { getLatestNewslettersAsync, safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
+import { getLatestNewslettersAsync, safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from "@/lib/intel";
 
 const CHANNEL_ID = "UCnsL7Nh-e09D1W5TmC6Yklw"; // Jesse from AI Guerrilla
 
@@ -120,7 +120,7 @@ export async function GET(req: Request) {
                     }
                 }
                 if (videoResponseText) {
-                    const parsed = JSON.parse(videoResponseText);
+                    const parsed = JSON.parse(extractJsonFromText(videoResponseText));
                     summary = parsed.summary;
                     actionItems = parsed.actionItems;
                 }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { logApiUsageAsync } from '@/lib/db';
-import { safeCallGemini, callOpenRouter, callGroq } from '@/lib/intel';
+import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from '@/lib/intel';
 
 
 
@@ -98,10 +98,8 @@ Required JSON schema:
             }
         }
         if (!textResponse) textResponse = "";
-        textResponse = textResponse.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-
-        const parsedContext = JSON.parse(textResponse);
-
+        const cleanJson = extractJsonFromText(textResponse);
+        const parsedContext = JSON.parse(cleanJson);
         console.log(`[Master Sheet] Successfully synthesized: "${parsedContext.title}" — ${parsedContext.tracklist?.length} tracks`);
 
         return NextResponse.json({ success: true, data: parsedContext });

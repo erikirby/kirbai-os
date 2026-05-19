@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { saveRoadmapAsync, getRoadmapAsync, logApiUsageAsync } from '@/lib/db';
-import { safeCallGemini, callOpenRouter, callGroq } from '@/lib/intel';
+import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from '@/lib/intel';
 
 export async function POST(request: Request) {
     try {
@@ -69,7 +69,7 @@ Schema:
             const outputTokens = textOutput.length;
             await logApiUsageAsync('/api/parse-roadmap', inputTokens, outputTokens);
 
-            const structuredData = JSON.parse(textOutput);
+            const structuredData = JSON.parse(extractJsonFromText(textOutput));
 
             if (!structuredData.phases || !Array.isArray(structuredData.phases)) {
                 throw new Error("Invalid schema returned: Missing phases array");

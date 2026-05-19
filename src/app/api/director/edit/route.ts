@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { getRow, saveMissionAsync, getTelemetryAsync } from "@/lib/db";
-import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from '@/lib/intel';
 
 export async function POST(req: NextRequest) {
     try {
@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        const updatedData = JSON.parse(visualistText);
+        const updatedData = JSON.parse(extractJsonFromText(visualistText));
         const aiMission = updatedData.mission;
 
         if (aiMission) {

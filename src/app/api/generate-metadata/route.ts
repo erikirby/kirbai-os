@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { addMetadataPackAsync, getDbAsync, logApiUsageAsync } from "@/lib/db";
-import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from "@/lib/intel";
 
 
 
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
         }
 
         if (responseText) {
-            const generatedData = JSON.parse(responseText);
+            const generatedData = JSON.parse(extractJsonFromText(responseText));
 
             // Save to persistence
             await addMetadataPackAsync({
@@ -89,6 +89,6 @@ export async function GET() {
         const db = await getDbAsync();
         return NextResponse.json({ history: db.metadataHistory });
     } catch (e: any) {
-        return NextResponse.json({ error: "Failed to fetch history" }, { status: 500 });
+        return NextResponse.json({ error: "Failed to fetch history", details: e.message }, { status: 500 });
     }
 }

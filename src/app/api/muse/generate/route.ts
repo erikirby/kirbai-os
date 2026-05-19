@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { getRow, getMissionsAsync, getRoadmapAsync, getUserPsycheAsync, MuseCard, UserPsyche, getPulseStateAsync, logApiUsageAsync } from "@/lib/db";
-import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from '@/lib/intel';
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        const parsed = JSON.parse(responseText);
+        const parsed = JSON.parse(extractJsonFromText(responseText));
         if (!parsed.cards || !Array.isArray(parsed.cards) || parsed.cards.length === 0) {
             throw new Error("AI response missing cards array");
         }

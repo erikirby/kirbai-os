@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { logApiUsageAsync, getRow, setRow } from "@/lib/db";
-import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from "@/lib/intel";
 
 
 
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
         let parsed;
         try {
             // Strip markdown if AI ignored the JSON-only instruction
-            const targetJson = text.replace(/\`\`\`(json)?/g, '').trim();
+            const targetJson = extractJsonFromText(text);
             parsed = JSON.parse(targetJson);
         } catch (parseErr) {
             console.error("Failed to parse Gemini JSON:", text);

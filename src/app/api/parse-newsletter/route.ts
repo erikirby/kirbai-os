@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 import { getDbAsync, setIntelCacheAsync, IntelItem, logApiUsageAsync } from "@/lib/db";
-import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
+import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from "@/lib/intel";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
 
         if (!responseText) throw new Error("No response from AI providers");
 
-        const parsed = JSON.parse(responseText);
+        const parsed = JSON.parse(extractJsonFromText(responseText));
 
         const newIntelItem: IntelItem = {
             id: `manual-${(typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36)).split('-')[0]}`,

@@ -43,6 +43,6 @@ export async function GET() {
 
         return NextResponse.json({ news: complianceIntel });
     } catch (e: any) {
-        return NextResponse.json({ error: "Failed to scrape compliance intel" }, { status: 500 });
+        return NextResponse.json({ error: "Failed to scrape compliance intel", details: e.message }, { status: 500 });
     }
 }

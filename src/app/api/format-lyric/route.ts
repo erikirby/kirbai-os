@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { logApiUsageAsync } from '@/lib/db';
-import { safeCallGemini, callOpenRouter, callGroq } from '@/lib/intel';
+import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from '@/lib/intel';
 
 
 
@@ -68,7 +68,7 @@ ${rawText}
         if (!textResponse) throw new Error("Empty response from AI");
 
         textResponse = textResponse.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-        const parsed = JSON.parse(textResponse);
+        const parsed = JSON.parse(extractJsonFromText(textResponse));
 
         return NextResponse.json({ success: true, data: parsed.formattedLyrics });
 

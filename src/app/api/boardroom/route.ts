@@ -11,7 +11,7 @@ import {
     saveHeartScaleNodeAsync
 } from "@/lib/db";
 import { AGENTS } from "@/config/agents";
-import { safeCallGemini } from "@/lib/intel";
+import { safeCallGemini, extractJsonFromText } from "@/lib/intel";
 
 export async function POST(req: NextRequest) {
     const encoder = new TextEncoder();
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
                 const triageText = triageResponse.text || "{}";
                 let triageData: { selected: string[], md_initial: string } = { selected: [], md_initial: "" };
                 try {
-                    const cleanTriage = triageText.replace(/```json|```/g, '').trim();
+                    const cleanTriage = extractJsonFromText(triageText);
                     const parsed = JSON.parse(cleanTriage);
                     triageData.selected = Array.isArray(parsed.selected) ? parsed.selected : [];
                     triageData.md_initial = parsed.md_initial || "";
@@ -209,7 +209,7 @@ export async function POST(req: NextRequest) {
                 const mdText = mdRes.text || "{}";
                 let mdData = { ready: true, binary: true, clash: "Continue?", outcomes: ["Analyzing..."] };
                 try {
-                    const cleanMd = mdText.replace(/```json|```/g, '').trim();
+                    const cleanMd = extractJsonFromText(mdText);
                     const parsed = JSON.parse(cleanMd);
                     mdData = {
                         ready: typeof parsed.ready === 'boolean' ? parsed.ready : true,
@@ -248,7 +248,7 @@ export async function POST(req: NextRequest) {
                 const loreText = loreRes.text || "{}";
                 let loreData = { entity: "Session", truth: "Strategy updated." };
                 try {
-                    const cleanLore = loreText.replace(/```json|```/g, '').trim();
+                    const cleanLore = extractJsonFromText(loreText);
                     const parsed = JSON.parse(cleanLore);
                     loreData.entity = parsed.entity || "Session";
                     loreData.truth = parsed.truth || "Strategy updated.";

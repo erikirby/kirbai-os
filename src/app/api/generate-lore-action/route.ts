@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { safeCallGemini, callOpenRouter, callGroq } from '@/lib/intel';
+import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from '@/lib/intel';
 
 export async function POST(req: NextRequest) {
     try {
@@ -87,11 +87,9 @@ EXAMPLE — adding two characters and an edge:
         }
         let actions;
         try {
-            actions = JSON.parse(rawText);
+            actions = JSON.parse(extractJsonFromText(rawText));
         } catch (parseErr) {
-            // Try to extract JSON array from response if it has extra text
-            const match = rawText.match(/\[[\s\S]*\]/);
-            actions = match ? JSON.parse(match[0]) : [];
+            actions = [];
         }
 
         if (!Array.isArray(actions)) {
