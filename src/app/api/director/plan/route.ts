@@ -120,7 +120,18 @@ export async function POST(req: NextRequest) {
         };
 
         const planningText = await callAiWithFallback(mainPlanningPrompt, systemInstruction1, schema1, imageParts);
-        const parsedPlanning = JSON.parse(extractJsonFromText(planningText || "{}"));
+        let parsedPlanning: any = {};
+        try {
+            parsedPlanning = JSON.parse(extractJsonFromText(planningText || "{}"));
+        } catch (parseErr) {
+            console.error("[Director Plan] Failed to parse planning JSON, using raw text fallback:", parseErr);
+            parsedPlanning = {
+                cameos: [],
+                directorDraft: planningText || "No draft generated.",
+                strategistCritique: "Critique parsing failed.",
+                audienceCritique: "Critique parsing failed."
+            };
+        }
         const extractedCameos = parsedPlanning.cameos || [];
         const allCameos = Array.from(new Set([...(cameos || []), ...extractedCameos]));
         const directorDraft = parsedPlanning.directorDraft || "No draft generated.";
