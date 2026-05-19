@@ -1,7 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import { saveMissionAsync, logApiUsageAsync, getTelemetryAsync } from "@/lib/db";
-import { safeCallGemini, extractJsonFromText } from "@/lib/intel";
+import { safeCallGemini, extractJsonFromText, callOpenRouter, callGroq } from "@/lib/intel";
+
+async function callAiWithFallback(
+    prompt: string,
+    systemInstruction: string,
+    schema: any,
+    imageParts: any[] = []
+): Promise<string> {
+    try {
+        console.log(`🤖 [Director Plan] Trying Gemini (gemini-2.5-flash)...`);
+        const contents = imageParts.length > 0 
+            ? [{ role: 'user', parts: [{ text: prompt }, ...imageParts] }]
+            : [{ role: 'user', parts: [{ text: prompt }] }];
+            
+        const response = await safeCallGemini("gemini-2.5-flash", {
+            contents,
+            config: {
+                systemInstruction,
+                responseMimeType: "application/json",
+                responseSchema: schema
+            }
+        }, 0); // 0 extra retries to failover fast to OpenRouter/Groq
+        
+        if (response.usageMetadata) {
+            await logApiUsageAsync("/api/director/plan", response.usageMetadata.promptTokenCount || 0, response.usageMetadata.candidatesTokenCount || 0);
+        }
+        
+        return response.text || "";
+    } catch (geminiErr: any) {
+        console.warn(`[Director Plan] Gemini failed, attempting OpenRouter... Error: ${geminiErr.message?.slice(0, 120)}`);
+        
+        let fullPrompt = prompt;
+        if (imageParts.length > 0) {
+            fullPrompt += "\n(Note: User provided reference images that are processed on the server, please assume references are valid and write matching styles.)";
+        }
+
+        // Try OpenRouter
+        try {
+            const orResponse = await callOpenRouter(fullPrompt, systemInstruction, true);
+            return orResponse;
+        } catch (orErr: any) {
+            console.warn(`[Director Plan] OpenRouter failed, attempting Groq... Error: ${orErr.message?.slice(0, 120)}`);
+            
+            // Try Groq
+            try {
+                const groqResponse = await callGroq(fullPrompt, systemInstruction, true);
+                return groqResponse;
+            } catch (groqErr: any) {
+                console.error(`[Director Plan] All fallback models exhausted.`);
+                throw new Error(`All AI Providers failed.\nGemini: ${geminiErr.message}\nOpenRouter: ${orErr.message}\nGroq: ${groqErr.message}`);
+            }
+        }
+    }
+}
 
 export async function POST(req: NextRequest) {
     try {
@@ -46,43 +99,33 @@ export async function POST(req: NextRequest) {
             }
         `;
 
-        const directorParts: any[] = [{ text: mainPlanningPrompt }];
+        const imageParts: any[] = [];
         if (references && references.length > 0) {
             references.forEach((ref: string) => {
                 const base64Data = ref.split(',')[1] || ref;
-                directorParts.push({ inlineData: { mimeType: "image/jpeg", data: base64Data } });
+                imageParts.push({ inlineData: { mimeType: "image/jpeg", data: base64Data } });
             });
-            const updatedPrompt = mainPlanningPrompt + "\nNote: Reference images for the Art Style and Character Poses are provided. Ensure the vision matches these exactly.";
-            directorParts[0].text = updatedPrompt;
         }
 
-        const mainPlanningResult = await safeCallGemini("gemini-2.5-flash", { 
-            contents: [{ role: 'user', parts: directorParts }],
-            config: { 
-                responseMimeType: "application/json",
-                responseSchema: { 
-                    type: Type.OBJECT, 
-                    properties: {
-                        cameos: { type: Type.ARRAY, items: { type: Type.STRING } },
-                        directorDraft: { type: Type.STRING },
-                        strategistCritique: { type: Type.STRING },
-                        audienceCritique: { type: Type.STRING }
-                    },
-                    required: ["cameos", "directorDraft", "strategistCritique", "audienceCritique"]
-                } 
-            }
-        });
+        const systemInstruction1 = "You are an elite creative video production team planning a cinematic narrative music video.";
+        const schema1 = { 
+            type: Type.OBJECT, 
+            properties: {
+                cameos: { type: Type.ARRAY, items: { type: Type.STRING } },
+                directorDraft: { type: Type.STRING },
+                strategistCritique: { type: Type.STRING },
+                audienceCritique: { type: Type.STRING }
+            },
+            required: ["cameos", "directorDraft", "strategistCritique", "audienceCritique"]
+        };
 
-        if (mainPlanningResult.usageMetadata) {
-            await logApiUsageAsync("/api/director/plan (Planning)", mainPlanningResult.usageMetadata.promptTokenCount || 0, mainPlanningResult.usageMetadata.candidatesTokenCount || 0);
-        }
-
-        const parsedPlanning = JSON.parse(extractJsonFromText(mainPlanningResult.text || "{}"));
+        const planningText = await callAiWithFallback(mainPlanningPrompt, systemInstruction1, schema1, imageParts);
+        const parsedPlanning = JSON.parse(extractJsonFromText(planningText || "{}"));
         const extractedCameos = parsedPlanning.cameos || [];
         const allCameos = Array.from(new Set([...(cameos || []), ...extractedCameos]));
-        const directorDraft = parsedPlanning.directorDraft || "";
-        const strategistCritique = parsedPlanning.strategistCritique || "";
-        const audienceCritique = parsedPlanning.audienceCritique || "";
+        const directorDraft = parsedPlanning.directorDraft || "No draft generated.";
+        const strategistCritique = parsedPlanning.strategistCritique || "No strategist critique generated.";
+        const audienceCritique = parsedPlanning.audienceCritique || "No audience critique generated.";
 
         // --- PHASE 2: THE VISUALIST (SHOT MATRIX) ---
         const visualistPrompt = `
@@ -106,57 +149,49 @@ export async function POST(req: NextRequest) {
             Return a JSON object: { requiredReferences: [], shots: [] }
         `;
 
-        const visualistResult = await safeCallGemini("gemini-2.5-flash", {
-            contents: [{ role: 'user', parts: [{ text: visualistPrompt }] }],
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        requiredReferences: {
-                            type: Type.ARRAY,
-                            items: {
-                                type: Type.OBJECT,
-                                properties: {
-                                    label: { type: Type.STRING },
-                                    description: { type: Type.STRING },
-                                    category: { type: Type.STRING, enum: ["Character", "Location", "Object"] }
-                                },
-                                required: ["label", "description", "category"]
-                            }
+        const systemInstruction2 = "You are a visual planning assistant structuring a music video shot list.";
+        const schema2 = {
+            type: Type.OBJECT,
+            properties: {
+                requiredReferences: {
+                    type: Type.ARRAY,
+                    items: {
+                        type: Type.OBJECT,
+                        properties: {
+                            label: { type: Type.STRING },
+                            description: { type: Type.STRING },
+                            category: { type: Type.STRING, enum: ["Character", "Location", "Object"] }
                         },
-                        shots: {
-                            type: Type.ARRAY,
-                            items: {
-                                type: Type.OBJECT,
-                                properties: {
-                                    timestamp: { type: Type.STRING },
-                                    visualDescription: { type: Type.STRING },
-                                    bananaPromptV2: { type: Type.STRING },
-                                    grokPromptV2: { type: Type.STRING },
-                                    syncedLyrics: { type: Type.STRING },
-                                    refLabels: { type: Type.ARRAY, items: { type: Type.STRING } },
-                                    directorNote: { type: Type.STRING },
-                                    strategistNote: { type: Type.STRING },
-                                    audienceNote: { type: Type.STRING }
-                                },
-                                required: ["timestamp", "visualDescription", "bananaPromptV2", "grokPromptV2", "syncedLyrics", "refLabels"]
-                            }
-                        }
-                    },
-                    required: ["shots", "requiredReferences"]
+                        required: ["label", "description", "category"]
+                    }
+                },
+                shots: {
+                    type: Type.ARRAY,
+                    items: {
+                        type: Type.OBJECT,
+                        properties: {
+                            timestamp: { type: Type.STRING },
+                            visualDescription: { type: Type.STRING },
+                            bananaPromptV2: { type: Type.STRING },
+                            grokPromptV2: { type: Type.STRING },
+                            syncedLyrics: { type: Type.STRING },
+                            refLabels: { type: Type.ARRAY, items: { type: Type.STRING } },
+                            directorNote: { type: Type.STRING },
+                            strategistNote: { type: Type.STRING },
+                            audienceNote: { type: Type.STRING }
+                        },
+                        required: ["timestamp", "visualDescription", "bananaPromptV2", "grokPromptV2", "syncedLyrics", "refLabels"]
+                    }
                 }
-            }
-        });
+            },
+            required: ["shots", "requiredReferences"]
+        };
 
-        if (visualistResult.usageMetadata) {
-            await logApiUsageAsync("/api/director/plan (Visualist)", visualistResult.usageMetadata.promptTokenCount || 0, visualistResult.usageMetadata.candidatesTokenCount || 0);
-        }
-
-        const rawText = visualistResult.text || "{}";
+        const visualistText = await callAiWithFallback(visualistPrompt, systemInstruction2, schema2);
+        
         let responseData: any = { shots: [], requiredReferences: [] };
         try {
-            responseData = JSON.parse(extractJsonFromText(rawText));
+            responseData = JSON.parse(extractJsonFromText(visualistText || "{}"));
         } catch (e) {
             console.error("Visualist Parse Error:", e);
         }
