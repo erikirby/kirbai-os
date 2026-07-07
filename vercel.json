@@ -14,6 +14,12 @@
     },
     "src/app/api/generate-content/route.ts": {
       "maxDuration": 60
+    },
+    "src/app/api/boardroom/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/hook-engine/route.ts": {
+      "maxDuration": 60
     }
   }
 }

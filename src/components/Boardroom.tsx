@@ -79,14 +79,18 @@ export default function Boardroom({ mode }: { mode: string }) {
 
         const reader = res.body?.getReader();
         const decoder = new TextDecoder();
+        let streamBuffer = "";
 
         if (reader) {
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
 
-                const chunk = decoder.decode(value);
-                const lines = chunk.split('\n').filter(l => l.trim() !== '');
+                // Buffer carry-over: a JSON line can be split across network chunks.
+                streamBuffer += decoder.decode(value, { stream: true });
+                const rawLines = streamBuffer.split('\n');
+                streamBuffer = rawLines.pop() || ""; // keep incomplete tail for next chunk
+                const lines = rawLines.filter(l => l.trim() !== '');
 
                 for (const line of lines) {
                     try {

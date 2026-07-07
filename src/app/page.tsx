@@ -18,10 +18,12 @@ import MuseDeck from "@/components/MuseDeck";
 import Boardroom from "@/components/Boardroom";
 import DistroOptimizer from "@/components/DistroOptimizer";
 import CompetitorTracker from "@/components/CompetitorTracker";
+import RevenueEngine from "@/components/RevenueEngine";
+import HookEngine from "@/components/HookEngine";
 import { Database, LineChart, Network, MessageSquare, Plus, Check, Settings2, Share2, Menu, X, Home as HomeIcon, Clapperboard, Layers, Sparkles, Wallet, Brain } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
-type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors";
+type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks";
 type Theme = "dark" | "light" | "pink" | "snes" | "gbc" | "pokopia";
 
 export default function Home() {
@@ -139,9 +141,9 @@ export default function Home() {
         <div className={`flex items-center gap-1 p-1 relative z-50 ${theme === 'pokopia' ? '' : 'bg-surface/20 backdrop-blur-md rounded-full border border-border/10 shadow-2xl'}`}>
           {[
             { id: "command", label: "Command", items: [{ id: "roadmap", label: "Home" }, { id: "intel", label: "Intel" }, { id: "competitors", label: "Competitors" }, { id: "muse", label: "Muse" }, { id: "boardroom", label: "Boardroom" }] },
-            { id: "pipeline", label: "Pipeline", items: [{ id: "creative", label: "Brainstorm" }, { id: "director", label: "Director's Suite" }, { id: "distro", label: "Description Generator" }] },
+            { id: "pipeline", label: "Pipeline", items: [{ id: "hooks", label: "Hook Engine" }, { id: "creative", label: "Brainstorm" }, { id: "director", label: "Director's Suite" }, { id: "distro", label: "Description Generator" }] },
             { id: "archive", label: "Archive", items: [{ id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "prompts", label: "Prompts" }, { id: "core", label: "Core" }] },
-            { id: "performance", label: "Performance", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "api-health", label: "API" }] },
+            { id: "performance", label: "Performance", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "revenue", label: "Revenue Engine" }, { id: "api-health", label: "API" }] },
           ].map((group) => (
             <div 
               key={group.id} 
@@ -203,6 +205,8 @@ export default function Home() {
                 {activeModule === "pulse" && <AnalyticsMatrix theme={theme} mode={activeTab} />}
                 {activeModule === "director" && <DirectorSuite mode={activeTab} />}
                 {activeModule === "finance" && <FinanceView mode={activeTab} />}
+                {activeModule === "revenue" && <RevenueEngine mode={activeTab} />}
+                {activeModule === "hooks" && <HookEngine mode={activeTab} />}
                 {activeModule === "api-health" && <APIHealth theme={theme} />}
                 {activeModule === "chat" && <AIHub theme={theme} />}
                 {activeModule === "core" && <ConsultantSettings theme={theme} />}
