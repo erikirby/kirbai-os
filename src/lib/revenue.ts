@@ -244,6 +244,10 @@ export function parseMetaPosts(rows: string[][], platform: "facebook" | "instagr
 const normalize = (s: string) =>
     s.toLowerCase().replace(/['’‘"“”]/g, "").replace(/\s+/g, " ").trim();
 
+/** Truncate without splitting an emoji/surrogate pair — a half-emoji makes the
+ *  serialized payload invalid JSON and Supabase rejects the save. */
+const clip = (s: string, n: number) => s.slice(0, n).replace(/[\uD800-\uDBFF]$/, "");
+
 /** "Power Whip (Tsareena Step)" -> "power whip" */
 export function baseName(title: string): string {
     const cut = title.split(" (")[0];
@@ -379,7 +383,7 @@ export function computeRevenueAnalysis(
             earningsPer1kVideoViews: videoViews > 0 ? ((s.earnings + fbVideoEarnings) / videoViews) * 1000 : null,
             lastVideoDate: lastVid,
             monthly: [...s.monthly.entries()].sort().map(([month, m]) => ({ month, earnings: m.e, streams: m.q })),
-            videos: vids.slice(0, 12).map((v) => ({ platform: v.platform, date: v.publishTime, views: v.views, caption: v.caption.slice(0, 90) })),
+            videos: vids.slice(0, 12).map((v) => ({ platform: v.platform, date: v.publishTime, views: v.views, caption: clip(v.caption, 90) })),
         };
     }).sort((a, b) => b.earnings - a.earnings);
 
@@ -483,6 +487,6 @@ export function computeRevenueAnalysis(
             .filter((v) => v.views > 1000)
             .sort((a, b) => b.views - a.views)
             .slice(0, 15)
-            .map((v) => ({ platform: v.platform, date: v.publishTime, views: v.views, caption: v.caption.slice(0, 90) })),
+            .map((v) => ({ platform: v.platform, date: v.publishTime, views: v.views, caption: clip(v.caption, 90) })),
     };
 }
