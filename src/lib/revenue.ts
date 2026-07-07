@@ -250,7 +250,28 @@ export function baseName(title: string): string {
     return normalize(cut);
 }
 
-/** Best (longest) song match found in a caption, or null. */
+const TOKEN_STOPWORDS = new Set([
+    "ver", "version", "mix", "remix", "cut", "master", "anthem", "dub", "step",
+    "crash", "deluxe", "aria", "edition", "song", "theme", "intro", "feat", "the",
+    "and", "vs", "encore", "english", "japanese", "slow", "fast", "instrumental",
+]);
+
+/** Character/keyword tokens from the parenthetical: "Magic Bounce (Hatterene Master)" -> ["hatterene"] */
+export function characterTokens(title: string): string[] {
+    const m = title.match(/\(([^)]+)\)/);
+    if (!m) return [];
+    return normalize(m[1])
+        .split(/[^a-z0-9]+/)
+        .filter((w) => w.length >= 4 && !TOKEN_STOPWORDS.has(w));
+}
+
+/**
+ * Best song match for a caption.
+ * 1) Song base name in caption (longest wins) — strongest signal.
+ * 2) Fallback: character token from the title's parenthetical (e.g. "Hatterene"),
+ *    but only when it resolves to exactly ONE song — ambiguity stays unmatched
+ *    rather than mis-attributed.
+ */
 export function matchSong(caption: string, songBases: { base: string; title: string }[]): string | null {
     const c = normalize(caption);
     let best: { title: string; len: number } | null = null;
@@ -260,7 +281,16 @@ export function matchSong(caption: string, songBases: { base: string; title: str
             best = { title: s.title, len: s.base.length };
         }
     }
-    return best?.title ?? null;
+    if (best) return best.title;
+
+    const tokenHits = new Map<string, string>(); // song title -> token
+    for (const s of songBases) {
+        for (const tok of characterTokens(s.title)) {
+            if (c.includes(tok)) { tokenHits.set(s.title, tok); break; }
+        }
+    }
+    if (tokenHits.size === 1) return [...tokenHits.keys()][0];
+    return null;
 }
 
 // ---------- Main computation ----------
@@ -359,10 +389,10 @@ export function computeRevenueAnalysis(
             const recencyFactor = days === null ? 2 : Math.min(days / 90, 2);
             const score = (s.recentEarnings + s.earnings * 0.15) * (0.5 + recencyFactor);
             let reason: string;
-            if (days === null) reason = `Earned $${s.earnings.toFixed(0)} with ZERO matched videos — pure catalog demand. A video is free money.`;
-            else if (days > 90) reason = `Still earning $${s.recentEarnings.toFixed(0)}/quarter but no video in ${days} days. Proven converter going cold.`;
-            else if (s.earningsPer1kVideoViews && s.earningsPer1kVideoViews > 1) reason = `Converts at $${s.earningsPer1kVideoViews.toFixed(2)}/1K video views — above-average audience. Feed it.`;
-            else reason = `Active earner ($${s.recentEarnings.toFixed(0)}/quarter). Recent video support — maintain cadence.`;
+            if (days === null) reason = `$${s.earnings.toFixed(0)} lifetime · no matched videos in the uploaded exports.`;
+            else if (days > 90) reason = `$${s.recentEarnings.toFixed(0)} last quarter · most recent matched video was ${days} days ago.`;
+            else if (s.earningsPer1kVideoViews && s.earningsPer1kVideoViews > 1) reason = `Converts at $${s.earningsPer1kVideoViews.toFixed(2)}/1K video views (blended average is ~$0.75).`;
+            else reason = `$${s.recentEarnings.toFixed(0)} last quarter · has recent video coverage.`;
             return {
                 title: s.title,
                 score: Math.round(score * 10) / 10,

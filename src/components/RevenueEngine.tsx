@@ -107,7 +107,11 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ mode, analysis: result }),
             });
-            if (!res.ok) setError("Computed OK, but saving to the vault failed. Results shown are not persisted.");
+            if (!res.ok) {
+                let detail = "";
+                try { detail = (await res.json()).error || ""; } catch { /* non-JSON response */ }
+                setError(`Computed OK, but saving failed (${res.status}${detail ? `: ${detail.slice(0, 140)}` : ""}). Results shown are not persisted.`);
+            }
         } catch (err: any) {
             setError(err?.message || "Computation failed.");
         } finally {
@@ -239,8 +243,8 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
 
                     {/* Opportunity queue */}
                     <div className="rounded-2xl bg-surface/40 backdrop-blur-md border border-accent/20 p-5">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-accent mb-1">Make This Next — Revenue-Weighted Queue</h3>
-                        <p className="text-[10px] text-neutral-500 mb-4">Proven earners ranked by unmet video demand. Top of this list = highest expected $ per video produced.</p>
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-accent mb-1">Revenue vs. Video Coverage</h3>
+                        <p className="text-[10px] text-neutral-500 mb-4">Songs ranked by earnings against how little matched video support they have. Data only — conclusions are yours.</p>
                         <div className="flex flex-col gap-2">
                             {analysis.opportunities.map((o, i) => (
                                 <div key={o.title} className="flex items-start gap-4 rounded-xl bg-background/40 border border-border/10 p-4">
