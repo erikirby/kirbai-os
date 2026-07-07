@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { getRow, getMissionsAsync, getRoadmapAsync, getUserPsycheAsync, MuseCard, UserPsyche, getPulseStateAsync, logApiUsageAsync } from "@/lib/db";
 import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from '@/lib/intel';
+import { HOOK_FRAMEWORK } from '@/lib/hooks';
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
@@ -64,10 +65,23 @@ export async function POST(req: NextRequest) {
             5. THE ADVOCATE: Erik's emotional anchor. Knows his anxiety, his motivation dips, and his wins. Ensures the other agents don't burn him out.
             6. THE MUSE (CLEFAIRY): The synthesizer. She watches the debate with starry-eyed wonder but grounded wisdom. She provides a final, comforting, yet insightful summary of why these choices matter for Erik's soul.
 
-            STRICT RULE: Do NOT repeat any titles from the ALREADY SUGGESTED list. We need fresh, evolving inspiration every day.
+            STRICT RULE: Do NOT repeat any titles from the ALREADY SUGGESTED list — and do not repeat the STRUCTURE of an old idea with new nouns swapped in. Fresh shapes, not reskins.
+
+            HOOK DOCTRINE — governs every content-type card. This is the core product:
+            ${HOOK_FRAMEWORK}
+
+            VARIETY ENGINE — THE LENSES:
+            Each content card must be generated through a DIFFERENT lens (no two cards in a session share one):
+            1. NOSTALGIA CORE — a specific Gen 1–4 childhood memory or ritual, subverted for adults. Nostalgia is as powerful as any trend.
+            2. TREND RIDER — ride something concrete from LIVE PLATFORM INTEL, but ONLY when it genuinely fits the brand. NEVER force the current trending thing into an idea; if nothing fits, skip this lens entirely.
+            3. GRIEVANCE / JUSTICE — a character wronged by canon or fandom, getting even.
+            4. FORMAT HIJACK — a trusted real-world format (alert, court hearing, security cam, nature doc) with Pokémon inside.
+            5. BETRAYAL OF CUTE — maximally wholesome surface, wrongness revealed by second 3.
+            6. GUESSING GAME — perceptual puzzle with fast repeated payoffs.
+            7. DEEP CUT — current-era lore/characters played for menace, glamour, or taboo tension.
 
             DEBATE TOPICS:
-            - Content ideas for IG/TikTok rooted in the ACTIVE KIRBAI PROJECTS and LORE provided in the context. Draw from the actual characters, narratives, and visual vibes present there — not generic Pokémon references.
+            - Content ideas for IG/TikTok rooted in the ACTIVE KIRBAI PROJECTS and LORE provided in the context. Draw from the actual characters, narratives, and visual vibes present there — not generic Pokémon references. Every content idea is hook-first: specify frame 1 and the second-5 shift, and pass the cold-viewer rule.
             - Workflow improvements for Kirbai OS (Autopilot features, better analytics parsing).
             - Monetization strategies tied to the current active projects (DistroKid, merch, content).
             - Competitive pivots based on the current era of Erik's work as shown in the context.
@@ -76,7 +90,7 @@ export async function POST(req: NextRequest) {
             SPECIFIC INSTRUCTIONS:
             - THE LOREKEEPER: Ground every suggestion in the CURRENT ERA project and lore nodes from the context. Do not reference other vault projects unless directly relevant.
             - THE ADVOCATE: If Erik's motivation is low, PUSH for low-effort, high-reward "rest weeks" or "automation wins".
-            - THE STRATEGIST: Base trend suggestions on the LIVE PLATFORM INTEL in the context, not hardcoded assumptions.
+            - THE STRATEGIST: Only invoke LIVE PLATFORM INTEL when the TREND RIDER lens is in play. Trends are one lens among seven, weighted no higher than nostalgia.
             - THE MUSE: Provide a high-level "Clefairy Comment" for the entire session.
 
             OUTPUT FORMAT (JSON ONLY):
@@ -86,6 +100,8 @@ export async function POST(req: NextRequest) {
                         "type": "content" | "workflow" | "monetization" | "competitor" | "mental_health",
                         "title": "Short punchy title",
                         "description": "The specific proposal",
+                        "lens": "which Variety Engine lens (content cards only)",
+                        "hook": { "frame1": "what is on screen at 0.0s — instantly legible + one deviant element", "second5": "the state change timed to the drop" },
                         "reason": "Justification from the Strategist/Scout or Lorekeeper",
                         "debateLog": "A summary of the 5-agent debate (who agreed, who fought, why)",
                         "actionMatrix": { "time": "low|med|high", "revenue": "low|med|high", "creativeValue": "low|med|high" }
@@ -102,46 +118,41 @@ export async function POST(req: NextRequest) {
 
         const musePrompt = `CONTEXT:\n${contextSummary}\n\nTask: Generate the Daily Symposium Presentation.`;
         let responseText = "";
+        const failures: string[] = [];
 
-        // Primary: OpenRouter free tier (no quota drain on Gemini)
-        try {
-            console.log('[Muse] Trying OpenRouter...');
-            responseText = await callOpenRouter(musePrompt, symposiumPrompt, true);
-        } catch (orErr: any) {
-            console.warn(`[Muse] OpenRouter failed: ${orErr.message?.slice(0, 80)}`);
-            let resolved = false;
-
-            // Second: Groq free tier
+        // Primary: Gemini (highest creative quality — free-tier-first was producing
+        // recycled, generic ideas). Fallbacks: OpenRouter free tier, then Groq.
+        const geminiModels = ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash'] as const;
+        for (const model of geminiModels) {
             try {
-                console.log('[Muse] Trying Groq...');
-                responseText = await callGroq(musePrompt, symposiumPrompt, true);
-                resolved = true;
-            } catch (groqErr: any) {
-                console.warn(`[Muse] Groq failed: ${groqErr.message?.slice(0, 80)}`);
-            }
-
-            // Third: Gemini models in sequence, fail fast
-            if (!resolved) {
-                const geminiModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'] as const;
-                let geminiResponse: any = null;
-                for (const model of geminiModels) {
-                    try {
-                        console.warn(`[Muse] Trying Gemini fallback: ${model}`);
-                        geminiResponse = await safeCallGemini(model, {
-                            contents: [{ role: 'user', parts: [{ text: musePrompt }] }],
-                            config: { systemInstruction: symposiumPrompt, temperature: 0.8, responseMimeType: 'application/json' }
-                        }, 0);
-                        break;
-                    } catch (e: any) {
-                        console.warn(`[Muse] ${model} failed: ${e.message?.slice(0, 60)}`);
-                    }
-                }
-                if (!geminiResponse) throw orErr; // All models exhausted
+                console.log(`[Muse] Trying Gemini: ${model}`);
+                const geminiResponse: any = await safeCallGemini(model, {
+                    contents: [{ role: 'user', parts: [{ text: musePrompt }] }],
+                    config: { systemInstruction: symposiumPrompt, temperature: 1.0, responseMimeType: 'application/json' }
+                }, 0);
                 if (geminiResponse.usageMetadata) {
                     await logApiUsageAsync("/api/muse/generate", geminiResponse.usageMetadata.promptTokenCount || 0, geminiResponse.usageMetadata.candidatesTokenCount || 0);
                 }
                 responseText = geminiResponse.text || "";
+                if (responseText) break;
+            } catch (e: any) {
+                failures.push(`${model}: ${e.message?.slice(0, 60)}`);
             }
+        }
+        if (!responseText) {
+            try {
+                console.log('[Muse] Trying OpenRouter fallback...');
+                responseText = await callOpenRouter(musePrompt, symposiumPrompt, true);
+            } catch (e: any) { failures.push(`OpenRouter: ${e.message?.slice(0, 60)}`); }
+        }
+        if (!responseText) {
+            try {
+                console.log('[Muse] Trying Groq fallback...');
+                responseText = await callGroq(musePrompt, symposiumPrompt, true);
+            } catch (e: any) { failures.push(`Groq: ${e.message?.slice(0, 60)}`); }
+        }
+        if (!responseText) {
+            throw new Error(`All AI providers failed — ${failures.join(' | ')}`);
         }
 
         const parsed = JSON.parse(extractJsonFromText(responseText));

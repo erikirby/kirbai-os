@@ -481,6 +481,8 @@ export interface MuseCard {
     description: string;
     reason: string; // The "Scout" or "Strategist" justification
     source?: string; // e.g. "YouTube Trends", "Competitor X Analysis"
+    lens?: string; // Variety Engine lens (content cards)
+    hook?: { frame1: string; second5: string }; // Hook spec (content cards)
     status: 'pending' | 'yes' | 'no' | 'maybe';
     debateLog: string; // The transcript of the Symposium
     actionMatrix: {

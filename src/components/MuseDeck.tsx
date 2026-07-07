@@ -205,6 +205,14 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                                         {currentCard.description}
                                     </p>
 
+                                    {currentCard.hook && (currentCard.hook.frame1 || currentCard.hook.second5) && (
+                                        <div className={`p-5 rounded-[28px] border flex flex-col gap-1.5 ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'bg-white/50 border-white/85' : 'bg-black/5 border-black/10'}`}>
+                                            {currentCard.lens && <span className={`text-[9px] font-black uppercase tracking-widest ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'text-accent/50' : 'text-[#3b2b1d]/50'}`}>Lens: {currentCard.lens}</span>}
+                                            {currentCard.hook.frame1 && <p className={`text-sm font-bold ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'text-accent/75' : 'text-[#3b2b1d]/85'}`}><span className="uppercase text-[9px] font-black tracking-widest opacity-60">Frame 1: </span>{currentCard.hook.frame1}</p>}
+                                            {currentCard.hook.second5 && <p className={`text-sm font-bold ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'text-accent/75' : 'text-[#3b2b1d]/85'}`}><span className="uppercase text-[9px] font-black tracking-widest opacity-60">Second 5: </span>{currentCard.hook.second5}</p>}
+                                        </div>
+                                    )}
+
                                     <div className={`p-8 md:p-10 rounded-[40px] border shadow-inner overflow-visible min-h-[120px] ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'bg-white/60 border-white/85' : 'bg-black/5 border-black/5'}`}>
                                         <p className={`text-sm leading-relaxed italic font-bold ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'text-accent/55' : 'text-[#3b2b1d]/75'}`}>
                                             <strong className={typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'text-accent/85 opacity-70' : 'text-[#121212] opacity-90'}>The Symposium Debated:</strong> {currentCard.debateLog}
