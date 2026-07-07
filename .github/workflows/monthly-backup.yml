@@ -1,0 +1,33 @@
+name: Monthly Database Backup
+
+on:
+  schedule:
+    - cron: "0 8 1 * *" # 1st of each month, 8:00 UTC
+  workflow_dispatch: {} # manual run button in GitHub → Actions
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download database export
+        run: |
+          mkdir -p backups
+          curl -fsSL --max-time 120 \
+            "https://kirbai-os.vercel.app/api/admin/export?secret=kirbai_backup_safe" \
+            -o backups/kirbai-backup-latest.json
+          # sanity check: must be valid JSON and non-trivial
+          node -e "const d=require('./backups/kirbai-backup-latest.json'); if(!d.tables||!d.tables.persistence||d.tables.persistence.length<1){console.error('Backup looks empty — aborting commit');process.exit(1)}"
+          echo "Backup OK: $(du -h backups/kirbai-backup-latest.json | cut -f1)"
+
+      - name: Commit backup
+        run: |
+          git config user.name "kirbai-backup-bot"
+          git config user.email "actions@github.com"
+          git add backups/kirbai-backup-latest.json
+          git diff --cached --quiet && echo "No changes" || git commit -m "chore(backup): monthly database export $(date +%Y-%m-%d)"
+          git push
