@@ -283,13 +283,13 @@ export function matchSong(caption: string, songBases: { base: string; title: str
     }
     if (best) return best.title;
 
-    const tokenHits = new Map<string, string>(); // song title -> token
+    // Token fallback: songBases arrive sorted by earnings (flagship first), so the
+    // first hit is the highest-earning candidate — ambiguity resolves to the flagship.
     for (const s of songBases) {
         for (const tok of characterTokens(s.title)) {
-            if (c.includes(tok)) { tokenHits.set(s.title, tok); break; }
+            if (c.includes(tok)) return s.title;
         }
     }
-    if (tokenHits.size === 1) return [...tokenHits.keys()][0];
     return null;
 }
 
@@ -339,7 +339,11 @@ export function computeRevenueAnalysis(
         s.monthly.set(r.saleMonth, m);
         songMap.set(r.title, s);
     }
-    const songBases = [...songMap.keys()].map((title) => ({ title, base: baseName(title) }));
+    // Sorted by earnings so base-name ties (e.g. two releases of the same song) and
+    // token ambiguity both resolve to the flagship release, not a remix variant.
+    const songBases = [...songMap.entries()]
+        .sort((a, b) => b[1].earnings - a[1].earnings)
+        .map(([title]) => ({ title, base: baseName(title) }));
 
     // --- video attribution ---
     const videosBySong = new Map<string, VideoRow[]>();
