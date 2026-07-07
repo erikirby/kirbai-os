@@ -52,7 +52,11 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
             try {
                 const res = await fetch(`/api/revenue-engine?mode=${mode}`);
                 const data = await res.json();
-                if (data.analysis) setAnalysis(data.analysis);
+                // Only accept a well-formed analysis — malformed stored data must not crash the render
+                const a = data.analysis;
+                if (a && a.kpis && Array.isArray(a.monthlyTrend) && Array.isArray(a.songs) && Array.isArray(a.stores) && Array.isArray(a.opportunities) && Array.isArray(a.durationBuckets) && Array.isArray(a.unmatchedVideos)) {
+                    setAnalysis(a);
+                }
             } catch { /* cold start is fine */ }
         })();
     }, [mode]);
