@@ -1,7 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { MuseCard, getMuseCardsAsync, saveMuseCardsAsync, saveUserPsycheAsync, getUserPsycheAsync, addRoadmapTaskAsync } from '@/lib/db';
+import type { MuseCard } from '@/lib/db';
+
+// Server-backed persistence (browser must not hit Supabase directly — RLS)
+const getMuseCardsAsync = async (): Promise<MuseCard[]> => {
+    const res = await fetch('/api/muse/cards');
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to load cards');
+    return data.cards || [];
+};
+const saveMuseCardsAsync = async (cards: MuseCard[]) => {
+    const res = await fetch('/api/muse/cards', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'saveCards', cards }) });
+    if (!res.ok) throw new Error((await res.json()).error || 'Failed to save cards');
+};
+const addRoadmapTaskAsync = async (mode: string, title: string, description: string) => {
+    const res = await fetch('/api/muse/cards', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'addRoadmapTask', mode, title, description }) });
+    if (!res.ok) throw new Error((await res.json()).error || 'Failed to add task');
+};
 import MuseClefairy from './MuseClefairy';
 import { Sparkles, X, Check, Eye, Brain, TrendingUp, DollarSign, Heart, ChevronRight, Loader2, Bookmark, CheckCircle2 } from 'lucide-react';
 
