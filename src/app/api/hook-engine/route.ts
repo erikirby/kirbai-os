@@ -34,7 +34,7 @@ change — never a static beat.
 Return ONLY JSON:
 { "concepts": [ { "name": "", "archetype": "", "frame1": "what is on screen at 0.0s — instantly legible + the one deviant element", "sec0to3": "motion/tension already in progress", "second5": "the state change timed to the drop", "openLoop": "the question the viewer now needs answered", "butThen": "mid-video twist that chains the next loop", "arousal": "which high-arousal emotion", "character": "pick + one-clause tier justification", "coldCheck": "one sentence proving a zero-context viewer parses frame 1" } ] }`;
 
-            const res = await safeCallGemini("gemini-2.5-pro", {
+            const res = await safeCallGemini("gemini-2.5-flash", {
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
             });
             const data = JSON.parse(extractJsonFromText(res.text || "{}"));
@@ -69,7 +69,7 @@ advice). Then write the strongest version of this same concept in 2–3 sentence
 Return ONLY JSON:
 { "verdict": "one blunt sentence", "total": 0-35, "axes": [ { "axis": "Frame-1 legibility", "score": 0, "note": "", "fix": "" }, { "axis": "One deviant element", "score": 0, "note": "", "fix": "" }, { "axis": "Gap opened by 3s", "score": 0, "note": "", "fix": "" }, { "axis": "Second-5 shift", "score": 0, "note": "", "fix": "" }, { "axis": "Arousal level", "score": 0, "note": "", "fix": "" }, { "axis": "Cold-viewer safety", "score": 0, "note": "", "fix": "" }, { "axis": "Character tier", "score": 0, "note": "", "fix": "" } ], "strongestVersion": "" }`;
 
-            const res = await safeCallGemini("gemini-2.5-pro", {
+            const res = await safeCallGemini("gemini-2.5-flash", {
                 contents: [{ role: "user", parts: [{ text: prompt }] }],
             });
             const data = JSON.parse(extractJsonFromText(res.text || "{}"));
