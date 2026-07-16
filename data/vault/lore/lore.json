@@ -59,7 +59,7 @@
       },
       "data": {
         "label": "Lopunny",
-        "description": "A graceful Pokémon, now a member of the Heart Scales Girl Group.",
+        "description": "A graceful Pok\u00e9mon, now a member of the Heart Scales Girl Group.",
         "traits": "Graceful, charming, and a natural performer, often taking the lead in dance routines."
       }
     },
@@ -72,7 +72,7 @@
       },
       "data": {
         "label": "Meloetta",
-        "description": "A melodic Pokémon, now a member of the Heart Scales Girl Group.",
+        "description": "A melodic Pok\u00e9mon, now a member of the Heart Scales Girl Group.",
         "traits": "Melodic, soulful, and the primary vocalist, capable of moving audiences with her voice."
       }
     },
@@ -110,7 +110,7 @@
       },
       "data": {
         "label": "Gothitelle",
-        "description": "A cunning Psychic-type Pokémon and member of the Baddie 4."
+        "description": "A cunning Psychic-type Pok\u00e9mon and member of the Baddie 4."
       }
     },
     {
@@ -122,7 +122,7 @@
       },
       "data": {
         "label": "Jynx",
-        "description": "An Ice/Psychic-type Pokémon and member of the Baddie 4."
+        "description": "An Ice/Psychic-type Pok\u00e9mon and member of the Baddie 4."
       }
     },
     {
@@ -134,7 +134,7 @@
       },
       "data": {
         "label": "Tsareena",
-        "description": "A regal Grass-type Pokémon and member of the Baddie 4."
+        "description": "A regal Grass-type Pok\u00e9mon and member of the Baddie 4."
       }
     },
     {
@@ -146,7 +146,7 @@
       },
       "data": {
         "label": "Hatterene",
-        "description": "A mysterious Psychic/Fairy-type Pokémon and member of the Baddie 4."
+        "description": "A mysterious Psychic/Fairy-type Pok\u00e9mon and member of the Baddie 4."
       }
     },
     {
@@ -170,7 +170,7 @@
       },
       "data": {
         "label": "Sailor Pokemon",
-        "description": "A heroic group of Pokémon recruited by Mega Sailor Gardevoir to combat threats."
+        "description": "A heroic group of Pok\u00e9mon recruited by Mega Sailor Gardevoir to combat threats."
       }
     },
     {
@@ -182,7 +182,7 @@
       },
       "data": {
         "label": "Alolan Ninetales",
-        "description": "An elegant Ice/Fairy-type Pokémon, a member of the Sailor Pokemon."
+        "description": "An elegant Ice/Fairy-type Pok\u00e9mon, a member of the Sailor Pokemon."
       }
     },
     {
@@ -206,7 +206,7 @@
       },
       "data": {
         "label": "Machoke",
-        "description": "A strong Fighting-type Pokémon, a member of the Sailor Pokemon."
+        "description": "A strong Fighting-type Pok\u00e9mon, a member of the Sailor Pokemon."
       }
     },
     {
@@ -218,7 +218,7 @@
       },
       "data": {
         "label": "Braixen",
-        "description": "A Fire-type Pokémon, a member of the Sailor Pokemon."
+        "description": "A Fire-type Pok\u00e9mon, a member of the Sailor Pokemon."
       }
     },
     {
@@ -242,7 +242,7 @@
       },
       "data": {
         "label": "Ditto",
-        "description": "A shapeshifting Pokémon with a mysterious role in the universe."
+        "description": "A shapeshifting Pok\u00e9mon with a mysterious role in the universe."
       }
     },
     {
@@ -254,7 +254,7 @@
       },
       "data": {
         "label": "Meowscarada",
-        "description": "A captivating Pokémon known for her flair and agility."
+        "description": "A captivating Pok\u00e9mon known for her flair and agility."
       }
     },
     {
@@ -267,6 +267,102 @@
       "data": {
         "label": "Cloning Machine",
         "description": "The same machine Mewtwo used in the Pokemon First Movie, now repurposed by Gholdengo to create perfect Dittos."
+      }
+    },
+    {
+      "id": "pre_era_phase",
+      "type": "era",
+      "position": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "label": "Pre-Era Phase",
+        "description": "Early random singles + two remix albums, no overarching story. Jigglypuff (many versions of one song) was the biggest draw of this phase. Ended when the Jynx song popped off and Erik decided to get structured."
+      }
+    },
+    {
+      "id": "banned_badge_era",
+      "type": "era",
+      "position": {
+        "x": 320,
+        "y": 50
+      },
+      "data": {
+        "label": "Banned Badge Era",
+        "description": "Erik's first real Era (overarching video storyline). Core album: Banned Badge (Jynx, Hatterene, Gothitelle, Gardevoir, Tsareena / Baddie 4). Pixilate is a same-roster remix/fusion album within this Era."
+      }
+    },
+    {
+      "id": "heart_scales_era",
+      "type": "era",
+      "position": {
+        "x": 590,
+        "y": 50
+      },
+      "data": {
+        "label": "Heart Scales Era",
+        "description": "Followed Banned Badge once its story was told. Core album: Heart Scales (Meowscarada, Pheromosa, Gholdengo, Meloetta, Lopunny, Ditto / Heart Scales Girl Group)."
+      }
+    },
+    {
+      "id": "pink_bois_era",
+      "type": "era",
+      "position": {
+        "x": 860,
+        "y": 50
+      },
+      "data": {
+        "label": "Pink Bois Era",
+        "description": "Started once Erik stopped promoting Heart Scales. Core album: Pink Bois (Swampert, Voltorb, Heracross, Electabuzz, Quagsire, Nidoking, Rhyhorn, Kyogre, Dratini). Currently winding down as of mid-2026."
+      }
+    },
+    {
+      "id": "pretty_rare_candies_era",
+      "type": "era",
+      "position": {
+        "x": 1130,
+        "y": 50
+      },
+      "data": {
+        "label": "Pretty Rare Candies Era",
+        "description": "Next/current Era as of mid-2026, in development. A future spooky/horror-themed Era (Misdreavus, Gengar, Hypno, Malamar, others) has been floated for after this one but is not committed yet."
+      }
+    },
+    {
+      "id": "battle_ready_bridge",
+      "type": "event",
+      "position": {
+        "x": 455,
+        "y": 200
+      },
+      "data": {
+        "label": "Battle Ready (bridge album)",
+        "description": "Remix album combining characters from both the Banned Badge Era (Baddie 4) and Heart Scales Era (Heart Scales Girl Group) \u2014 released as Heart Scales wound down."
+      }
+    },
+    {
+      "id": "pheromone_edition_addition",
+      "type": "event",
+      "position": {
+        "x": 860,
+        "y": 200
+      },
+      "data": {
+        "label": "Pink Bois: Pheromone Edition",
+        "description": "Remix album within the Pink Bois Era that remixed the main tracks and added Butterfree and Salazzle into the Pink Bois storyline."
+      }
+    },
+    {
+      "id": "dream_eater_bridge",
+      "type": "event",
+      "position": {
+        "x": 995,
+        "y": 200
+      },
+      "data": {
+        "label": "Dream Eater (bridge single)",
+        "description": "Single featuring Hypno and Drowzee, released mid-Pink Bois Era and incorporated into the Pink Bois video storyline. Real purpose: keep new content flowing while the bigger Pretty Rare Candies album was in development."
       }
     }
   ],
@@ -355,6 +451,61 @@
       "source": "gholdengo",
       "target": "ditto",
       "label": "profits from"
+    },
+    {
+      "source": "pre_era_phase",
+      "target": "banned_badge_era",
+      "label": "led to"
+    },
+    {
+      "source": "banned_badge_era",
+      "target": "heart_scales_era",
+      "label": "followed by"
+    },
+    {
+      "source": "heart_scales_era",
+      "target": "pink_bois_era",
+      "label": "followed by"
+    },
+    {
+      "source": "pink_bois_era",
+      "target": "pretty_rare_candies_era",
+      "label": "followed by"
+    },
+    {
+      "source": "baddie_4",
+      "target": "banned_badge_era",
+      "label": "featured in"
+    },
+    {
+      "source": "heart_scales_group",
+      "target": "heart_scales_era",
+      "label": "featured in"
+    },
+    {
+      "source": "battle_ready_bridge",
+      "target": "banned_badge_era",
+      "label": "bridges"
+    },
+    {
+      "source": "battle_ready_bridge",
+      "target": "heart_scales_era",
+      "label": "bridges"
+    },
+    {
+      "source": "pheromone_edition_addition",
+      "target": "pink_bois_era",
+      "label": "part of"
+    },
+    {
+      "source": "dream_eater_bridge",
+      "target": "pink_bois_era",
+      "label": "part of"
+    },
+    {
+      "source": "dream_eater_bridge",
+      "target": "pretty_rare_candies_era",
+      "label": "bridges into"
     }
   ],
   "history": [
@@ -418,7 +569,7 @@
           },
           "data": {
             "label": "Lopunny",
-            "description": "A graceful Pokémon, now a member of the Heart Scales Girl Group.",
+            "description": "A graceful Pok\u00e9mon, now a member of the Heart Scales Girl Group.",
             "traits": "Graceful, charming, and a natural performer, often taking the lead in dance routines."
           }
         },
@@ -431,7 +582,7 @@
           },
           "data": {
             "label": "Meloetta",
-            "description": "A melodic Pokémon, now a member of the Heart Scales Girl Group.",
+            "description": "A melodic Pok\u00e9mon, now a member of the Heart Scales Girl Group.",
             "traits": "Melodic, soulful, and the primary vocalist, capable of moving audiences with her voice."
           }
         },
@@ -469,7 +620,7 @@
           },
           "data": {
             "label": "Gothitelle",
-            "description": "A cunning Psychic-type Pokémon and member of the Baddie 4."
+            "description": "A cunning Psychic-type Pok\u00e9mon and member of the Baddie 4."
           }
         },
         {
@@ -481,7 +632,7 @@
           },
           "data": {
             "label": "Jynx",
-            "description": "An Ice/Psychic-type Pokémon and member of the Baddie 4."
+            "description": "An Ice/Psychic-type Pok\u00e9mon and member of the Baddie 4."
           }
         },
         {
@@ -493,7 +644,7 @@
           },
           "data": {
             "label": "Tsareena",
-            "description": "A regal Grass-type Pokémon and member of the Baddie 4."
+            "description": "A regal Grass-type Pok\u00e9mon and member of the Baddie 4."
           }
         },
         {
@@ -505,7 +656,7 @@
           },
           "data": {
             "label": "Hatterene",
-            "description": "A mysterious Psychic/Fairy-type Pokémon and member of the Baddie 4."
+            "description": "A mysterious Psychic/Fairy-type Pok\u00e9mon and member of the Baddie 4."
           }
         },
         {
@@ -529,7 +680,7 @@
           },
           "data": {
             "label": "Sailor Pokemon",
-            "description": "A heroic group of Pokémon recruited by Mega Sailor Gardevoir to combat threats."
+            "description": "A heroic group of Pok\u00e9mon recruited by Mega Sailor Gardevoir to combat threats."
           }
         },
         {
@@ -541,7 +692,7 @@
           },
           "data": {
             "label": "Alolan Ninetales",
-            "description": "An elegant Ice/Fairy-type Pokémon, a member of the Sailor Pokemon."
+            "description": "An elegant Ice/Fairy-type Pok\u00e9mon, a member of the Sailor Pokemon."
           }
         },
         {
@@ -565,7 +716,7 @@
           },
           "data": {
             "label": "Machoke",
-            "description": "A strong Fighting-type Pokémon, a member of the Sailor Pokemon."
+            "description": "A strong Fighting-type Pok\u00e9mon, a member of the Sailor Pokemon."
           }
         },
         {
@@ -577,7 +728,7 @@
           },
           "data": {
             "label": "Braixen",
-            "description": "A Fire-type Pokémon, a member of the Sailor Pokemon."
+            "description": "A Fire-type Pok\u00e9mon, a member of the Sailor Pokemon."
           }
         },
         {
@@ -721,7 +872,7 @@
           },
           "data": {
             "label": "Lopunny",
-            "description": "A graceful Pokémon, now a member of the Heart Scales Girl Group.",
+            "description": "A graceful Pok\u00e9mon, now a member of the Heart Scales Girl Group.",
             "traits": "Graceful, charming, and a natural performer, often taking the lead in dance routines."
           }
         },
@@ -734,7 +885,7 @@
           },
           "data": {
             "label": "Meloetta",
-            "description": "A melodic Pokémon, now a member of the Heart Scales Girl Group.",
+            "description": "A melodic Pok\u00e9mon, now a member of the Heart Scales Girl Group.",
             "traits": "Melodic, soulful, and the primary vocalist, capable of moving audiences with her voice."
           }
         },
@@ -772,7 +923,7 @@
           },
           "data": {
             "label": "Gothitelle",
-            "description": "A cunning Psychic-type Pokémon and member of the Baddie 4."
+            "description": "A cunning Psychic-type Pok\u00e9mon and member of the Baddie 4."
           }
         },
         {
@@ -784,7 +935,7 @@
           },
           "data": {
             "label": "Jynx",
-            "description": "An Ice/Psychic-type Pokémon and member of the Baddie 4."
+            "description": "An Ice/Psychic-type Pok\u00e9mon and member of the Baddie 4."
           }
         },
         {
@@ -796,7 +947,7 @@
           },
           "data": {
             "label": "Tsareena",
-            "description": "A regal Grass-type Pokémon and member of the Baddie 4."
+            "description": "A regal Grass-type Pok\u00e9mon and member of the Baddie 4."
           }
         },
         {
@@ -808,7 +959,7 @@
           },
           "data": {
             "label": "Hatterene",
-            "description": "A mysterious Psychic/Fairy-type Pokémon and member of the Baddie 4."
+            "description": "A mysterious Psychic/Fairy-type Pok\u00e9mon and member of the Baddie 4."
           }
         },
         {
@@ -832,7 +983,7 @@
           },
           "data": {
             "label": "Sailor Pokemon",
-            "description": "A heroic group of Pokémon recruited by Mega Sailor Gardevoir to combat threats."
+            "description": "A heroic group of Pok\u00e9mon recruited by Mega Sailor Gardevoir to combat threats."
           }
         },
         {
@@ -844,7 +995,7 @@
           },
           "data": {
             "label": "Alolan Ninetales",
-            "description": "An elegant Ice/Fairy-type Pokémon, a member of the Sailor Pokemon."
+            "description": "An elegant Ice/Fairy-type Pok\u00e9mon, a member of the Sailor Pokemon."
           }
         },
         {
@@ -868,7 +1019,7 @@
           },
           "data": {
             "label": "Machoke",
-            "description": "A strong Fighting-type Pokémon, a member of the Sailor Pokemon."
+            "description": "A strong Fighting-type Pok\u00e9mon, a member of the Sailor Pokemon."
           }
         },
         {
@@ -880,7 +1031,7 @@
           },
           "data": {
             "label": "Braixen",
-            "description": "A Fire-type Pokémon, a member of the Sailor Pokemon."
+            "description": "A Fire-type Pok\u00e9mon, a member of the Sailor Pokemon."
           }
         },
         {
@@ -904,7 +1055,7 @@
           },
           "data": {
             "label": "Ditto",
-            "description": "A shapeshifting Pokémon with a mysterious role in the universe."
+            "description": "A shapeshifting Pok\u00e9mon with a mysterious role in the universe."
           }
         },
         {
@@ -916,7 +1067,7 @@
           },
           "data": {
             "label": "Meowscarada",
-            "description": "A captivating Pokémon known for her flair and agility."
+            "description": "A captivating Pok\u00e9mon known for her flair and agility."
           }
         }
       ],
@@ -1054,7 +1205,7 @@
           },
           "data": {
             "label": "Lopunny",
-            "description": "A graceful Pokémon, now a member of the Heart Scales Girl Group.",
+            "description": "A graceful Pok\u00e9mon, now a member of the Heart Scales Girl Group.",
             "traits": "Graceful, charming, and a natural performer, often taking the lead in dance routines."
           }
         },
@@ -1067,7 +1218,7 @@
           },
           "data": {
             "label": "Meloetta",
-            "description": "A melodic Pokémon, now a member of the Heart Scales Girl Group.",
+            "description": "A melodic Pok\u00e9mon, now a member of the Heart Scales Girl Group.",
             "traits": "Melodic, soulful, and the primary vocalist, capable of moving audiences with her voice."
           }
         },
@@ -1105,7 +1256,7 @@
           },
           "data": {
             "label": "Gothitelle",
-            "description": "A cunning Psychic-type Pokémon and member of the Baddie 4."
+            "description": "A cunning Psychic-type Pok\u00e9mon and member of the Baddie 4."
           }
         },
         {
@@ -1117,7 +1268,7 @@
           },
           "data": {
             "label": "Jynx",
-            "description": "An Ice/Psychic-type Pokémon and member of the Baddie 4."
+            "description": "An Ice/Psychic-type Pok\u00e9mon and member of the Baddie 4."
           }
         },
         {
@@ -1129,7 +1280,7 @@
           },
           "data": {
             "label": "Tsareena",
-            "description": "A regal Grass-type Pokémon and member of the Baddie 4."
+            "description": "A regal Grass-type Pok\u00e9mon and member of the Baddie 4."
           }
         },
         {
@@ -1141,7 +1292,7 @@
           },
           "data": {
             "label": "Hatterene",
-            "description": "A mysterious Psychic/Fairy-type Pokémon and member of the Baddie 4."
+            "description": "A mysterious Psychic/Fairy-type Pok\u00e9mon and member of the Baddie 4."
           }
         },
         {
@@ -1165,7 +1316,7 @@
           },
           "data": {
             "label": "Sailor Pokemon",
-            "description": "A heroic group of Pokémon recruited by Mega Sailor Gardevoir to combat threats."
+            "description": "A heroic group of Pok\u00e9mon recruited by Mega Sailor Gardevoir to combat threats."
           }
         },
         {
@@ -1177,7 +1328,7 @@
           },
           "data": {
             "label": "Alolan Ninetales",
-            "description": "An elegant Ice/Fairy-type Pokémon, a member of the Sailor Pokemon."
+            "description": "An elegant Ice/Fairy-type Pok\u00e9mon, a member of the Sailor Pokemon."
           }
         },
         {
@@ -1201,7 +1352,7 @@
           },
           "data": {
             "label": "Machoke",
-            "description": "A strong Fighting-type Pokémon, a member of the Sailor Pokemon."
+            "description": "A strong Fighting-type Pok\u00e9mon, a member of the Sailor Pokemon."
           }
         },
         {
@@ -1213,7 +1364,7 @@
           },
           "data": {
             "label": "Braixen",
-            "description": "A Fire-type Pokémon, a member of the Sailor Pokemon."
+            "description": "A Fire-type Pok\u00e9mon, a member of the Sailor Pokemon."
           }
         },
         {
@@ -1237,7 +1388,7 @@
           },
           "data": {
             "label": "Ditto",
-            "description": "A shapeshifting Pokémon with a mysterious role in the universe."
+            "description": "A shapeshifting Pok\u00e9mon with a mysterious role in the universe."
           }
         },
         {
@@ -1249,7 +1400,7 @@
           },
           "data": {
             "label": "Meowscarada",
-            "description": "A captivating Pokémon known for her flair and agility."
+            "description": "A captivating Pok\u00e9mon known for her flair and agility."
           }
         }
       ],
