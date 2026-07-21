@@ -3,15 +3,19 @@
 @theme {
   --color-accent: var(--accent-color, #FF3366);
   --color-accent-sunset: var(--accent-sunset, #FF8C42);
-  --color-background: var(--bg-color, #121212);
-  --color-foreground: var(--fg-color, #FFFFFF);
-  --color-surface: var(--surface-color, #1A1A1A);
-  --color-border: var(--border-color, #2A2A2A);
+  --color-background: var(--bg-color, #0A0A0F);
+  --color-foreground: var(--fg-color, #E8E8ED);
+  --color-surface: var(--surface-color, #14141B);
+  --color-border: var(--border-color, #1E1E2A);
 
   --animate-pulse-slow: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-sanctuary-cycle: sanctuary-cycle 20s ease-in-out infinite;
   --animate-float-slow: float-slow 15s ease-in-out infinite;
 }
+
+/* ═══════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════ */
 
 @keyframes sanctuary-cycle {
   0% { background-color: #deb8c2; }
@@ -31,316 +35,86 @@
 }
 
 @keyframes pulse-slow {
-
-  0%,
-  100% {
-    opacity: 0.3;
-  }
-
-  50% {
-    opacity: 0.7;
-  }
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes wounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes drift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(20px); }
+}
+
+.animate-wounce {
+  animation: wounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.animate-drift {
+  animation: drift 10s ease-in-out infinite alternate;
+}
+
+
+/* ═══════════════════════════════════════════════
+   THEME: DARK (Default)
+   Deep navy-black with warm pink accents
+   ═══════════════════════════════════════════════ */
+
 :root {
-  /* Soft Dark (Default) */
-  --bg-color: #121212;
-  --fg-color: #F8F8F8;
-  --surface-color: #1A1A1A;
-  --border-color: rgba(255, 255, 255, 0.08);
+  --bg-color: #0A0A0F;
+  --fg-color: #E8E8ED;
+  --fg-muted: #8888A0;
+  --surface-color: #13131B;
+  --surface-elevated: #1A1A25;
+  --border-color: rgba(255, 255, 255, 0.06);
   --accent-color: #FF3366;
   --accent-sunset: #FF8C42;
   --panel-blur: 24px;
+  --card-radius: 20px;
+  --btn-radius: 12px;
 }
 
-html[data-theme='light'] {
-  /* Warm Sunset / Sand Palette */
-  --bg-color: #F4EBD0;
-  --fg-color: #2D1E2F;
-  --surface-color: #EAE0C5;
-  --border-color: rgba(45, 30, 47, 0.15);
-  --accent-color: #FF8C42;
-  --accent-sunset: #D84315;
-  --panel-blur: 16px;
-}
 
-html[data-theme='pink'] {
-  /* True Pastel Pink with High Contrast Text */
-  --bg-color: #FFF0F5;
-  /* Lavender Blush - very light pastel pink */
-  --fg-color: #880E4F;
-  /* Deep Magenta - high contrast for readability */
-  --surface-color: #FCE4EC;
-  /* Slightly darker pastel for cards */
-  --border-color: rgba(136, 14, 79, 0.15);
-  /* Subtle deep magenta border */
-  --accent-color: #D81B60;
-  /* Vibrant Pink */
-  --accent-sunset: #AD1457;
-  /* Rich Dark Pink */
-  --panel-blur: 20px;
-}
-
-html[data-theme='pink'] body {
-  background-color: #FFF0F5 !important;
-}
+/* ═══════════════════════════════════════════════
+   THEME: SNES
+   Classic Super Famicom hardware UI
+   ═══════════════════════════════════════════════ */
 
 html[data-theme='snes'] {
-  /* Classic SNES Hardware UI mapped to exact palette */
   --bg-color: #b5b6e4;
-  /* Light Periwinkle */
   --fg-color: #211a21;
-  /* Almost Black (High contrast text) */
+  --fg-muted: #5c546a;
   --surface-color: #cec9cc;
-  /* Light Gray cards */
+  --surface-elevated: #d8d4d7;
   --border-color: #908a99;
-  /* Medium Gray */
   --accent-color: #4f43ae;
-  /* Indigo */
   --accent-sunset: #4f43ae;
   --panel-blur: 0px;
+  --card-radius: 8px;
+  --btn-radius: 6px;
 }
 
-html[data-theme='gbc'] {
-  /* Gameboy DMG Classic */
-  --bg-color: #c2c0bc;
-  /* Grey Shell */
-  --fg-color: #081820;
-  /* Dark Black/Green Text */
-  --surface-color: #e0f8d0;
-  /* Classic Green LCD Screen */
-  --border-color: #081820;
-  /* Dark outlines for LCD frames */
-  --accent-color: #9b2256;
-  /* Burgundy (A/B Buttons) */
-  --accent-sunset: #484686;
-  /* Dark Blue (D-Pad/Select/Start) */
-  --panel-blur: 0px;
-}
-
-html[data-theme='gbc'] body {
-  background-color: var(--bg-color) !important;
-  background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1.5px, transparent 1.5px) !important;
-  background-size: 6px 6px !important;
-}
-
-/* GBC specific box shadows and borders (pixel look) */
-html[data-theme='gbc'] .squircle {
-  border-radius: 0 !important;
-  /* Sharp corners for pixel look */
-  border: 2px solid var(--border-color) !important;
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15) !important;
-}
-
-html[data-theme='gbc'] .glass,
-html[data-theme='gbc'] .glass-accent {
+/* SNES: Plastic cartridge card look */
+[data-theme='snes'] .card,
+[data-theme='snes'] .glass {
+  background: #E0E0E0 !important;
+  border: 2px solid #FFFFFF !important;
+  border-right-color: #A0A0A0 !important;
+  border-bottom-color: #A0A0A0 !important;
+  box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.8), 4px 4px 15px rgba(0, 0, 0, 0.1) !important;
   backdrop-filter: none !important;
-  background: var(--surface-color) !important;
-  border: 2px solid var(--border-color) !important;
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15) !important;
+  border-radius: var(--card-radius) !important;
 }
 
-html[data-theme='pokopia'] {
-  /* Pokémon Pokopia Deep Palette & Textures */
-  --bg-color: #f7e9d7; /* Wood Base stays as secondary texture */
-  --bg-sky: #A6D9F7;   /* Re-introducing Sky Blue */
-  --fg-color: #3b2b1d; 
-  --bg-card: #ffffff;
-  --surface-color: #ffffff;
-  --border-color: #ffffff;
-  --accent-color: #a3c422; 
-  --accent-sunset: #f89d1b; 
-  
-  /* Specialized Shadows */
-  --pokopia-shadow-green: 0 6px 0 rgba(3, 60, 21, 0.15);
-  --pokopia-shadow-brown: 0 6px 0 rgba(59, 43, 29, 0.12);
-  --pokopia-sticker-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-}
-
-html[data-theme='pokopia'], 
-html[data-theme='pokopia'] body {
-  background-color: var(--bg-sky) !important; /* Sky Blue as PRIMARY Canvas */
-  color: #3b2b1d !important;
-  font-family: var(--font-geist-sans), sans-serif;
-}
-
-/* Force All Interactive and Content Text to High Contrast */
-html[data-theme='pokopia'] h1, 
-html[data-theme='pokopia'] h2, 
-html[data-theme='pokopia'] h3, 
-html[data-theme='pokopia'] h4, 
-html[data-theme='pokopia'] span,
-html[data-theme='pokopia'] p,
-html[data-theme='pokopia'] li {
-  color: #3b2b1d !important;
-}
-
-/* Sky Blue primary canvas with a subtle wood "ground" texture at the bottom */
-html[data-theme='pokopia'] body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-color: var(--bg-sky);
-  background-image: 
-    linear-gradient(to bottom, transparent 60%, rgba(59, 43, 29, 0.05) 100%),
-    repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 80px, transparent 80px, transparent 160px);
-  background-size: 100% 100%, 160px 100%;
-  background-attachment: fixed;
-  z-index: -20;
-  pointer-events: none;
-}
-
-/* ABSOLUTELY NO HARD ANGLES */
-html[data-theme='pokopia'] header,
-html[data-theme='pokopia'] section,
-html[data-theme='pokopia'] button,
-html[data-theme='pokopia'] .squircle,
-html[data-theme='pokopia'] .glass {
-  border-radius: 40px !important;
-}
-
-/* Navigation Wood Slab Contrast */
-html[data-theme='pokopia'] nav {
-  background: #f7e9d7 !important;
-  background-image: repeating-linear-gradient(rgba(59, 43, 29, 0.05) 0, rgba(59, 43, 29, 0.05) 1px, transparent 1px, transparent 40px) !important;
-  border: 4px solid #ffffff !important;
-  border-radius: 999px !important;
-  padding: 8px 32px !important;
-  box-shadow: 0 8px 20px rgba(59, 43, 29, 0.15) !important;
-  border-bottom: 4px solid #ffffff !important;
-  margin: 16px 0 !important;
-}
-
-/* Dropdown Utilities */
-.dropdown-pill {
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-html[data-theme='pokopia'] .nav-btn {
-  background-color: var(--bg-sky) !important;
-  color: #3b2b1d !important;
-  border: 2px solid #ffffff !important;
-  border-radius: 999px !important;
-  padding: 6px 18px !important;
-  font-weight: 900 !important;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.05);
-}
-
-html[data-theme='pokopia'] .dropdown-menu {
-    background: #f7e9d7 !important;
-    border: 4px solid white !important;
-    border-radius: 24px !important;
-    padding: 12px !important;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important;
-}
-
-/* Pokopia Sticker Components */
-html[data-theme='pokopia'] .squircle,
-html[data-theme='pokopia'] .glass,
-html[data-theme='pokopia'] .responsive-table tr {
-  border-radius: 30px !important;
-  border: 4px solid #ffffff !important;
-  background: #ffffff !important;
-  box-shadow: var(--pokopia-shadow-brown) !important;
-  backdrop-filter: none !important;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
-}
-
-/* Pokopia Sectional Colors */
-html[data-theme='pokopia'] .bg-section-green { background-color: #C0E8A8 !important; }
-html[data-theme='pokopia'] .bg-section-blue { background-color: #A6D9F7 !important; }
-html[data-theme='pokopia'] .bg-section-purple { background-color: #D3C2F7 !important; }
-html[data-theme='pokopia'] .bg-section-wood { background-color: #f7e9d7 !important; }
-
-html[data-theme='pokopia'] .responsive-table tr {
-  margin-bottom: 2rem !important;
-}
-
-html[data-theme='pokopia'] button,
-html[data-theme='pokopia'] .clickable,
-html[data-theme='pokopia'] .mobile-launcher-btn {
-  border-radius: 40px !important;
-  border: 4px solid #ffffff !important;
-  box-shadow: var(--pokopia-shadow-brown) !important;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-}
-
-html[data-theme='pokopia'] button:hover,
-html[data-theme='pokopia'] .clickable:hover,
-html[data-theme='pokopia'] .mobile-launcher-btn:hover {
-  transform: scale(1.1) !important;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-}
-
-/* Pokopia Navigation Force Consistency */
-html[data-theme='pokopia'] .nav-btn,
-html[data-theme='pokopia'] .dropdown-pill span,
-html[data-theme='pokopia'] .dropdown-menu button {
-  font-size: 11px !important;
-  font-weight: 900 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.1em !important;
-}
-
-body {
-  background-color: var(--bg-color);
-  color: var(--fg-color);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-image:
-    radial-gradient(circle at 15% 15%, color-mix(in srgb, var(--accent-color) 4%, transparent) 0%, transparent 35%),
-    radial-gradient(circle at 85% 85%, color-mix(in srgb, var(--accent-sunset) 3%, transparent) 0%, transparent 35%);
-  background-attachment: fixed;
-  transition: background-color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* 2026 Modern: Squircles (Continuous Corners) */
-.squircle {
-  border-radius: 2rem;
-  overflow: hidden;
-}
-
-/* 2026 Modern: Specular Reflections (Inner Gloss) */
-.specular-reflect {
-  position: relative;
-  overflow: hidden;
-}
-
-.specular-reflect::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-  pointer-events: none;
-}
-
-/* Glassmorphism Utilities */
-.glass {
-  background: color-mix(in srgb, var(--surface-color) 70%, transparent);
-  backdrop-filter: blur(var(--panel-blur)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--panel-blur)) saturate(160%);
-  border: 1px solid var(--border-color);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
-}
-
-.glass-accent {
-  background: color-mix(in srgb, var(--accent-color) 5%, transparent);
-  backdrop-filter: blur(12px);
-  border: 1px solid color-mix(in srgb, var(--accent-color) 15%, transparent);
-}
-
-.text-gradient {
-  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-sunset) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* SFC (Super Famicom) Controller Button Styles */
+/* SNES Controller Button Colors */
 [data-theme='snes'] .snes-btn-blue {
   background: #0067B1 !important;
   border: 2px solid #004a80 !important;
@@ -373,19 +147,6 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-[data-theme='snes'] .glass {
-  background: #E0E0E0 !important;
-  border: 2px solid #FFFFFF !important;
-  border-right-color: #A0A0A0 !important;
-  border-bottom-color: #A0A0A0 !important;
-  box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.8), 4px 4px 15px rgba(0, 0, 0, 0.1) !important;
-  backdrop-filter: none !important;
-}
-
-[data-theme='snes'] .squircle {
-  border-radius: 0.5rem !important;
-}
-
 [data-theme='snes'] button:active,
 [data-theme='snes'] .snes-btn-active {
   transform: translateY(4px) !important;
@@ -393,28 +154,360 @@ body {
   box-shadow: none !important;
 }
 
-/* Pokopia Animations: Wouncy & Bouncy */
-@keyframes wounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+
+/* ═══════════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════════ */
+
+body {
+  background-color: var(--bg-color);
+  color: var(--fg-color);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-image:
+    radial-gradient(ellipse at 15% 0%, color-mix(in srgb, var(--accent-color) 3%, transparent) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 100%, color-mix(in srgb, var(--accent-sunset) 2%, transparent) 0%, transparent 50%);
+  background-attachment: fixed;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-.animate-wounce {
-  animation: wounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+/* Muted text helper */
+.text-muted {
+  color: var(--fg-muted);
 }
 
-@keyframes drift {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(20px); }
+
+/* ═══════════════════════════════════════════════
+   CARD SYSTEM
+   The universal panel component
+   ═══════════════════════════════════════════════ */
+
+.card {
+  background: color-mix(in srgb, var(--surface-color) 80%, transparent);
+  backdrop-filter: blur(var(--panel-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--panel-blur)) saturate(140%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.03) inset,
+    0 8px 40px -12px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.animate-drift {
-  animation: drift 10s ease-in-out infinite alternate;
+/* Specular top-edge highlight */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 10%, rgba(255, 255, 255, 0.06) 50%, transparent 90%);
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* removed divider-grass and divider-cloud */
+.card:hover {
+  border-color: color-mix(in srgb, var(--accent-color) 15%, transparent);
+}
 
-/* --- MOBILE SUIT: HIGH-FIDELITY RESPONSIVE SYSTEM --- */
+/* Card without padding — for banner/media containers */
+.card-flush {
+  composes: card;
+  padding: 0;
+}
+
+/* Legacy compat: keep glass/squircle working */
+.glass {
+  background: color-mix(in srgb, var(--surface-color) 70%, transparent);
+  backdrop-filter: blur(var(--panel-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--panel-blur)) saturate(160%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+}
+
+.squircle {
+  border-radius: var(--card-radius);
+  overflow: hidden;
+}
+
+.glass-accent {
+  background: color-mix(in srgb, var(--accent-color) 5%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--accent-color) 15%, transparent);
+  border-radius: var(--card-radius);
+}
+
+
+/* ═══════════════════════════════════════════════
+   SPECULAR REFLECTIONS
+   ═══════════════════════════════════════════════ */
+
+.specular-reflect {
+  position: relative;
+  overflow: hidden;
+}
+
+.specular-reflect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  pointer-events: none;
+}
+
+
+/* ═══════════════════════════════════════════════
+   BUTTON SYSTEM
+   Three tiers: primary, secondary, ghost
+   ═══════════════════════════════════════════════ */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--btn-radius);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--accent-color) 25%, transparent);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px color-mix(in srgb, var(--accent-color) 35%, transparent);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background: color-mix(in srgb, var(--surface-color) 60%, transparent);
+  color: var(--fg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--btn-radius);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: color-mix(in srgb, var(--surface-color) 90%, transparent);
+  border-color: color-mix(in srgb, var(--accent-color) 30%, transparent);
+  color: var(--fg-color);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--fg-muted);
+  border: none;
+  border-radius: var(--btn-radius);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-ghost:hover {
+  background: color-mix(in srgb, var(--fg-color) 5%, transparent);
+  color: var(--fg-color);
+}
+
+
+/* ═══════════════════════════════════════════════
+   BADGE / TAG SYSTEM
+   ═══════════════════════════════════════════════ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--surface-color) 60%, transparent);
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+
+.badge-accent {
+  background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+  border-color: color-mix(in srgb, var(--accent-color) 20%, transparent);
+  color: var(--accent-color);
+}
+
+
+/* ═══════════════════════════════════════════════
+   INPUT / TEXTAREA SYSTEM
+   ═══════════════════════════════════════════════ */
+
+.input-field {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: color-mix(in srgb, var(--surface-color) 50%, transparent);
+  border: 1px solid var(--border-color);
+  border-radius: var(--btn-radius);
+  color: var(--fg-color);
+  font-size: 0.875rem;
+  font-family: var(--font-geist-mono), monospace;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+  resize: vertical;
+}
+
+.input-field::placeholder {
+  color: var(--fg-muted);
+  opacity: 0.5;
+}
+
+.input-field:focus {
+  border-color: color-mix(in srgb, var(--accent-color) 40%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 8%, transparent);
+}
+
+
+/* ═══════════════════════════════════════════════
+   STAT / KPI SYSTEM
+   ═══════════════════════════════════════════════ */
+
+.stat-value {
+  font-size: 1.875rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--fg-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+
+/* ═══════════════════════════════════════════════
+   SECTION HEADER SYSTEM
+   Consistent title + subtitle pair per module
+   ═══════════════════════════════════════════════ */
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.section-title {
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--fg-color);
+  line-height: 1.2;
+}
+
+.section-subtitle {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.section-eyebrow {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+  opacity: 0.8;
+}
+
+
+/* ═══════════════════════════════════════════════
+   TEXT GRADIENT
+   ═══════════════════════════════════════════════ */
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-sunset) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
+/* ═══════════════════════════════════════════════
+   GAMIFICATION: XP BAR
+   ═══════════════════════════════════════════════ */
+
+.xp-bar-inner {
+  background: linear-gradient(90deg, var(--accent-color), var(--accent-sunset));
+  box-shadow: 0 0 10px var(--accent-color);
+  transition: width 1s ease-in-out;
+}
+
+
+/* ═══════════════════════════════════════════════
+   DROPDOWN UTILITIES
+   ═══════════════════════════════════════════════ */
+
+.dropdown-pill {
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+
+/* ═══════════════════════════════════════════════
+   MOBILE RESPONSIVE SYSTEM
+   ═══════════════════════════════════════════════ */
+
 @media (max-width: 768px) {
   .tabs-container {
     overflow-x: auto;
@@ -422,7 +515,7 @@ body {
     width: 100%;
   }
 
-  /* Table to Card Transformation: Aggressive Nuke */
+  /* Table to Card Transformation */
   .responsive-table,
   .responsive-table border-collapse,
   .responsive-table thead,
@@ -441,9 +534,9 @@ body {
   .responsive-table tr {
     padding: 1.5rem !important;
     margin-bottom: 1.5rem !important;
-    background: rgba(255, 255, 255, 0.03) !important;
+    background: color-mix(in srgb, var(--surface-color) 40%, transparent) !important;
     border: 1px solid var(--border-color) !important;
-    border-radius: 32px !important;
+    border-radius: var(--card-radius) !important;
   }
 
   .responsive-table td {
@@ -463,10 +556,10 @@ body {
     left: 0;
     right: 0;
     height: 80px;
-    background: rgba(10, 10, 10, 0.8);
+    background: color-mix(in srgb, var(--bg-color) 85%, transparent);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -480,7 +573,7 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--fg-muted);
     transition: all 0.2s ease;
   }
 
@@ -490,7 +583,7 @@ body {
 
   .mobile-dock-item span {
     font-size: 9px;
-    font-weight: 900;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }
@@ -499,7 +592,7 @@ body {
   .mobile-launcher-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.95);
+    background: color-mix(in srgb, var(--bg-color) 95%, transparent);
     backdrop-filter: blur(30px);
     z-index: 2000;
     padding: 2.5rem;
@@ -516,9 +609,9 @@ body {
   }
 
   .mobile-launcher-btn {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
+    background: color-mix(in srgb, var(--surface-color) 40%, transparent);
+    border: 1px solid var(--border-color);
+    border-radius: var(--card-radius);
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
@@ -528,7 +621,7 @@ body {
   }
 
   .mobile-launcher-btn.active {
-    background: rgba(255, 51, 102, 0.1);
+    background: color-mix(in srgb, var(--accent-color) 10%, transparent);
     border-color: var(--accent-color);
   }
 
@@ -542,11 +635,4 @@ body {
   .show-on-mobile-only {
     display: none !important;
   }
-}
-
-/* Gamification: XP Progress Bar */
-.xp-bar-inner {
-  background: linear-gradient(90deg, var(--accent-color), var(--accent-sunset));
-  box-shadow: 0 0 10px var(--accent-color);
-  transition: width 1s ease-in-out;
 }

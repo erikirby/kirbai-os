@@ -19,17 +19,17 @@ interface Concept {
 }
 
 const TYPE_STYLES: Record<ConceptType, string> = {
-    reel: 'text-pink-400 bg-pink-400/10 border-pink-400/20',
+    reel: 'text-accent bg-accent/10 border-accent/20',
     post: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
     music: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
     general: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
 };
 
 const STATUS_STYLES: Record<ConceptStatus, string> = {
-    concept: 'text-neutral-400 bg-neutral-400/10 border-neutral-400/20',
+    concept: 'text-foreground/50 bg-surface/40 border-border',
     'in-dev': 'text-cyan-400 bg-cyan-400/10 border-cyan-400/20',
     executed: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-    archived: 'text-neutral-600 bg-neutral-600/10 border-neutral-600/20',
+    archived: 'text-foreground/30 bg-surface/60 border-border/50',
 };
 
 const TYPE_LABELS: Record<ConceptType, string> = {
@@ -199,14 +199,14 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
             {/* Header */}
             <div className="flex items-start justify-between">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tighter">Creative</h1>
+                    <h1 className="section-title text-3xl">Creative</h1>
                     <p className="text-foreground/50 text-sm mt-2">
                         Concepts in development. Shower thoughts to Roadmap tasks.
                     </p>
                 </div>
                 <button
                     onClick={() => { setShowNew(v => !v); setForm(BLANK_FORM); }}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-accent text-white rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-accent/80 transition-all shadow-lg shadow-accent/20"
+                    className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider"
                 >
                     {showNew ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                     {showNew ? 'Cancel' : 'New Concept'}
@@ -215,21 +215,21 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
 
             {/* New Concept Form */}
             {showNew && (
-                <div className="bg-surface border border-border/20 rounded-2xl p-6 flex flex-col gap-4 shadow-2xl">
-                    <h2 className="text-xs font-black uppercase tracking-[0.3em] text-accent mb-2">New Concept</h2>
+                <div className="card p-6 flex flex-col gap-4">
+                    <h2 className="section-eyebrow mb-2">New Concept</h2>
                     <input
                         value={form.title}
                         onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                         placeholder="Title"
-                        className="px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white font-bold text-lg focus:outline-none focus:border-accent/40 placeholder:text-white/20"
+                        className="input-field text-lg font-bold"
                     />
                     <div className="flex gap-3 flex-wrap">
                         <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Type</label>
+                            <label className="text-[10px] font-semibold uppercase tracking-widest text-foreground/40">Type</label>
                             <select
                                 value={form.type}
                                 onChange={e => setForm(f => ({ ...f, type: e.target.value as ConceptType }))}
-                                className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm focus:outline-none"
+                                className="input-field py-2 text-sm"
                             >
                                 <option value="reel">Reel</option>
                                 <option value="post">Post</option>
@@ -238,11 +238,11 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                             </select>
                         </div>
                         <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Status</label>
+                            <label className="text-[10px] font-semibold uppercase tracking-widest text-foreground/40">Status</label>
                             <select
                                 value={form.status}
                                 onChange={e => setForm(f => ({ ...f, status: e.target.value as ConceptStatus }))}
-                                className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm focus:outline-none"
+                                className="input-field py-2 text-sm"
                             >
                                 <option value="concept">Concept</option>
                                 <option value="in-dev">In Dev</option>
@@ -251,12 +251,12 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                             </select>
                         </div>
                         <div className="flex flex-col gap-1 flex-1 min-w-[140px]">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Character (optional)</label>
+                            <label className="text-[10px] font-semibold uppercase tracking-widest text-foreground/40">Character (optional)</label>
                             <input
                                 value={form.character}
                                 onChange={e => setForm(f => ({ ...f, character: e.target.value }))}
                                 placeholder="e.g. Pheromosa"
-                                className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm focus:outline-none placeholder:text-white/20"
+                                className="input-field py-2 text-sm"
                             />
                         </div>
                     </div>
@@ -265,13 +265,13 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                         onChange={e => setForm(f => ({ ...f, body: e.target.value }))}
                         placeholder="Paste your concept, script idea, scene breakdown, or half-baked thought..."
                         rows={10}
-                        className="px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white/80 text-sm font-mono leading-relaxed focus:outline-none focus:border-accent/40 resize-none placeholder:text-white/20"
+                        className="input-field text-sm font-mono leading-relaxed resize-none"
                     />
                     <StatusButton
                         onClick={handleNew}
                         loading={isSaving}
                         disabled={!form.title.trim() || !form.body.trim()}
-                        className="self-end px-6 py-2.5 bg-accent text-white rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-accent/80 transition-all disabled:opacity-50 shadow-lg shadow-accent/20"
+                        className="btn-primary self-end px-6 py-2.5 text-sm uppercase tracking-wider disabled:opacity-50"
                         icon={<Check className="w-4 h-4" />}
                     >
                         Save Concept
@@ -281,29 +281,29 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
 
             {/* Filters */}
             <div className="flex gap-3 items-center flex-wrap">
-                <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-foreground/30">
+                <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-foreground/30">
                     <Filter className="w-3 h-3" /> Filter
                 </div>
                 {(['all', 'reel', 'post', 'music', 'general'] as const).map(t => (
                     <button
                         key={t}
                         onClick={() => setFilterType(t)}
-                        className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full border transition-all ${filterType === t
-                            ? 'bg-accent text-white border-accent'
-                            : 'border-border/20 text-foreground/40 hover:text-foreground/70'
+                        className={`badge transition-all ${filterType === t
+                            ? 'badge-accent'
+                            : 'border-border/20 text-foreground/40 hover:text-foreground/70 bg-transparent'
                             }`}
                     >
                         {t === 'all' ? 'All Types' : t === 'general' ? 'Brainstorm' : t.charAt(0).toUpperCase() + t.slice(1)}
                     </button>
                 ))}
-                <div className="w-px h-4 bg-border/20 mx-1" />
+                <div className="w-px h-4 bg-border mx-1" />
                 {(['all', 'concept', 'in-dev', 'executed', 'archived'] as const).map(s => (
                     <button
                         key={s}
                         onClick={() => setFilterStatus(s)}
-                        className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full border transition-all ${filterStatus === s
-                            ? 'bg-white/10 text-white border-white/20'
-                            : 'border-border/20 text-foreground/40 hover:text-foreground/70'
+                        className={`badge transition-all ${filterStatus === s
+                            ? 'bg-surface-elevated text-foreground border-border'
+                            : 'border-border/20 text-foreground/40 hover:text-foreground/70 bg-transparent'
                             }`}
                     >
                         {s === 'all' ? 'All Statuses' : STATUS_LABELS[s as ConceptStatus]}
@@ -331,7 +331,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                         return (
                             <div
                                 key={concept.id}
-                                className="bg-surface border border-border/10 rounded-2xl overflow-hidden shadow-xl hover:border-border/30 transition-colors group"
+                                className="card overflow-hidden group"
                             >
                                 {/* Card Header */}
                                 <div
@@ -340,10 +340,10 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                 >
                                     <div className="flex-1 flex flex-col gap-2">
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border ${TYPE_STYLES[concept.type]}`}>
+                                            <span className={`badge ${TYPE_STYLES[concept.type]}`}>
                                                 {TYPE_LABELS[concept.type]}
                                             </span>
-                                            <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border ${STATUS_STYLES[concept.status]}`}>
+                                            <span className={`badge ${STATUS_STYLES[concept.status]}`}>
                                                 {STATUS_LABELS[concept.status]}
                                             </span>
                                             {concept.character && (
@@ -352,9 +352,9 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                                 </span>
                                             )}
                                         </div>
-                                        <h3 className="text-lg font-bold text-white leading-tight">{concept.title}</h3>
+                                        <h3 className="text-lg font-bold text-foreground leading-tight">{concept.title}</h3>
                                         {!isExpanded && (
-                                            <p className="text-sm text-foreground/40 line-clamp-2 font-mono leading-relaxed">
+                                            <p className="text-sm text-foreground/40 line-clamp-2 font-mono leading-relaxed font-medium">
                                                 {concept.body || "No description."}
                                             </p>
                                         )}
@@ -363,7 +363,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button
                                                 onClick={e => { e.stopPropagation(); startEdit(concept); }}
-                                                className="p-1.5 text-white/30 hover:text-white transition-colors rounded-lg hover:bg-white/5"
+                                                className="p-1.5 text-foreground/30 hover:text-foreground transition-colors rounded-lg hover:bg-surface-elevated"
                                                 title="Edit"
                                             >
                                                 <Edit2 className="w-4 h-4" />
@@ -385,19 +385,19 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
 
                                 {/* Expanded Body */}
                                 {isExpanded && (
-                                    <div className="border-t border-white/5 px-5 pb-5 pt-4 flex flex-col gap-4">
+                                    <div className="border-t border-border px-5 pb-5 pt-4 flex flex-col gap-4">
                                         {isEditing ? (
                                             <>
                                                 <input
                                                     value={editForm.title}
                                                     onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))}
-                                                    className="px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white font-bold text-lg focus:outline-none focus:border-accent/40"
+                                                    className="input-field text-lg font-bold"
                                                 />
                                                 <div className="flex gap-3 flex-wrap">
                                                     <select
                                                         value={editForm.type}
                                                         onChange={e => setEditForm(f => ({ ...f, type: e.target.value as ConceptType }))}
-                                                        className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm focus:outline-none"
+                                                        className="input-field py-2 text-sm"
                                                     >
                                                         <option value="reel">Reel</option>
                                                         <option value="post">Post</option>
@@ -407,7 +407,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                                     <select
                                                         value={editForm.status}
                                                         onChange={e => setEditForm(f => ({ ...f, status: e.target.value as ConceptStatus }))}
-                                                        className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm focus:outline-none"
+                                                        className="input-field py-2 text-sm"
                                                     >
                                                         <option value="concept">Concept</option>
                                                         <option value="in-dev">In Dev</option>
@@ -418,70 +418,70 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                                         value={editForm.character}
                                                         onChange={e => setEditForm(f => ({ ...f, character: e.target.value }))}
                                                         placeholder="Character"
-                                                        className="px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm focus:outline-none placeholder:text-white/20"
+                                                        className="input-field py-2 text-sm"
                                                     />
                                                 </div>
                                                 <textarea
                                                     value={editForm.body}
                                                     onChange={e => setEditForm(f => ({ ...f, body: e.target.value }))}
                                                     rows={14}
-                                                    className="px-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white/80 text-sm font-mono leading-relaxed focus:outline-none focus:border-accent/40 resize-none"
+                                                    className="input-field text-sm font-mono leading-relaxed resize-none"
                                                 />
                                                 <div className="flex gap-2 self-end">
                                                     <StatusButton
                                                         onClick={() => handleEdit(concept.id)}
                                                         loading={isSaving}
-                                                        className="px-4 py-2 bg-accent/20 border border-accent/30 rounded-xl text-accent text-xs font-black hover:bg-accent/40 transition-colors"
+                                                        className="btn-primary px-4 py-2 text-xs"
                                                         icon={<Check className="w-3 h-3" />}
                                                     >
                                                         Save
                                                     </StatusButton>
                                                     <button
                                                         onClick={() => setEditingId(null)}
-                                                        className="flex items-center gap-1.5 px-4 py-2 text-white/30 text-xs font-black hover:text-white transition-colors"
+                                                        className="btn-ghost flex items-center gap-1.5 px-4 py-2 text-xs"
                                                     >
                                                         <X className="w-3 h-3" /> Cancel
                                                     </button>
                                                 </div>
                                             </>
                                         ) : (
-                                            <p className="text-sm text-foreground/70 font-mono leading-relaxed whitespace-pre-wrap">
+                                            <p className="text-sm text-foreground/70 font-mono leading-relaxed whitespace-pre-wrap font-medium">
                                                 {concept.body || "No description."}
                                             </p>
                                         )}
 
                                         {/* Promotion UI */}
-                                        <div className="mt-4 pt-4 border-t border-white/5 flex flex-col gap-4">
+                                        <div className="mt-4 pt-4 border-t border-border flex flex-col gap-4">
                                             {promotingId === concept.id ? (
-                                                <div className="bg-accent/5 border border-accent/20 rounded-2xl p-4 flex flex-col gap-4 animate-in slide-in-from-top-2">
+                                                <div className="bg-accent/5 border border-accent/20 rounded-[var(--card-radius)] p-4 flex flex-col gap-4 animate-in slide-in-from-top-2">
                                                     <div className="flex items-center justify-between">
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-accent flex items-center gap-2">
+                                                        <span className="text-[10px] font-semibold uppercase tracking-widest text-accent flex items-center gap-2">
                                                             <Clapperboard className="w-3 h-3" /> Initializing Mission Data
                                                         </span>
-                                                        <button onClick={() => setPromotingId(null)} className="text-foreground/40 hover:text-white transition-colors">
+                                                        <button onClick={() => setPromotingId(null)} className="text-foreground/40 hover:text-foreground transition-colors">
                                                             <X className="w-4 h-4" />
                                                         </button>
                                                     </div>
                                                     <div className="flex gap-4">
                                                         <div className="flex-1 flex flex-col gap-1">
-                                                            <label className="text-[9px] font-black uppercase tracking-widest text-foreground/40">Lyrics / Script</label>
+                                                            <label className="text-[9px] font-semibold uppercase tracking-widest text-foreground/40">Lyrics / Script</label>
                                                             <textarea 
                                                                 value={lyrics}
                                                                 onChange={e => setLyrics(e.target.value)}
                                                                 placeholder="Paste the song lyrics or script poem here..."
-                                                                className="w-full h-32 bg-black/40 border border-white/5 rounded-xl p-4 text-xs font-mono focus:outline-none focus:border-accent/40 resize-none placeholder:text-white/20"
+                                                                className="input-field w-full h-32 p-4 text-xs font-mono resize-none"
                                                             />
                                                         </div>
                                                         <div className="w-32 flex flex-col gap-1">
-                                                            <label className="text-[9px] font-black uppercase tracking-widest text-foreground/40">Runtime (sec)</label>
+                                                            <label className="text-[9px] font-semibold uppercase tracking-widest text-foreground/40">Runtime (sec)</label>
                                                             <input 
                                                                 type="number"
                                                                 value={targetRuntime}
                                                                 onChange={e => setTargetRuntime(e.target.value)}
                                                                 placeholder="60"
-                                                                className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:border-accent/40 text-center"
+                                                                className="input-field w-full px-4 py-3 text-xs font-mono text-center"
                                                             />
-                                                            <span className="text-[8px] text-foreground/20 italic leading-tight mt-1 text-center">Estimation for shot pacing</span>
+                                                            <span className="text-[8px] text-foreground/20 italic leading-tight mt-1 text-center font-medium">Estimation for shot pacing</span>
                                                         </div>
                                                     </div>
                                                     <StatusButton 
@@ -489,7 +489,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                                         loading={isPlanning}
                                                         disabled={!lyrics.trim()}
                                                         loadingText="Planning..."
-                                                        className="bg-accent text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent/80 transition-all shadow-lg flex items-center justify-center gap-2"
+                                                        className="btn-primary px-6 py-2.5 text-[10px] font-semibold uppercase tracking-widest flex items-center justify-center gap-2"
                                                         icon={<Send className="w-3 h-3" />}
                                                     >
                                                         Launch Multi-Agent Planning
@@ -498,7 +498,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                             ) : (
                                                 <button 
                                                     onClick={() => setPromotingId(concept.id)}
-                                                    className="w-fit flex items-center gap-2 px-4 py-2 border border-border/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-foreground/40 hover:text-white hover:border-accent transition-all group/btn"
+                                                    className="w-fit flex items-center gap-2 px-4 py-2 border border-border rounded-[var(--btn-radius)] text-[10px] font-semibold uppercase tracking-widest text-foreground/40 hover:text-foreground hover:border-accent transition-all group/btn"
                                                 >
                                                     <Clapperboard className="w-4 h-4 text-accent/50 group-hover/btn:text-accent" /> Promote to Director's Suite
                                                 </button>

@@ -90,31 +90,27 @@ const MuseClefairy: React.FC<MuseClefairyProps> = ({ emotion = 'idle', message }
             <div className="relative w-48 h-48 md:w-56 md:h-56 animate-float flex items-center justify-center cursor-pointer active:scale-95 transition-transform">
                 
                 {/* Outer Glass Ring */}
-                <div className="absolute inset-0 rounded-full border-2 border-white/20 bg-gradient-to-br from-white/10 to-accent/5 backdrop-blur-xl shadow-2xl overflow-hidden">
+                <div className="absolute inset-0 rounded-full border-2 border-white/20 bg-surface backdrop-blur-xl shadow-2xl overflow-hidden">
                      {/* Internal Shimmer */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-transparent -translate-x-full animate-shimmer" />
                 </div>
 
                 {/* Avatar Cropped Tight */}
-                <div className={`relative w-[85%] h-[85%] rounded-full overflow-hidden flex items-center justify-center bg-white/5 border ${typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'pokopia' ? 'border-white border-8 shadow-2xl' : 'border-white/40'}`}>
-                    <img 
-                        src={getEmotionSrc()} 
-                        alt="Muse Clefairy"
-                        className="w-full h-full object-contain scale-[1.4] origin-center relative z-10 transition-all duration-500 hover:scale-[1.5]"
-                    />
+                <div className={`relative w-[85%] h-[85%] rounded-full overflow-hidden flex items-center justify-center bg-white/5 border border-border`}>
+                    <Image src={getEmotionSrc()} alt="Muse Clefairy" fill className="w-full h-full object-contain scale-[1.4] origin-center relative z-10 transition-all duration-500 hover:scale-[1.5]" unoptimized />
                 </div>
             </div>
 
             {/* Speech Bubble - Now in the stack below the avatar */}
             {displayedMessage && (
-                <div className="mt-6 w-48 md:w-56 bg-white/95 backdrop-blur-3xl p-4 rounded-[32px] shadow-[0_20px_40px_rgba(255,51,102,0.1)] border-2 border-accent/10 animate-in zoom-in slide-in-from-top-4 duration-300 z-50">
+                <div className="mt-6 w-48 md:w-56 card p-4 animate-in zoom-in slide-in-from-top-4 duration-300 z-50">
                     <p className="text-[11px] font-black text-accent uppercase tracking-widest leading-relaxed text-center italic drop-shadow-sm">
                         {displayedMessage}
                     </p>
                 </div>
             )}
 
-            <style jsx>{`
+            <style>{`
                 @keyframes float {
                     0%, 100% { transform: translateY(0px) rotate(-1deg); }
                     50% { transform: translateY(-15px) rotate(2deg); }

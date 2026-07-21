@@ -17,7 +17,7 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
                     const level = headerMatch[1].length;
                     const text = headerMatch[2];
                     const Tag = `h${level}` as any;
-                    return <Tag key={i} className={`font-bold text-white/90 ${level === 1 ? 'text-xl' : 'text-lg'}`}>{text}</Tag>;
+                    return <Tag key={i} className={`font-bold text-foreground/90 ${level === 1 ? 'text-xl' : 'text-lg'}`}>{text}</Tag>;
                 }
                 const listMatch = line.match(/^(\s*[-*])\s+(.*)$/);
                 if (listMatch) {
@@ -97,10 +97,10 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
 
     const PlatformCard = ({ title, content, id, platform }: { title: string, content: string, id: string, platform: string }) => {
         return (
-            <div className={`bg-surface border border-border/10 rounded-3xl flex flex-col overflow-hidden shadow-2xl group transition-all hover:border-accent/30 ${!content && 'opacity-30 p-8 border-dashed'}`}>
+            <div className={`card flex flex-col overflow-hidden shadow-2xl group transition-all hover:border-accent/30 ${!content && 'opacity-30 p-8 border-dashed'}`}>
                 {!content ? (
                     <div className="flex flex-col items-center justify-center text-center gap-2 py-8">
-                         <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5">
+                         <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-border">
                             {platform === 'tiktok' ? <Smartphone className="w-5 h-5 opacity-20" /> : 
                              platform === 'youtube' ? <Laptop className="w-5 h-5 opacity-20" /> :
                              platform === 'instagram' ? <Users className="w-5 h-5 opacity-20" /> :
@@ -110,22 +110,22 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                     </div>
                 ) : (
                     <>
-                        <div className="bg-black/40 px-6 py-4 border-b border-border/5 flex items-center justify-between">
+                        <div className="bg-surface/60 px-6 py-4 border-b border-border/5 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent ring-1 ring-accent/20">
                                      {platform === 'tiktok' ? 't' : platform === 'instagram' ? 'i' : platform === 'youtube' ? 'y' : 'f'}
                                 </div>
-                                <span className="text-[11px] font-black uppercase tracking-widest text-white/90">{title} Profile</span>
+                                <span className="text-[11px] font-black uppercase tracking-widest text-foreground/90">{title} Profile</span>
                             </div>
                             <button 
                                 onClick={() => handleCopy(content, id)}
-                                className="text-foreground/40 hover:text-white transition-colors p-2 bg-white/5 rounded-xl hover:bg-accent/20"
+                                className="text-foreground/40 hover:text-foreground transition-colors p-2 bg-white/5 rounded-xl hover:bg-accent/20"
                             >
                                 {copiedKey === id ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
                             </button>
                         </div>
                         <div className="p-6 flex-1 bg-gradient-to-b from-black/20 to-transparent">
-                            <div className="w-full bg-black/40 rounded-2xl p-4 border border-white/5 shadow-inner min-h-[220px]">
+                            <div className="w-full bg-surface/60 rounded-2xl p-4 border border-border shadow-inner min-h-[220px]">
                                 <p className="text-[13px] font-sans leading-relaxed text-foreground/80 whitespace-pre-wrap select-text">
                                     {content}
                                 </p>
@@ -142,15 +142,15 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
             
             {/* Left Pane: The Strategist Chat */}
             <div className="w-full lg:w-[400px] xl:w-[450px] flex flex-col gap-4 sticky top-24 self-start">
-                <div className="bg-surface border border-border/10 rounded-[40px] p-8 flex flex-col shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] h-[800px] relative overflow-hidden group">
+                <div className="card p-8 flex flex-col shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] h-[800px] relative overflow-hidden group">
                     <div className="absolute top-0 left-0 w-full h-40 bg-accent/10 blur-[60px] -z-10 animate-pulse duration-[5000ms]" />
                     
-                    <div className="flex items-center gap-4 mb-8 pb-6 border-b border-white/5">
+                    <div className="flex items-center gap-4 mb-8 pb-6 border-b border-border">
                          <div className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center shadow-[0_0_20px_rgba(255,51,102,0.3)]">
-                            <Bot className="w-7 h-7 text-white" />
+                            <Bot className="w-7 h-7 text-foreground" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-black tracking-tight text-white leading-none">Description Generator</h2>
+                            <h2 className="text-2xl font-black tracking-tight text-foreground leading-none">Description Generator</h2>
                             <div className="flex items-center gap-2 mt-2">
                                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                                 <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Context: Radar Online</span>
@@ -168,7 +168,7 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                             <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 opacity-30">
                                 <Sparkles className="w-16 h-16 animate-gentle-bounce text-accent" />
                                 <div className="space-y-2">
-                                    <p className="text-xl font-bold text-white uppercase tracking-tighter">Strategizing Distribution</p>
+                                    <p className="text-xl font-bold text-foreground uppercase tracking-tighter">Strategizing Distribution</p>
                                     <p className="text-sm max-w-[280px] mx-auto leading-relaxed">
                                         Drop your concept or script. I'll search current trends and match your Radar's rivals automatically.
                                     </p>
@@ -180,7 +180,7 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                                     <div className={`max-w-[90%] rounded-3xl p-5 ${
                                         msg.role === 'user' 
                                             ? 'bg-accent/10 border border-accent/20 text-foreground/90 rounded-br-none shadow-lg' 
-                                            : 'bg-white/5 border border-white/10 text-foreground/90 rounded-tl-none font-sans leading-relaxed'
+                                            : 'bg-white/5 border border-border text-foreground/90 rounded-tl-none font-sans leading-relaxed'
                                     }`}>
                                         {msg.role === 'user' ? (
                                             <p className="text-base font-medium">{msg.text || ""}</p>
@@ -195,7 +195,7 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                         )}
                         {isGenerating && (
                              <div className="flex justify-start animate-in fade-in">
-                                 <div className="bg-white/5 border border-white/10 rounded-3xl rounded-tl-none p-5 flex items-center gap-3 w-fit text-accent shadow-xl ring-1 ring-accent/20">
+                                 <div className="bg-white/5 border border-border rounded-3xl rounded-tl-none p-5 flex items-center gap-3 w-fit text-accent shadow-xl ring-1 ring-accent/20">
                                     <Loader2 className="w-5 h-5 animate-spin" />
                                     <span className="text-[11px] uppercase tracking-widest font-black">Cycling AI Providers...</span>
                                  </div>
@@ -205,7 +205,7 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                     </div>
 
                     {/* Input Block */}
-                    <div className="relative mt-auto pt-6 border-t border-white/5">
+                    <div className="relative mt-auto pt-6 border-t border-border">
                         <textarea 
                             value={prompt}
                             onChange={(e) => setPrompt(e.target.value)}
@@ -216,12 +216,12 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                                 }
                             }}
                             placeholder="Improve the TikTok hook..."
-                            className="w-full text-[15px] bg-black/60 border border-border/20 rounded-[24px] py-5 pl-6 pr-16 resize-none h-28 focus:outline-none focus:border-accent/50 text-white placeholder:text-foreground/30 font-sans shadow-2xl transition-all"
+                            className="w-full text-[15px] bg-surface/60 border border-border/20 rounded-[var(--card-radius)] py-5 pl-6 pr-16 resize-none h-28 focus:outline-none focus:border-accent/50 text-foreground placeholder:text-foreground/30 font-sans shadow-2xl transition-all"
                         />
                         <button 
                             onClick={handleGenerate}
                             disabled={!prompt.trim() || isGenerating}
-                            className="absolute bottom-10 right-10 w-12 h-12 rounded-2xl bg-accent text-white flex items-center justify-center hover:bg-accent/80 disabled:opacity-50 shadow-2xl transition-all scale-100 active:scale-95"
+                            className="absolute bottom-10 right-10 w-12 h-12 rounded-2xl bg-accent text-foreground flex items-center justify-center hover:bg-accent/80 disabled:opacity-50 shadow-2xl transition-all scale-100 active:scale-95"
                         >
                             <Send className="w-5 h-5" />
                         </button>

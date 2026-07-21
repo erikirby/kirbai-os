@@ -145,7 +145,7 @@ export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string;
             {/* Header */}
             <div className="flex justify-between items-center ml-1">
                 <div className="flex flex-col gap-1">
-                    <h2 className="text-2xl font-black tracking-tighter text-foreground uppercase">Prompt Bank</h2>
+                    <h2 className="section-title uppercase">Prompt Bank</h2>
                     <p className="text-[10px] text-foreground/60 uppercase tracking-[0.4em] font-black">Reusable AI Directives</p>
                 </div>
             </div>
@@ -175,14 +175,14 @@ export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string;
                                         value={editingUniversalText}
                                         onChange={e => setEditingUniversalText(e.target.value)}
                                         onKeyDown={e => { if (e.key === 'Enter') saveUniversal(idx); if (e.key === 'Escape') setEditingUniversal(null); }}
-                                        className="flex-1 px-3 py-2 bg-black/30 border border-accent/30 rounded-lg text-sm font-mono focus:outline-none"
+                                        className="flex-1 px-3 py-2 bg-surface/30 border border-accent/30 rounded-lg text-sm font-mono focus:outline-none"
                                         autoFocus
                                     />
                                     <button onClick={() => saveUniversal(idx)} className="px-3 py-1 bg-accent/20 border border-accent/30 rounded-lg text-accent text-xs font-black hover:bg-accent/40 transition-colors">Save</button>
                                     <button onClick={() => setEditingUniversal(null)} className="px-3 py-1 text-foreground/40 text-xs font-black hover:text-foreground transition-colors">Cancel</button>
                                 </div>
                             ) : (
-                                <div className="flex items-start justify-between gap-4 p-3 bg-black/20 rounded-xl border border-white/5 group-hover:border-accent/20 transition-all">
+                                <div className="flex items-start justify-between gap-4 p-3 bg-surface/20 rounded-xl border border-border group-hover:border-accent/20 transition-all">
                                     <p className="text-sm font-mono text-foreground/80 flex-1 leading-relaxed">{rule}</p>
                                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                                         <button onClick={() => copyToClipboard(rule, `u-${idx}`)} className="p-1.5 rounded-lg hover:bg-white/10 text-foreground/40 hover:text-foreground transition-colors">
@@ -206,7 +206,7 @@ export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string;
                                 onChange={e => setNewUniversalText(e.target.value)}
                                 onKeyDown={e => { if (e.key === 'Enter') addUniversal(); if (e.key === 'Escape') setAddingUniversal(false); }}
                                 placeholder="New universal rule..."
-                                className="flex-1 px-3 py-2 bg-black/30 border border-accent/30 rounded-lg text-sm font-mono focus:outline-none placeholder:text-foreground/30"
+                                className="flex-1 px-3 py-2 bg-surface/30 border border-accent/30 rounded-lg text-sm font-mono focus:outline-none placeholder:text-foreground/30"
                                 autoFocus
                             />
                             <button onClick={addUniversal} className="px-3 py-1 bg-accent/20 border border-accent/30 rounded-lg text-accent text-xs font-black hover:bg-accent/40 transition-colors">Add</button>
@@ -242,18 +242,18 @@ export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string;
                                     {prompts.map(prompt => (
                                         <div key={prompt.id} className="group">
                                             {editingPrompt?.id === prompt.id ? (
-                                                <div className="flex flex-col gap-2 p-4 bg-black/20 rounded-xl border border-accent/20">
+                                                <div className="flex flex-col gap-2 p-4 bg-surface/20 rounded-xl border border-accent/20">
                                                     <input
                                                         value={editForm.name}
                                                         onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
                                                         placeholder="Prompt name..."
-                                                        className="px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-xs font-bold focus:outline-none"
+                                                        className="px-3 py-2 bg-surface/30 border border-border rounded-lg text-xs font-bold focus:outline-none"
                                                     />
                                                     <textarea
                                                         value={editForm.text}
                                                         onChange={e => setEditForm(f => ({ ...f, text: e.target.value }))}
                                                         rows={4}
-                                                        className="px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-sm font-mono focus:outline-none resize-none"
+                                                        className="px-3 py-2 bg-surface/30 border border-border rounded-lg text-sm font-mono focus:outline-none resize-none"
                                                     />
                                                     <div className="flex gap-2">
                                                         <button onClick={saveEditPrompt} className="px-4 py-1.5 bg-accent/20 border border-accent/30 rounded-lg text-accent text-xs font-black hover:bg-accent/40 transition-colors">Save</button>
@@ -261,9 +261,9 @@ export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string;
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="flex items-start gap-4 p-4 bg-black/20 rounded-xl border border-white/5 group-hover:border-white/10 transition-all">
+                                                <div className="flex items-start gap-4 p-4 bg-surface/20 rounded-xl border border-border group-hover:border-border transition-all">
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-foreground/50 mb-2">{prompt.name}</p>
+                                                        <p className="section-subtitle mb-2">{prompt.name}</p>
                                                         <p className="text-sm font-mono text-foreground/70 leading-relaxed">{prompt.text}</p>
                                                     </div>
                                                     <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
@@ -296,12 +296,12 @@ export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string;
 
                                     {/* Add Prompt */}
                                     {addingPrompt === cat ? (
-                                        <div className="flex flex-col gap-2 p-4 bg-black/20 rounded-xl border border-accent/20">
+                                        <div className="flex flex-col gap-2 p-4 bg-surface/20 rounded-xl border border-accent/20">
                                             <input
                                                 value={addForm.name}
                                                 onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))}
                                                 placeholder="Prompt name..."
-                                                className="px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-xs font-bold focus:outline-none placeholder:text-foreground/30"
+                                                className="px-3 py-2 bg-surface/30 border border-border rounded-lg text-xs font-bold focus:outline-none placeholder:text-foreground/30"
                                                 autoFocus
                                             />
                                             <textarea
@@ -309,7 +309,7 @@ export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string;
                                                 onChange={e => setAddForm(f => ({ ...f, text: e.target.value }))}
                                                 placeholder="Paste your prompt here..."
                                                 rows={4}
-                                                className="px-3 py-2 bg-black/30 border border-white/10 rounded-lg text-sm font-mono focus:outline-none resize-none placeholder:text-foreground/30"
+                                                className="px-3 py-2 bg-surface/30 border border-border rounded-lg text-sm font-mono focus:outline-none resize-none placeholder:text-foreground/30"
                                             />
                                             <div className="flex gap-2">
                                                 <button onClick={() => addPrompt(cat)} className="px-4 py-1.5 bg-accent/20 border border-accent/30 rounded-lg text-accent text-xs font-black hover:bg-accent/40 transition-colors">Add Prompt</button>

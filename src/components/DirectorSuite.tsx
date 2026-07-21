@@ -1101,17 +1101,17 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
     return (
         <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* API Health / Cost Shield Bar */}
-            <div className="mb-4 flex flex-col md:flex-row gap-4 items-center justify-between p-4 bg-black/40 border border-white/5 rounded-3xl backdrop-blur-xl">
+            <div className="mb-4 flex flex-col md:flex-row gap-4 items-center justify-between p-4 bg-surface/60 border border-border rounded-3xl backdrop-blur-xl">
                 <div className="flex items-center gap-6">
                     <div className="flex flex-col gap-0.5">
-                        <span className="text-[8px] font-black text-accent uppercase tracking-widest">Monthly Spend</span>
+                        <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Monthly Spend</span>
                         <span className={`text-sm font-mono font-black ${isOverBudget ? 'text-red-400 animate-pulse' : 'text-foreground'}`}>
                             ${monthlySpend.toFixed(2)}
                         </span>
                     </div>
-                    <div className="w-px h-8 bg-white/5" />
+                    <div className="w-px h-8 bg-foreground/5" />
                     <div className="flex flex-col gap-0.5">
-                        <span className="text-[8px] font-black text-accent uppercase tracking-widest">Session Logic</span>
+                        <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Session Logic</span>
                         <span className="text-xs font-bold text-green-400 flex items-center gap-1.5">
                             <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                             Nano Banana Online
@@ -1119,9 +1119,9 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                     </div>
                     {telemetry && (
                         <>
-                            <div className="w-px h-8 bg-white/5" />
+                            <div className="w-px h-8 bg-foreground/5" />
                             <div className="flex flex-col gap-0.5">
-                                <span className="text-[8px] font-black text-accent uppercase tracking-widest">Est. Trial Used</span>
+                                <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Est. Trial Used</span>
                                 <span className="text-xs font-bold text-foreground/60">
                                     ${(telemetry.lifetimeCost || 0).toFixed(2)} / $300
                                 </span>
@@ -1130,10 +1130,10 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                     )}
                     {isSyncing && (
                         <>
-                            <div className="w-px h-8 bg-white/5" />
+                            <div className="w-px h-8 bg-foreground/5" />
                             <div className="flex items-center gap-2 animate-pulse">
                                 <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_#FF3366]" />
-                                <span className="text-[10px] font-black text-accent uppercase tracking-widest">Vault Syncing...</span>
+                                <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Vault Syncing...</span>
                             </div>
                         </>
                     )}
@@ -1142,13 +1142,13 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 {isOverBudget && (
                     <div className="flex items-center gap-3 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-2xl animate-in fade-in zoom-in">
                         <AlertCircle className="w-4 h-4 text-red-500" />
-                        <span className="text-[10px] font-black text-red-500 uppercase tracking-tight">Monthly Limit Reached</span>
+                        <span className="text-[11px] font-semibold text-red-500 uppercase tracking-tight">Monthly Limit Reached</span>
                         <label className="flex items-center gap-2 cursor-pointer group">
                             <input 
                                 type="checkbox" 
                                 checked={costShieldOverridden} 
                                 onChange={e => setCostShieldOverridden(e.target.checked)}
-                                className="w-4 h-4 rounded border-red-500/40 bg-black/40 text-red-500 focus:ring-red-500 focus:ring-offset-0 transition-all cursor-pointer"
+                                className="w-4 h-4 rounded border-red-500/40 bg-surface/60 text-red-500 focus:ring-red-500 focus:ring-offset-0 transition-all cursor-pointer"
                             />
                             <span className="text-[9px] font-bold text-foreground/40 group-hover:text-foreground transition-colors uppercase">Unlock Over-Budget</span>
                         </label>
@@ -1158,8 +1158,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             {/* Header Area: Synchronized with 4-column layout */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6 items-end">
                 <div className="lg:col-span-1 flex flex-col gap-1 ml-1">
-                    <h2 className="text-2xl font-black tracking-tighter text-foreground uppercase leading-tight">The Director's Suite</h2>
-                    <p className="text-[10px] text-foreground/60 uppercase tracking-[0.4em] font-black">Multi-Agent Narrative Planning</p>
+                    <h2 className="section-title">The Director's Suite</h2>
+                    <p className="section-subtitle">Multi-Agent Narrative Planning</p>
                 </div>
                 
                 <div className="lg:col-span-3">
@@ -1171,13 +1171,13 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                 onChange={e => setInstruction(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleSmartEdit()}
                                 placeholder="Ask AI to make changes (e.g. 'Add 3 cameos', 'Make the end dramatic')"
-                                className="flex-1 bg-transparent border-none text-sm font-bold text-white focus:outline-none placeholder:text-foreground/30"
+                                className="flex-1 bg-transparent border-none text-sm font-bold text-foreground focus:outline-none placeholder:text-foreground/30"
                             />
                             <StatusButton 
                                 onClick={handleSmartEdit}
                                 loading={isEditing}
                                 disabled={!instruction.trim()}
-                                className="px-4 py-2 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent/80"
+                                className="btn-primary"
                                 icon={<Send className="w-3 h-3" />}
                             >
                                 Ask AI
@@ -1190,7 +1190,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 {/* Missions Sidebar */}
                 <div className="lg:col-span-1 flex flex-col gap-4">
-                    <h3 className="text-[10px] font-black uppercase tracking-widest text-foreground/40 mb-2">Live Missions</h3>
+                    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-foreground/40 mb-2">Live Missions</h3>
                     {missions.length === 0 ? (
                         <div className="p-8 border border-dashed border-border/20 rounded-3xl text-center">
                             <p className="text-[10px] uppercase font-black text-foreground/20 leading-loose">No active missions.<br/>Promote a concept from the Creative Hub to begin.</p>
@@ -1201,10 +1201,10 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                 <button
                                     onClick={() => loadMission(m)}
                                     disabled={isFullMissionLoading === m.id}
-                                    className={`w-full p-4 rounded-2xl border transition-all text-left flex flex-col gap-2 relative ${activeMission?.id === m.id ? 'bg-accent/10 border-accent/40 shadow-lg' : 'bg-surface/30 border-border/10 hover:border-accent/20'}`}
+                                    className={`card w-full p-4 text-left flex flex-col gap-2 relative transition-all ${activeMission?.id === m.id ? 'border-accent/40' : 'hover:border-accent/20'}`}
                                 >
                                     <div className="flex items-center justify-between">
-                                        <span className={`text-[9px] font-black uppercase tracking-widest ${activeMission?.id === m.id ? 'text-accent' : 'text-foreground/40'}`}>{m.alias}</span>
+                                        <span className={`text-[11px] font-semibold uppercase tracking-wider ${activeMission?.id === m.id ? 'text-accent' : 'text-foreground/40'}`}>{m.alias}</span>
                                         {isFullMissionLoading === m.id ? <Loader2 className="w-3 h-3 animate-spin text-accent" /> : null}
                                     </div>
                                     <span className="text-xs font-bold truncate pr-6">{m.title}</span>
@@ -1218,14 +1218,14 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                         <div className="flex items-center gap-1 animate-in fade-in slide-in-from-right-2">
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); deleteMission(m.id); }}
-                                                className="p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 shadow-xl"
+                                                className="p-1.5 bg-red-500 text-foreground rounded-lg hover:bg-red-600 shadow-xl"
                                                 title="Confirm Delete"
                                             >
                                                 <Check className="w-3 h-3" />
                                             </button>
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); setDeletingMissionId(null); }}
-                                                className="p-1.5 bg-surface border border-border/20 text-foreground/40 rounded-lg hover:text-white"
+                                                className="p-1.5 bg-surface border border-border/20 text-foreground/40 rounded-lg hover:text-foreground"
                                             >
                                                 <X className="w-3 h-3" />
                                             </button>
@@ -1233,7 +1233,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                     ) : (
                                         <button 
                                             onClick={(e) => { e.stopPropagation(); setDeletingMissionId(m.id); }}
-                                            className="p-1.5 bg-red-500/10 text-red-500/40 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 hover:text-white"
+                                            className="p-1.5 bg-red-500/10 text-red-500/40 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 hover:text-foreground"
                                         >
                                             <Trash2 className="w-3 h-3" />
                                         </button>
@@ -1247,23 +1247,23 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 {/* Main Workshop Area */}
                 <div className="lg:col-span-3 flex flex-col gap-2">
                     {!activeMission ? (
-                        <div className="flex-1 bg-surface/20 border border-border/5 rounded-[40px] p-20 flex flex-col items-center justify-center text-center gap-6">
+                        <div className="flex-1 bg-surface/20 border border-border/5 rounded-[var(--card-radius)] p-20 flex flex-col items-center justify-center text-center gap-6">
                             <Clapperboard className="w-16 h-16 text-foreground/5 opacity-20" />
-                            <p className="text-[11px] font-black uppercase tracking-[0.4em] text-foreground/20">Select a mission to view the matrix</p>
+                            <p className="text-[11px] font-semibold uppercase tracking-wider tracking-[0.4em] text-foreground/20">Select a mission to view the matrix</p>
                         </div>
                     ) : (
                         <div className="flex flex-col gap-2">
 
                             {/* Mission Header */}
-                            <div className="p-6 bg-surface/40 border border-border/10 rounded-[40px] flex flex-col gap-4 glass">
+                            <div className="card p-6 flex flex-col gap-4">
                                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mobile-stack-header">
                                     <div className="flex items-center gap-4 sm:gap-6">
                                         <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-accent/20 flex items-center justify-center border border-accent/20 shadow-inner shrink-0">
                                             <Play className="w-6 h-6 sm:w-8 sm:h-8 text-accent fill-accent" />
                                         </div>
                                         <div className="flex flex-col gap-0.5 sm:gap-1">
-                                            <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight leading-tight max-w-[200px] sm:max-w-none">{activeMission.title}</h3>
-                                            <div className="flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-foreground/40">
+                                            <h3 className="section-title">{activeMission.title}</h3>
+                                            <div className="flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[11px] font-semibold uppercase tracking-wider text-foreground/40">
                                                 <span className="text-accent underline shrink-0">Active Mission</span>
                                                 <span className="shrink-0">•</span>
                                                 <span className="font-mono truncate">{activeMission.id}</span>
@@ -1277,7 +1277,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                             onClick={handleCloneMission}
                                             loading={isRegenerating}
                                             title="Branch/Clone Mission (Save progress and experiment)"
-                                            className="w-full lg:w-auto px-4 py-2 bg-white/5 border border-white/10 text-accent/60 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 hover:text-accent"
+                                            className="btn-secondary w-full lg:w-auto"
                                             icon={<Copy className="w-3 h-3" />}
                                         >
                                             Clone
@@ -1288,7 +1288,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                 loading={isRegenerating}
                                                 loadingText="Syncing"
                                                 title="Regenerate all shots based on latest refs/cameos"
-                                                className="w-full lg:w-auto px-5 py-2.5 bg-accent/10 border border-accent/20 text-accent rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-accent hover:text-white"
+                                                className="btn-primary w-full lg:w-auto"
                                                 icon={<Sparkles className="w-3 h-3" />}
                                             >
                                                 Regenerate Vision
@@ -1299,34 +1299,34 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                 
                                 {/* Tab Navigation */}
                                 <div className="tabs-container pb-2">
-                                    <div className="flex items-center bg-black/20 p-1 rounded-2xl border border-white/5 w-fit">
+                                    <div className="flex items-center bg-surface/40 p-1 rounded-full border border-border w-fit">
                                         <button 
                                             onClick={() => setActiveTab("outline")}
-                                            className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0 ${activeTab === 'outline' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
+                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0 ${activeTab === 'outline' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
                                         >
                                             <Sparkles className="w-3 h-3" /> Outline
                                         </button>
                                         <button 
                                             onClick={() => setActiveTab("references")}
-                                            className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0 ${activeTab === 'references' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
+                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0 ${activeTab === 'references' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
                                         >
                                             <Camera className="w-3 h-3" /> Refs
                                         </button>
                                         <button 
                                             onClick={() => setActiveTab("cameos")}
-                                            className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0 ${activeTab === 'cameos' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
+                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0 ${activeTab === 'cameos' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
                                         >
                                             <Users className="w-3 h-3" /> Cameos
                                         </button>
                                         <button 
                                             onClick={() => setActiveTab("blocking")}
-                                            className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0 ${activeTab === 'blocking' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
+                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0 ${activeTab === 'blocking' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
                                         >
                                             <Layout className="w-3 h-3" /> Blocking
                                         </button>
                                         <button 
                                             onClick={() => setActiveTab("frames")}
-                                            className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shrink-0 ${activeTab === 'frames' ? 'bg-accent text-white' : 'text-foreground/40 hover:text-white'}`}
+                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0 ${activeTab === 'frames' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
                                         >
                                             <ImageIcon className="w-3 h-3" /> Frames
                                         </button>
@@ -1335,18 +1335,18 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                             </div>
 
                              {/* Tab Content */}
-                            <div className="bg-surface/20 border border-border/10 rounded-[40px] overflow-hidden p-6 min-h-[400px]">
+                            <div className="bg-surface/20 border border-border/10 rounded-[var(--card-radius)] overflow-hidden p-6 min-h-[400px]">
                                 {activeTab === "outline" && (
                                     <div className="flex flex-col gap-8 animate-in fade-in duration-300">
                                         <div className="flex justify-between items-center">
                                             <div className="flex flex-col gap-1">
-                                                <h4 className="text-sm font-black uppercase tracking-widest">Mission Outline</h4>
+                                                <h4 className="text-sm font-semibold uppercase tracking-wider tracking-wider">Mission Outline</h4>
                                                 <p className="text-[10px] text-foreground/40 uppercase">Broad strokes vision exported from the Brainstorm phase</p>
                                             </div>
                                             {!isEditingOutline ? (
                                                 <button 
                                                     onClick={() => setIsEditingOutline(true)}
-                                                    className="p-2 bg-white/5 border border-white/10 rounded-xl text-foreground/40 hover:text-accent transition-all"
+                                                    className="p-2 bg-foreground/5 border border-border rounded-xl text-foreground/40 hover:text-accent transition-all"
                                                 >
                                                     <Layout className="w-4 h-4" /> {/* Pencil icon replacement if needed, but Layout works for block editing */}
                                                 </button>
@@ -1355,13 +1355,13 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                     <StatusButton 
                                                         onClick={saveOutline}
                                                         loading={isSyncing}
-                                                        className="px-4 py-2 bg-accent text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent/80"
+                                                        className="btn-primary"
                                                     >
                                                         Save
                                                     </StatusButton>
                                                     <button 
                                                         onClick={() => setIsEditingOutline(false)}
-                                                        className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+                                                        className="btn-ghost"
                                                     >
                                                         Cancel
                                                     </button>
@@ -1373,10 +1373,10 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                             <textarea 
                                                 value={outlineDraft}
                                                 onChange={e => setOutlineDraft(e.target.value)}
-                                                className="w-full h-64 p-8 bg-black/40 border border-accent/20 rounded-[32px] font-medium text-sm text-foreground/80 leading-relaxed focus:outline-none focus:border-accent transition-all resize-none"
+                                                className="w-full h-64 p-8 bg-surface/60 border border-accent/20 rounded-[var(--card-radius)] font-medium text-sm text-foreground/80 leading-relaxed focus:outline-none focus:border-accent transition-all resize-none"
                                             />
                                         ) : (
-                                            <div className="p-8 bg-black/40 border border-white/5 rounded-[32px] font-medium text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap max-w-4xl">
+                                            <div className="p-8 bg-surface/60 border border-border rounded-[var(--card-radius)] font-medium text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap max-w-4xl">
                                                 {activeMission.conceptDescription || (activeMission as any).body || (activeMission as any).description || "No concept description available."}
                                             </div>
                                         )}
@@ -1395,12 +1395,12 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                         <div key={category} className="flex flex-col gap-4">
                                                                  <div className="flex items-center justify-between border-l-2 border-accent/20 pl-4">
                                                                     <div>
-                                                                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-accent/60">{category} Sources</h4>
-                                                                        <p className="text-[8px] text-foreground/30 uppercase font-bold tracking-widest">Mandatory visual data for {category.toLowerCase()} consistency</p>
+                                                                        <h4 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent/60">{category} Sources</h4>
+                                                                        <p className="text-[8px] text-foreground/30 uppercase font-bold tracking-wider">Mandatory visual data for {category.toLowerCase()} consistency</p>
                                                                     </div>
                                                                     <button 
                                                                         onClick={() => setAddingRefCategory(category)}
-                                                                        className="flex items-center gap-1.5 px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-[8px] font-black uppercase tracking-widest text-accent/60 hover:text-accent transition-all"
+                                                                        className="btn-secondary"
                                                                     >
                                                                         <Plus className="w-3 h-3" /> Add Source
                                                                     </button>
@@ -1412,19 +1412,19 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                              value={newRefLabel}
                                                                              onChange={e => setNewRefLabel(e.target.value)}
                                                                              placeholder="e.g. Pheromosa High-Def"
-                                                                             className="flex-1 bg-black/40 border border-accent/20 rounded-xl px-4 py-2 text-[10px] font-mono text-white focus:outline-none"
+                                                                             className="flex-1 bg-surface/60 border border-accent/20 rounded-xl px-4 py-2 text-[10px] font-mono text-foreground focus:outline-none"
                                                                              autoFocus
                                                                              onKeyDown={e => e.key === 'Enter' && handleAddCustomReference(category)}
                                                                          />
                                                                          <button 
                                                                              onClick={() => handleAddCustomReference(category)}
-                                                                             className="px-4 py-2 bg-accent text-white rounded-xl text-[9px] font-black uppercase"
+                                                                             className="px-4 py-2 bg-accent text-foreground rounded-xl text-[11px] font-semibold uppercase"
                                                                          >
                                                                              Add
                                                                          </button>
                                                                          <button 
                                                                              onClick={() => setAddingRefCategory(null)}
-                                                                             className="p-2 hover:bg-white/5 rounded-xl text-foreground/20"
+                                                                             className="p-2 hover:bg-foreground/5 rounded-xl text-foreground/20"
                                                                          >
                                                                              <X className="w-4 h-4" />
                                                                          </button>
@@ -1441,11 +1441,11 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                 <div className="flex items-center gap-2">
                                                                                     <button 
                                                                                         onClick={() => toggleReferenceManual(originalIdx)}
-                                                                                        className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${req.manualCheck ? 'bg-accent border-accent text-white' : 'border-accent/40 hover:border-accent'}`}
+                                                                                        className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${req.manualCheck ? 'bg-accent border-accent text-foreground' : 'border-accent/40 hover:border-accent'}`}
                                                                                     >
                                                                                         {req.manualCheck && <Check className="w-3 h-3" />}
                                                                                     </button>
-                                                                                    <span className="text-[10px] font-black uppercase tracking-tighter text-accent">{req.label}</span>
+                                                                                    <span className="text-[11px] font-semibold uppercase tracking-tighter text-accent">{req.label}</span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
                                                                                     {editingRefLabel !== req.label && (
@@ -1454,7 +1454,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                                 setEditingRefLabel(req.label);
                                                                                                 setRefTempDescription(req.description);
                                                                                             }}
-                                                                                            className="p-1.5 hover:bg-white/5 rounded-lg text-foreground/20 hover:text-accent transition-all"
+                                                                                            className="p-1.5 hover:bg-foreground/5 rounded-lg text-foreground/20 hover:text-accent transition-all"
                                                                                             title="Edit Description"
                                                                                         >
                                                                                             <Layout className="w-3 h-3" />
@@ -1465,10 +1465,10 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                          <div className="w-8 h-8 rounded-lg border border-green-500/30 overflow-hidden shadow-lg shadow-green-500/10 shrink-0">
                                                                                              <img src={activeMission.references?.[req.uploadedIndex]} className="w-full h-full object-cover" alt="" />
                                                                                          </div>
-                                                                                         <div className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[8px] font-black uppercase rounded-md border border-green-500/20 whitespace-nowrap">Linked</div>
+                                                                                         <div className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[11px] font-semibold uppercase rounded-md border border-green-500/20 whitespace-nowrap">Linked</div>
                                                                                          <button 
                                                                                             onClick={() => clearReferenceImage(originalIdx)}
-                                                                                            className="p-1.5 hover:bg-white/5 rounded-lg text-foreground/20 hover:text-accent transition-all"
+                                                                                            className="p-1.5 hover:bg-foreground/5 rounded-lg text-foreground/20 hover:text-accent transition-all"
                                                                                             title="Clear Reference Image"
                                                                                          >
                                                                                             <Trash2 className="w-3 h-3" />
@@ -1481,7 +1481,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                              fileInputRef.current?.click();
                                                                                          }}
                                                                                          loading={isUploadingRef && targetingReqIdx === originalIdx}
-                                                                                         className="px-2 py-0.5 bg-accent/20 text-accent text-[8px] font-black uppercase rounded-md border border-accent/20 hover:bg-accent hover:text-white transition-all shadow-lg"
+                                                                                         className="px-2 py-0.5 bg-accent/20 text-accent text-[11px] font-semibold uppercase rounded-md border border-accent/20 hover:bg-accent hover:text-foreground transition-all shadow-lg"
                                                                                      >
                                                                                          Upload
                                                                                      </StatusButton>
@@ -1493,27 +1493,27 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                     <textarea 
                                                                                         value={refTempDescription}
                                                                                         onChange={e => setRefTempDescription(e.target.value)}
-                                                                                        className="w-full h-20 p-3 bg-black/40 border border-accent/40 rounded-xl font-medium text-[10px] text-foreground/80 leading-relaxed focus:outline-none focus:border-accent transition-all resize-none"
+                                                                                        className="w-full h-20 p-3 bg-surface/60 border border-accent/40 rounded-xl font-medium text-[10px] text-foreground/80 leading-relaxed focus:outline-none focus:border-accent transition-all resize-none"
                                                                                         autoFocus
                                                                                     />
                                                                                     <div className="flex gap-2">
                                                                                          <StatusButton 
                                                                                              onClick={() => handleRegenerateReference(req)}
                                                                                              loading={isRegeneratingRef === req.label}
-                                                                                             className="flex-1 px-3 py-1.5 bg-accent text-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-accent/80 transition-all flex items-center justify-center gap-1.5"
+                                                                                             className="btn-primary flex-1 flex items-center justify-center gap-1.5"
                                                                                              icon={<RefreshCw className="w-2.5 h-2.5" />}
                                                                                          >
                                                                                              Regenerate Image
                                                                                          </StatusButton>
                                                                                         <button 
                                                                                             onClick={() => saveReferenceDescription(req.label)}
-                                                                                            className="px-3 py-1.5 bg-white/10 text-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-white/20 transition-all"
+                                                                                            className="btn-secondary"
                                                                                         >
                                                                                             Save Only
                                                                                         </button>
                                                                                         <button 
                                                                                             onClick={() => setEditingRefLabel(null)}
-                                                                                            className="px-3 py-1.5 bg-white/5 text-foreground/40 rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+                                                                                            className="px-3 py-1.5 bg-foreground/5 text-foreground/40 rounded-lg text-[11px] font-semibold uppercase tracking-wider hover:bg-foreground/10 transition-all"
                                                                                         >
                                                                                             Cancel
                                                                                         </button>
@@ -1528,7 +1528,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                       onClick={() => getAssetPrompt(req)}
                                                                                       loading={isAssetPromptLoading === req.label}
                                                                                       loadingText="Forging..."
-                                                                                      className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all active:scale-95 ${copiedId === req.label ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-black/40 border border-white/5 text-foreground/40 hover:text-accent hover:border-accent/20'}`}
+                                                                                      className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[11px] font-semibold uppercase tracking-wider transition-all active:scale-95 ${copiedId === req.label ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-surface/60 border border-border text-foreground/40 hover:text-accent hover:border-accent/20'}`}
                                                                                       icon={copiedId === req.label ? <Check className="w-3 h-3" /> : <Sparkles className="w-3 h-3 text-accent" />}
                                                                                   >
                                                                                       {copiedId === req.label ? "Copied" : "Get Prompt help"}
@@ -1536,7 +1536,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                 {(req as any).isCustom && (
                                                                                     <button 
                                                                                         onClick={() => deleteCustomReference(req.label)}
-                                                                                        className="p-2 bg-black/40 border border-white/5 rounded-xl text-foreground/20 hover:text-red-400 hover:border-red-400/20 transition-all"
+                                                                                        className="p-2 bg-surface/60 border border-border rounded-xl text-foreground/20 hover:text-red-400 hover:border-red-400/20 transition-all"
                                                                                         title="Delete Custom Source"
                                                                                     >
                                                                                         <X className="w-3 h-3" />
@@ -1553,9 +1553,9 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                             </div>
                                         )}
 
-                                        <div className="flex justify-between items-center bg-black/40 border border-white/5 p-6 rounded-3xl">
+                                        <div className="flex justify-between items-center bg-surface/60 border border-border p-6 rounded-3xl">
                                             <div className="flex flex-col gap-1">
-                                                <h4 className="text-sm font-black uppercase tracking-widest text-foreground/80">Reference Library</h4>
+                                                <h4 className="text-sm font-semibold uppercase tracking-wider tracking-wider text-foreground/80">Reference Library</h4>
                                                 <p className="text-[10px] text-foreground/40 uppercase">Assets linked to requirements above</p>
                                             </div>
                                             <input type="file" ref={fileInputRef} onChange={handleUploadReference} className="hidden" accept="image/*" />
@@ -1563,13 +1563,13 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
  
                                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                             {(activeMission.references || []).map((ref, i) => (
-                                                <div key={i} className="relative group aspect-[3/4] rounded-2xl overflow-hidden border border-white/5 bg-black/20 shadow-2xl">
+                                                <div key={i} className="relative group aspect-[3/4] rounded-2xl overflow-hidden border border-border bg-surface/40 shadow-2xl">
                                                     <img src={ref} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                                                     <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-center">
-                                                        <span className="text-[8px] font-black uppercase text-white/60">Source #{i+1}</span>
+                                                        <span className="text-[11px] font-semibold uppercase text-foreground/60">Source #{i+1}</span>
                                                         <button 
                                                             onClick={() => removeReference(i)}
-                                                            className="p-1.5 bg-red-500 text-white rounded-lg shadow-xl hover:bg-red-600"
+                                                            className="p-1.5 bg-red-500 text-foreground rounded-lg shadow-xl hover:bg-red-600"
                                                         >
                                                             <Trash2 className="w-3 h-3" />
                                                         </button>
@@ -1582,10 +1582,10 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                      fileInputRef.current?.click();
                                                  }}
                                                  loading={isUploadingRef && targetingReqIdx === null}
-                                                 className="aspect-[3/4] rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center gap-3 text-foreground/20 hover:text-accent hover:border-accent/40 transition-all bg-white/2 hover:bg-accent/5"
+                                                 className="aspect-[3/4] rounded-2xl border border-dashed border-border flex flex-col items-center justify-center gap-3 text-foreground/20 hover:text-accent hover:border-accent/40 transition-all bg-foreground/5 hover:bg-accent/5"
                                                  icon={<Plus className="w-6 h-6" />}
                                              >
-                                                 <span className="text-[9px] font-black uppercase tracking-widest">New Reference</span>
+                                                 <span className="text-[11px] font-semibold uppercase tracking-wider">New Reference</span>
                                              </StatusButton>
                                         </div>
                                     </div>
@@ -1594,7 +1594,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                 {activeTab === "cameos" && (
                                     <div className="flex flex-col gap-8 animate-in fade-in duration-300">
                                         <div className="flex flex-col gap-1">
-                                            <h4 className="text-sm font-black uppercase tracking-widest">Secondary Cast (Cameos)</h4>
+                                            <h4 className="text-sm font-semibold uppercase tracking-wider tracking-wider">Secondary Cast (Cameos)</h4>
                                             <p className="text-[10px] text-foreground/40 uppercase">Supporting Pokemon appearing in the background or specific shots</p>
                                         </div>
 
@@ -1605,11 +1605,11 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                     onChange={e => setNewCameo(e.target.value)}
                                                     onKeyDown={e => e.key === 'Enter' && addCameo()}
                                                     placeholder="e.g. Munchlax"
-                                                    className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-accent"
+                                                    className="flex-1 bg-surface/60 border border-border rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-accent"
                                                 />
                                                 <button 
                                                     onClick={addCameo}
-                                                    className="px-4 bg-accent text-white rounded-xl hover:bg-accent/80 transition-all"
+                                                    className="btn-primary px-4"
                                                 >
                                                     <Plus className="w-4 h-4" />
                                                 </button>
@@ -1640,7 +1640,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                     </div>
                                                 ) : (
                                                     (activeMission.cameos || []).map((c, i) => (
-                                                        <div key={i} className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/5 rounded-xl">
+                                                        <div key={i} className="flex items-center gap-2 px-3 py-1.5 bg-foreground/5 border border-border rounded-xl">
                                                             <span className="text-[11px] font-bold text-foreground/80">{c}</span>
                                                             <button onClick={() => removeCameo(i)}>
                                                                 <X className="w-3 h-3 text-foreground/30 hover:text-red-400" />
@@ -1658,19 +1658,19 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-left border-collapse responsive-table">
                                                 <thead>
-                                                    <tr className="border-b border-border/10 bg-black/20">
-                                                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-foreground/40">Time</th>
-                                                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-foreground/40">Lyric Sync</th>
-                                                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-foreground/40">Director's vision</th>
-                                                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-foreground/40">Round Table critiques</th>
+                                                    <tr className="border-b border-border/10 bg-surface/40">
+                                                        <th className="p-6 text-[11px] font-semibold uppercase tracking-wider text-foreground/40">Time</th>
+                                                        <th className="p-6 text-[11px] font-semibold uppercase tracking-wider text-foreground/40">Lyric Sync</th>
+                                                        <th className="p-6 text-[11px] font-semibold uppercase tracking-wider text-foreground/40">Director's vision</th>
+                                                        <th className="p-6 text-[11px] font-semibold uppercase tracking-wider text-foreground/40">Round Table critiques</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-border/5">
                                                     {activeMission.shots.map((shot, idx) => (
-                                                        <tr key={shot.id} className="group hover:bg-white/5 transition-colors">
+                                                        <tr key={shot.id} className="group hover:bg-foreground/5 transition-colors">
                                                             <td className="p-6 align-top">
                                                                 <div className="flex flex-col gap-1">
-                                                                    <span className="lg:hidden text-[9px] font-black uppercase tracking-widest text-accent mb-1 opacity-50">Timestamp</span>
+                                                                    <span className="lg:hidden text-[11px] font-semibold uppercase tracking-wider text-accent mb-1 opacity-50">Timestamp</span>
                                                                     <span className="text-[11px] font-mono font-black text-accent bg-accent/5 px-2 py-1 rounded-md w-fit">
                                                                         {shot.timestamp}
                                                                     </span>
@@ -1678,35 +1678,35 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                             </td>
                                                             <td className="p-6 lg:p-6 align-top max-w-none lg:max-w-[150px]">
                                                                 <div className="flex flex-col gap-1">
-                                                                    <span className="lg:hidden text-[9px] font-black uppercase tracking-widest text-accent mb-1 opacity-50">Lyric Sync</span>
+                                                                    <span className="lg:hidden text-[11px] font-semibold uppercase tracking-wider text-accent mb-1 opacity-50">Lyric Sync</span>
                                                                     <p className="text-[10px] font-mono text-pink-400 leading-relaxed italic m-0">{shot.lyric || "—"}</p>
                                                                 </div>
                                                             </td>
                                                             <td className="p-6 lg:p-6 align-top max-w-none lg:max-w-sm">
                                                                 <div className="flex flex-col gap-1">
-                                                                    <span className="lg:hidden text-[9px] font-black uppercase tracking-widest text-accent mb-1 opacity-50">Director's Vision</span>
+                                                                    <span className="lg:hidden text-[11px] font-semibold uppercase tracking-wider text-accent mb-1 opacity-50">Director's Vision</span>
                                                                     <p className="text-sm leading-relaxed font-medium text-foreground/80 m-0">{shot.visualDescription}</p>
                                                                 </div>
                                                             </td>
                                                             <td className="p-6 lg:p-6 align-top max-w-none lg:max-w-sm">
                                                                 <div className="flex flex-col gap-3">
-                                                                    <span className="lg:hidden text-[9px] font-black uppercase tracking-widest text-accent mb-1 opacity-50">Critiques</span>
+                                                                    <span className="lg:hidden text-[11px] font-semibold uppercase tracking-wider text-accent mb-1 opacity-50">Critiques</span>
                                                                     {shot.personaCritiques?.director && (
                                                                         <div className="flex gap-2">
                                                                             <Sparkles className="w-2.5 h-2.5 text-purple-400 mt-1 shrink-0" />
-                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-purple-400 font-black uppercase tracking-tighter">Director:</span> {shot.personaCritiques.director}</p>
+                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-purple-400 font-semibold uppercase tracking-wider tracking-tighter">Director:</span> {shot.personaCritiques.director}</p>
                                                                         </div>
                                                                     )}
                                                                     {shot.personaCritiques?.strategist && (
                                                                         <div className="flex gap-2">
                                                                             <Sparkles className="w-2.5 h-2.5 text-emerald-400 mt-1 shrink-0" />
-                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-emerald-400 font-black uppercase tracking-tighter">Strategist:</span> {shot.personaCritiques.strategist}</p>
+                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-emerald-400 font-semibold uppercase tracking-wider tracking-tighter">Strategist:</span> {shot.personaCritiques.strategist}</p>
                                                                         </div>
                                                                     )}
                                                                     {shot.personaCritiques?.audience && (
                                                                         <div className="flex gap-2">
                                                                             <Sparkles className="w-2.5 h-2.5 text-pink-400 mt-1 shrink-0" />
-                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-pink-400 font-black uppercase tracking-tighter">Audience:</span> {shot.personaCritiques.audience}</p>
+                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-pink-400 font-semibold uppercase tracking-wider tracking-tighter">Audience:</span> {shot.personaCritiques.audience}</p>
                                                                         </div>
                                                                     )}
                                                                 </div>
@@ -1725,14 +1725,14 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                         <div className="p-6 bg-accent/5 border border-accent/20 rounded-3xl flex flex-col gap-3">
                                             <div className="flex justify-between items-end">
                                                 <div className="flex flex-col gap-1">
-                                                    <h4 className="text-xs font-black uppercase tracking-widest text-accent">Production Progress</h4>
+                                                    <h4 className="text-xs font-semibold uppercase tracking-wider tracking-wider text-accent">Production Progress</h4>
                                                     <p className="text-[10px] text-foreground/40 uppercase">Tracking finished assets for this mission</p>
                                                 </div>
                                                 <span className="text-xl font-black text-accent">
                                                     {Math.round(((activeMission.shots.filter(s => s.isProduced).length) / activeMission.shots.length) * 100)}%
                                                 </span>
                                             </div>
-                                            <div className="h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                                            <div className="h-2 bg-surface/60 rounded-full overflow-hidden border border-border">
                                                 <div 
                                                     className="h-full bg-accent transition-all duration-700 ease-out shadow-[0_0_15px_rgba(255,51,102,0.5)]"
                                                     style={{ width: `${((activeMission.shots.filter(s => s.isProduced).length) / activeMission.shots.length) * 100}%` }}
@@ -1742,7 +1742,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
 
                                         <div className="grid grid-cols-1 gap-4">
                                             {activeMission.shots.map((shot, idx) => (
-                                                <div key={shot.id} className={`p-6 rounded-[2.5rem] flex flex-col gap-6 border transition-all relative overflow-hidden group ${shot.isProduced ? 'bg-accent/[0.03] border-accent/20 opacity-80' : 'bg-black/60 border-white/5'}`}>
+                                                <div key={shot.id} className={`card p-6 flex flex-col gap-6 transition-all relative overflow-hidden group ${shot.isProduced ? 'border-accent/20 opacity-80' : ''}`}>
                                                     {shot.thumbnailUrl && (
                                                         <div className="absolute top-0 right-0 w-64 h-full pointer-events-none opacity-20 group-hover:opacity-40 transition-opacity">
                                                             <img src={shot.thumbnailUrl} className="w-full h-full object-cover blur-sm" alt="" />
@@ -1752,15 +1752,15 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                     
                                                     <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 relative z-10">
                                                         <div className="flex items-center gap-3 flex-wrap">
-                                                            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-[10px] font-black text-white border border-white/10 shrink-0">
+                                                            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-[11px] font-semibold text-foreground border border-border shrink-0">
                                                                 {idx + 1}
                                                             </div>
-                                                            <div className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-black border ${shot.isProduced ? 'bg-accent/20 border-accent/40 text-accent' : 'bg-accent/5 border-white/5 text-accent'}`}>
+                                                            <div className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-black border ${shot.isProduced ? 'bg-accent/20 border-accent/40 text-accent' : 'bg-accent/5 border-border text-accent'}`}>
                                                                 {shot.timestamp}
                                                             </div>
                                                             <button 
                                                                 onClick={() => toggleShotProduced(shot.id)}
-                                                                className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all ${shot.isProduced ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'bg-white/5 text-foreground/40 hover:bg-white/10'}`}
+                                                                className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-[11px] font-semibold uppercase tracking-wider transition-all ${shot.isProduced ? 'bg-accent text-foreground shadow-lg shadow-accent/20' : 'bg-foreground/5 text-foreground/40 hover:bg-foreground/10'}`}
                                                             >
                                                                 {shot.isProduced ? <Check className="w-3 h-3" /> : <div className="w-3 h-3 rounded-full border-2 border-current opacity-30" />}
                                                                 {shot.isProduced ? "Produced" : "Mark Finished"}
@@ -1771,7 +1771,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                 onClick={() => handleGenerateImage(shot)}
                                                                 loading={generatingShotId === shot.id && generatingType === "new"}
                                                                 loadingText="Forging..."
-                                                                className="px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-yellow-400 text-black hover:bg-yellow-300 shadow-[0_0_20px_rgba(250,204,21,0.2)] active:scale-95"
+                                                                className="px-4 py-2 rounded-2xl text-[11px] font-semibold uppercase tracking-wider bg-yellow-400 text-black hover:bg-yellow-300 shadow-[0_0_20px_rgba(250,204,21,0.2)] active:scale-95"
                                                                 icon={<span className="text-sm">🍌</span>}
                                                             >
                                                                 Generate
@@ -1782,21 +1782,21 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                     onClick={() => handleForgeVideoPrompt(shot)}
                                                                     loading={forgingVideoShotId === shot.id}
                                                                     loadingText="Forging..."
-                                                                    className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20 shadow-lg active:scale-95"
+                                                                    className="px-3 py-1.5 rounded-xl text-[11px] font-semibold uppercase tracking-wider bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20 shadow-lg active:scale-95"
                                                                     icon={<Video className="w-3 h-3" />}
                                                                 >
                                                                     📽️ Prompt
                                                                 </StatusButton>
                                                              )}
 
-                                                             <div className="h-6 w-px bg-white/10 mx-2 hidden lg:block" />
+                                                             <div className="h-6 w-px bg-foreground/10 mx-2 hidden lg:block" />
 
                                                              {shot.thumbnailUrl && (
                                                                 <StatusButton 
                                                                     onClick={() => handleGenerateImage(shot, true)}
                                                                     loading={generatingShotId === shot.id && generatingType === "edit"}
                                                                     loadingText="Refining..."
-                                                                    className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/5 border border-white/5 text-foreground/60 hover:text-white hover:bg-white/10 shadow-lg active:scale-95"
+                                                                    className="px-3 py-1.5 rounded-xl text-[11px] font-semibold uppercase tracking-wider bg-foreground/5 border border-border text-foreground/60 hover:text-foreground hover:bg-foreground/10 shadow-lg active:scale-95"
                                                                     icon={<ImageIcon className="w-3 h-3" />}
                                                                 >
                                                                     🖼️ Edit
@@ -1804,7 +1804,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                              )}
            
 
-                                                            <div className="h-6 w-px bg-white/10 mx-2 hidden lg:block" />
+                                                            <div className="h-6 w-px bg-foreground/10 mx-2 hidden lg:block" />
 
                                                             
                                                         </div>
@@ -1815,11 +1815,11 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                             {editingShotId === shot.id ? (
                                                                 <div className="flex flex-col gap-2">
                                                                        <div className="flex justify-between items-center mb-1">
-                                                                            <span className="text-[10px] font-black uppercase tracking-widest text-accent/60">Banana Image Prompt</span>
+                                                                            <span className="text-[11px] font-semibold uppercase tracking-wider text-accent/60">Banana Image Prompt</span>
                                                                             <div className="flex items-center gap-2">
                                                                                 <button 
                                                                                     onClick={() => copyPrompt(shot.bananaPromptV2 || shot.bananaPrompt || "", `${shot.id}-banana`)}
-                                                                                    className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[8px] font-black uppercase tracking-widest transition-all ${copiedId === `${shot.id}-banana` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-white/5 border-white/5 text-accent/40 hover:text-accent hover:border-accent'}`}
+                                                                                    className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[11px] font-semibold uppercase tracking-wider transition-all ${copiedId === `${shot.id}-banana` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-foreground/5 border-border text-accent/40 hover:text-accent hover:border-accent'}`}
                                                                                 >
                                                                                     <Copy className={`w-2.5 h-2.5 ${copiedId === `${shot.id}-banana` ? 'hidden' : 'block'}`} />
                                                                                     {copiedId === `${shot.id}-banana` ? 'Copied' : 'Copy Banana'}
@@ -1827,7 +1827,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                 <StatusButton 
                                                                                      onClick={() => getShotPrompt(shot)}
                                                                                      loading={isAssetPromptLoading === shot.id}
-                                                                                     className="p-1.5 hover:bg-white/5 rounded-lg text-accent/40 hover:text-accent"
+                                                                                     className="p-1.5 hover:bg-foreground/5 rounded-lg text-accent/40 hover:text-accent"
                                                                                      title="Regenerate Prompt from Vision"
                                                                                      icon={<RefreshCw className="w-3 h-3" />}
                                                                                  />
@@ -1837,7 +1837,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                         <textarea 
                                                                             value={tempPrompt}
                                                                             onChange={(e) => setTempPrompt(e.target.value)}
-                                                                            className="w-full h-32 p-4 bg-black/40 border border-accent/40 rounded-2xl font-mono text-[11px] text-white focus:outline-none resize-none"
+                                                                            className="w-full h-32 p-4 bg-surface/60 border border-accent/40 rounded-2xl font-mono text-[11px] text-foreground focus:outline-none resize-none"
                                                                             autoFocus
                                                                         />
                                                                     <div className="flex gap-2">
@@ -1877,9 +1877,9 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                          }
                                                                                  }}
                                                                                  loading={isSavingPrompt === shot.id}
-                                                                                 className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase transition-all ${
+                                                                                 className={`px-3 py-1 rounded-lg text-[11px] font-semibold uppercase transition-all ${
                                                                                      isSavingPrompt === 'success' 
-                                                                                     ? 'bg-green-500 text-white' 
+                                                                                     ? 'bg-green-500 text-foreground' 
                                                                                      : 'bg-accent text-black hover:bg-accent/80'
                                                                                  }`}
                                                                              >
@@ -1888,7 +1888,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                          
                                                                         <button 
                                                                             onClick={() => setEditingShotId(null)}
-                                                                            className="px-3 py-1 bg-white/5 rounded-lg text-[9px] font-black uppercase"
+                                                                            className="btn-ghost"
                                                                         >
                                                                             Cancel
                                                                         </button>
@@ -1897,18 +1897,18 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                             ) : (
                                                                 <div className="flex flex-col gap-2">
                                                                     <div className="flex justify-between items-center mb-1">
-                                                                        <span className="text-[10px] font-black uppercase tracking-widest text-accent/60">Banana Image Prompt</span>
+                                                                        <span className="text-[11px] font-semibold uppercase tracking-wider text-accent/60">Banana Image Prompt</span>
                                                                         <div className="flex items-center gap-2">
                                                                             <button 
                                                                                 onClick={() => copyPrompt(shot.bananaPromptV2 || shot.bananaPrompt || "", `${shot.id}-banana`)}
-                                                                                className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[8px] font-black uppercase tracking-widest transition-all ${copiedId === `${shot.id}-banana` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-white/5 border-white/5 text-accent/40 hover:text-accent hover:border-accent'}`}
+                                                                                className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[11px] font-semibold uppercase tracking-wider transition-all ${copiedId === `${shot.id}-banana` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-foreground/5 border-border text-accent/40 hover:text-accent hover:border-accent'}`}
                                                                             >
                                                                                 <Copy className={`w-2.5 h-2.5 ${copiedId === `${shot.id}-banana` ? 'hidden' : 'block'}`} />
                                                                                 {copiedId === `${shot.id}-banana` ? 'Copied' : 'Copy Banana'}
                                                                             </button>
                                                                             <button 
                                                                                 onClick={() => getShotPrompt(shot)}
-                                                                                className="p-1.5 hover:bg-white/5 rounded-lg text-accent/40 hover:text-accent transition-all"
+                                                                                className="p-1.5 hover:bg-foreground/5 rounded-lg text-accent/40 hover:text-accent transition-all"
                                                                                 title="Regenerate Prompt from Vision"
                                                                             >
                                                                                 {isAssetPromptLoading === shot.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
@@ -1920,7 +1920,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                             setEditingShotId(shot.id);
                                                                             setTempPrompt(shot.bananaPromptV2 || shot.bananaPrompt || "");
                                                                         }}
-                                                                        className="p-4 bg-black/60 rounded-2xl border border-white/5 font-mono text-[11px] text-foreground/60 leading-relaxed whitespace-pre-wrap cursor-edit hover:border-accent/30 transition-all min-h-[100px]"
+                                                                        className="p-4 bg-surface/80 rounded-2xl border border-border font-mono text-[11px] text-foreground/60 leading-relaxed whitespace-pre-wrap cursor-edit hover:border-accent/30 transition-all min-h-[100px]"
                                                                     >
                                                                         {shot.bananaPromptV2 || shot.bananaPrompt || "No prompt generated yet."}
                                                                     </div>
@@ -1930,12 +1930,12 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                             {shot.grokPromptV2 && (
                                                                 <div className="flex flex-col gap-2 mt-4">
                                                                     <div className="flex justify-between items-center mb-1">
-                                                                        <span className={`text-[10px] font-black uppercase tracking-widest ${shot.grokPromptV2?.startsWith("models stay consistent") ? 'text-purple-400' : 'text-purple-400/50'}`}>
+                                                                        <span className={`text-[11px] font-semibold uppercase tracking-wider ${shot.grokPromptV2?.startsWith("models stay consistent") ? 'text-purple-400' : 'text-purple-400/50'}`}>
                                                                             {shot.grokPromptV2?.startsWith("models stay consistent") ? "Grok Anti-Morph Forge (Vision-Aware)" : "Grok Movement (Initial Draft)"}
                                                                         </span>
                                                                         <button 
                                                                             onClick={() => copyPrompt(shot.grokPromptV2!, `${shot.id}-grok`)}
-                                                                            className={`px-3 py-1 rounded-lg border text-[8px] font-black uppercase tracking-widest transition-all ${copiedId === `${shot.id}-grok` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-surface/40 border-border/10 hover:border-accent'}`}
+                                                                            className={`px-3 py-1 rounded-lg border text-[11px] font-semibold uppercase tracking-wider transition-all ${copiedId === `${shot.id}-grok` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-surface/40 border-border/10 hover:border-accent'}`}
                                                                         >
                                                                             {copiedId === `${shot.id}-grok` ? 'Copied' : 'Copy Command'}
                                                                         </button>
@@ -1971,16 +1971,16 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                 </div>
                                                              )}
                                                             {shot.lyric && (
-                                                                <p className="px-1 text-[10px] font-black uppercase tracking-widest text-accent/80 italic">
+                                                                <p className="px-1 text-[11px] font-semibold uppercase tracking-wider text-accent/80 italic">
                                                                     "{shot.lyric}"
                                                                 </p>
                                                             )}
                                                             <div className="flex flex-col gap-4 mt-2">
                                                                 <div className="flex items-center justify-between">
-                                                                    <span className="text-[10px] font-black uppercase tracking-widest text-accent/40">Visual References</span>
+                                                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-accent/40">Visual References</span>
                                                                     <button 
                                                                         onClick={() => setManagingRefsShotId(managingRefsShotId === shot.id ? null : shot.id)}
-                                                                        className="flex items-center gap-1.5 px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-[8px] font-black uppercase tracking-widest text-accent/60 hover:text-accent transition-all"
+                                                                        className="btn-secondary"
                                                                     >
                                                                         <Plus className="w-3 h-3" /> Manage
                                                                     </button>
@@ -1992,7 +1992,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                             <button 
                                                                                 key={ri}
                                                                                 onClick={() => toggleRefForShot(shot.id, req.label)}
-                                                                                className={`px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all ${shot.refLabels?.includes(req.label) ? 'bg-accent text-white border-accent' : 'bg-black/40 border-white/5 text-foreground/40 hover:border-accent/30'}`}
+                                                                                className={`px-3 py-1.5 rounded-xl border text-[11px] font-semibold uppercase tracking-wider transition-all ${shot.refLabels?.includes(req.label) ? 'bg-accent text-foreground border-accent' : 'bg-surface/60 border-border text-foreground/40 hover:border-accent/30'}`}
                                                                             >
                                                                                 {req.label}
                                                                             </button>
@@ -2008,10 +2008,10 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                         <div key={li} className="flex flex-col gap-2">
                                                                             <div className="px-3 py-1 bg-accent/5 border border-accent/20 rounded-lg flex items-center gap-2 w-fit">
                                                                                 <Camera className="w-3 h-3 text-accent" />
-                                                                                <span className="text-[8px] font-black uppercase tracking-widest text-accent/60">USE: {lbl}</span>
+                                                                                <span className="text-[11px] font-semibold uppercase tracking-wider text-accent/60">USE: {lbl}</span>
                                                                             </div>
                                                                             {hasImage && (
-                                                                                <div className="w-16 h-16 rounded-xl border border-white/10 overflow-hidden shadow-2xl ml-1">
+                                                                                <div className="w-16 h-16 rounded-xl border border-border overflow-hidden shadow-2xl ml-1">
                                                                                     <img src={activeMission.references![req.uploadedIndex!]} className="w-full h-full object-cover" alt={lbl} />
                                                                                 </div>
                                                                             )}
@@ -2023,9 +2023,9 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
 
                                                         <div className="lg:col-span-4 flex flex-col gap-3">
                                                             {shot.thumbnailUrl ? (
-                                                                <div className="aspect-[9/16] rounded-3xl overflow-hidden border border-white/10 bg-black/40 shadow-2xl relative group/img">
+                                                                <div className="aspect-[9/16] rounded-3xl overflow-hidden border border-border bg-surface/60 shadow-2xl relative group/img">
                                                                      <img src={shot.thumbnailUrl} className="w-full h-full object-cover" alt="Generated Frame" />
-                                                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 p-6">
+                                                                     <div className="absolute inset-0 bg-surface/80 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 p-6">
                                                                          <button 
                                                                              onClick={() => {
                                                                                  const link = document.createElement('a');
@@ -2033,13 +2033,13 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                  link.download = `frame-${shot.timestamp}.jpg`;
                                                                                  link.click();
                                                                              }}
-                                                                             className="w-full flex items-center justify-center gap-2 py-2 bg-accent text-white rounded-xl text-[9px] font-black uppercase tracking-widest"
+                                                                             className="w-full flex items-center justify-center gap-2 py-2 bg-accent text-foreground rounded-xl text-[11px] font-semibold uppercase tracking-wider"
                                                                          >
                                                                              <Download className="w-3 h-3" /> Download High-Fi
                                                                          </button>
                                                                          
                                                                          <div className="grid grid-cols-2 gap-2 w-full">
-                                                                             <label className={`flex items-center justify-center gap-2 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-[9px] font-black uppercase tracking-widest cursor-pointer transition-all ${isUploadingShotId === shot.id ? 'opacity-50 pointer-events-none' : ''}`}>
+                                                                             <label className={`flex items-center justify-center gap-2 py-2 bg-foreground/10 hover:bg-foreground/20 text-foreground rounded-xl text-[11px] font-semibold uppercase tracking-wider cursor-pointer transition-all ${isUploadingShotId === shot.id ? 'opacity-50 pointer-events-none' : ''}`}>
                                                                                  {isUploadingShotId === shot.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
                                                                                  {isUploadingShotId === shot.id ? "Uploading..." : "Swap"}
                                                                                  <input 
@@ -2052,7 +2052,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                              </label>
                                                                              <button 
                                                                                  onClick={() => handleClearShot(shot.id)}
-                                                                                 className="flex items-center justify-center gap-2 py-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
+                                                                                 className="flex items-center justify-center gap-2 py-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-foreground rounded-xl text-[11px] font-semibold uppercase tracking-wider transition-all"
                                                                              >
                                                                                  <Trash2 className="w-3 h-3" /> Clear
                                                                              </button>
@@ -2060,11 +2060,11 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                      </div>
                                                                  </div>
                                                             ) : (
-                                                                <div className="aspect-[9/16] rounded-3xl border border-dashed border-white/5 bg-black/20 flex flex-col items-center justify-center gap-4 text-foreground/10">
+                                                                <div className="aspect-[9/16] rounded-3xl border border-dashed border-border bg-surface/40 flex flex-col items-center justify-center gap-4 text-foreground/10">
                                                                     <div className="w-12 h-12 rounded-full border border-current flex items-center justify-center animate-pulse">
                                                                         <ImageIcon className="w-6 h-6" />
                                                                     </div>
-                                                                    <span className="text-[9px] font-black uppercase tracking-widest">Awaiting Vision</span>
+                                                                    <span className="text-[11px] font-semibold uppercase tracking-wider">Awaiting Vision</span>
                                                                 </div>
                                                             )}
                                                         </div>

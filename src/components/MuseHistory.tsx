@@ -19,20 +19,20 @@ const MuseHistory: React.FC<MuseHistoryProps> = ({ cards, onBack }) => {
                 </div>
                 <button 
                     onClick={onBack}
-                    className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+                    className="flex items-center gap-2 btn-secondary rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
                 >
                     <ArrowLeft className="w-3 h-3" /> Back
                 </button>
             </div>
 
             {cards.length === 0 ? (
-                <div className="p-12 text-center glass rounded-3xl border-white/5 opacity-40">
+                <div className="card p-12 text-center opacity-40">
                     <p className="text-[10px] font-black uppercase tracking-widest">No accepted proposals yet.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {cards.map((card) => (
-                        <div key={card.id} className="p-6 glass rounded-3xl border-white/10 hover:border-accent/40 transition-all group">
+                        <div key={card.id} className="card p-6 hover:border-accent/40 transition-all group">
                             <div className="flex justify-between items-start mb-2">
                                 <span className="text-[8px] font-black uppercase tracking-widest text-accent/60">{card.type}</span>
                                 <CheckCircle2 className="w-4 h-4 text-green-400 opacity-60 group-hover:opacity-100 transition-opacity" />

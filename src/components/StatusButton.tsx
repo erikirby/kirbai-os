@@ -7,6 +7,7 @@ interface StatusButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement
     loading?: boolean;
     loadingText?: string;
     icon?: React.ReactNode;
+    variant?: "primary" | "secondary" | "ghost";
 }
 
 export default function StatusButton({ 
@@ -16,13 +17,20 @@ export default function StatusButton({
     children, 
     disabled, 
     className = "", 
+    variant = "primary",
     ...props 
 }: StatusButtonProps) {
+    const variantClass = {
+        primary: "btn-primary",
+        secondary: "btn-secondary",
+        ghost: "btn-ghost",
+    }[variant];
+
     return (
         <button
             {...props}
             disabled={loading || disabled}
-            className={`${className} flex items-center justify-center gap-2 transition-all disabled:opacity-50`}
+            className={`${variantClass} ${className}`}
         >
             {loading ? (
                 <>

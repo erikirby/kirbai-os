@@ -234,7 +234,7 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                 <button 
                     onClick={handleUndo}
                     disabled={state.history.length === 0}
-                    className="flex items-center gap-2 px-4 py-2 bg-black/40 border border-white/10 hover:bg-white/10 text-white rounded-xl shadow-lg backdrop-blur-md transition-all disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-surface/40 border border-border hover:bg-white/10 text-foreground rounded-xl shadow-lg backdrop-blur-md transition-all disabled:opacity-50"
                 >
                     <Undo2 className="w-4 h-4" />
                     <span className="text-sm font-bold uppercase tracking-wider">Undo</span>
@@ -243,13 +243,13 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
             </div>
 
             {/* Title Area */}
-            <div className="pt-10 px-10 pb-6 border-b border-white/5">
-                <h1 className="text-3xl font-black tracking-tighter">Lore Database</h1>
+            <div className="pt-10 px-10 pb-6 border-b border-border">
+                <h2 className="section-title">Lore Database</h2>
                 <p className="text-foreground/50 text-sm mt-2">A conceptual grid matrix tracking characters, artifacts, and their relationships.</p>
             </div>
 
             {/* Main Grid View */}
-            <div className="flex-1 overflow-y-auto p-10 bg-black/20">
+            <div className="flex-1 overflow-y-auto p-10 bg-surface/20">
                 {isLoading ? (
                     <div className="w-full h-full flex items-center justify-center text-accent">
                         <Loader2 className="w-10 h-10 animate-spin opacity-50" />
@@ -261,13 +261,13 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                             const styleClass = typeColors[node.type] || typeColors.character;
 
                             return (
-                                <div key={node.id} className="relative bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col group hover:bg-white/10 transition-colors shadow-xl">
+                                <div key={node.id} className="relative bg-white/5 border border-border rounded-2xl p-6 flex flex-col group hover:bg-white/10 transition-colors shadow-xl">
 
                                     {/* Action buttons — absolutely positioned, zero layout impact */}
                                     <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                         <button
                                             onClick={() => startEditNode(node)}
-                                            className="text-white/30 hover:text-white transition-colors p-1"
+                                            className="text-foreground/30 hover:text-foreground transition-colors p-1"
                                             title="Edit"
                                         >
                                             <Edit2 className="w-4 h-4" />
@@ -283,14 +283,14 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                                     {/* Header: Avatar top-left, type badge + full name — no truncation */}
                                     <div className="flex gap-4 items-start mb-4 pr-12">
                                         {/* Avatar */}
-                                        <div className="relative w-12 h-12 shrink-0 rounded-full border border-white/20 overflow-hidden bg-black/40 flex items-center justify-center group/icon">
+                                        <div className="relative w-12 h-12 shrink-0 rounded-full border border-border overflow-hidden bg-surface/40 flex items-center justify-center group/icon">
                                             {node.data.imagePath ? (
                                                 <img src={node.data.imagePath} alt={node.data.label} className="w-full h-full object-cover" />
                                             ) : (
-                                                <span className="text-white/20 text-xs font-bold font-serif">{node.data.label.charAt(0)}</span>
+                                                <span className="text-foreground/20 text-xs font-bold font-serif">{node.data.label.charAt(0)}</span>
                                             )}
-                                            <label className="absolute inset-0 bg-black/60 opacity-0 group-hover/icon:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
-                                                <ImagePlus className="w-4 h-4 text-white" />
+                                            <label className="absolute inset-0 bg-surface/60 opacity-0 group-hover/icon:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+                                                <ImagePlus className="w-4 h-4 text-foreground" />
                                                 <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, node.id)} />
                                             </label>
                                         </div>
@@ -299,7 +299,7 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                                             <div className={`text-[9px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-full inline-block border mb-1 ${styleClass}`}>
                                                 {node.type}
                                             </div>
-                                            <h3 className="text-xl font-bold text-white leading-tight">{node.data.label}</h3>
+                                            <h3 className="text-xl font-bold text-foreground leading-tight">{node.data.label}</h3>
                                         </div>
                                     </div>
 
@@ -310,14 +310,14 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                                             <input
                                                 value={editForm.label}
                                                 onChange={e => setEditForm(f => ({ ...f, label: e.target.value }))}
-                                                className="px-3 py-2 bg-black/40 border border-white/20 rounded-lg text-sm font-bold text-white focus:outline-none"
+                                                className="px-3 py-2 bg-surface/40 border border-border rounded-lg text-sm font-bold text-foreground focus:outline-none"
                                                 placeholder="Name"
                                             />
                                             <textarea
                                                 value={editForm.description}
                                                 onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
                                                 rows={3}
-                                                className="px-3 py-2 bg-black/40 border border-white/20 rounded-lg text-sm text-white/80 focus:outline-none resize-none font-mono"
+                                                className="px-3 py-2 bg-surface/40 border border-border rounded-lg text-sm text-foreground/80 focus:outline-none resize-none font-mono"
                                                 placeholder="Description..."
                                             />
                                             <textarea
@@ -335,7 +335,7 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                                                 >
                                                     Save
                                                 </StatusButton>
-                                                <button onClick={() => setEditingNodeId(null)} className="flex items-center gap-1 px-3 py-1.5 text-white/30 text-xs font-black hover:text-white transition-colors">
+                                                <button onClick={() => setEditingNodeId(null)} className="flex items-center gap-1 px-3 py-1.5 text-foreground/30 text-xs font-black hover:text-foreground transition-colors">
                                                     <X className="w-3 h-3" /> Cancel
                                                 </button>
                                             </div>
@@ -358,15 +358,15 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
 
                                     {/* Connection Pills */}
                                     {connections.length > 0 && (
-                                        <div className="space-y-2 mt-auto pt-4 border-t border-white/5">
-                                            <div className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest flex items-center gap-1.5 mb-3">
+                                        <div className="space-y-2 mt-auto pt-4 border-t border-border">
+                                            <div className="section-subtitle flex items-center gap-1.5 mb-3">
                                                 <LinkIcon className="w-3 h-3" /> Linked Data
                                             </div>
                                             <div className="flex flex-wrap gap-2">
                                                 {connections.map((conn, idx) => (
-                                                    <div key={idx} className="bg-black/40 border border-white/5 rounded-full px-3 py-1.5 text-xs flex items-center gap-2">
+                                                    <div key={idx} className="bg-surface/40 border border-border rounded-full px-3 py-1.5 text-xs flex items-center gap-2">
                                                         <span className="text-foreground/40 italic">{conn.direction === 'out' ? '→' : '←'} {conn.label}</span>
-                                                        <span className="font-bold text-white/80">{conn.linkedNodeLabel}</span>
+                                                        <span className="font-bold text-foreground/80">{conn.linkedNodeLabel}</span>
                                                     </div>
                                                 ))}
                                             </div>
@@ -379,7 +379,7 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                         {state.nodes.length === 0 && (
                             <div className="col-span-full h-[400px] flex flex-col items-center justify-center opacity-30">
                                 <Sparkles className="w-12 h-12 mb-4" />
-                                <p className="text-xl font-bold text-white">The Database is Empty</p>
+                                <p className="text-xl font-bold text-foreground">The Database is Empty</p>
                                 <p>Use the generative command bar below to seed the universe.</p>
                             </div>
                         )}
@@ -399,7 +399,7 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                         {aiStatus.message}
                     </div>
                 )}
-                <div className="bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl p-2 flex gap-2 shadow-2xl items-center relative overflow-hidden group">
+                <div className="card p-2 flex gap-2 items-center relative group">
                     <div className="absolute inset-0 bg-gradient-to-r from-accent/0 via-accent/10 to-accent/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out pointer-events-none"></div>
                     
                     <Sparkles className="w-5 h-5 text-accent ml-3 shrink-0" />
@@ -410,7 +410,7 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                         onChange={(e) => setPrompt(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') handlePromptSubmit(); }}
                         placeholder="Add Ditto. Delete Sailor Venus. Update Pheromosa's description to say she is the lead dancer."
-                        className="flex-1 bg-transparent border-none text-white focus:outline-none focus:ring-0 px-2 placeholder:text-foreground/30 font-sans text-sm"
+                        className="flex-1 bg-transparent border-none text-foreground focus:outline-none focus:ring-0 px-2 placeholder:text-foreground/30 font-sans text-sm"
                         disabled={isGenerating}
                     />
 
@@ -419,7 +419,7 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                         loading={isGenerating}
                         disabled={!prompt.trim()}
                         loadingText=""
-                        className="w-10 h-10 bg-accent text-white rounded-xl flex items-center justify-center hover:bg-accent/80 transition-colors disabled:opacity-50 shrink-0 shadow-lg shadow-accent/20 cursor-pointer relative z-10"
+                        className="w-10 h-10 bg-accent text-foreground rounded-xl flex items-center justify-center hover:bg-accent/80 transition-colors disabled:opacity-50 shrink-0 shadow-lg shadow-accent/20 cursor-pointer relative z-10"
                         icon={<Send className="w-4 h-4" />}
                     />
                 </div>
