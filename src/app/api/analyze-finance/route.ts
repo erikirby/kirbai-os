@@ -5,9 +5,43 @@ import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 
 
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
-        const stored = await getFinanceAnalysisAsync();
+        const { searchParams } = new URL(req.url);
+        const mode = searchParams.get("mode") || "kirbai";
+        let stored = await getFinanceAnalysisAsync();
+
+        // Cross-sync with Revenue Engine's latest DistroKid dataset
+        const revData: any = await getRow(`revenue_engine_${mode === "factory" ? "factory" : "kirbai"}`);
+        if (revData && revData.bySong && revData.byStore) {
+            const revTimestamp = revData.savedAt ? new Date(revData.savedAt).getTime() : 0;
+            const financeTimestamp = stored?.persistedAt ? new Date(stored.persistedAt).getTime() : 0;
+
+            if (!stored || revTimestamp > financeTimestamp) {
+                stored = {
+                    totals: { revenue: revData.kpis.totalRevenue, streams: revData.kpis.totalStreams },
+                    platforms: revData.byStore.map((s: any) => ({
+                        store: s.store,
+                        revenue: s.earnings,
+                        streams: s.streams,
+                        rate: s.rate,
+                        reportingLatency: s.lastReportDate && s.lastSaleMonth ? {
+                            reportDate: s.lastReportDate,
+                            saleMonth: s.lastSaleMonth
+                        } : null
+                    })),
+                    tracks: revData.bySong.map((t: any) => ({
+                        title: t.title,
+                        revenue: t.earnings,
+                        streams: t.streams
+                    })),
+                    advice: stored?.advice || `<p>Synced from latest Revenue Engine DistroKid dataset. Total Earnings: $${(revData.kpis.totalRevenue || 0).toFixed(2)} across ${(revData.kpis.totalStreams || 0).toLocaleString()} streams.</p>`,
+                    persistedAt: revData.savedAt || new Date().toISOString()
+                };
+                await setFinanceAnalysisAsync(stored);
+            }
+        }
+
         return NextResponse.json({ analysis: stored });
     } catch (err: any) {
         return NextResponse.json({ error: "Failed to retrieve stored data" }, { status: 500 });

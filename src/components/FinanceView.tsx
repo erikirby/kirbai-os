@@ -16,7 +16,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
     useEffect(() => {
         const loadStoredData = async () => {
             try {
-                const res = await fetch("/api/analyze-finance");
+                const res = await fetch(`/api/analyze-finance?mode=${mode}`);
                 const data = await res.json();
                 if (data.analysis) {
                     setAnalysisResults(data.analysis);
@@ -26,7 +26,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
             }
         };
         loadStoredData();
-    }, []);
+    }, [mode]);
 
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();

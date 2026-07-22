@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { getRow, setRow } from "@/lib/db";
+import { getRow, setRow, setFinanceAnalysisAsync } from "@/lib/db";
 
 // Revenue Engine persistence. Analysis is computed client-side (deterministic math,
 // no AI) and stored here per-mode so it survives sessions.
@@ -24,7 +23,40 @@ export async function POST(req: Request) {
         if (!analysis || !analysis.kpis) {
             return NextResponse.json({ error: "No analysis payload provided." }, { status: 400 });
         }
-        await setRow(key(mode || "kirbai"), analysis);
+
+        const timestamp = new Date().toISOString();
+        const payload = {
+            ...analysis,
+            savedAt: timestamp
+        };
+
+        await setRow(key(mode || "kirbai"), payload);
+
+        // Auto-sync Finance Analysis store if DistroKid data is present
+        if (analysis.bySong && analysis.byStore) {
+            const financePayload = {
+                totals: { revenue: analysis.kpis.totalRevenue, streams: analysis.kpis.totalStreams },
+                platforms: analysis.byStore.map((s: any) => ({
+                    store: s.store,
+                    revenue: s.earnings,
+                    streams: s.streams,
+                    rate: s.rate,
+                    reportingLatency: s.lastReportDate && s.lastSaleMonth ? {
+                        reportDate: s.lastReportDate,
+                        saleMonth: s.lastSaleMonth
+                    } : null
+                })),
+                tracks: analysis.bySong.map((t: any) => ({
+                    title: t.title,
+                    revenue: t.earnings,
+                    streams: t.streams
+                })),
+                advice: `<p>Auto-synced from latest Revenue Engine DistroKid export (${new Date().toLocaleDateString()}). Total Revenue: $${(analysis.kpis.totalRevenue || 0).toFixed(2)} across ${(analysis.kpis.totalStreams || 0).toLocaleString()} streams.</p>`,
+                persistedAt: timestamp
+            };
+            await setFinanceAnalysisAsync(financePayload);
+        }
+
         return NextResponse.json({ ok: true });
     } catch (err: any) {
         return NextResponse.json({ error: err?.message || "Failed to save analysis" }, { status: 500 });
