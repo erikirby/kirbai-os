@@ -166,8 +166,8 @@ export default function CampaignBoard() {
                         value={command}
                         onChange={e => setCommand(e.target.value)}
                         onKeyDown={e => { if (e.key === "Enter") runCommand(); }}
-                        placeholder="Tell Studio what changed… “mark the Jinx clip posted”, “add a comedy idea about Diancie’s skincare routine”, “check off caption for Cast Reveal”"
-                        className="flex-1 bg-transparent border-none outline-none text-sm py-2 placeholder:text-foreground/30"
+                        placeholder="Tell Studio what changed…"
+                        className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm py-2 placeholder:text-foreground/30"
                         disabled={commandBusy}
                     />
                     <button

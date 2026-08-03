@@ -21,7 +21,7 @@ import CompetitorTracker from "@/components/CompetitorTracker";
 import RevenueEngine from "@/components/RevenueEngine";
 import HookEngine from "@/components/HookEngine";
 import CampaignBoard from "@/components/CampaignBoard";
-import { MessageSquare, Settings2, ChevronDown, Sparkles } from 'lucide-react';
+import { MessageSquare, Settings2, ChevronDown, Sparkles, Home as HomeIcon, Menu, X } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
 type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks" | "studio";
@@ -130,10 +130,66 @@ export default function Home() {
         {/* Mobile Settings Trigger */}
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className="lg:hidden p-2.5 bg-surface/60 border border-border/50 rounded-xl text-accent"
+          className="lg:hidden p-2.5 bg-surface/60 border border-border/50 rounded-xl text-accent relative"
         >
           <Settings2 className="w-5 h-5" />
         </button>
+
+        {/* Mobile Settings Panel — brand + theme toggle */}
+        {showSettings && (
+          <div className="show-on-mobile-only fixed top-[68px] right-4 z-[200] card p-4 flex flex-col gap-4 w-60">
+            <div className="flex flex-col gap-2">
+              <span className="section-eyebrow">Ecosystem</span>
+              <div className="flex p-0.5 bg-surface/60 rounded-xl border border-border/50">
+                <button
+                  onClick={() => setActiveTab("kirbai")}
+                  className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
+                    activeTab === "kirbai" ? "bg-accent text-white shadow-md" : "text-foreground/40"
+                  }`}
+                >
+                  Kirbai
+                </button>
+                <button
+                  onClick={() => setActiveTab("factory")}
+                  className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
+                    activeTab === "factory" ? "bg-accent text-white shadow-md" : "text-foreground/40"
+                  }`}
+                >
+                  Factory
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <span className="section-eyebrow">Theme</span>
+              <div className="flex p-0.5 bg-surface/60 rounded-xl border border-border/50">
+                <button
+                  onClick={() => setTheme("dark")}
+                  className={`flex-1 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
+                    theme === "dark" ? "bg-accent text-white shadow-md" : "text-foreground/40"
+                  }`}
+                >
+                  Dark
+                </button>
+                <button
+                  onClick={() => setTheme("snes")}
+                  className={`flex-1 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
+                    theme === "snes" ? "snes-btn-red text-white" : "text-foreground/40"
+                  }`}
+                >
+                  SNES
+                </button>
+                <button
+                  onClick={() => setTheme("calm")}
+                  className={`flex-1 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
+                    theme === "calm" ? "bg-accent text-white shadow-md" : "text-foreground/40"
+                  }`}
+                >
+                  Calm
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* ─── HERO BANNER ─── */}
@@ -143,7 +199,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
           <div className="absolute bottom-6 left-8 flex flex-col gap-0.5">
             <span className="section-eyebrow">Operational Context</span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-foreground uppercase drop-shadow-2xl">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-foreground uppercase drop-shadow-2xl">
               {activeTab === "kirbai" ? "Brand: Kirbai" : "Factory: SEO Matrix"}
             </h2>
           </div>
@@ -235,7 +291,7 @@ export default function Home() {
 
       {/* ─── MAIN CONTENT ─── */}
       <section className="flex-1 w-full">
-        <div className="mx-auto w-full px-6 py-6 flex flex-col gap-8">
+        <div className="mx-auto w-full px-6 py-6 pb-28 lg:pb-6 flex flex-col gap-8">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className={activeModule === "roadmap" ? "lg:col-span-3 flex flex-col gap-8" : "lg:col-span-4 flex flex-col gap-8"}>
               <div key={`${activeTab}-${activeModule}`} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -274,6 +330,55 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ─── MOBILE BOTTOM DOCK ─── */}
+      <div className="mobile-bottom-dock show-on-mobile-only">
+        <button onClick={() => setActiveModule("roadmap")} className={`mobile-dock-item ${activeModule === "roadmap" ? "active" : ""}`}>
+          <HomeIcon className="w-5 h-5" />
+          <span>Home</span>
+        </button>
+        <button onClick={() => setActiveModule("chat")} className={`mobile-dock-item ${activeModule === "chat" ? "active" : ""}`}>
+          <MessageSquare className="w-5 h-5" />
+          <span>Chat</span>
+        </button>
+        <button onClick={() => { setActiveModule("studio"); setTheme("calm"); }} className={`mobile-dock-item ${activeModule === "studio" ? "active" : ""}`}>
+          <Sparkles className="w-5 h-5" />
+          <span>Studio</span>
+        </button>
+        <button onClick={() => setShowLauncher(true)} className={`mobile-dock-item ${showLauncher ? "active" : ""}`}>
+          <Menu className="w-5 h-5" />
+          <span>More</span>
+        </button>
+      </div>
+
+      {/* ─── MOBILE LAUNCHER OVERLAY ─── */}
+      {showLauncher && (
+        <div className="mobile-launcher-overlay show-on-mobile-only">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-extrabold uppercase tracking-tight text-foreground">Menu</h2>
+            <button onClick={() => setShowLauncher(false)} className="p-2 text-foreground/50">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {NAV_GROUPS.map(group => (
+            <div key={group.id} className="flex flex-col gap-2">
+              <span className="section-eyebrow">{group.label}</span>
+              <div className="launcher-grid">
+                {group.items.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => { setActiveModule(item.id as Module); setShowLauncher(false); }}
+                    className={`mobile-launcher-btn ${activeModule === item.id ? "active" : ""}`}
+                  >
+                    <span className="text-xs font-bold uppercase text-center">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </main>
   );
 }
