@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { Plus, Pin, ChevronDown, X, Sparkles } from "lucide-react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { Plus, Pin, ChevronDown, X, Sparkles, Wand2, Loader2 } from "lucide-react";
 import type { CampaignBoard as Board, CampaignCard, Stream, CardStatus, MenialTask } from "@/app/api/campaign-board/route";
 
-const STREAMS: { id: Stream; label: string; blurb: string }[] = [
-    { id: "video", label: "Music Videos", blurb: "One card per track / character" },
-    { id: "carousel", label: "Still Photo Carousels", blurb: "One card per character — 4 slides each" },
-    { id: "comedy", label: "Comedy & Lifestyle", blurb: "One card per bit idea" },
+const STREAMS: { id: Stream; label: string; blurb: string; accent: string }[] = [
+    { id: "video", label: "Music Videos", blurb: "One card per track / character", accent: "var(--stream-video)" },
+    { id: "carousel", label: "Still Photo Carousels", blurb: "One card per character — 4 slides each", accent: "var(--stream-carousel)" },
+    { id: "comedy", label: "Comedy & Lifestyle", blurb: "One card per bit idea", accent: "var(--stream-comedy)" },
 ];
 
 const STATUS_ORDER: CardStatus[] = ["idea", "in-progress", "ready", "posted"];
@@ -33,12 +33,23 @@ function defaultTasks(): MenialTask[] {
     ];
 }
 
+// Small deterministic "pinned to a corkboard" tilt, based on card id.
+function tiltFor(id: string): number {
+    let h = 0;
+    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 1000;
+    return (h % 300) / 100 - 1.5; // -1.5deg .. 1.5deg
+}
+
 export default function CampaignBoard() {
     const [board, setBoard] = useState<Board | null>(null);
     const [expanded, setExpanded] = useState<string | null>(null);
     const [threadsOpen, setThreadsOpen] = useState(false);
     const [addingIn, setAddingIn] = useState<Stream | null>(null);
     const [newTitle, setNewTitle] = useState("");
+    const [command, setCommand] = useState("");
+    const [commandBusy, setCommandBusy] = useState(false);
+    const [commandReply, setCommandReply] = useState<string | null>(null);
+    const replyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         fetch("/api/campaign-board").then(r => r.json()).then(d => {
@@ -85,6 +96,33 @@ export default function CampaignBoard() {
         persist({ ...board, threads: board.threads.filter(t => t.id !== id) });
     }, [board, persist]);
 
+    const runCommand = useCallback(async () => {
+        if (!command.trim() || commandBusy) return;
+        setCommandBusy(true);
+        setCommandReply(null);
+        try {
+            const res = await fetch("/api/campaign-board/command", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ command }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                setBoard(data.board);
+                setCommandReply(data.reply || "Done.");
+                setCommand("");
+            } else {
+                setCommandReply(data.error || "Couldn't do that — try rephrasing.");
+            }
+        } catch {
+            setCommandReply("Something went wrong reaching Studio's assistant.");
+        } finally {
+            setCommandBusy(false);
+            if (replyTimer.current) clearTimeout(replyTimer.current);
+            replyTimer.current = setTimeout(() => setCommandReply(null), 6000);
+        }
+    }, [command, commandBusy]);
+
     const upNext = useMemo(() => {
         if (!board) return null;
         const active = board.cards.filter(c => c.status !== "posted");
@@ -118,6 +156,33 @@ export default function CampaignBoard() {
                     <span className="stat-value text-base">{posted}</span>
                     <span className="stat-label">/ {totalActive} posted</span>
                 </div>
+            </div>
+
+            {/* AI command bar */}
+            <div className="flex flex-col gap-2">
+                <div className="card p-2 flex items-center gap-2">
+                    <Wand2 className="w-4 h-4 text-accent ml-2 shrink-0" />
+                    <input
+                        value={command}
+                        onChange={e => setCommand(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") runCommand(); }}
+                        placeholder="Tell Studio what changed… “mark the Jinx clip posted”, “add a comedy idea about Diancie’s skincare routine”, “check off caption for Cast Reveal”"
+                        className="flex-1 bg-transparent border-none outline-none text-sm py-2 placeholder:text-foreground/30"
+                        disabled={commandBusy}
+                    />
+                    <button
+                        onClick={runCommand}
+                        disabled={commandBusy || !command.trim()}
+                        className="btn-primary text-[10px] py-2 px-4 shrink-0"
+                    >
+                        {commandBusy ? <Loader2 className="w-3 h-3 animate-spin" /> : "Go"}
+                    </button>
+                </div>
+                {commandReply && (
+                    <div className="px-4 py-2.5 rounded-xl bg-accent/10 border border-accent/20 text-xs text-foreground/70 animate-in fade-in slide-in-from-top-1 duration-300">
+                        {commandReply}
+                    </div>
+                )}
             </div>
 
             {/* Up Next spotlight */}
@@ -168,54 +233,62 @@ export default function CampaignBoard() {
                 </div>
             )}
 
-            {/* Streams */}
+            {/* Streams — corkboard / masonry */}
             {STREAMS.map(stream => {
                 const cards = board.cards.filter(c => c.stream === stream.id);
                 return (
                     <div key={stream.id} className="flex flex-col gap-4">
-                        <div className="section-header">
-                            <h3 className="text-base font-bold text-foreground">{stream.label}</h3>
-                            <span className="text-xs text-foreground/30">{stream.blurb}</span>
+                        <div className="flex items-center gap-2.5">
+                            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: stream.accent }} />
+                            <div className="section-header">
+                                <h3 className="text-base font-bold text-foreground">{stream.label}</h3>
+                                <span className="text-xs text-foreground/30">{stream.blurb}</span>
+                            </div>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 [column-fill:_balance]">
                             {cards.map(c => (
-                                <CardTile
-                                    key={c.id}
-                                    card={c}
-                                    expanded={expanded === c.id}
-                                    onToggleExpand={() => setExpanded(expanded === c.id ? null : c.id)}
-                                    onUpdate={patch => updateCard(c.id, patch)}
-                                    onDelete={() => deleteCard(c.id)}
-                                />
+                                <div key={c.id} className="break-inside-avoid mb-4">
+                                    <CardTile
+                                        card={c}
+                                        accent={stream.accent}
+                                        tilt={tiltFor(c.id)}
+                                        expanded={expanded === c.id}
+                                        onToggleExpand={() => setExpanded(expanded === c.id ? null : c.id)}
+                                        onUpdate={patch => updateCard(c.id, patch)}
+                                        onDelete={() => deleteCard(c.id)}
+                                    />
+                                </div>
                             ))}
 
-                            {addingIn === stream.id ? (
-                                <div className="rounded-2xl border border-dashed border-accent/40 bg-accent/5 p-5 flex flex-col gap-3">
-                                    <input
-                                        autoFocus
-                                        value={newTitle}
-                                        onChange={e => setNewTitle(e.target.value)}
-                                        onKeyDown={e => {
-                                            if (e.key === "Enter") addCard(stream.id, newTitle);
-                                            if (e.key === "Escape") { setAddingIn(null); setNewTitle(""); }
-                                        }}
-                                        placeholder="Card title…"
-                                        className="input-field text-sm py-2"
-                                    />
-                                    <div className="flex gap-2">
-                                        <button onClick={() => addCard(stream.id, newTitle)} className="btn-primary text-[10px] py-1.5 px-3">Add</button>
-                                        <button onClick={() => { setAddingIn(null); setNewTitle(""); }} className="btn-ghost text-[10px] py-1.5 px-3">Cancel</button>
+                            <div className="break-inside-avoid mb-4">
+                                {addingIn === stream.id ? (
+                                    <div className="rounded-2xl border border-dashed border-accent/40 bg-accent/5 p-5 flex flex-col gap-3">
+                                        <input
+                                            autoFocus
+                                            value={newTitle}
+                                            onChange={e => setNewTitle(e.target.value)}
+                                            onKeyDown={e => {
+                                                if (e.key === "Enter") addCard(stream.id, newTitle);
+                                                if (e.key === "Escape") { setAddingIn(null); setNewTitle(""); }
+                                            }}
+                                            placeholder="Card title…"
+                                            className="input-field text-sm py-2"
+                                        />
+                                        <div className="flex gap-2">
+                                            <button onClick={() => addCard(stream.id, newTitle)} className="btn-primary text-[10px] py-1.5 px-3">Add</button>
+                                            <button onClick={() => { setAddingIn(null); setNewTitle(""); }} className="btn-ghost text-[10px] py-1.5 px-3">Cancel</button>
+                                        </div>
                                     </div>
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={() => setAddingIn(stream.id)}
-                                    className="rounded-2xl border border-dashed border-border flex flex-col items-center justify-center gap-2 text-foreground/20 hover:text-accent hover:border-accent/40 transition-all bg-foreground/[0.02] hover:bg-accent/5 min-h-[140px]"
-                                >
-                                    <Plus className="w-5 h-5" />
-                                    <span className="text-[10px] font-semibold uppercase tracking-wider">New Card</span>
-                                </button>
-                            )}
+                                ) : (
+                                    <button
+                                        onClick={() => setAddingIn(stream.id)}
+                                        className="w-full rounded-2xl border border-dashed border-border flex flex-col items-center justify-center gap-2 text-foreground/20 hover:text-accent hover:border-accent/40 transition-all bg-foreground/[0.02] hover:bg-accent/5 min-h-[120px]"
+                                    >
+                                        <Plus className="w-5 h-5" />
+                                        <span className="text-[10px] font-semibold uppercase tracking-wider">New Card</span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 );
@@ -224,8 +297,10 @@ export default function CampaignBoard() {
     );
 }
 
-function CardTile({ card, expanded, onToggleExpand, onUpdate, onDelete }: {
+function CardTile({ card, accent, tilt, expanded, onToggleExpand, onUpdate, onDelete }: {
     card: CampaignCard;
+    accent: string;
+    tilt: number;
     expanded: boolean;
     onToggleExpand: () => void;
     onUpdate: (patch: Partial<CampaignCard>) => void;
@@ -235,7 +310,14 @@ function CardTile({ card, expanded, onToggleExpand, onUpdate, onDelete }: {
     const doneTasks = card.tasks.filter(t => t.done).length;
 
     return (
-        <div className={`card p-5 flex flex-col gap-3 group ${card.status === "posted" ? "opacity-70" : ""}`}>
+        <div
+            className={`card corkboard-card p-5 flex flex-col gap-3 group ${card.status === "posted" ? "opacity-70" : ""}`}
+            style={{
+                background: `color-mix(in srgb, ${accent} 9%, var(--surface-color))`,
+                borderColor: `color-mix(in srgb, ${accent} 22%, var(--border-color))`,
+                ["--tilt" as string]: `${tilt}deg`,
+            } as any}
+        >
             <div className="flex items-start justify-between gap-2">
                 <button
                     onClick={() => onUpdate({ status: nextStatus(card.status) })}

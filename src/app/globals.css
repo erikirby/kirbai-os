@@ -162,34 +162,53 @@ html[data-theme='snes'] {
    ═══════════════════════════════════════════════ */
 
 html[data-theme='calm'] {
-  --bg-color: #FAFAFC;
-  --fg-color: #1D1D1F;
-  --fg-muted: #6E6E76;
-  --surface-color: #FFFFFF;
-  --surface-elevated: #F5F5F8;
-  --border-color: rgba(0, 0, 0, 0.07);
-  --accent-color: #FF7AA8;
-  --accent-sunset: #9C8CFF;
+  --bg-color: #FCF4F7;
+  --fg-color: #211E24;
+  --fg-muted: #746E7C;
+  --surface-color: #FFFDFE;
+  --surface-elevated: #FBF1F5;
+  --border-color: rgba(140, 60, 100, 0.12);
+  --accent-color: #FF6FA0;
+  --accent-sunset: #A78BFA;
   --panel-blur: 20px;
   --card-radius: 24px;
   --btn-radius: 14px;
+
+  /* Pastel accents per content stream, for moodboard tiles */
+  --stream-video: #B79CFF;
+  --stream-carousel: #FFA9C6;
+  --stream-comedy: #7FD9C4;
 }
 
 [data-theme='calm'] .card {
   box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
-    0 12px 40px -16px rgba(120, 90, 160, 0.18);
+    0 1px 0 0 rgba(255, 255, 255, 0.7) inset,
+    0 12px 40px -16px rgba(150, 70, 120, 0.22);
 }
 
 [data-theme='calm'] body {
   background-image:
-    radial-gradient(ellipse at 10% -10%, color-mix(in srgb, var(--accent-color) 10%, transparent) 0%, transparent 55%),
-    radial-gradient(ellipse at 90% 110%, color-mix(in srgb, var(--accent-sunset) 10%, transparent) 0%, transparent 55%);
+    linear-gradient(160deg, #FFE7F1 0%, #FDF3F8 22%, #F7F5FC 48%, #F1EEFC 68%, #FFF0F6 100%),
+    radial-gradient(ellipse at 8% -10%, color-mix(in srgb, var(--accent-color) 22%, transparent) 0%, transparent 50%),
+    radial-gradient(ellipse at 95% 105%, color-mix(in srgb, var(--accent-sunset) 20%, transparent) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 40%, color-mix(in srgb, var(--stream-comedy) 8%, transparent) 0%, transparent 45%);
+  background-attachment: fixed;
 }
 
 [data-theme='calm'] .btn-primary {
   background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-sunset) 100%);
   box-shadow: 0 8px 24px color-mix(in srgb, var(--accent-color) 30%, transparent);
+}
+
+/* Corkboard tilt for Studio moodboard cards */
+.corkboard-card {
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.corkboard-card:hover {
+  transform: rotate(0deg) scale(1.02);
+  z-index: 2;
 }
 
 
