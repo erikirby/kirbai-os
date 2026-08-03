@@ -20,11 +20,12 @@ import DistroOptimizer from "@/components/DistroOptimizer";
 import CompetitorTracker from "@/components/CompetitorTracker";
 import RevenueEngine from "@/components/RevenueEngine";
 import HookEngine from "@/components/HookEngine";
-import { MessageSquare, Settings2, ChevronDown } from 'lucide-react';
+import CampaignBoard from "@/components/CampaignBoard";
+import { MessageSquare, Settings2, ChevronDown, Sparkles } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
-type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks";
-type Theme = "dark" | "snes";
+type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks" | "studio";
+type Theme = "dark" | "snes" | "calm";
 
 const NAV_GROUPS = [
   { id: "command", label: "Command", items: [{ id: "roadmap", label: "Home" }, { id: "intel", label: "Intel" }, { id: "competitors", label: "Competitors" }, { id: "muse", label: "Muse" }, { id: "boardroom", label: "Boardroom" }] },
@@ -109,6 +110,14 @@ export default function Home() {
             >
               SNES
             </button>
+            <button
+              onClick={() => setTheme("calm")}
+              className={`px-3 py-1 text-[9px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
+                theme === "calm" ? "bg-accent text-white shadow-md" : "text-foreground/40 hover:text-foreground/60"
+              }`}
+            >
+              Calm
+            </button>
           </div>
 
           {/* System Status */}
@@ -154,6 +163,19 @@ export default function Home() {
         >
           <MessageSquare className="w-3.5 h-3.5" />
           <span className="text-[10px] font-bold uppercase tracking-wider">Chat</span>
+        </button>
+
+        {/* Studio — Pretty Rare Candies campaign board */}
+        <button
+          onClick={() => { setActiveModule("studio"); setTheme("calm"); }}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all border ${
+            activeModule === "studio"
+              ? "bg-accent border-accent/40 text-white shadow-lg shadow-accent/10"
+              : "bg-surface/40 border-border/50 text-foreground/50 hover:text-foreground hover:border-foreground/20"
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          <span className="text-[10px] font-bold uppercase tracking-wider">Studio</span>
         </button>
 
         {/* Module Group Dropdowns */}
@@ -235,6 +257,7 @@ export default function Home() {
                 {activeModule === "boardroom" && <Boardroom mode={activeTab} />}
                 {activeModule === "distro" && <DistroOptimizer theme={theme} mode={activeTab} />}
                 {activeModule === "competitors" && <CompetitorTracker theme={theme} mode={activeTab} />}
+                {activeModule === "studio" && <CampaignBoard />}
               </div>
             </div>
 

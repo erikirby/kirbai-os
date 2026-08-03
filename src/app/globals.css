@@ -156,6 +156,44 @@ html[data-theme='snes'] {
 
 
 /* ═══════════════════════════════════════════════
+   THEME: CALM
+   White/pastel, Apple-style, high-contrast text.
+   For flow-state work — Studio module.
+   ═══════════════════════════════════════════════ */
+
+html[data-theme='calm'] {
+  --bg-color: #FAFAFC;
+  --fg-color: #1D1D1F;
+  --fg-muted: #6E6E76;
+  --surface-color: #FFFFFF;
+  --surface-elevated: #F5F5F8;
+  --border-color: rgba(0, 0, 0, 0.07);
+  --accent-color: #FF7AA8;
+  --accent-sunset: #9C8CFF;
+  --panel-blur: 20px;
+  --card-radius: 24px;
+  --btn-radius: 14px;
+}
+
+[data-theme='calm'] .card {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
+    0 12px 40px -16px rgba(120, 90, 160, 0.18);
+}
+
+[data-theme='calm'] body {
+  background-image:
+    radial-gradient(ellipse at 10% -10%, color-mix(in srgb, var(--accent-color) 10%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 110%, color-mix(in srgb, var(--accent-sunset) 10%, transparent) 0%, transparent 55%);
+}
+
+[data-theme='calm'] .btn-primary {
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-sunset) 100%);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--accent-color) 30%, transparent);
+}
+
+
+/* ═══════════════════════════════════════════════
    BASE STYLES
    ═══════════════════════════════════════════════ */
 
