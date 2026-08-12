@@ -68,33 +68,37 @@ export default function RevenueTimelineChart({ data }: TimelineProps) {
             </div>
 
             {/* Visual Bar Timeline Grid */}
-            <div className="flex items-end gap-1.5 h-48 pt-6 pb-2 px-2 overflow-x-auto custom-scrollbar">
+            <div className="flex items-end gap-2 h-52 pt-8 pb-4 px-2 overflow-x-auto custom-scrollbar border-b border-border/30">
                 {data.map((item, idx) => {
                     const value = viewType === 'earnings' ? item.earningsUsd : item.quantity;
-                    const heightPercent = Math.max(8, Math.min(100, (value / maxVal) * 100));
+                    // Min 10% height for any non-zero value so small months are clearly visible
+                    const rawPct = maxVal > 0 ? (value / maxVal) * 100 : 0;
+                    const heightPercent = value > 0 ? Math.max(10, Math.min(100, rawPct)) : 4;
 
                     return (
-                        <div key={idx} className="flex-1 min-w-[24px] flex flex-col items-center gap-2 group relative">
+                        <div key={idx} className="flex-1 min-w-[28px] h-full flex flex-col items-center justify-end gap-2 group relative">
                             {/* Hover Tooltip */}
-                            <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-surface border border-border px-2 py-1 rounded text-[10px] font-mono whitespace-nowrap z-20 pointer-events-none shadow-xl">
+                            <div className="absolute -top-12 opacity-0 group-hover:opacity-100 transition-opacity bg-surface border border-border px-2.5 py-1.5 rounded-lg text-[10px] font-mono whitespace-nowrap z-30 pointer-events-none shadow-2xl">
                                 <span className="text-foreground/70 font-bold block">{item.name}</span>
                                 <span className={viewType === 'earnings' ? 'text-emerald-400 font-black' : 'text-purple-400 font-black'}>
                                     {formatVal(value)}
                                 </span>
                             </div>
 
-                            {/* Bar Column */}
-                            <div className="w-full bg-surface/80 rounded-t-md border-t border-x border-border/40 flex items-end justify-center p-0.5 relative h-full">
+                            {/* Bar Column Container */}
+                            <div className="w-full bg-surface/80 rounded-t-lg border-t border-x border-border/40 flex items-end justify-center p-0.5 h-36 relative overflow-hidden">
                                 <div
-                                    className={`w-full rounded-t-sm transition-all duration-700 ease-out group-hover:brightness-125 ${
-                                        viewType === 'earnings' ? 'bg-emerald-500/80 shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-purple-500/80 shadow-[0_0_10px_rgba(168,85,247,0.3)]'
+                                    className={`w-full rounded-t-md transition-all duration-700 ease-out group-hover:brightness-125 ${
+                                        viewType === 'earnings' 
+                                            ? 'bg-gradient-to-t from-emerald-600 to-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.5)]' 
+                                            : 'bg-gradient-to-t from-purple-600 to-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.5)]'
                                     }`}
                                     style={{ height: `${heightPercent}%` }}
                                 />
                             </div>
 
                             {/* Date Label */}
-                            <span className="text-[8px] font-mono text-foreground/40 rotate-45 origin-left whitespace-nowrap mt-1">
+                            <span className="text-[9px] font-mono font-semibold text-foreground/50 rotate-45 origin-left whitespace-nowrap mt-2">
                                 {item.name}
                             </span>
                         </div>

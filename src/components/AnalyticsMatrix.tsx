@@ -138,20 +138,12 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                             Overview
                         </button>
                         <button
-                            onClick={() => setActiveSubTab('distrokid')}
-                            className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${
-                                activeSubTab === 'distrokid' ? 'bg-emerald-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
-                            }`}
-                        >
-                            DistroKid Music
-                        </button>
-                        <button
                             onClick={() => setActiveSubTab('social')}
                             className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${
                                 activeSubTab === 'social' ? 'bg-pink-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
                             }`}
                         >
-                            Social Reels
+                            Social Reels (IG, FB, TikTok)
                         </button>
                         <button
                             onClick={() => setActiveSubTab('youtube')}
@@ -159,7 +151,15 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                                 activeSubTab === 'youtube' ? 'bg-red-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
                             }`}
                         >
-                            YouTube API
+                            YouTube Intel
+                        </button>
+                        <button
+                            onClick={() => setActiveSubTab('distrokid')}
+                            className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${
+                                activeSubTab === 'distrokid' ? 'bg-emerald-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
+                            }`}
+                        >
+                            DistroKid Music
                         </button>
                     </div>
 
