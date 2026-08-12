@@ -227,7 +227,12 @@ const facebookFiles = csvFiles.filter((file) =>
     file.headers.includes('Page ID') && file.headers.includes('Post ID')
 );
 const distroKidFiles = csvFiles.filter((file) =>
-    file.headers.includes('Sale Month') && file.headers.includes('Earnings (USD)')
+    (file.headers.includes('Sale Month') && file.headers.includes('Earnings (USD)')) ||
+    file.name.toLowerCase().includes('results')
+);
+const tikTokFiles = csvFiles.filter((file) =>
+    file.headers.some((h) => h.includes('Video Views') || h.includes('FollowerHistory') || h.includes('Video ID') || h.includes('Play Time')) ||
+    file.name.toLowerCase().includes('tiktok')
 );
 
 if (!instagramFiles.length || !facebookFiles.length || !distroKidFiles.length) {
