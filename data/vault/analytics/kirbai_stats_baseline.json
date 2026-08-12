@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-12T01:23:39.272Z",
+  "generatedAt": "2026-08-12T01:53:04.752Z",
   "status": "Historical baseline; refresh from the source folder before claiming metrics are current.",
   "sourceDirectory": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats",
   "sources": [
@@ -55,8 +55,8 @@
     {
       "fileName": "results 2.csv",
       "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/results 2.csv",
-      "checksumSha256": "38ef47428fed4fc1a0b2973f366cf1bbaca871c80de963add40f954bc933e305",
-      "rows": 25772,
+      "checksumSha256": "e419f9109574e5a7e29104d83e0ffd7b8fb2fc076b9623119158f726d9420f97",
+      "rows": 32444,
       "columns": 15,
       "detectedType": "distrokid"
     }
@@ -589,24 +589,24 @@
     "grain": "DistroKid royalty ledger row by reporting batch, sale month, store, track, release ID, source type, and country; no transaction ID is present.",
     "coverage": {
       "firstSaleMonth": "2024-09",
-      "lastSaleMonth": "2026-05",
+      "lastSaleMonth": "2026-06",
       "firstReportingDate": "2024-10-30",
-      "lastReportingDate": "2026-06-24",
-      "ledgerRows": 25678,
-      "tracks": 162,
-      "stores": 25,
-      "countries": 142
+      "lastReportingDate": "2026-08-01",
+      "ledgerRows": 32349,
+      "tracks": 166,
+      "stores": 27,
+      "countries": 146
     },
     "totals": {
-      "quantity": 1601487,
-      "earningsUsd": 3105.700318,
+      "quantity": 2216847,
+      "earningsUsd": 3803.436163,
       "songwriterRoyaltiesWithheldUsd": 0
     },
     "deduplicatedSensitivity": {
       "exactDuplicateRows": 10,
       "totalsIfExactDuplicatesRemoved": {
-        "quantity": 1601475,
-        "earningsUsd": 3101.614546,
+        "quantity": 2216835,
+        "earningsUsd": 3799.350391,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       "rule": "Official totals retain every exported row because the file has no transaction ID. The deduplicated figure is a sensitivity check only."
@@ -614,56 +614,62 @@
     "topStores": [
       {
         "name": "Spotify",
-        "quantity": 339734,
-        "earningsUsd": 1165.565061,
+        "quantity": 437768,
+        "earningsUsd": 1506.673871,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "YouTube (Red)",
-        "quantity": 85127,
-        "earningsUsd": 812.934241,
+        "quantity": 100901,
+        "earningsUsd": 961.636841,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Apple Music",
-        "quantity": 119835,
-        "earningsUsd": 723.60029,
+        "quantity": 140584,
+        "earningsUsd": 848.645893,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "iTunes Songs",
-        "quantity": 277,
-        "earningsUsd": 186.035,
+        "quantity": 310,
+        "earningsUsd": 209.156685,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "YouTube (Ads)",
-        "quantity": 45924,
-        "earningsUsd": 119.233473,
+        "quantity": 55137,
+        "earningsUsd": 148.557979,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "iTunes",
-        "quantity": 12,
-        "earningsUsd": 51.715923,
+        "quantity": 13,
+        "earningsUsd": 55.676417,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Facebook (Social Media Pack)",
-        "quantity": 997752,
-        "earningsUsd": 23.52404,
+        "quantity": 1465040,
+        "earningsUsd": 37.257741,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Tidal",
-        "quantity": 1017,
-        "earningsUsd": 7.743248,
+        "quantity": 1643,
+        "earningsUsd": 12.517781,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Deezer",
-        "quantity": 1752,
-        "earningsUsd": 4.730828,
+        "quantity": 3056,
+        "earningsUsd": 8.486073,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Pandora",
+        "quantity": 669,
+        "earningsUsd": 3.576733,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
@@ -673,241 +679,235 @@
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
-        "name": "Pandora",
-        "quantity": 428,
-        "earningsUsd": 2.338692,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Facebook",
-        "quantity": 8188,
-        "earningsUsd": 1.696418,
+        "name": "Amazon Prime (Streaming)",
+        "quantity": 1032,
+        "earningsUsd": 2.567491,
         "songwriterRoyaltiesWithheldUsd": 0
       }
     ],
     "topTracks": [
       {
         "name": "Power Whip (Tsareena Step)",
-        "quantity": 303889,
-        "earningsUsd": 419.042228,
+        "quantity": 324744,
+        "earningsUsd": 487.913767,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Mean Look (Gothitelle Cut)",
-        "quantity": 310801,
-        "earningsUsd": 416.37388,
+        "quantity": 327427,
+        "earningsUsd": 455.746875,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Lovely Kiss (Jynx Anthem)",
-        "quantity": 78446,
-        "earningsUsd": 338.054031,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Magic Bounce (Hatterene Master)",
-        "quantity": 58370,
-        "earningsUsd": 132.55429,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Scrappy Klutz (Lopunny Crash)",
-        "quantity": 124430,
-        "earningsUsd": 119.351556,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "I'm the Pheromosa",
-        "quantity": 23572,
-        "earningsUsd": 103.597692,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Pixilate (Gardevoir Dub)",
-        "quantity": 38347,
-        "earningsUsd": 100.771954,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Flower Trick (Meowscarada Mix)",
-        "quantity": 36462,
-        "earningsUsd": 91.597503,
+        "quantity": 88424,
+        "earningsUsd": 379.378207,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Poison Pink (Nidoking)",
-        "quantity": 11487,
-        "earningsUsd": 77.13835,
+        "quantity": 301458,
+        "earningsUsd": 178.909457,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
-        "name": "Jigglypuff's Song (Uproar Ver.)",
-        "quantity": 13653,
-        "earningsUsd": 74.714657,
+        "name": "Magic Bounce (Hatterene Master)",
+        "quantity": 62072,
+        "earningsUsd": 146.010398,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
-        "name": "Just a Ditto",
-        "quantity": 191284,
-        "earningsUsd": 69.938525,
+        "name": "Scrappy Klutz (Lopunny Crash)",
+        "quantity": 135414,
+        "earningsUsd": 143.088271,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "I'm the Pheromosa",
+        "quantity": 26766,
+        "earningsUsd": 117.266465,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Pixilate (Gardevoir Dub)",
+        "quantity": 42344,
+        "earningsUsd": 111.050381,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Flower Trick (Meowscarada Mix)",
+        "quantity": 42522,
+        "earningsUsd": 106.735016,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Make It Rain (Gholdengo Deluxe)",
-        "quantity": 17305,
-        "earningsUsd": 66.861428,
+        "quantity": 23695,
+        "earningsUsd": 84.077104,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Jigglypuff's Song (Uproar Ver.)",
+        "quantity": 15047,
+        "earningsUsd": 83.820762,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Just a Ditto",
+        "quantity": 207104,
+        "earningsUsd": 81.615087,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Relic Song (Meloetta Aria)",
-        "quantity": 18456,
-        "earningsUsd": 54.332075,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Banned Badge (Intro)",
-        "quantity": 33877,
-        "earningsUsd": 47.865786,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Battle Ready",
-        "quantity": 64120,
-        "earningsUsd": 41.294239,
+        "quantity": 24551,
+        "earningsUsd": 65.999762,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Power Klutz (Tsareena vs. Lopunny)",
-        "quantity": 8189,
-        "earningsUsd": 39.187459,
+        "quantity": 12367,
+        "earningsUsd": 60.097993,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
-        "name": "Your Boyfriend is So Shady (Energy Upgrade)",
-        "quantity": 8268,
-        "earningsUsd": 37.300331,
+        "name": "Banned Badge (Intro)",
+        "quantity": 35071,
+        "earningsUsd": 50.967745,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
-        "name": "Pixie Kiss (Jynx vs. Gardevoir)",
-        "quantity": 34260,
-        "earningsUsd": 36.577017,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Pixie Whip (Tsareena vs. Gardevoir)",
-        "quantity": 8766,
-        "earningsUsd": 36.221093,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Mean Trick (Gothitelle vs. Meowscarada)",
-        "quantity": 6880,
-        "earningsUsd": 34.107402,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Pixie Look (Gothitelle vs. Gardevoir)",
-        "quantity": 22537,
-        "earningsUsd": 32.133926,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Destiny Knot",
-        "quantity": 12576,
-        "earningsUsd": 30.154626,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Pixilate (Mega Gardevoir Ver.)",
-        "quantity": 5120,
-        "earningsUsd": 28.180246,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Staryu Starmie (Cosmic Power Ver.)",
-        "quantity": 7203,
-        "earningsUsd": 27.297002,
+        "name": "Battle Ready",
+        "quantity": 77978,
+        "earningsUsd": 49.773159,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Pink Buzz (Electabuzz)",
-        "quantity": 3724,
-        "earningsUsd": 24.267474,
+        "quantity": 25294,
+        "earningsUsd": 46.08673,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Mean Trick (Gothitelle vs. Meowscarada)",
+        "quantity": 9317,
+        "earningsUsd": 45.833314,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Pixie Kiss (Jynx vs. Gardevoir)",
+        "quantity": 36882,
+        "earningsUsd": 41.465071,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Pixie Whip (Tsareena vs. Gardevoir)",
+        "quantity": 9851,
+        "earningsUsd": 40.928233,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Your Boyfriend is So Shady (Energy Upgrade)",
+        "quantity": 8631,
+        "earningsUsd": 38.764308,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Pixie Look (Gothitelle vs. Gardevoir)",
+        "quantity": 27883,
+        "earningsUsd": 38.47008,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Destiny Knot",
+        "quantity": 17174,
+        "earningsUsd": 34.300893,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Heavy Pink (Swampert)",
+        "quantity": 5877,
+        "earningsUsd": 31.451762,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Pixilate (Mega Gardevoir Ver.)",
+        "quantity": 5714,
+        "earningsUsd": 30.951736,
         "songwriterRoyaltiesWithheldUsd": 0
       }
     ],
     "topCountries": [
       {
         "name": "US",
-        "quantity": 534602,
-        "earningsUsd": 1662.518018,
+        "quantity": 754489,
+        "earningsUsd": 2056.644902,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "GB",
-        "quantity": 61932,
-        "earningsUsd": 284.610206,
+        "quantity": 87309,
+        "earningsUsd": 341.375895,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "DE",
-        "quantity": 59654,
-        "earningsUsd": 178.626065,
+        "quantity": 93009,
+        "earningsUsd": 223.733896,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "CA",
-        "quantity": 48787,
-        "earningsUsd": 126.048434,
+        "quantity": 67669,
+        "earningsUsd": 145.63163,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "AU",
-        "quantity": 37048,
-        "earningsUsd": 112.412162,
+        "quantity": 52454,
+        "earningsUsd": 144.466895,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "MX",
-        "quantity": 122282,
-        "earningsUsd": 82.391101,
+        "quantity": 161204,
+        "earningsUsd": 95.904559,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "FR",
-        "quantity": 37076,
-        "earningsUsd": 62.528649,
+        "quantity": 55511,
+        "earningsUsd": 77.045569,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "ES",
-        "quantity": 50321,
-        "earningsUsd": 55.496342,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "IT",
-        "quantity": 39745,
-        "earningsUsd": 52.267144,
+        "quantity": 65715,
+        "earningsUsd": 67.712308,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "JP",
-        "quantity": 34890,
-        "earningsUsd": 51.935532,
+        "quantity": 44078,
+        "earningsUsd": 61.414861,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "BR",
-        "quantity": 102108,
-        "earningsUsd": 50.625005,
+        "quantity": 132323,
+        "earningsUsd": 60.104191,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "IT",
+        "quantity": 55151,
+        "earningsUsd": 59.038634,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "NL",
-        "quantity": 10534,
-        "earningsUsd": 33.183909,
+        "quantity": 15170,
+        "earningsUsd": 37.843831,
         "songwriterRoyaltiesWithheldUsd": 0
       }
     ],
@@ -974,44 +974,44 @@
       },
       {
         "name": "2025-07",
-        "quantity": 2257,
-        "earningsUsd": 3.767079,
+        "quantity": 2258,
+        "earningsUsd": 3.76716,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "2025-08",
-        "quantity": 894,
-        "earningsUsd": 3.530189,
+        "quantity": 940,
+        "earningsUsd": 3.535574,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "2025-09",
-        "quantity": 2144,
-        "earningsUsd": 9.618228,
+        "quantity": 2146,
+        "earningsUsd": 9.618595,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "2025-10",
-        "quantity": 8657,
-        "earningsUsd": 52.17171,
+        "quantity": 8661,
+        "earningsUsd": 52.173402,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "2025-11",
-        "quantity": 20719,
-        "earningsUsd": 63.515142,
+        "quantity": 20733,
+        "earningsUsd": 63.518066,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "2025-12",
-        "quantity": 7553,
-        "earningsUsd": 38.903437,
+        "quantity": 7558,
+        "earningsUsd": 38.903949,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "2026-01",
-        "quantity": 500352,
-        "earningsUsd": 568.738192,
+        "quantity": 500923,
+        "earningsUsd": 568.961987,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
@@ -1022,20 +1022,26 @@
       },
       {
         "name": "2026-03",
-        "quantity": 378725,
-        "earningsUsd": 640.609767,
+        "quantity": 379260,
+        "earningsUsd": 641.977481,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "2026-04",
-        "quantity": 247977,
-        "earningsUsd": 605.146102,
+        "quantity": 248815,
+        "earningsUsd": 608.191506,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "2026-05",
-        "quantity": 53422,
-        "earningsUsd": 373.351542,
+        "quantity": 504890,
+        "earningsUsd": 730.506227,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "2026-06",
+        "quantity": 161876,
+        "earningsUsd": 335.933286,
         "songwriterRoyaltiesWithheldUsd": 0
       }
     ],
@@ -1044,9 +1050,9 @@
   "baselineSignals": [
     "The top Instagram post in this export is “Machoke looking for trade again... 👀 u free tonight tho? 🎵 “Your Boyfriend is so Shady” – Kirbai #pokemon #gay #pokemonlegendsza” with 892,296 views and 47,263 shares.",
     "The top Facebook post in this export is “Pokopia is cute until you realize Ditto is in crisis 💔 Ditto built an entire world for people who never came back. 🎧 I'm Just a Ditto – Kirbai | full song on Spotify & YouTube #Pokopia #Ditto #Pokemon #PokemonMusic #PokemonCommunity #Kir…” with 107,927 views and $10.52 in native earnings.",
-    "DistroKid reports $3,105.70 across 1,601,487 reported units for Kirbai through sale month 2026-05; the newest month may be incomplete.",
-    "The leading DistroKid stores by earnings are Spotify ($1,165.57), YouTube (Red) ($812.93), Apple Music ($723.60).",
-    "The leading tracks by DistroKid earnings are Power Whip (Tsareena Step) ($419.04), Mean Look (Gothitelle Cut) ($416.37), Lovely Kiss (Jynx Anthem) ($338.05), Magic Bounce (Hatterene Master) ($132.55), Scrappy Klutz (Lopunny Crash) ($119.35)."
+    "DistroKid reports $3,803.44 across 2,216,847 reported units for Kirbai through sale month 2026-06; the newest month may be incomplete.",
+    "The leading DistroKid stores by earnings are Spotify ($1,506.67), YouTube (Red) ($961.64), Apple Music ($848.65).",
+    "The leading tracks by DistroKid earnings are Power Whip (Tsareena Step) ($487.91), Mean Look (Gothitelle Cut) ($455.75), Lovely Kiss (Jynx Anthem) ($379.38), Poison Pink (Nidoking) ($178.91), Magic Bounce (Hatterene Master) ($146.01)."
   ],
   "dataQuality": {
     "instagram": {
