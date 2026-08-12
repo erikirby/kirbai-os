@@ -1,5 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import defaultKirbaiIdentity from '../../data/vault/brand/identity.json';
+import kirbaiStatsBaseline from '../../data/vault/analytics/kirbai_stats_baseline.json';
+import kirbaiDistroKidCatalog from '../../data/vault/releases/distrokid_catalog.json';
 
 // Server-side Supabase client (used in lib/db.ts which runs only on server)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -163,6 +166,97 @@ export async function setRow(key: string, value: any): Promise<void> {
     }
 }
 
+export function getKirbaiStatsBaseline() {
+    return {
+        generatedAt: kirbaiStatsBaseline.generatedAt,
+        status: kirbaiStatsBaseline.status,
+        instagram: {
+            coverage: kirbaiStatsBaseline.instagram.coverage,
+            totals: kirbaiStatsBaseline.instagram.totals,
+            topPosts: kirbaiStatsBaseline.instagram.topPosts.slice(0, 8),
+        },
+        facebook: {
+            coverage: kirbaiStatsBaseline.facebook.coverage,
+            totals: kirbaiStatsBaseline.facebook.totals,
+            topPosts: kirbaiStatsBaseline.facebook.topPosts.slice(0, 8),
+        },
+        distroKid: {
+            coverage: kirbaiStatsBaseline.distroKid.coverage,
+            totals: kirbaiStatsBaseline.distroKid.totals,
+            deduplicatedSensitivity: kirbaiStatsBaseline.distroKid.deduplicatedSensitivity,
+            topStores: kirbaiStatsBaseline.distroKid.topStores.slice(0, 10),
+            topTracks: kirbaiStatsBaseline.distroKid.topTracks.slice(0, 15),
+            topCountries: kirbaiStatsBaseline.distroKid.topCountries.slice(0, 10),
+            reportingCaveat: kirbaiStatsBaseline.distroKid.reportingCaveat,
+        },
+        dataQuality: kirbaiStatsBaseline.dataQuality,
+        baselineSignals: kirbaiStatsBaseline.baselineSignals,
+        usageRules: kirbaiStatsBaseline.usageRules,
+    };
+}
+
+export function getKirbaiDistroKidCatalog() {
+    return kirbaiDistroKidCatalog;
+}
+
+export function getKirbaiDistroKidCatalogSummary() {
+    return {
+        extractedAt: kirbaiDistroKidCatalog.extractedAt,
+        methodology: kirbaiDistroKidCatalog.methodology,
+        summary: kirbaiDistroKidCatalog.summary,
+        releases: kirbaiDistroKidCatalog.releases.map((release) => ({
+            title: release.title,
+            releaseDate: release.releaseDateIso,
+            upc: release.upc,
+            trackCount: release.tracks.length,
+            scope: release.kirbaiOsScope.status,
+            vaultMatch: release.vaultMatch,
+            storeLinks: release.storeLinks,
+        })),
+    };
+}
+
+// The checked-in profile is Kirbai's durable baseline. Supabase contains the
+// user-editable overlay, so saving the five Core text fields cannot erase the
+// structured social, audience, catalog, and distribution context.
+export async function getBrandIdentityAsync(mode: string = 'kirbai'): Promise<Record<string, unknown> | null> {
+    if (mode === 'factory') {
+        const factoryIdentity = await getRow('brand_identity_factory');
+        return factoryIdentity && typeof factoryIdentity === 'object' ? factoryIdentity : null;
+    }
+
+    const [{ data, error }, legacy] = await Promise.all([
+        supabase
+            .from('brand_identity')
+            .select('value')
+            .eq('key', 'brand_identity')
+            .maybeSingle(),
+        getRow('brand_identity'),
+    ]);
+
+    if (error) {
+        console.warn('[Brand Identity] Dedicated table read failed; using baseline and persistence fallback:', error.message);
+    }
+
+    return {
+        ...defaultKirbaiIdentity,
+        ...(legacy && typeof legacy === 'object' ? legacy : {}),
+        ...(data?.value && typeof data.value === 'object' ? data.value : {}),
+        performanceBaseline: getKirbaiStatsBaseline(),
+        distributionCatalog: getKirbaiDistroKidCatalogSummary(),
+    };
+}
+
+export async function saveBrandIdentityAsync(value: Record<string, unknown>): Promise<void> {
+    const current = await getBrandIdentityAsync('kirbai');
+    const merged = { ...(current ?? {}), ...value };
+    const { error } = await supabase
+        .from('brand_identity')
+        .upsert({ key: 'brand_identity', value: merged }, { onConflict: 'key' });
+
+    if (error) throw error;
+}
+
 // --- DB helpers (async versions) ---
 
 export async function getDbAsync(): Promise<DatabaseSchema> {
@@ -218,7 +312,29 @@ export async function setFinanceAnalysisAsync(analysis: any) {
 
 export async function getFinanceAnalysisAsync() {
     const db = await getDbAsync();
-    return db.financeAnalysis;
+    if (db?.financeAnalysis && db.financeAnalysis.totals) {
+        return db.financeAnalysis;
+    }
+
+    const baseline = getKirbaiStatsBaseline();
+    return {
+        totals: {
+            revenue: baseline.distroKid.totals.earningsUsd,
+            streams: baseline.distroKid.totals.quantity
+        },
+        platforms: baseline.distroKid.topStores.map((s: any) => ({
+            store: s.name,
+            revenue: s.earningsUsd,
+            streams: s.quantity
+        })),
+        tracks: baseline.distroKid.topTracks.map((t: any) => ({
+            title: t.name,
+            revenue: t.earningsUsd,
+            streams: t.quantity
+        })),
+        advice: `<p>Baseline royalty dataset compiled on ${baseline.generatedAt ? new Date(baseline.generatedAt).toLocaleDateString() : 'recent export'}. Total Earnings: $${baseline.distroKid.totals.earningsUsd.toFixed(2)} across ${baseline.distroKid.totals.quantity.toLocaleString()} reported units.</p>`,
+        persistedAt: baseline.generatedAt || new Date().toISOString()
+    };
 }
 
 export async function saveRoadmapAsync(mode: string, roadmap: RoadmapData) {
@@ -353,7 +469,34 @@ export async function savePulseStateAsync(mode: string, state: any) {
 
 export async function getPulseStateAsync(mode: string) {
     const key = mode === 'factory' ? 'pulse_state_factory' : 'pulse_state_kirbai';
-    return await getRow(key);
+    const state = await getRow(key);
+    if (state && (state.instagram?.reach || state.igReach)) return state;
+
+    if (mode === 'kirbai') {
+        const baseline = getKirbaiStatsBaseline();
+        return {
+            instagram: {
+                followers: baseline.instagram.totals.follows.toString(),
+                reach: baseline.instagram.totals.reach.toString(),
+                views: baseline.instagram.totals.views.toString(),
+                lastUpdated: baseline.generatedAt ? new Date(baseline.generatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+                topPosts: baseline.instagram.topPosts,
+                totals: baseline.instagram.totals,
+                coverage: baseline.instagram.coverage,
+            },
+            facebook: {
+                followers: baseline.facebook.totals.follows.toString(),
+                reach: baseline.facebook.totals.reach.toString(),
+                views: baseline.facebook.totals.views.toString(),
+                lastUpdated: baseline.generatedAt ? new Date(baseline.generatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+                topPosts: baseline.facebook.topPosts,
+                totals: baseline.facebook.totals,
+                coverage: baseline.facebook.coverage,
+            },
+            distroKid: baseline.distroKid
+        };
+    }
+    return state || null;
 }
 
 // --- DISTRO / DESCRIPTION GENERATOR SESSIONS ---

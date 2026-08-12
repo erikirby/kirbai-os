@@ -1,4 +1,5 @@
-import { getRow, setRow, setFinanceAnalysisAsync } from "@/lib/db";
+import { getRow, setRow, setFinanceAnalysisAsync, getKirbaiStatsBaseline } from "@/lib/db";
+import { NextResponse } from "next/server";
 
 // Revenue Engine persistence. Analysis is computed client-side (deterministic math,
 // no AI) and stored here per-mode so it survives sessions.
@@ -9,7 +10,29 @@ export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const mode = searchParams.get("mode") || "kirbai";
-        const stored = await getRow(key(mode));
+        let stored = await getRow(key(mode));
+        if (!stored && mode === 'kirbai') {
+            const baseline = getKirbaiStatsBaseline();
+            stored = {
+                kpis: {
+                    totalRevenue: baseline.distroKid.totals.earningsUsd,
+                    totalStreams: baseline.distroKid.totals.quantity,
+                    effectiveCpm: (baseline.distroKid.totals.earningsUsd / (baseline.distroKid.totals.quantity || 1)) * 1000,
+                },
+                byStore: baseline.distroKid.topStores.map((s: any) => ({
+                    store: s.name,
+                    earnings: s.earningsUsd,
+                    streams: s.quantity,
+                    rate: s.quantity ? s.earningsUsd / s.quantity : 0
+                })),
+                bySong: baseline.distroKid.topTracks.map((t: any) => ({
+                    title: t.name,
+                    earnings: t.earningsUsd,
+                    streams: t.quantity
+                })),
+                savedAt: baseline.generatedAt || new Date().toISOString()
+            };
+        }
         return NextResponse.json({ analysis: stored });
     } catch {
         return NextResponse.json({ error: "Failed to retrieve stored analysis" }, { status: 500 });
