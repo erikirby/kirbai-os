@@ -28,8 +28,30 @@ export default function RevenueTimelineChart({ data }: TimelineProps) {
     const maxVal = Math.max(...data.map(d => viewType === 'earnings' ? d.earningsUsd : d.quantity), 1);
 
     const formatVal = (val: number) => {
+        if (viewType === 'earnings') {
+            if (val >= 1000) return `$${(val / 1000).toFixed(1)}k`;
+            if (val >= 1) return `$${Math.round(val)}`;
+            if (val > 0) return `$${val.toFixed(2)}`;
+            return '$0';
+        }
+        if (val >= 1000000) return `${(val / 1000000).toFixed(1)}M`;
+        if (val >= 1000) return `${(val / 1000).toFixed(0)}k`;
+        return val.toString();
+    };
+
+    const formatFullVal = (val: number) => {
         if (viewType === 'earnings') return `$${val.toFixed(2)}`;
         return val.toLocaleString();
+    };
+
+    const formatMonthName = (dateStr: string) => {
+        // e.g. "2026-05" -> "May '26" or "05/26"
+        const [year, month] = dateStr.split('-');
+        if (!year || !month) return dateStr;
+        const shortYear = year.slice(2);
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const mIdx = parseInt(month, 10) - 1;
+        return `${monthNames[mIdx] || month} '${shortYear}`;
     };
 
     return (
@@ -68,25 +90,32 @@ export default function RevenueTimelineChart({ data }: TimelineProps) {
             </div>
 
             {/* Visual Bar Timeline Grid */}
-            <div className="flex items-end gap-2 h-52 pt-8 pb-4 px-2 overflow-x-auto custom-scrollbar border-b border-border/30">
+            <div className="flex items-end gap-2.5 h-64 pt-10 pb-8 px-2 overflow-x-auto custom-scrollbar border-b border-border/30">
                 {data.map((item, idx) => {
                     const value = viewType === 'earnings' ? item.earningsUsd : item.quantity;
-                    // Min 10% height for any non-zero value so small months are clearly visible
                     const rawPct = maxVal > 0 ? (value / maxVal) * 100 : 0;
-                    const heightPercent = value > 0 ? Math.max(10, Math.min(100, rawPct)) : 4;
+                    const heightPercent = value > 0 ? Math.max(12, Math.min(100, rawPct)) : 4;
+                    const isTopMonth = value === maxVal;
 
                     return (
-                        <div key={idx} className="flex-1 min-w-[28px] h-full flex flex-col items-center justify-end gap-2 group relative">
+                        <div key={idx} className="flex-1 min-w-[38px] h-full flex flex-col items-center justify-end gap-1.5 group relative">
+                            {/* Value Badge On Top of Bar */}
+                            <span className={`text-[10px] font-mono font-extrabold tracking-tight transition-all ${
+                                isTopMonth ? 'text-amber-300 scale-110' : viewType === 'earnings' ? 'text-emerald-400' : 'text-purple-400'
+                            }`}>
+                                {value > 0 ? formatVal(value) : ''}
+                            </span>
+
                             {/* Hover Tooltip */}
                             <div className="absolute -top-12 opacity-0 group-hover:opacity-100 transition-opacity bg-surface border border-border px-2.5 py-1.5 rounded-lg text-[10px] font-mono whitespace-nowrap z-30 pointer-events-none shadow-2xl">
-                                <span className="text-foreground/70 font-bold block">{item.name}</span>
+                                <span className="text-foreground/70 font-bold block">{item.name} ({formatMonthName(item.name)})</span>
                                 <span className={viewType === 'earnings' ? 'text-emerald-400 font-black' : 'text-purple-400 font-black'}>
-                                    {formatVal(value)}
+                                    {formatFullVal(value)}
                                 </span>
                             </div>
 
                             {/* Bar Column Container */}
-                            <div className="w-full bg-surface/80 rounded-t-lg border-t border-x border-border/40 flex items-end justify-center p-0.5 h-36 relative overflow-hidden">
+                            <div className="w-full bg-surface/80 rounded-t-lg border-t border-x border-border/40 flex items-end justify-center p-0.5 h-40 relative overflow-hidden">
                                 <div
                                     className={`w-full rounded-t-md transition-all duration-700 ease-out group-hover:brightness-125 ${
                                         viewType === 'earnings' 
@@ -97,9 +126,9 @@ export default function RevenueTimelineChart({ data }: TimelineProps) {
                                 />
                             </div>
 
-                            {/* Date Label */}
-                            <span className="text-[9px] font-mono font-semibold text-foreground/50 rotate-45 origin-left whitespace-nowrap mt-2">
-                                {item.name}
+                            {/* Date Label (Clear, Non-Truncated Vertical Text) */}
+                            <span className="text-[9px] font-mono font-bold text-foreground/60 whitespace-nowrap tracking-tighter mt-1">
+                                {formatMonthName(item.name)}
                             </span>
                         </div>
                     );
@@ -107,7 +136,7 @@ export default function RevenueTimelineChart({ data }: TimelineProps) {
             </div>
 
             {/* Footnote */}
-            <div className="flex items-center gap-2 text-[10px] font-mono text-foreground/40 bg-surface/30 p-3 rounded-lg border border-border/40 mt-4">
+            <div className="flex items-center gap-2 text-[10px] font-mono text-foreground/40 bg-surface/30 p-3 rounded-lg border border-border/40">
                 <AlertCircle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
                 <span>
                     Reporting Caveat: DistroKid royalties arrive on a 2–3 month latency delay. The newest month ({data[data.length - 1]?.name}) represents partial earnings and should not be directly compared with mature reporting periods.
