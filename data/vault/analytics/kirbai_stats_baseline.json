@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-12T01:53:16.172Z",
+  "generatedAt": "2026-09-03T23:14:18.826Z",
   "status": "Historical baseline; refresh from the source folder before claiming metrics are current.",
   "sourceDirectory": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats",
   "sources": [
@@ -37,6 +37,22 @@
       "detectedType": "instagram"
     },
     {
+      "fileName": "Jan-01-2026_Sep-03-2026_1796667004661863 (1).csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Jan-01-2026_Sep-03-2026_1796667004661863 (1).csv",
+      "checksumSha256": "218727ec19154b5e4d1670f6c20eff0e9033ce609ebc291d7f46040a49a27fa2",
+      "rows": 84,
+      "columns": 31,
+      "detectedType": "facebook"
+    },
+    {
+      "fileName": "Jan-01-2026_Sep-03-2026_1851941875777783.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Jan-01-2026_Sep-03-2026_1851941875777783.csv",
+      "checksumSha256": "8d4624a89a3f261b763fe179d538fee9bcdaa7ce167e5ae47b24103f7b4cb637",
+      "rows": 88,
+      "columns": 18,
+      "detectedType": "instagram"
+    },
+    {
       "fileName": "Jul-01-2026_Aug-11-2026_990670734019030.csv",
       "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Jul-01-2026_Aug-11-2026_990670734019030.csv",
       "checksumSha256": "496d16cb71e43bc0e55d2993bdca4ec312cb53609db56016d018a9019211b281",
@@ -53,6 +69,22 @@
       "detectedType": "instagram"
     },
     {
+      "fileName": "Overview.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Overview.csv",
+      "checksumSha256": "f07b3dd262a7b9a2b94349ec49cf2786eb42f580aa1f165ccd9eb22e6bce2a19",
+      "rows": 365,
+      "columns": 6,
+      "detectedType": "unknown"
+    },
+    {
+      "fileName": "results 2 copy.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/results 2 copy.csv",
+      "checksumSha256": "693929e288239125b0b5155f741e58cf9c1c9f445e9ed249b60d3756f1935a05",
+      "rows": 36283,
+      "columns": 15,
+      "detectedType": "distrokid"
+    },
+    {
       "fileName": "results 2.csv",
       "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/results 2.csv",
       "checksumSha256": "e419f9109574e5a7e29104d83e0ffd7b8fb2fc076b9623119158f726d9420f97",
@@ -65,19 +97,19 @@
     "grain": "One lifetime aggregate row per post ID.",
     "coverage": {
       "firstPublishDate": "2025-10-12",
-      "lastPublishDate": "2026-08-07",
-      "posts": 107,
-      "videos": 91,
+      "lastPublishDate": "2026-09-02",
+      "posts": 110,
+      "videos": 94,
       "otherPosts": 16
     },
     "totals": {
-      "views": 5226489,
-      "reach": 3430364,
-      "reactions": 313260,
-      "comments": 4216,
-      "shares": 186943,
-      "saves": 38947,
-      "follows": 15271,
+      "views": 5612585,
+      "reach": 3699079,
+      "reactions": 337231,
+      "comments": 4619,
+      "shares": 205795,
+      "saves": 42230,
+      "follows": 16302,
       "earningsUsd": 0
     },
     "topPosts": [
@@ -104,12 +136,12 @@
         "caption": "Gothitelle is a fashion serial killer 🥀⛓️ To be honest, I wasn’t a fan of her before I started this project, but seeing her tie up and humiliate Machoke changed that. bringing magic✨ Featuring Gothorita dance crew and a dead Chandelure. P…",
         "permalink": "https://www.instagram.com/reel/DTTyeTiAHBn/",
         "durationSeconds": 45,
-        "views": 482325,
-        "reach": 322577,
-        "reactions": 41182,
-        "comments": 358,
-        "shares": 14680,
-        "saves": 5053,
+        "views": 483155,
+        "reach": 322847,
+        "reactions": 41133,
+        "comments": 357,
+        "shares": 14700,
+        "saves": 5049,
         "follows": 3452,
         "earningsUsd": 0
       },
@@ -120,13 +152,13 @@
         "caption": "daddy runs everything 🩷 music: \"Poison Pink\" - Kirbai Dratini and Quagsire are going to a pink party. Electabuzz is hitting the sauce a bit too hard, but he's just having fun!! Rhyhorn isn't drinking so he can be the DD. Swampert is using…",
         "permalink": "https://www.instagram.com/reel/DX1o59FgxXv/",
         "durationSeconds": 70,
-        "views": 462709,
-        "reach": 357636,
-        "reactions": 25270,
-        "comments": 357,
-        "shares": 40374,
-        "saves": 4564,
-        "follows": 1755,
+        "views": 467103,
+        "reach": 358922,
+        "reactions": 25443,
+        "comments": 360,
+        "shares": 40534,
+        "saves": 4596,
+        "follows": 1783,
         "earningsUsd": 0
       },
       {
@@ -136,13 +168,13 @@
         "caption": "Tsareena, the grass type diva 👑🌿 🎵: Power Whip (Tsareena Step) - Kirbai I spent way too much time getting the texture right on the pink boots, but if she's going to be banned from the league she might as well look expensive doing it. Ad…",
         "permalink": "https://www.instagram.com/reel/DTiYq_agKyj/",
         "durationSeconds": 64,
-        "views": 400501,
-        "reach": 272248,
-        "reactions": 30967,
+        "views": 401457,
+        "reach": 272956,
+        "reactions": 30948,
         "comments": 458,
-        "shares": 19314,
-        "saves": 3709,
-        "follows": 2855,
+        "shares": 19345,
+        "saves": 3710,
+        "follows": 2856,
         "earningsUsd": 0
       },
       {
@@ -162,18 +194,34 @@
         "earningsUsd": 0
       },
       {
+        "postId": "18006108314937373",
+        "publishDate": "2026-06-24",
+        "type": "IG reel",
+        "caption": "Jynx's shopping haul took a turn🧊 🎵 Lovely Kiss (Captivate Ver.)- Kirbai #pokemon #pokemonart #jynx #pokemoncommunity #staryu",
+        "permalink": "https://www.instagram.com/reel/DZ_A-eXioKU/",
+        "durationSeconds": 51,
+        "views": 207686,
+        "reach": 149154,
+        "reactions": 12761,
+        "comments": 132,
+        "shares": 4703,
+        "saves": 1444,
+        "follows": 765,
+        "earningsUsd": 0
+      },
+      {
         "postId": "18064629908665252",
         "publishDate": "2026-02-23",
         "type": "IG reel",
         "caption": "🎧 Music: Scrappy Klutz (Lopunny Crash) She's just a Pokemon in love, and can't be held responsible for her actions. 🎀🔪 They say love makes you crazy, therefore you can't call her crazy. 'Cause when you call her crazy, you're just callin…",
         "permalink": "https://www.instagram.com/reel/DVGvkjOgKlm/",
         "durationSeconds": 83,
-        "views": 202565,
-        "reach": 139758,
-        "reactions": 14656,
+        "views": 203197,
+        "reach": 139922,
+        "reactions": 14641,
         "comments": 175,
-        "shares": 8924,
-        "saves": 2271,
+        "shares": 8934,
+        "saves": 2265,
         "follows": 1104,
         "earningsUsd": 0
       },
@@ -184,29 +232,29 @@
         "caption": "Pokopia is cute until you realize Ditto is in crisis 💔 Ditto built an entire world for people who never came back. 🎧 I'm Just a Ditto – Kirbai | full song on Spotify & YouTube #Pokopia #Ditto #Pokemon #PokemonMusic #PokemonCommunity #Kir…",
         "permalink": "https://www.instagram.com/reel/DVqj8s_AKNR/",
         "durationSeconds": 30,
-        "views": 180262,
-        "reach": 131276,
-        "reactions": 8985,
+        "views": 180948,
+        "reach": 131572,
+        "reactions": 8979,
         "comments": 55,
-        "shares": 1546,
-        "saves": 1145,
+        "shares": 1548,
+        "saves": 1143,
         "follows": 64,
         "earningsUsd": 0
       },
       {
-        "postId": "18006108314937373",
-        "publishDate": "2026-06-24",
+        "postId": "18114134488786444",
+        "publishDate": "2026-09-02",
         "type": "IG reel",
-        "caption": "Jynx's shopping haul took a turn🧊 🎵 Lovely Kiss - Kirbai (lo-fi remix) #pokemon #pokemonart #jynx #pokemoncommunity #staryu",
-        "permalink": "https://www.instagram.com/reel/DZ_A-eXioKU/",
-        "durationSeconds": 51,
-        "views": 151312,
-        "reach": 109746,
-        "reactions": 9579,
-        "comments": 98,
-        "shares": 3689,
-        "saves": 1079,
-        "follows": 506,
+        "caption": "Category is: Legendary 💎� Regirock isn't here to make friends. She's here to win.� Tonight's runway: Regirock, Regice, Registeel, Regieleki & Regidrago. 🎵 “Runway Regi” - KIRBAI inspired by the iconic @regirocktok ❤️ #Pokemon #Regirock #…",
+        "permalink": "https://www.instagram.com/reel/DczPEg2Am5K/",
+        "durationSeconds": 139,
+        "views": 139732,
+        "reach": 106215,
+        "reactions": 11514,
+        "comments": 186,
+        "shares": 13430,
+        "saves": 1622,
+        "follows": 301,
         "earningsUsd": 0
       },
       {
@@ -216,29 +264,13 @@
         "caption": "The Banned Badge baddies face off against the Heart Scale hotties in the mashup EP, Battle Ready. High-intensity tracks for the final set. Really, I just wanted an excuse to see Jynx's hilarious face more. God I love her. 👑 Tsareena v 🐰 …",
         "permalink": "https://www.instagram.com/reel/DWbY_mjgCoz/",
         "durationSeconds": 42,
-        "views": 137140,
-        "reach": 93455,
-        "reactions": 10609,
+        "views": 138543,
+        "reach": 93954,
+        "reactions": 10653,
         "comments": 161,
-        "shares": 3442,
-        "saves": 1303,
-        "follows": 375,
-        "earningsUsd": 0
-      },
-      {
-        "postId": "18037776356756380",
-        "publishDate": "2026-02-27",
-        "type": "IG reel",
-        "caption": "Pokemon Winds and Waves announcement has me feeling like summer!! 🏝️ We doing Gecqua, Browt, or Pombon? Yes they all look like previous Pokemon, and yes I wish Pokemon would be more original, but also YES to cute fire types, realistic bea…",
-        "permalink": "https://www.instagram.com/reel/DVSA8OUgPgo/",
-        "durationSeconds": 18,
-        "views": 115892,
-        "reach": 83746,
-        "reactions": 7087,
-        "comments": 85,
-        "shares": 2848,
-        "saves": 610,
-        "follows": 82,
+        "shares": 3446,
+        "saves": 1312,
+        "follows": 376,
         "earningsUsd": 0
       },
       {
@@ -248,13 +280,29 @@
         "caption": "❄️ OG Jynx gets revenge on Kanto for making her change 👄🔮 🎵 Lovely Kiss - Kirbai (unreleased remix) #pokemon #pokemonmusic #jynx #justiceforjynx",
         "permalink": "https://www.instagram.com/reel/DaB6b3yiNX4/",
         "durationSeconds": 98,
-        "views": 85830,
-        "reach": 64038,
-        "reactions": 5979,
-        "comments": 178,
-        "shares": 3891,
-        "saves": 848,
-        "follows": 284,
+        "views": 133719,
+        "reach": 96948,
+        "reactions": 8628,
+        "comments": 252,
+        "shares": 5390,
+        "saves": 1294,
+        "follows": 460,
+        "earningsUsd": 0
+      },
+      {
+        "postId": "18037776356756380",
+        "publishDate": "2026-02-27",
+        "type": "IG reel",
+        "caption": "Pokemon Winds and Waves announcement has me feeling like summer!! 🏝️ We doing Gecqua, Browt, or Pombon? Yes they all look like previous Pokemon, and yes I wish Pokemon would be more original, but also YES to cute fire types, realistic bea…",
+        "permalink": "https://www.instagram.com/reel/DVSA8OUgPgo/",
+        "durationSeconds": 18,
+        "views": 116348,
+        "reach": 83805,
+        "reactions": 7087,
+        "comments": 85,
+        "shares": 2854,
+        "saves": 610,
+        "follows": 82,
         "earningsUsd": 0
       },
       {
@@ -264,12 +312,12 @@
         "caption": "🔮 Down, down, down the Road… Down this B!tch’s Road 🕯️ Music💿: \"Magic Bounce\" by Kirbai This is the villain origin story of the banned Hatterene. After Iron Valiant was unjustly taken, Hatterene is determined to walk the Witch’s Road to…",
         "permalink": "https://www.instagram.com/reel/DTxvXyKAO0q/",
         "durationSeconds": 89,
-        "views": 67048,
-        "reach": 43092,
-        "reactions": 4844,
+        "views": 67459,
+        "reach": 43267,
+        "reactions": 4850,
         "comments": 64,
-        "shares": 1447,
-        "saves": 821,
+        "shares": 1448,
+        "saves": 818,
         "follows": 256,
         "earningsUsd": 0
       },
@@ -304,22 +352,6 @@
         "saves": 400,
         "follows": 36,
         "earningsUsd": 0
-      },
-      {
-        "postId": "18091178144019661",
-        "publishDate": "2026-02-16",
-        "type": "IG reel",
-        "caption": "What if Pokémon formed a K-pop group? 🧬✨ Heart Scales Project: Authenticated. A transformative, fan tribute music experiment. Subject registry open. Choose your bias: Lopunny • Meowscarada • Pheromosa • Meloetta • Ditto • Gholdengo 🎧 Hea…",
-        "permalink": "https://www.instagram.com/reel/DU024CTAGoL/",
-        "durationSeconds": 31,
-        "views": 57616,
-        "reach": 36712,
-        "reactions": 3651,
-        "comments": 53,
-        "shares": 952,
-        "saves": 432,
-        "follows": 143,
-        "earningsUsd": 0
       }
     ]
   },
@@ -327,20 +359,20 @@
     "grain": "One lifetime aggregate row per post ID.",
     "coverage": {
       "firstPublishDate": "2026-02-23",
-      "lastPublishDate": "2026-08-10",
-      "posts": 81,
-      "videos": 67,
+      "lastPublishDate": "2026-09-02",
+      "posts": 86,
+      "videos": 72,
       "otherPosts": 14
     },
     "totals": {
-      "views": 1547473,
-      "reach": 1242996,
-      "reactions": 40509,
-      "comments": 1193,
-      "shares": 3056,
+      "views": 1844170,
+      "reach": 1502825,
+      "reactions": 49399,
+      "comments": 1499,
+      "shares": 3762,
       "saves": 0,
       "follows": 0,
-      "earningsUsd": 125.8
+      "earningsUsd": 156.66
     },
     "topPosts": [
       {
@@ -350,14 +382,14 @@
         "caption": "Pokopia is cute until you realize Ditto is in crisis 💔 Ditto built an entire world for people who never came back. 🎧 I'm Just a Ditto – Kirbai | full song on Spotify & YouTube #Pokopia #Ditto #Pokemon #PokemonMusic #PokemonCommunity #Kir…",
         "permalink": "https://www.facebook.com/reel/1400645312111007/",
         "durationSeconds": 31,
-        "views": 107927,
-        "reach": 101929,
-        "reactions": 1216,
-        "comments": 42,
-        "shares": 51,
+        "views": 113561,
+        "reach": 107049,
+        "reactions": 1269,
+        "comments": 44,
+        "shares": 55,
         "saves": 0,
         "follows": 0,
-        "earningsUsd": 10.52
+        "earningsUsd": 10.86
       },
       {
         "postId": "122116597700076338",
@@ -366,14 +398,14 @@
         "caption": "Machoke looking for trade again... 👀 u free tonight tho? 🎵 “Your Boyfriend is so Shady” – Kirbai #pokemon #gaymer #pokemonlegendsza #machoke",
         "permalink": "https://www.facebook.com/reel/4462906783984277/",
         "durationSeconds": 14,
-        "views": 79967,
-        "reach": 46792,
-        "reactions": 2411,
+        "views": 80583,
+        "reach": 46955,
+        "reactions": 2424,
         "comments": 41,
-        "shares": 157,
+        "shares": 159,
         "saves": 0,
         "follows": 0,
-        "earningsUsd": 1.26
+        "earningsUsd": 1.28
       },
       {
         "postId": "122114468096076338",
@@ -382,14 +414,14 @@
         "caption": "Jynx is a star and I'm tired of her getting shafted. So I wrote this song 💅🔮 full song: search ‘Lovely Kiss – Kirbai’ on Spotify/YouTube/Amazon 💋❄️ Apple should be live in a couple days ルージュラ! #pokemon #pokemonmusic #justiceforjynx #kir…",
         "permalink": "https://www.facebook.com/reel/1619764519115832/",
         "durationSeconds": 39,
-        "views": 70985,
-        "reach": 52983,
-        "reactions": 2222,
-        "comments": 93,
-        "shares": 184,
+        "views": 78894,
+        "reach": 59933,
+        "reactions": 2524,
+        "comments": 98,
+        "shares": 197,
         "saves": 0,
         "follows": 0,
-        "earningsUsd": 4.73
+        "earningsUsd": 5.05
       },
       {
         "postId": "122113718786076338",
@@ -398,30 +430,14 @@
         "caption": "got them all addicted, now who's the addict? pheromones or real love, both hit like acid 🩷☠️ Music: Pink Pheromones - Kirbai just a quickie #salazzle #incineroar #quagsire #machamp #swampert #pokemoncommunity #aimusic #gaymer",
         "permalink": "https://www.facebook.com/reel/878305031950463/",
         "durationSeconds": 21,
-        "views": 68337,
-        "reach": 51477,
-        "reactions": 974,
+        "views": 68615,
+        "reach": 51504,
+        "reactions": 989,
         "comments": 20,
-        "shares": 61,
+        "shares": 62,
         "saves": 0,
         "follows": 0,
-        "earningsUsd": 2.72
-      },
-      {
-        "postId": "122115474902076338",
-        "publishDate": "2026-06-24",
-        "type": "Videos",
-        "caption": "Jynx's shopping haul took a turn🧊 🎵 Lovely Kiss - Kirbai (lo-fi remix) #pokemon #pokemonart #jynx #pokemoncommunity #staryu",
-        "permalink": "https://www.facebook.com/reel/1568995088187532/",
-        "durationSeconds": 52,
-        "views": 60708,
-        "reach": 47010,
-        "reactions": 2051,
-        "comments": 49,
-        "shares": 135,
-        "saves": 0,
-        "follows": 0,
-        "earningsUsd": 7.79
+        "earningsUsd": 2.73
       },
       {
         "postId": "122114541920076338",
@@ -430,14 +446,30 @@
         "caption": "Gothitelle is a fashion serial killer 🥀⛓️ To be honest, I wasn’t a fan of her before I started this project, but seeing her tie up and humiliate Machoke changed that. bringing magic✨ Featuring Gothorita dance crew and a dead Chandelure. P…",
         "permalink": "https://www.facebook.com/reel/1529580938717477/",
         "durationSeconds": 46,
-        "views": 60488,
-        "reach": 44558,
-        "reactions": 2580,
-        "comments": 25,
-        "shares": 168,
+        "views": 61754,
+        "reach": 45410,
+        "reactions": 2674,
+        "comments": 28,
+        "shares": 177,
         "saves": 0,
         "follows": 0,
-        "earningsUsd": 5
+        "earningsUsd": 5.11
+      },
+      {
+        "postId": "122115474902076338",
+        "publishDate": "2026-06-24",
+        "type": "Videos",
+        "caption": "Jynx's shopping haul took a turn🧊 🎵 Lovely Kiss - Kirbai (lo-fi remix) #pokemon #pokemonart #jynx #pokemoncommunity #staryu",
+        "permalink": "https://www.facebook.com/reel/1568995088187532/",
+        "durationSeconds": 52,
+        "views": 61750,
+        "reach": 47720,
+        "reactions": 2122,
+        "comments": 49,
+        "shares": 138,
+        "saves": 0,
+        "follows": 0,
+        "earningsUsd": 7.93
       },
       {
         "postId": "122114938976076338",
@@ -446,30 +478,14 @@
         "caption": "hypno's garden is very well maintained. 🎵 Dream Eater - Kirbai he tends to his collection, but he's missing someone... #pokemon #pokemonart #hypno #jigglypuff #pokemoncommunity",
         "permalink": "https://www.facebook.com/reel/3137994283065189/",
         "durationSeconds": 45,
-        "views": 60261,
-        "reach": 45770,
-        "reactions": 1475,
+        "views": 60510,
+        "reach": 45883,
+        "reactions": 1479,
         "comments": 13,
-        "shares": 91,
+        "shares": 93,
         "saves": 0,
         "follows": 0,
-        "earningsUsd": 2.43
-      },
-      {
-        "postId": "122115557834076338",
-        "publishDate": "2026-06-25",
-        "type": "Videos",
-        "caption": "❄️ OG Jynx gets revenge on Kanto for making her change 👄🔮 🎵 Lovely Kiss - Kirbai (unreleased remix) #pokemon #pokemonmusic #jynx #justiceforjynx",
-        "permalink": "https://www.facebook.com/reel/1351101933295265/",
-        "durationSeconds": 99,
-        "views": 55462,
-        "reach": 48048,
-        "reactions": 1920,
-        "comments": 107,
-        "shares": 201,
-        "saves": 0,
-        "follows": 0,
-        "earningsUsd": 11.47
+        "earningsUsd": 2.45
       },
       {
         "postId": "122114960432076338",
@@ -478,14 +494,30 @@
         "caption": "Hypno strut #kylieminogue #pokemoncommunity #pokemonmeme",
         "permalink": "https://www.facebook.com/reel/2413742659095395/",
         "durationSeconds": 12,
-        "views": 54643,
-        "reach": 37872,
-        "reactions": 1191,
-        "comments": 31,
-        "shares": 83,
+        "views": 58610,
+        "reach": 40552,
+        "reactions": 1333,
+        "comments": 34,
+        "shares": 90,
         "saves": 0,
         "follows": 0,
-        "earningsUsd": 0.3
+        "earningsUsd": 0.32
+      },
+      {
+        "postId": "122115557834076338",
+        "publishDate": "2026-06-25",
+        "type": "Videos",
+        "caption": "❄️ OG Jynx gets revenge on Kanto for making her change 👄🔮 🎵 Lovely Kiss - Kirbai (unreleased remix) #pokemon #pokemonmusic #jynx #justiceforjynx",
+        "permalink": "https://www.facebook.com/reel/1351101933295265/",
+        "durationSeconds": 99,
+        "views": 56247,
+        "reach": 48291,
+        "reactions": 1949,
+        "comments": 108,
+        "shares": 203,
+        "saves": 0,
+        "follows": 0,
+        "earningsUsd": 11.62
       },
       {
         "postId": "122114686940076338",
@@ -494,30 +526,30 @@
         "caption": "Tsareena, the grass type diva 👑🌿 🎵: Power Whip (Tsareena Step) - Kirbai I spent way too much time getting the texture right on the pink boots, but if she's going to be banned from the league she might as well look expensive doing it. Ad…",
         "permalink": "https://www.facebook.com/reel/4066015280356046/",
         "durationSeconds": 65,
-        "views": 54337,
-        "reach": 42680,
-        "reactions": 2040,
+        "views": 54914,
+        "reach": 43550,
+        "reactions": 2089,
         "comments": 46,
-        "shares": 130,
+        "shares": 134,
         "saves": 0,
         "follows": 0,
-        "earningsUsd": 1.77
+        "earningsUsd": 1.79
       },
       {
-        "postId": "122114015696076338",
-        "publishDate": "2026-06-06",
+        "postId": "122121350246076338",
+        "publishDate": "2026-09-02",
         "type": "Videos",
-        "caption": "Thunder Wave couldn't stop this. Chapter 5: Pink Pool Party Slowbro should have cut Dratini off. Dratini started a wrap battle with everyone there. Quagsire tried to stop him. Lickitung did not. 🎵 Wrap Me In Pink (Quiver Dance Ver.) - Kir…",
-        "permalink": "https://www.facebook.com/reel/1292914756347594/",
-        "durationSeconds": 83,
-        "views": 51735,
-        "reach": 45492,
-        "reactions": 1192,
-        "comments": 38,
-        "shares": 101,
+        "caption": "Category is: Legendary 💅 Regirock isn't here to make friends. She's here to win. Tonight's runway: Regirock, Regice, Registeel, Regieleki & Regidrago. 🎵 “Runway Regi” - KIRBAI inspired by the iconic @regirocktok ❤️ #Pokemon #Regirock #Po…",
+        "permalink": "https://www.facebook.com/reel/1702399930845662/",
+        "durationSeconds": 140,
+        "views": 54088,
+        "reach": 53296,
+        "reactions": 1607,
+        "comments": 95,
+        "shares": 214,
         "saves": 0,
         "follows": 0,
-        "earningsUsd": 7.69
+        "earningsUsd": 5.54
       },
       {
         "postId": "122112827042076338",
@@ -526,14 +558,46 @@
         "caption": "Daddy runs everything 🩷 music: \"Poison Pink\" - Kirbai Dratini and Quagsire are going to a pink party. Electabuzz is hitting the sauce a bit too hard, but he's just having fun!! Rhyhorn isn't drinking so he can be the DD. Swampert is using…",
         "permalink": "https://www.facebook.com/reel/1005291475292314/",
         "durationSeconds": 71,
-        "views": 51334,
-        "reach": 42427,
-        "reactions": 1814,
+        "views": 51937,
+        "reach": 42636,
+        "reactions": 1851,
         "comments": 92,
-        "shares": 187,
+        "shares": 190,
         "saves": 0,
         "follows": 0,
-        "earningsUsd": 3.62
+        "earningsUsd": 3.73
+      },
+      {
+        "postId": "122114015696076338",
+        "publishDate": "2026-06-06",
+        "type": "Videos",
+        "caption": "Thunder Wave couldn't stop this. Chapter 5: Pink Pool Party Slowbro should have cut Dratini off. Dratini started a wrap battle with everyone there. Quagsire tried to stop him. Lickitung did not. 🎵 Wrap Me In Pink (Quiver Dance Ver.) - Kir…",
+        "permalink": "https://www.facebook.com/reel/1292914756347594/",
+        "durationSeconds": 83,
+        "views": 51916,
+        "reach": 45629,
+        "reactions": 1202,
+        "comments": 38,
+        "shares": 101,
+        "saves": 0,
+        "follows": 0,
+        "earningsUsd": 7.73
+      },
+      {
+        "postId": "122120782772076338",
+        "publishDate": "2026-08-28",
+        "type": "Videos",
+        "caption": "The Banned Badge baddies face off against the Heart Scale hotties in the mashup EP, Battle Ready. High-intensity tracks for the final set. Really, I just wanted an excuse to see Jynx's hilarious face more. God I love her. 👑 Tsareena v 🐰 …",
+        "permalink": "https://www.facebook.com/reel/3567668643395407/",
+        "durationSeconds": 43,
+        "views": 51826,
+        "reach": 48337,
+        "reactions": 1423,
+        "comments": 31,
+        "shares": 100,
+        "saves": 0,
+        "follows": 0,
+        "earningsUsd": 3.7
       },
       {
         "postId": "122114764736076338",
@@ -542,46 +606,14 @@
         "caption": "I feed off your unraveling. Hypno works the circuit party differently. Pokemon dreams taste better pink and scared. 🎵 Dream Eater - Kirbai #hypno #pokemonart #nidoking #slowpoke #pokemoncommunity #aimusic #aimusicvideo #kirbai #pokemonmus…",
         "permalink": "https://www.facebook.com/reel/1715944426089184/",
         "durationSeconds": 128,
-        "views": 51020,
-        "reach": 42064,
-        "reactions": 1268,
+        "views": 51257,
+        "reach": 42096,
+        "reactions": 1276,
         "comments": 24,
-        "shares": 81,
+        "shares": 82,
         "saves": 0,
         "follows": 0,
-        "earningsUsd": 11.35
-      },
-      {
-        "postId": "122116357556076338",
-        "publishDate": "2026-07-06",
-        "type": "Videos",
-        "caption": "She's just a Lopunny in love, and can't be held responsible for her actions. 🎀🔪 They say love makes you crazy. Therefore you can't call her crazy, cause when you call her crazy, you're just calling her in love. And if Golurk really didn'…",
-        "permalink": "https://www.facebook.com/reel/1332854832390164/",
-        "durationSeconds": 84,
-        "views": 49779,
-        "reach": 41820,
-        "reactions": 1626,
-        "comments": 47,
-        "shares": 130,
-        "saves": 0,
-        "follows": 0,
-        "earningsUsd": 2.25
-      },
-      {
-        "postId": "122115555626076338",
-        "publishDate": "2026-06-26",
-        "type": "Videos",
-        "caption": "The Baddie 4 have been running amok and Gardevoir is not having it. 😤💅 She becomes Sailor Gardevoir to put a stop to them once and for all🌙💫 Moon Gardevoir Power, MAKE UP!!!!! ✨💖🌙 🎧: \"Pixilate\" by Kirbai #Pokemon #SailorMoon #Gardev…",
-        "permalink": "https://www.facebook.com/reel/1577458784165871/",
-        "durationSeconds": 224,
-        "views": 47309,
-        "reach": 44622,
-        "reactions": 1793,
-        "comments": 36,
-        "shares": 178,
-        "saves": 0,
-        "follows": 0,
-        "earningsUsd": 14.09
+        "earningsUsd": 11.39
       }
     ]
   },
@@ -589,24 +621,24 @@
     "grain": "DistroKid royalty ledger row by reporting batch, sale month, store, track, release ID, source type, and country; no transaction ID is present.",
     "coverage": {
       "firstSaleMonth": "2024-09",
-      "lastSaleMonth": "2026-06",
+      "lastSaleMonth": "2026-07",
       "firstReportingDate": "2024-10-30",
-      "lastReportingDate": "2026-08-01",
-      "ledgerRows": 32349,
-      "tracks": 166,
+      "lastReportingDate": "2026-08-28",
+      "ledgerRows": 36186,
+      "tracks": 177,
       "stores": 27,
-      "countries": 146
+      "countries": 150
     },
     "totals": {
-      "quantity": 2216847,
-      "earningsUsd": 3803.436163,
+      "quantity": 2339207,
+      "earningsUsd": 4326.732829,
       "songwriterRoyaltiesWithheldUsd": 0
     },
     "deduplicatedSensitivity": {
       "exactDuplicateRows": 10,
       "totalsIfExactDuplicatesRemoved": {
-        "quantity": 2216835,
-        "earningsUsd": 3799.350391,
+        "quantity": 2339195,
+        "earningsUsd": 4322.647057,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       "rule": "Official totals retain every exported row because the file has no transaction ID. The deduplicated figure is a sensitivity check only."
@@ -614,8 +646,14 @@
     "topStores": [
       {
         "name": "Spotify",
-        "quantity": 437768,
-        "earningsUsd": 1506.673871,
+        "quantity": 532064,
+        "earningsUsd": 1840.785301,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Apple Music",
+        "quantity": 167293,
+        "earningsUsd": 1008.37204,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
@@ -625,15 +663,9 @@
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
-        "name": "Apple Music",
-        "quantity": 140584,
-        "earningsUsd": 848.645893,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
         "name": "iTunes Songs",
-        "quantity": 310,
-        "earningsUsd": 209.156685,
+        "quantity": 336,
+        "earningsUsd": 228.072942,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
@@ -644,8 +676,8 @@
       },
       {
         "name": "iTunes",
-        "quantity": 13,
-        "earningsUsd": 55.676417,
+        "quantity": 15,
+        "earningsUsd": 63.031213,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
@@ -662,8 +694,14 @@
       },
       {
         "name": "Deezer",
-        "quantity": 3056,
-        "earningsUsd": 8.486073,
+        "quantity": 4111,
+        "earningsUsd": 10.490291,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Amazon Songs",
+        "quantity": 6,
+        "earningsUsd": 4.26788,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
@@ -673,241 +711,235 @@
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
-        "name": "Amazon Songs",
-        "quantity": 5,
-        "earningsUsd": 3.555945,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
         "name": "Amazon Prime (Streaming)",
-        "quantity": 1032,
-        "earningsUsd": 2.567491,
+        "quantity": 1181,
+        "earningsUsd": 2.94332,
         "songwriterRoyaltiesWithheldUsd": 0
       }
     ],
     "topTracks": [
       {
         "name": "Power Whip (Tsareena Step)",
-        "quantity": 324744,
-        "earningsUsd": 487.913767,
+        "quantity": 337857,
+        "earningsUsd": 539.628343,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Mean Look (Gothitelle Cut)",
-        "quantity": 327427,
-        "earningsUsd": 455.746875,
+        "quantity": 333702,
+        "earningsUsd": 484.06936,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Lovely Kiss (Jynx Anthem)",
-        "quantity": 88424,
-        "earningsUsd": 379.378207,
+        "quantity": 97834,
+        "earningsUsd": 423.763279,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Poison Pink (Nidoking)",
-        "quantity": 301458,
-        "earningsUsd": 178.909457,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Magic Bounce (Hatterene Master)",
-        "quantity": 62072,
-        "earningsUsd": 146.010398,
+        "quantity": 311268,
+        "earningsUsd": 221.459281,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Scrappy Klutz (Lopunny Crash)",
-        "quantity": 135414,
-        "earningsUsd": 143.088271,
+        "quantity": 138887,
+        "earningsUsd": 157.342924,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Magic Bounce (Hatterene Master)",
+        "quantity": 64349,
+        "earningsUsd": 156.028222,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "I'm the Pheromosa",
-        "quantity": 26766,
-        "earningsUsd": 117.266465,
+        "quantity": 28796,
+        "earningsUsd": 125.801631,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Pixilate (Gardevoir Dub)",
-        "quantity": 42344,
-        "earningsUsd": 111.050381,
+        "quantity": 43981,
+        "earningsUsd": 118.842855,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Flower Trick (Meowscarada Mix)",
-        "quantity": 42522,
-        "earningsUsd": 106.735016,
+        "quantity": 44578,
+        "earningsUsd": 116.436157,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Make It Rain (Gholdengo Deluxe)",
-        "quantity": 23695,
-        "earningsUsd": 84.077104,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Jigglypuff's Song (Uproar Ver.)",
-        "quantity": 15047,
-        "earningsUsd": 83.820762,
+        "quantity": 26116,
+        "earningsUsd": 94.638053,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Just a Ditto",
-        "quantity": 207104,
-        "earningsUsd": 81.615087,
+        "quantity": 208208,
+        "earningsUsd": 86.534439,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Jigglypuff's Song (Uproar Ver.)",
+        "quantity": 15661,
+        "earningsUsd": 86.29769,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Relic Song (Meloetta Aria)",
-        "quantity": 24551,
-        "earningsUsd": 65.999762,
+        "quantity": 26243,
+        "earningsUsd": 72.802531,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Power Klutz (Tsareena vs. Lopunny)",
-        "quantity": 12367,
-        "earningsUsd": 60.097993,
+        "quantity": 14903,
+        "earningsUsd": 70.693495,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
-        "name": "Banned Badge (Intro)",
-        "quantity": 35071,
-        "earningsUsd": 50.967745,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Battle Ready",
-        "quantity": 77978,
-        "earningsUsd": 49.773159,
+        "name": "Pink Pheromones",
+        "quantity": 51406,
+        "earningsUsd": 58.952475,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Pink Buzz (Electabuzz)",
-        "quantity": 25294,
-        "earningsUsd": 46.08673,
+        "quantity": 27996,
+        "earningsUsd": 56.628282,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Banned Badge (Intro)",
+        "quantity": 35789,
+        "earningsUsd": 54.702825,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Battle Ready",
+        "quantity": 79122,
+        "earningsUsd": 54.645659,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Mean Trick (Gothitelle vs. Meowscarada)",
-        "quantity": 9317,
-        "earningsUsd": 45.833314,
+        "quantity": 10868,
+        "earningsUsd": 52.049274,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Pixie Kiss (Jynx vs. Gardevoir)",
-        "quantity": 36882,
-        "earningsUsd": 41.465071,
+        "quantity": 37784,
+        "earningsUsd": 45.101437,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Pixie Whip (Tsareena vs. Gardevoir)",
-        "quantity": 9851,
-        "earningsUsd": 40.928233,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Your Boyfriend is So Shady (Energy Upgrade)",
-        "quantity": 8631,
-        "earningsUsd": 38.764308,
+        "quantity": 10730,
+        "earningsUsd": 44.459368,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Pixie Look (Gothitelle vs. Gardevoir)",
-        "quantity": 27883,
-        "earningsUsd": 38.47008,
+        "quantity": 28611,
+        "earningsUsd": 41.582873,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "Your Boyfriend is So Shady (Energy Upgrade)",
+        "quantity": 8867,
+        "earningsUsd": 39.741942,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "Destiny Knot",
-        "quantity": 17174,
-        "earningsUsd": 34.300893,
+        "quantity": 18343,
+        "earningsUsd": 37.482597,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
-        "name": "Heavy Pink (Swampert)",
-        "quantity": 5877,
-        "earningsUsd": 31.451762,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "Pixilate (Mega Gardevoir Ver.)",
-        "quantity": 5714,
-        "earningsUsd": 30.951736,
+        "name": "Pink Bois (Heracross)",
+        "quantity": 8278,
+        "earningsUsd": 37.092676,
         "songwriterRoyaltiesWithheldUsd": 0
       }
     ],
     "topCountries": [
       {
         "name": "US",
-        "quantity": 754489,
-        "earningsUsd": 2056.644902,
+        "quantity": 807113,
+        "earningsUsd": 2326.246329,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "GB",
-        "quantity": 87309,
-        "earningsUsd": 341.375895,
+        "quantity": 97474,
+        "earningsUsd": 415.03311,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "DE",
-        "quantity": 93009,
-        "earningsUsd": 223.733896,
-        "songwriterRoyaltiesWithheldUsd": 0
-      },
-      {
-        "name": "CA",
-        "quantity": 67669,
-        "earningsUsd": 145.63163,
+        "quantity": 98906,
+        "earningsUsd": 251.383677,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "AU",
-        "quantity": 52454,
-        "earningsUsd": 144.466895,
+        "quantity": 57642,
+        "earningsUsd": 162.962077,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "CA",
+        "quantity": 71975,
+        "earningsUsd": 160.350614,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "MX",
-        "quantity": 161204,
-        "earningsUsd": 95.904559,
+        "quantity": 167004,
+        "earningsUsd": 106.36836,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "FR",
-        "quantity": 55511,
-        "earningsUsd": 77.045569,
+        "quantity": 58421,
+        "earningsUsd": 90.382297,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "ES",
-        "quantity": 65715,
-        "earningsUsd": 67.712308,
+        "quantity": 68072,
+        "earningsUsd": 77.398699,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "JP",
-        "quantity": 44078,
-        "earningsUsd": 61.414861,
+        "quantity": 47577,
+        "earningsUsd": 68.891567,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "BR",
-        "quantity": 132323,
-        "earningsUsd": 60.104191,
+        "quantity": 136139,
+        "earningsUsd": 67.857458,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "IT",
-        "quantity": 55151,
-        "earningsUsd": 59.038634,
+        "quantity": 56760,
+        "earningsUsd": 65.949682,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "NL",
-        "quantity": 15170,
-        "earningsUsd": 37.843831,
+        "quantity": 16009,
+        "earningsUsd": 42.713441,
         "songwriterRoyaltiesWithheldUsd": 0
       }
     ],
@@ -1034,14 +1066,20 @@
       },
       {
         "name": "2026-05",
-        "quantity": 504890,
-        "earningsUsd": 730.506227,
+        "quantity": 505945,
+        "earningsUsd": 732.510446,
         "songwriterRoyaltiesWithheldUsd": 0
       },
       {
         "name": "2026-06",
-        "quantity": 161876,
-        "earningsUsd": 335.933286,
+        "quantity": 256322,
+        "earningsUsd": 671.13248,
+        "songwriterRoyaltiesWithheldUsd": 0
+      },
+      {
+        "name": "2026-07",
+        "quantity": 26859,
+        "earningsUsd": 186.093253,
         "songwriterRoyaltiesWithheldUsd": 0
       }
     ],
@@ -1049,28 +1087,32 @@
   },
   "baselineSignals": [
     "The top Instagram post in this export is “Machoke looking for trade again... 👀 u free tonight tho? 🎵 “Your Boyfriend is so Shady” – Kirbai #pokemon #gay #pokemonlegendsza” with 892,296 views and 47,263 shares.",
-    "The top Facebook post in this export is “Pokopia is cute until you realize Ditto is in crisis 💔 Ditto built an entire world for people who never came back. 🎧 I'm Just a Ditto – Kirbai | full song on Spotify & YouTube #Pokopia #Ditto #Pokemon #PokemonMusic #PokemonCommunity #Kir…” with 107,927 views and $10.52 in native earnings.",
-    "DistroKid reports $3,803.44 across 2,216,847 reported units for Kirbai through sale month 2026-06; the newest month may be incomplete.",
-    "The leading DistroKid stores by earnings are Spotify ($1,506.67), YouTube (Red) ($961.64), Apple Music ($848.65).",
-    "The leading tracks by DistroKid earnings are Power Whip (Tsareena Step) ($487.91), Mean Look (Gothitelle Cut) ($455.75), Lovely Kiss (Jynx Anthem) ($379.38), Poison Pink (Nidoking) ($178.91), Magic Bounce (Hatterene Master) ($146.01)."
+    "The top Facebook post in this export is “Pokopia is cute until you realize Ditto is in crisis 💔 Ditto built an entire world for people who never came back. 🎧 I'm Just a Ditto – Kirbai | full song on Spotify & YouTube #Pokopia #Ditto #Pokemon #PokemonMusic #PokemonCommunity #Kir…” with 113,561 views and $10.86 in native earnings.",
+    "DistroKid reports $4,326.73 across 2,339,207 reported units for Kirbai through sale month 2026-07; the newest month may be incomplete.",
+    "The leading DistroKid stores by earnings are Spotify ($1,840.79), Apple Music ($1,008.37), YouTube (Red) ($961.64).",
+    "The leading tracks by DistroKid earnings are Power Whip (Tsareena Step) ($539.63), Mean Look (Gothitelle Cut) ($484.07), Lovely Kiss (Jynx Anthem) ($423.76), Poison Pink (Nidoking) ($221.46), Scrappy Klutz (Lopunny Crash) ($157.34)."
   ],
   "dataQuality": {
     "instagram": {
       "severity": "low",
-      "rawRowsAcrossExports": 195,
-      "uniquePostIds": 107,
-      "overlappingRowsNotDoubleCounted": 88,
+      "rawRowsAcrossExports": 283,
+      "uniquePostIds": 110,
+      "overlappingRowsNotDoubleCounted": 173,
       "finding": "The July 17 Instagram export fully supersedes the overlapping July 6 export. Baseline totals use one row per post ID."
     },
     "facebook": {
       "severity": "low",
-      "rows": 81,
-      "uniquePostIds": 81,
+      "rows": 86,
+      "uniquePostIds": 86,
       "finding": "The export mixes videos and photo posts. Totals include both; the coverage block separates video count."
     },
     "distroKid": {
       "severity": "medium",
-      "finding": "The ledger contains a small number of exact duplicate-looking rows, but there is no transaction ID proving they are accidental duplicates. Official totals therefore retain them and expose a deduplicated sensitivity check."
+      "selectedFile": "results 2 copy.csv",
+      "ignoredOlderCumulativeExports": [
+        "results 2.csv"
+      ],
+      "finding": "Only the newest cumulative DistroKid export is summarized. The selected ledger contains a small number of exact duplicate-looking rows, but there is no transaction ID proving they are accidental duplicates. Official totals therefore retain them and expose a deduplicated sensitivity check."
     }
   },
   "usageRules": [

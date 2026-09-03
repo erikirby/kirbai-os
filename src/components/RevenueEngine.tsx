@@ -93,7 +93,9 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
         setIsComputing(true);
         setError(null);
         try {
-            const ledger: LedgerRow[] = parseDistroKid(dk.rows);
+            const ledger: LedgerRow[] = parseDistroKid(dk.rows).filter((row) =>
+                mode !== "kirbai" || row.artist === "Kirbai"
+            );
             const videos: VideoRow[] = [];
             for (const f of files) {
                 if (f.type === "facebook") videos.push(...parseMetaPosts(f.rows, "facebook"));
