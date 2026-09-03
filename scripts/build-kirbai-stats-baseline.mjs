@@ -245,6 +245,10 @@ function getFileMaxDate(file) {
     return dates.sort().at(-1) || file.name;
 }
 
+function getFileMaxValue(file, field) {
+    return max(file.records.map((record) => record[field]));
+}
+
 function mergeMetaFiles(files) {
     const sortedFiles = [...files].sort((a, b) => getFileMaxDate(a).localeCompare(getFileMaxDate(b)));
     const postsMap = new Map();
@@ -267,7 +271,15 @@ function mergeMetaFiles(files) {
 const { mergedRows: instagramRows, rawRowsCount: instagramRawRows } = mergeMetaFiles(instagramFiles);
 const { mergedRows: facebookRows, rawRowsCount: facebookRawRows } = mergeMetaFiles(facebookFiles);
 
-const distroKidRows = distroKidFiles.flatMap((file) => file.records);
+// DistroKid exports are cumulative snapshots. Use the snapshot with the newest
+// reporting date instead of adding exports together, which would double-count
+// every historical row shared by an older and newer download.
+const latestDistroKidFile = [...distroKidFiles].sort((a, b) => {
+    const dateComparison = (getFileMaxValue(a, 'Reporting Date') || '')
+        .localeCompare(getFileMaxValue(b, 'Reporting Date') || '');
+    return dateComparison || a.records.length - b.records.length;
+}).at(-1);
+const distroKidRows = latestDistroKidFile.records;
 
 const instagram = summarizeMeta(instagramRows, 'instagram');
 const facebook = summarizeMeta(facebookRows, 'facebook');
@@ -321,7 +333,11 @@ const baseline = {
         },
         distroKid: {
             severity: 'medium',
-            finding: 'The ledger contains a small number of exact duplicate-looking rows, but there is no transaction ID proving they are accidental duplicates. Official totals therefore retain them and expose a deduplicated sensitivity check.',
+            selectedFile: latestDistroKidFile.name,
+            ignoredOlderCumulativeExports: distroKidFiles
+                .filter((file) => file !== latestDistroKidFile)
+                .map((file) => file.name),
+            finding: 'Only the newest cumulative DistroKid export is summarized. The selected ledger contains a small number of exact duplicate-looking rows, but there is no transaction ID proving they are accidental duplicates. Official totals therefore retain them and expose a deduplicated sensitivity check.',
         },
     },
     usageRules: [

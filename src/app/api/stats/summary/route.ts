@@ -98,7 +98,9 @@ export async function GET(req: Request) {
 
         const dkTotals = revenueEngine?.kpis ? {
             quantity: revenueEngine.kpis.totalStreams,
-            earningsUsd: revenueEngine.kpis.totalRevenue
+            earningsUsd: revenueEngine.kpis.dkLifetime
+                ?? revenueEngine.kpis.totalRevenue
+                ?? baseline.distroKid.totals.earningsUsd
         } : baseline.distroKid.totals;
 
         const ttViews = parseInt(pulseState?.tiktok?.reach || '1561558', 10);
@@ -170,14 +172,16 @@ export async function GET(req: Request) {
         const revenueTimeline = baseline.distroKid.saleMonths || [];
 
         // Store Revenue Distribution
-        const storesDistribution = revenueEngine?.byStore?.length ? revenueEngine.byStore.map((s: any) => ({
+        const storedStores = revenueEngine?.stores || revenueEngine?.byStore || [];
+        const storesDistribution = storedStores.length ? storedStores.map((s: any) => ({
             name: s.store,
             earningsUsd: s.earnings,
             quantity: s.streams
         })) : baseline.distroKid.topStores;
 
         // Track Leaderboard
-        const trackLeaderboard = revenueEngine?.bySong?.length ? revenueEngine.bySong.map((s: any) => ({
+        const storedSongs = revenueEngine?.songs || revenueEngine?.bySong || [];
+        const trackLeaderboard = storedSongs.length ? storedSongs.map((s: any) => ({
             name: s.title,
             earningsUsd: s.earnings,
             quantity: s.streams
