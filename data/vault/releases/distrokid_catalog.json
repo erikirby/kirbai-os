@@ -1,0 +1,2438 @@
+{
+  "schemaVersion": 1,
+  "extractedAt": "2026-07-21T18:00:24.483Z",
+  "source": "DistroKid My Music release dashboards",
+  "artist": "Kirbai",
+  "releases": [
+    {
+      "albumUuid": "0F316876-C06C-4847-A1A29CF505D0F748",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=0F316876-C06C-4847-A1A29CF505D0F748",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Specie Entertainment",
+      "releaseDate": "July 6, 2026",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/lovely-kiss-shiny-versions-ep/6787922130?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/lovely-kiss-shiny-versions",
+        "spotify": "https://open.spotify.com/album/6i7g63h06GxVXJJZTsaSpu"
+      },
+      "title": "Lovely Kiss: Shiny Versions",
+      "tracks": [
+        {
+          "isrc": "QT6EX2611064",
+          "title": "Lovely Kiss (Double Slap Ver.)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QT6EX2611065",
+          "title": "Lovely Kiss (Japanese Ver.)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QT6EX2611066",
+          "title": "Lovely Kiss (Captivate Ver.)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QT6EX2611067",
+          "title": "Lovely Kiss (Hex Ver.)",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "882877628026",
+      "uploadDate": "July 5, 2026",
+      "releaseDateIso": "2026-07-06",
+      "uploadDateIso": "2026-07-05",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Jynx release; verified by title, tracks, and existing Kirbai brand context."
+      }
+    },
+    {
+      "albumUuid": "7023D24F-C13F-442B-873C45D6CBDAB9C8",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=7023D24F-C13F-442B-873C45D6CBDAB9C8",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Specie Entertainment",
+      "releaseDate": "June 15, 2026",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/dream-eater-ep/6780679905?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/dream-eater",
+        "spotify": "https://open.spotify.com/album/2ITHbJKEeNxFWrnvqExUSG"
+      },
+      "title": "Dream Eater",
+      "tracks": [
+        {
+          "isrc": "QT3FH2611879",
+          "title": "Dream Eater",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QT3FH2611880",
+          "title": "You're Getting Drowsy",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QT3FH2611881",
+          "title": "Dream Eater (Japanese Ver.)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QT3FH2611882",
+          "title": "You're Getting Drowsy (Japanese Ver.)",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "883417633319",
+      "uploadDate": "June 15, 2026",
+      "releaseDateIso": "2026-06-15",
+      "uploadDateIso": "2026-06-15",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Hypno/Drowzee bridge release documented in Kirbai identity and HyperFollow links."
+      }
+    },
+    {
+      "albumUuid": "E8F0FF1D-5C76-4E2E-9931744CA348630D",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=E8F0FF1D-5C76-4E2E-9931744CA348630D",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "May 29, 2026",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/pink-bois-pheromone-edition/6774131413?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/pink-bois-pheromone-edition",
+        "spotify": "https://open.spotify.com/album/7ypvH2GMBsImqfYeYAaIT1"
+      },
+      "title": "Pink Bois: Pheromone Edition",
+      "tracks": [
+        {
+          "isrc": "QT3EZ2613556",
+          "title": "Pink Pheromones",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pink Pheromones"
+          }
+        },
+        {
+          "isrc": "QT3EZ2613557",
+          "title": "Pink Hierarchy (Quiver Dance Ver.)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pink Hierarchy (Quiver Dance Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3EZ2613558",
+          "title": "The Pink Below (Quiver Dance Ver.)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "The Pink Below (Quiver Dance Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3EZ2613559",
+          "title": "Wrap Me In Pink (Quiver Dance Ver.)",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Wrap Me In Pink (Quiver Dance Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3EZ2613560",
+          "title": "Heavy Pink (Quiver Dance Ver.)",
+          "trackNumber": 5,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Heavy Pink (Quiver Dance Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3EZ2613561",
+          "title": "Pink Bois (Quiver Dance Ver.)",
+          "trackNumber": 6,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pink Bois (Quiver Dance Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3EZ2613562",
+          "title": "Poison Pink (Quiver Dance Ver.)",
+          "trackNumber": 7,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Poison Pink (Quiver Dance Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3EZ2613563",
+          "title": "Paint Me Pink (Quiver Dance Ver.)",
+          "trackNumber": 8,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Paint Me Pink (Quiver Dance Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3EZ2613564",
+          "title": "Pink Haze (Quiver Dance Ver.)",
+          "trackNumber": 9,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pink Haze (Quiver Dance Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3EZ2613565",
+          "title": "Pink Buzz (Quiver Dance Ver.)",
+          "trackNumber": 10,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pink Buzz (Quiver Dance Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3EZ2613566",
+          "title": "Rock The Pink (Quiver Dance Ver.)",
+          "trackNumber": 11,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Rock The Pink (Quiver Dance Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3EZ2613567",
+          "title": "The Pink Below (Dive Ver.)",
+          "trackNumber": 12,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "The Pink Below (Dive Ver.)"
+          }
+        }
+      ],
+      "upc": "883071629505",
+      "uploadDate": "May 27, 2026",
+      "releaseDateIso": "2026-05-29",
+      "uploadDateIso": "2026-05-27",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "66d582a8-a5c1-4cb5-8d59-cf21df12e032",
+        "projectTitle": "Pink Bois: Pheromone Edition"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "17034B8E-182C-4BC4-83A6719D7B1B3C41",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=17034B8E-182C-4BC4-83A6719D7B1B3C41",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "April 17, 2026",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/pink-bois/1893582791?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/pink-bois",
+        "spotify": "https://open.spotify.com/album/0JlPFLpSLdMJJKK0AjLYUN"
+      },
+      "title": "Pink Bois",
+      "tracks": [
+        {
+          "isrc": "QZWFE2689419",
+          "title": "Pink Bois (Heracross)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pink Bois (Heracross)"
+          }
+        },
+        {
+          "isrc": "QZWFE2689420",
+          "title": "Pink Buzz (Electabuzz)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pink Buzz (Electabuzz)"
+          }
+        },
+        {
+          "isrc": "QZWFE2689421",
+          "title": "Poison Pink (Nidoking)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Poison Pink (Nidoking)"
+          }
+        },
+        {
+          "isrc": "QZWFE2689422",
+          "title": "Wrap Me In Pink (Dratini)",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Wrap Me In Pink (Dratini)"
+          }
+        },
+        {
+          "isrc": "QZWFE2689423",
+          "title": "Heavy Pink (Swampert)",
+          "trackNumber": 5,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Heavy Pink (Swampert)"
+          }
+        },
+        {
+          "isrc": "QZWFE2689424",
+          "title": "Pink Haze (Quagsire)",
+          "trackNumber": 6,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pink Haze (Quagsire)"
+          }
+        },
+        {
+          "isrc": "QZWFE2689425",
+          "title": "Rock The Pink (Rhyhorn)",
+          "trackNumber": 7,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Rock The Pink (Rhyhorn)"
+          }
+        },
+        {
+          "isrc": "QZWFE2689426",
+          "title": "Paint Me Pink (Voltorb)",
+          "trackNumber": 8,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Paint Me Pink (Voltorb)"
+          }
+        },
+        {
+          "isrc": "QZWFE2689427",
+          "title": "The Pink Below (Kyogre)",
+          "trackNumber": 9,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "The Pink Below (Kyogre)"
+          }
+        }
+      ],
+      "upc": "825417595266",
+      "uploadDate": "April 13, 2026",
+      "releaseDateIso": "2026-04-17",
+      "uploadDateIso": "2026-04-13",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "55aa3ece-898f-46b4-a819-a403cda31ad2",
+        "projectTitle": "Pink Bois"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "0138942E-F281-4838-9C5C0DA01E5F72F6",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=0138942E-F281-4838-9C5C0DA01E5F72F6",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "March 24, 2026",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/battle-ready-ep/1888801685?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/battle-ready-2",
+        "spotify": "https://open.spotify.com/album/3HRVjHo0TX52RtIvFSNFyx"
+      },
+      "title": "Battle Ready",
+      "tracks": [
+        {
+          "isrc": "QZTAY2603993",
+          "title": "Battle Ready",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Battle Ready"
+          }
+        },
+        {
+          "isrc": "QZTB32618435",
+          "title": "Power Klutz (Tsareena vs. Lopunny)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Power Klutz (Tsareena vs. Lopunny)"
+          }
+        },
+        {
+          "isrc": "QZTAY2603996",
+          "title": "Lovely Beast (Jynx vs. Pheromosa)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Lovely Beast (Jynx vs. Pheromosa)"
+          }
+        },
+        {
+          "isrc": "QZTB32618436",
+          "title": "Mean Trick (Gothitelle vs. Meowscarada)",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Mean Trick (Gothitelle vs. Meowscarada)"
+          }
+        },
+        {
+          "isrc": "QZTB32618437",
+          "title": "Relic Bounce (Hatterene vs. Meloetta)",
+          "trackNumber": 5,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Relic Bounce (Hatterene vs. Meloetta)"
+          }
+        },
+        {
+          "isrc": "QZTAY2604002",
+          "title": "Magic Bounce (Future Sight Ver.)",
+          "trackNumber": 6,
+          "vaultMatch": {
+            "status": "none",
+            "title": null
+          }
+        }
+      ],
+      "upc": "825682418734",
+      "uploadDate": "March 25, 2026",
+      "releaseDateIso": "2026-03-24",
+      "uploadDateIso": "2026-03-25",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "c1a3b4e5-d6f7-8a9b-0c1d-2e3f4a5b6c7d",
+        "projectTitle": "Battle Ready"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "10C30291-22DD-470C-AE4E51A4239C0D2C",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=10C30291-22DD-470C-AE4E51A4239C0D2C",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "March 11, 2026",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/pink-hierarchy-bye-bye-butterfree-single/1884519221?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/pink-hierarchy-bye-bye-butterfree",
+        "spotify": "https://open.spotify.com/album/2P3zs3Q4GLlronDMQpKCLZ"
+      },
+      "title": "Pink Hierarchy (Bye Bye Butterfree)",
+      "tracks": [
+        {
+          "isrc": "QZPLR2640355",
+          "title": "Pink Hierarchy (Bye Bye Butterfree)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "none",
+            "title": null
+          }
+        }
+      ],
+      "upc": "825758189780",
+      "uploadDate": "March 11, 2026",
+      "releaseDateIso": "2026-03-11",
+      "uploadDateIso": "2026-03-11",
+      "vaultMatch": {
+        "status": "manual_review",
+        "projectId": "56a517a4-0ea8-4995-ae5d-6386e9ba17f2",
+        "projectTitle": "Bye Bye Butterfree (the Pink Hierarchy)"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Manual title mapping supported by matching Pokémon tracklists."
+      }
+    },
+    {
+      "albumUuid": "29BE54E0-E955-4D9B-A82BB8D24E9B66B0",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=29BE54E0-E955-4D9B-A82BB8D24E9B66B0",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "February 12, 2026",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/heart-scales/1878134124?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/heart-scales-3",
+        "spotify": "https://open.spotify.com/album/0HiMmkFNo7sJKKDf8OdFA2"
+      },
+      "title": "Heart Scales",
+      "tracks": [
+        {
+          "isrc": "QZK6K2698538",
+          "title": "Heart Scales Project (Intro)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Heart Scales Project (Intro)"
+          }
+        },
+        {
+          "isrc": "QZK6K2698539",
+          "title": "Scrappy Klutz (Lopunny Crash)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Scrappy Klutz (Lopunny Crash)"
+          }
+        },
+        {
+          "isrc": "QZK6K2698540",
+          "title": "Flower Trick (Meowscarada Mix)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Flower Trick (Meowscarada Mix)"
+          }
+        },
+        {
+          "isrc": "QZK6K2698541",
+          "title": "I'm the Pheromosa",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "I'm the Pheromosa"
+          }
+        },
+        {
+          "isrc": "QZK6K2698542",
+          "title": "Relic Song (Meloetta Aria)",
+          "trackNumber": 5,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Relic Song (Meloetta Aria)"
+          }
+        },
+        {
+          "isrc": "QZK6K2698543",
+          "title": "Destiny Knot",
+          "trackNumber": 6,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Destiny Knot"
+          }
+        },
+        {
+          "isrc": "QZK6K2698544",
+          "title": "Make It Rain (Gholdengo Deluxe)",
+          "trackNumber": 7,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Make It Rain (Gholdengo Deluxe)"
+          }
+        },
+        {
+          "isrc": "QZK6K2698545",
+          "title": "Shiny Addiction (Heart Scales Ver.)",
+          "trackNumber": 8,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Shiny Addiction (Heart Scales Ver.)"
+          }
+        },
+        {
+          "isrc": "QZFZ42650065",
+          "title": "Just a Ditto",
+          "trackNumber": 9,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Just a Ditto"
+          }
+        }
+      ],
+      "upc": "821430887869",
+      "uploadDate": "February 12, 2026",
+      "releaseDateIso": "2026-02-12",
+      "uploadDateIso": "2026-02-12",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "3dbb0a95-7755-4eb4-976b-4aecf4bc63cb",
+        "projectTitle": "Heart Scales"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "70863130-D7F7-428D-B5B7CDD605A48377",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=70863130-D7F7-428D-B5B7CDD605A48377",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "February 4, 2026",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/pixilate-the-fusions-ep/1874812076?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/pixilate-the-fusions",
+        "spotify": "https://open.spotify.com/album/5LyRmYcgb9oglnB8aXT9mE"
+      },
+      "title": "Pixilate: The Fusions",
+      "tracks": [
+        {
+          "isrc": "QZHNA2651435",
+          "title": "Pixilate (Mega Gardevoir Ver.)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pixilate (Mega Gardevoir Ver.)"
+          }
+        },
+        {
+          "isrc": "QZHNA2651436",
+          "title": "Pixie Kiss (Jynx vs. Gardevoir)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pixie Kiss (Jynx vs. Gardevoir)"
+          }
+        },
+        {
+          "isrc": "QZHNA2651437",
+          "title": "Pixie Look (Gothitelle vs. Gardevoir)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pixie Look (Gothitelle vs. Gardevoir)"
+          }
+        },
+        {
+          "isrc": "QZHNA2651438",
+          "title": "Pixie Whip (Tsareena vs. Gardevoir)",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pixie Whip (Tsareena vs. Gardevoir)"
+          }
+        },
+        {
+          "isrc": "QZHNA2651439",
+          "title": "Pixie Bounce (Hatterene vs. Gardevoir)",
+          "trackNumber": 5,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pixie Bounce (Hatterene vs. Gardevoir)"
+          }
+        }
+      ],
+      "upc": "821451025233",
+      "uploadDate": "February 4, 2026",
+      "releaseDateIso": "2026-02-04",
+      "uploadDateIso": "2026-02-04",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "5e2a991f-8828-43e5-875c-9a30daf837f5",
+        "projectTitle": "Pixilate: The Fusions"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "9823DA3B-5EC8-492A-AE878304E07D7ACD",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=9823DA3B-5EC8-492A-AE878304E07D7ACD",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "January 11, 2026",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/just-a-ditto-single/1867266370?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/just-a-ditto",
+        "spotify": "https://open.spotify.com/album/5MSeNdnpjewnYKkxTjIjUp"
+      },
+      "title": "Just a Ditto",
+      "tracks": [
+        {
+          "isrc": "QZFZ42650065",
+          "title": "Just a Ditto",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZFZ42650066",
+          "title": "Just a Ditto (Foreign Metamon Ver.)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "821300992303",
+      "uploadDate": "January 7, 2026",
+      "releaseDateIso": "2026-01-11",
+      "uploadDateIso": "2026-01-07",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Ditto release documented in Kirbai social-performance evidence."
+      }
+    },
+    {
+      "albumUuid": "37B8E4F9-892A-462E-903C5F7A99B31CC8",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=37B8E4F9-892A-462E-903C5F7A99B31CC8",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "January 6, 2026",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/banned-badge-ep/1867073700?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/banned-badge",
+        "spotify": "https://open.spotify.com/album/0o64c1RoSpuB0upx7gqKi9"
+      },
+      "title": "Banned Badge",
+      "tracks": [
+        {
+          "isrc": "QZFZ42608024",
+          "title": "Banned Badge (Intro)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Banned Badge (Intro)"
+          }
+        },
+        {
+          "isrc": "QZFZ42608025",
+          "title": "Mean Look (Gothitelle Cut)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Mean Look (Gothitelle Cut)"
+          }
+        },
+        {
+          "isrc": "QZFZ42608026",
+          "title": "Magic Bounce (Hatterene Master)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Magic Bounce (Hatterene Master)"
+          }
+        },
+        {
+          "isrc": "QT6HJ2550178",
+          "title": "Lovely Kiss (Jynx Anthem)",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Lovely Kiss (Jynx Anthem)"
+          }
+        },
+        {
+          "isrc": "QZFZ42608027",
+          "title": "Power Whip (Tsareena Step)",
+          "trackNumber": 5,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Power Whip (Tsareena Step)"
+          }
+        },
+        {
+          "isrc": "QZFZ42608028",
+          "title": "Pixilate (Gardevoir Dub)",
+          "trackNumber": 6,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pixilate (Gardevoir Dub)"
+          }
+        }
+      ],
+      "upc": "199934859904",
+      "uploadDate": "January 6, 2026",
+      "releaseDateIso": "2026-01-06",
+      "uploadDateIso": "2026-01-06",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "95c04d65-a2f3-48aa-935e-7e6fa36b15b4",
+        "projectTitle": "Banned Badge"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "85A86F6E-B858-41C3-97D7DD5EF84C3147",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=85A86F6E-B858-41C3-97D7DD5EF84C3147",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "December 28, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/lovely-kiss-jynx-anthem-single/1864996849?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/lovely-kiss-jynx-anthem",
+        "spotify": "https://open.spotify.com/album/1B9fpDYv6STIrNBDxTcsmW"
+      },
+      "title": "Lovely Kiss (Jynx Anthem)",
+      "tracks": [
+        {
+          "isrc": "QT6HJ2550178",
+          "title": "Lovely Kiss (Jynx Anthem)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199938104840",
+      "uploadDate": "December 28, 2025",
+      "releaseDateIso": "2025-12-28",
+      "uploadDateIso": "2025-12-28",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Jynx single documented in Kirbai identity, analytics, and HyperFollow links."
+      }
+    },
+    {
+      "albumUuid": "DB3E2336-A5E4-494B-92312C91F41F2731",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=DB3E2336-A5E4-494B-92312C91F41F2731",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "November 26, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/region-locked/1856477874?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/region-locked",
+        "spotify": "https://open.spotify.com/album/5q6PMfpgXWkKWCd3j0qMnJ"
+      },
+      "title": "Region Locked",
+      "tracks": [
+        {
+          "isrc": "QT6F62515419",
+          "title": "Pallet Town Dreaming (Masara Town Ver.)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pallet Town Dreaming (Masara Town Ver.)"
+          }
+        },
+        {
+          "isrc": "QT6F62515421",
+          "title": "Pokemon Center Joy (Kaifuku Ver.)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Pokemon Center Joy (Kaifuku Ver.)"
+          }
+        },
+        {
+          "isrc": "QT6F62515422",
+          "title": "Clefairy Clefairy (Tsuki no Hikari Ver.)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Clefairy Clefairy (Tsuki no Hikari Ver.)"
+          }
+        },
+        {
+          "isrc": "QT6F62515423",
+          "title": "Chimecho Chiriin (Haipaa Boisu Ver.)",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Chimecho Chiriin (Haipaa Boisu Ver.)"
+          }
+        },
+        {
+          "isrc": "QT6F62515424",
+          "title": "Shiny Addiction (Irochigai Ver.)",
+          "trackNumber": 5,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Shiny Addiction (Irochigai Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3F42510968",
+          "title": "Purin no Uta (Encore Ver.)",
+          "trackNumber": 6,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Purin no Uta (Encore Ver.)"
+          }
+        },
+        {
+          "isrc": "QT6E92505347",
+          "title": "Evolution (Kawarazu no Ishi Ver.)",
+          "trackNumber": 7,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Evolution (Kawarazu no Ishi Ver.)"
+          }
+        },
+        {
+          "isrc": "QT6E82538698",
+          "title": "Evolution (Kaminari no Ishi Ver.)",
+          "trackNumber": 8,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Evolution (Kaminari no Ishi Ver.)"
+          }
+        }
+      ],
+      "upc": "199949537125",
+      "uploadDate": "November 26, 2025",
+      "releaseDateIso": "2025-11-26",
+      "uploadDateIso": "2025-11-26",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "2582483e-d00d-4ae5-a6e1-caf2cf2111f6",
+        "projectTitle": "Region Locked"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "91412CCD-133D-4130-8DC2018E0CEB8A30",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=91412CCD-133D-4130-8DC2018E0CEB8A30",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "November 20, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/looking-for-k-single/1855384096?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/looking-for-k-2",
+        "spotify": "https://open.spotify.com/album/31S0VFcCepz9OiRJ1Rdr6H"
+      },
+      "title": "Looking for K",
+      "tracks": [
+        {
+          "isrc": "QT6F22542399",
+          "title": "Looking for K",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199952289905",
+      "uploadDate": "November 20, 2025",
+      "releaseDateIso": "2025-11-20",
+      "uploadDateIso": "2025-11-20",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "371D8BC6-75FB-49FA-A4439135623D1D2A",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=371D8BC6-75FB-49FA-A4439135623D1D2A",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "November 13, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/dont-call-me-ridiculous-single/1854105585?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/dont-call-me-ridiculous",
+        "spotify": "https://open.spotify.com/album/7rUcDuu0PyUAdoGQZ9j6n6"
+      },
+      "title": "Don't Call Me Ridiculous",
+      "tracks": [
+        {
+          "isrc": "QT6EW2530523",
+          "title": "Don't Call Me Ridiculous",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199954405112",
+      "uploadDate": "November 13, 2025",
+      "releaseDateIso": "2025-11-13",
+      "uploadDateIso": "2025-11-13",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "0DBF69FE-C83C-4CD7-9E31C024C7B13061",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=0DBF69FE-C83C-4CD7-9E31C024C7B13061",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "November 10, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/sorry-my-hands-are-so-cold-single/1853231453?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/sorry-my-hands-are-so-cold",
+        "spotify": "https://open.spotify.com/album/4izUz0LVWtXH0sypSI2L7r"
+      },
+      "title": "Sorry My Hands Are So Cold",
+      "tracks": [
+        {
+          "isrc": "QT6EU2508663",
+          "title": "Sorry My Hands Are So Cold",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199955460929",
+      "uploadDate": "November 10, 2025",
+      "releaseDateIso": "2025-11-10",
+      "uploadDateIso": "2025-11-10",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "6E483326-9F35-4468-99184DAF84A84510",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=6E483326-9F35-4468-99184DAF84A84510",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "November 6, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/shiny-addiction-single/1852186467?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/shiny-addiction",
+        "spotify": "https://open.spotify.com/album/2oZZ3LAcCNMicsTykcSYEc"
+      },
+      "title": "Shiny Addiction",
+      "tracks": [
+        {
+          "isrc": "QT6EF2552440",
+          "title": "Shiny Addiction",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "none",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QT6EF2552441",
+          "title": "Shiny Addiction (Charm Ver.)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Shiny Addiction (Charm Ver.)"
+          }
+        }
+      ],
+      "upc": "199956692695",
+      "uploadDate": "November 6, 2025",
+      "releaseDateIso": "2025-11-06",
+      "uploadDateIso": "2025-11-06",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "e6bfffbe-4b65-4003-92f7-428f78750a9e",
+        "projectTitle": "Shiny Addiction"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "6D2D2965-BFC0-48A8-8589A75CD9512909",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=6D2D2965-BFC0-48A8-8589A75CD9512909",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "October 27, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/evolution-shiny-versions-ep/1849931431?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/evolution-shiny-versions-2",
+        "spotify": "https://open.spotify.com/album/4vDvXn3k6aZKipqrplhxde"
+      },
+      "title": "Evolution: Shiny Versions",
+      "tracks": [
+        {
+          "isrc": "QT6E82538696",
+          "title": "Evolution (Thunder Stone Ver.)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Evolution (Thunder Stone Ver.)"
+          }
+        },
+        {
+          "isrc": "QT6E92505346",
+          "title": "Evolution (Everstone Ver.)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Evolution (Everstone Ver.)"
+          }
+        },
+        {
+          "isrc": "QT6E82538698",
+          "title": "Evolution (Kaminari no Ishi Ver.)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Evolution (Kaminari no Ishi Ver.)"
+          }
+        },
+        {
+          "isrc": "QT6E92505347",
+          "title": "Evolution (Kawarazu no Ishi Ver.)",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Evolution (Kawarazu no Ishi Ver.)"
+          }
+        }
+      ],
+      "upc": "199749306730",
+      "uploadDate": "October 27, 2025",
+      "releaseDateIso": "2025-10-27",
+      "uploadDateIso": "2025-10-27",
+      "vaultMatch": {
+        "status": "manual_review",
+        "projectId": "15d1c9bb-30ee-49bd-9f9d-de0e9c5b01d5",
+        "projectTitle": "Evolution Shiny Versions"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Manual title mapping supported by matching Pokémon tracklists."
+      }
+    },
+    {
+      "albumUuid": "9DFB464D-8B0F-4D1A-ACAD9B300A942565",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=9DFB464D-8B0F-4D1A-ACAD9B300A942565",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "October 26, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/staryu-starmie-single/1850017046?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/staryu-starmie",
+        "spotify": "https://open.spotify.com/album/67CGluNoAhz9di6rZ39o4Z"
+      },
+      "title": "Staryu Starmie",
+      "tracks": [
+        {
+          "isrc": "QZZ7M2531032",
+          "title": "Staryu Starmie",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Staryu Starmie"
+          }
+        },
+        {
+          "isrc": "QT6E92532422",
+          "title": "Staryu Starmie (Aqua Jet Ver.)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Staryu Starmie (Aqua Jet Ver.)"
+          }
+        }
+      ],
+      "upc": "199749539367",
+      "uploadDate": "October 26, 2025",
+      "releaseDateIso": "2025-10-26",
+      "uploadDateIso": "2025-10-26",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "41dcca51-a67c-448d-80e8-ef2e29861c06",
+        "projectTitle": "Staryu Starmie"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "74CCD84F-63DE-4E44-9E01D7483FDA403B",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=74CCD84F-63DE-4E44-9E01D7483FDA403B",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "September 26, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/shiny-versions-the-remixes-ep/1842731969?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/shiny-versions-the-remixes",
+        "spotify": "https://open.spotify.com/album/3kt64poXCrLbquivQhFdan"
+      },
+      "title": "Shiny Versions: The Remixes",
+      "tracks": [
+        {
+          "isrc": "QT3F42510963",
+          "title": "Clefairy Clefairy (Moonlight Ver.)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Clefairy Clefairy (Moonlight Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3F42510964",
+          "title": "Jigglypuff's Song (Teeter Dance Ver.)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Jigglypuff's Song (Teeter Dance Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3F42510965",
+          "title": "Dragonite My Fallen Star (Dragon Dance Ver.)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Dragonite My Fallen Star (Dragon Dance Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3F42510966",
+          "title": "Jigglypuff's Song (Uproar Ver.)",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Jigglypuff's Song (Uproar Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3F42510967",
+          "title": "Staryu Starmie (Cosmic Power Ver.)",
+          "trackNumber": 5,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Staryu Starmie (Cosmic Power Ver.)"
+          }
+        },
+        {
+          "isrc": "QT3F42510968",
+          "title": "Purin no Uta (Encore Ver.)",
+          "trackNumber": 6,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Purin no Uta (Encore Ver.)"
+          }
+        }
+      ],
+      "upc": "199741811775",
+      "uploadDate": "September 26, 2025",
+      "releaseDateIso": "2025-09-26",
+      "uploadDateIso": "2025-09-26",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "b720885b-6f0b-48a1-8644-ad758a728756",
+        "projectTitle": "Shiny Versions: The Remixes"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "34491819-E605-4C44-98D3E56745FADFE0",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=34491819-E605-4C44-98D3E56745FADFE0",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "September 8, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/want-to-fly-away-single/1838859082?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/want-to-fly-away",
+        "spotify": "https://open.spotify.com/album/0FU7R45FJW61veXCM7Rbrs"
+      },
+      "title": "Want to Fly Away",
+      "tracks": [
+        {
+          "isrc": "QZZ7T2546827",
+          "title": "Want to Fly Away",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199736430585",
+      "uploadDate": "September 8, 2025",
+      "releaseDateIso": "2025-09-08",
+      "uploadDateIso": "2025-09-08",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "F39BFE94-BD71-48D1-BF355FF44785ECFB",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=F39BFE94-BD71-48D1-BF355FF44785ECFB",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "September 2, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/lavender-town-curse-single/1837558866?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/lavender-town-curse",
+        "spotify": "https://open.spotify.com/album/1vOOjATPx0Q5OAUWWBUGz8"
+      },
+      "title": "Lavender Town Curse",
+      "tracks": [
+        {
+          "isrc": "QZZ7Q2546917",
+          "title": "Lavender's a Death Game (Haunter Version)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Lavender's a Death Game (Haunter Version)"
+          }
+        },
+        {
+          "isrc": "QZZ7Q2546918",
+          "title": "Lavender's a Death Game (Gengar Version)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Lavender's a Death Game (Gengar Version)"
+          }
+        }
+      ],
+      "upc": "199735974219",
+      "uploadDate": "September 2, 2025",
+      "releaseDateIso": "2025-09-02",
+      "uploadDateIso": "2025-09-02",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "e529a1c6-7a89-424c-8837-c3ad9e91e4a8",
+        "projectTitle": "Lavender Town Curse"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "7F2D1C2D-3DC2-4EF3-A50E5CD8CB1191B3",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=7F2D1C2D-3DC2-4EF3-A50E5CD8CB1191B3",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "August 29, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/dragonite-my-fallen-star-single/1836668909?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/dragonite-my-fallen-star",
+        "spotify": "https://open.spotify.com/album/1nGTfARcrrZc0j85V00TJF"
+      },
+      "title": "Dragonite, My Fallen Star",
+      "tracks": [
+        {
+          "isrc": "QZZ7N2531116",
+          "title": "Dragonite, My Fallen Star",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Dragonite, My Fallen Star"
+          }
+        }
+      ],
+      "upc": "199733020024",
+      "uploadDate": "August 29, 2025",
+      "releaseDateIso": "2025-08-29",
+      "uploadDateIso": "2025-08-29",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "1cca8156-98d7-4e8b-b07b-b86da0491d26",
+        "projectTitle": "Dragonite, My Fallen Star"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "064C2932-D4BE-4085-A78B511F1601AA06",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=064C2932-D4BE-4085-A78B511F1601AA06",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "August 26, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/jigglypuffs-song-reimagined-ep/1836098700?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/jigglypuffs-song-reimagined-2",
+        "spotify": "https://open.spotify.com/album/2aYnlfRDtUHMda9yl1Hqw2"
+      },
+      "title": "Jigglypuff’s Song (Reimagined)",
+      "tracks": [
+        {
+          "isrc": "QZZ7M2506670",
+          "title": "Jigglypuff’s Song (Echoed Voice Version)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Jigglypuff’s Song (Echoed Voice Version)"
+          }
+        },
+        {
+          "isrc": "QZZ7M2506672",
+          "title": "Jigglypuff’s Song (Sweet Kiss Version)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Jigglypuff’s Song (Sweet Kiss Version)"
+          }
+        },
+        {
+          "isrc": "QZZ7M2506674",
+          "title": "Jigglypuff’s Song (Rock Slide Version)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Jigglypuff’s Song (Rock Slide Version)"
+          }
+        },
+        {
+          "isrc": "QZZ7M2506676",
+          "title": "Jigglypuff’s Song (Hyper Voice Version)",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Jigglypuff’s Song (Hyper Voice Version)"
+          }
+        },
+        {
+          "isrc": "QZZ7M2506678",
+          "title": "Jigglypuff’s Song (Perish Song Version)",
+          "trackNumber": 5,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Jigglypuff’s Song (Perish Song Version)"
+          }
+        },
+        {
+          "isrc": "QZZ7M2506680",
+          "title": "プリンのうた (エコーボイスVer.)",
+          "trackNumber": 6,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "プリンのうた (エコーボイスVer.)"
+          }
+        }
+      ],
+      "upc": "199733632586",
+      "uploadDate": "August 27, 2025",
+      "releaseDateIso": "2025-08-26",
+      "uploadDateIso": "2025-08-27",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "6ed6c3d9-e7fd-410d-b875-43814c284d33",
+        "projectTitle": "Jigglypuff’s Song (Reimagined)"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "030AA23B-D256-4DE5-B54642A946F090C1",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=030AA23B-D256-4DE5-B54642A946F090C1",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "August 6, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/clefairy-clefairy-single/1831833981?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/clefairy-clefairy",
+        "spotify": "https://open.spotify.com/album/5YmMHuvvbJUY6IGQPKmA5W"
+      },
+      "title": "Clefairy Clefairy",
+      "tracks": [
+        {
+          "isrc": "QZWFT2584124",
+          "title": "Clefairy Clefairy",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "exact",
+            "title": "Clefairy Clefairy"
+          }
+        }
+      ],
+      "upc": "199507434149",
+      "uploadDate": "August 6, 2025",
+      "releaseDateIso": "2025-08-06",
+      "uploadDateIso": "2025-08-06",
+      "vaultMatch": {
+        "status": "exact",
+        "projectId": "a3f4a444-7c7f-46b4-8fa2-033d121d4221",
+        "projectTitle": "Clefairy Clefairy"
+      },
+      "kirbaiOsScope": {
+        "status": "pokemon_confirmed",
+        "evidence": "Exact release-title match to a Pokémon Vault project."
+      }
+    },
+    {
+      "albumUuid": "8C455F4B-5186-4293-A40FBDED1ADE61E3",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=8C455F4B-5186-4293-A40FBDED1ADE61E3",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "July 20, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/pure-projection-single/1828223902?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/pure-projection",
+        "spotify": "https://open.spotify.com/album/4ZVtg3GuBPDhwRrcDfTCuR"
+      },
+      "title": "Pure Projection",
+      "tracks": [
+        {
+          "isrc": "QZWFK2545325",
+          "title": "Pure Projection",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZWFK2545326",
+          "title": "Pure Projection (Stripped Build)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199511583291",
+      "uploadDate": "July 20, 2025",
+      "releaseDateIso": "2025-07-20",
+      "uploadDateIso": "2025-07-20",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "FCE01D9A-19EE-4FAC-A353C5E974A3D53C",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=FCE01D9A-19EE-4FAC-A353C5E974A3D53C",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "June 20, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/patch-notes/1822081901?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/patch-notes",
+        "spotify": "https://open.spotify.com/album/1wML2wCzHvbmGvzc1ic2xO"
+      },
+      "title": "Patch Notes",
+      "tracks": [
+        {
+          "isrc": "QZTB72582949",
+          "title": "Everything Is Fine (Regen v2.0)",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582950",
+          "title": "Hypnotize It Away (Regen v2.0)",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582951",
+          "title": "Crimescene Getaway (Regen v2.0)",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582952",
+          "title": "Too Many Moves",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582953",
+          "title": "Your Boyfriend is So Shady (Orchestra Patch)",
+          "trackNumber": 5,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582954",
+          "title": "Flake on Me (v2.0)",
+          "trackNumber": 6,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582955",
+          "title": "Opposition Research (Orchestra Patch)",
+          "trackNumber": 7,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582956",
+          "title": "Version of Events (Mainstage Build)",
+          "trackNumber": 8,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582957",
+          "title": "All the Gays Go to the Gym (v2.0)",
+          "trackNumber": 9,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582958",
+          "title": "Can I Use Your Pool?",
+          "trackNumber": 10,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582959",
+          "title": "Blueberry Tub",
+          "trackNumber": 11,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6N2508710",
+          "title": "Try Better",
+          "trackNumber": 12,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582960",
+          "title": "Cheat Codes On (8-Bit Build)",
+          "trackNumber": 13,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582961",
+          "title": "Remind Me Tomorrow (8‑Bit Build)",
+          "trackNumber": 14,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582962",
+          "title": "Fix Me (8‑Bit Build)",
+          "trackNumber": 15,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582963",
+          "title": "Gameboy at the Beach (Dreamboy Build)",
+          "trackNumber": 16,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582964",
+          "title": "I Want to Want to",
+          "trackNumber": 17,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582965",
+          "title": "I Don’t Need Your Speed (Dreamrock Build)",
+          "trackNumber": 18,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582966",
+          "title": "I’m Hooked (Energy Upgrade)",
+          "trackNumber": 19,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582967",
+          "title": "We Have Telepathy",
+          "trackNumber": 20,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582968",
+          "title": "Placebo Flex",
+          "trackNumber": 21,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582969",
+          "title": "Still Typing...",
+          "trackNumber": 22,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582970",
+          "title": "Cognitive Dissonance (v1.1)",
+          "trackNumber": 23,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582971",
+          "title": "Post‑Logic",
+          "trackNumber": 24,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTB72582972",
+          "title": "Your Boyfriend is So Shady (Energy Upgrade)",
+          "trackNumber": 25,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199518525355",
+      "uploadDate": "June 20, 2025",
+      "releaseDateIso": "2025-06-20",
+      "uploadDateIso": "2025-06-20",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "ED13ADAA-9639-475F-B03A1456507E4B84",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=ED13ADAA-9639-475F-B03A1456507E4B84",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "May 22, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/smear-campaign-single/1818780762?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/smear-campaign-2",
+        "spotify": "https://open.spotify.com/album/4ZlDpjOZDOJ7AstrmDnrvu"
+      },
+      "title": "Smear Campaign",
+      "tracks": [
+        {
+          "isrc": "QZRP42598055",
+          "title": "Smear Campaign",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199522310480",
+      "uploadDate": "June 4, 2025",
+      "releaseDateIso": "2025-05-22",
+      "uploadDateIso": "2025-06-04",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "BE387673-FEF5-4128-B145CD58CFC6BC31",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=BE387673-FEF5-4128-B145CD58CFC6BC31",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "May 15, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/not-your-dragon-single/1814727767?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/not-your-dragon-2",
+        "spotify": "https://open.spotify.com/album/2OXjAtC52JDPvVDngcvpjD"
+      },
+      "title": "Not Your Dragon",
+      "tracks": [
+        {
+          "isrc": "QZPLR2531217",
+          "title": "Not Your Dragon",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199329870996",
+      "uploadDate": "May 15, 2025",
+      "releaseDateIso": "2025-05-15",
+      "uploadDateIso": "2025-05-15",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "3768F567-42E2-40F2-BF6594A0EF663DC0",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=3768F567-42E2-40F2-BF6594A0EF663DC0",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "May 10, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/vansham-inc-single/1813695925?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/vansham-inc-2",
+        "spotify": "https://open.spotify.com/album/74vLzCOjyqMZ2iF7wlM2b9"
+      },
+      "title": "VanSham Inc.",
+      "tracks": [
+        {
+          "isrc": "QZNWY2512286",
+          "title": "VanSham Inc.",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199330993233",
+      "uploadDate": "May 10, 2025",
+      "releaseDateIso": "2025-05-10",
+      "uploadDateIso": "2025-05-10",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "D32BD37B-556A-431A-96287645F8BD90C4",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=D32BD37B-556A-431A-96287645F8BD90C4",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "May 7, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/never-with-teeth-single/1813210685?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/never-with-teeth",
+        "spotify": "https://open.spotify.com/album/4qZyuNAPrBIECXt5T8U30l"
+      },
+      "title": "Never With Teeth",
+      "tracks": [
+        {
+          "isrc": "QZNWW2587813",
+          "title": "Never With Teeth",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199331644677",
+      "uploadDate": "May 7, 2025",
+      "releaseDateIso": "2025-05-07",
+      "uploadDateIso": "2025-05-07",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "74E0FC8E-1F3E-468D-925E8D258D674D3A",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=74E0FC8E-1F3E-468D-925E8D258D674D3A",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "March 27, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/still-typing-single/1804999907?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/still-typing-3",
+        "spotify": "https://open.spotify.com/album/7wnixII9tsJ3nejUnVOKSN"
+      },
+      "title": "Still Typing...",
+      "tracks": [
+        {
+          "isrc": "QZK6K2526120",
+          "title": "Still Typing...",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199340491514",
+      "uploadDate": "March 27, 2025",
+      "releaseDateIso": "2025-03-27",
+      "uploadDateIso": "2025-03-27",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "655CCA78-1F5F-4BA9-AA95B2CDA28267CB",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=655CCA78-1F5F-4BA9-AA95B2CDA28267CB",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "March 20, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/try-better-single/1803211026?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/try-better",
+        "spotify": "https://open.spotify.com/album/2skHIsqMAA3x34y2WqEuOv"
+      },
+      "title": "Try Better",
+      "tracks": [
+        {
+          "isrc": "QZK6N2508710",
+          "title": "Try Better",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199342150976",
+      "uploadDate": "March 19, 2025",
+      "releaseDateIso": "2025-03-20",
+      "uploadDateIso": "2025-03-19",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "8B6F0FB3-6837-4876-B4A1385F4762DABC",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=8B6F0FB3-6837-4876-B4A1385F4762DABC",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "March 15, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/a-version-of-events/1802306311?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/a-version-of-events",
+        "spotify": "https://open.spotify.com/album/5v82OeUKZWtEHpMIF2G7Y3"
+      },
+      "title": "A Version of Events",
+      "tracks": [
+        {
+          "isrc": "QZK6Q2528843",
+          "title": "People Change",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528844",
+          "title": "Cheat Codes On",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528845",
+          "title": "Yes You Can’t",
+          "trackNumber": 3,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528846",
+          "title": "Cognitive Dissonance",
+          "trackNumber": 4,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528847",
+          "title": "Fuck!… I Did It Again",
+          "trackNumber": 5,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528848",
+          "title": "Opposition Research",
+          "trackNumber": 6,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528849",
+          "title": "Call Me Anytime",
+          "trackNumber": 7,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528850",
+          "title": "My Lawyer Said No",
+          "trackNumber": 8,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528851",
+          "title": "Version of Events",
+          "trackNumber": 9,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528852",
+          "title": "I Don’t Wanna Do Anything",
+          "trackNumber": 10,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528853",
+          "title": "Red Flags and Fireworks",
+          "trackNumber": 11,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528854",
+          "title": "Flake on Me",
+          "trackNumber": 12,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528855",
+          "title": "Guys Who Don’t Like Me",
+          "trackNumber": 13,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528856",
+          "title": "Remind Me Tomorrow",
+          "trackNumber": 14,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528857",
+          "title": "Just to Be Sure",
+          "trackNumber": 15,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528858",
+          "title": "Too Much",
+          "trackNumber": 16,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528859",
+          "title": "Fix Me",
+          "trackNumber": 17,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZK6Q2528860",
+          "title": "Your Boyfriend is So Shady",
+          "trackNumber": 18,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199343103957",
+      "uploadDate": "March 14, 2025",
+      "releaseDateIso": "2025-03-15",
+      "uploadDateIso": "2025-03-14",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "BDCB7437-55E6-4DBB-B5AB3EE14E785521",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=BDCB7437-55E6-4DBB-B5AB3EE14E785521",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "March 13, 2025",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/gameboy-at-the-beach-single/1802108533?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/gameboy-at-the-beach",
+        "spotify": "https://open.spotify.com/album/0GOVyUKGAG9JOtXlnFfTYc"
+      },
+      "title": "Gameboy at the Beach",
+      "tracks": [
+        {
+          "isrc": "QZHNC2539218",
+          "title": "Gameboy at the Beach",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "199343573217",
+      "uploadDate": "March 12, 2025",
+      "releaseDateIso": "2025-03-13",
+      "uploadDateIso": "2025-03-12",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    },
+    {
+      "albumUuid": "F579890A-3407-4B0B-B7DCD8D3ACE49D5B",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=F579890A-3407-4B0B-B7DCD8D3ACE49D5B",
+      "artist": "Kirbai",
+      "deliveryStatus": null,
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "October 26, 2024",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/your-boyfriend-is-so-shady-single/1776468245?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/your-boyfriend-is-so-shady",
+        "spotify": "https://open.spotify.com/album/3kHBXdkOvTycxDlzSvit0H"
+      },
+      "title": "Your Boyfriend is So Shady",
+      "tracks": [
+        {
+          "isrc": "QZWFV2424407",
+          "title": "Your Boyfriend is So Shady",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "198880029133",
+      "uploadDate": "October 26, 2024",
+      "releaseDateIso": "2024-10-26",
+      "uploadDateIso": "2024-10-26",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not a Pokémon song — used once in a single Pokémon meme video. Candidate for a future Pokémon feature, not a priority."
+      }
+    },
+    {
+      "albumUuid": "CF61A45D-F065-4711-AFC10DD996261F0E",
+      "sourceUrl": "https://distrokid.com/dashboard/album/?albumuuid=CF61A45D-F065-4711-AFC10DD996261F0E",
+      "artist": "Kirbai",
+      "deliveryStatus": "Delivered",
+      "recordLabel": "Poppy Bro Productions",
+      "releaseDate": "August 31, 2024",
+      "storeLinks": {
+        "appleMusic": "https://music.apple.com/us/album/all-the-gays-go-to-the-gym-single/1766244862?uo=4&app=music&at=1001lry3&ct=dashboard",
+        "hyperFollow": "https://distrokid.com/hyperfollow/kirbai/all-the-gays-go-to-the-gym",
+        "spotify": "https://open.spotify.com/album/53WhPvPHUhPkgBlZLwodJb"
+      },
+      "title": "All the Gays Go to the Gym",
+      "tracks": [
+        {
+          "isrc": "QZTBB2484965",
+          "title": "All the Gays Go to the Gym",
+          "trackNumber": 1,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        },
+        {
+          "isrc": "QZTBB2484966",
+          "title": "Ghosted on Leg Day",
+          "trackNumber": 2,
+          "vaultMatch": {
+            "status": "not_applicable",
+            "title": null
+          }
+        }
+      ],
+      "upc": "198890511062",
+      "uploadDate": "September 1, 2024",
+      "releaseDateIso": "2024-08-31",
+      "uploadDateIso": "2024-09-01",
+      "vaultMatch": {
+        "status": "none",
+        "projectId": null,
+        "projectTitle": null
+      },
+      "kirbaiOsScope": {
+        "status": "needs_review",
+        "evidence": "Not represented in the current Pokémon Vault; do not assume Pokémon or non-Pokémon from the title alone."
+      }
+    }
+  ],
+  "methodology": {
+    "sourceAuthority": "DistroKid release dashboards are authoritative for distributed title, release/upload date, UPC, ISRC, delivery status, and store links.",
+    "titleMatching": "Exact Unicode title equality is required for automatic Vault matches. Near matches remain manual review items.",
+    "scopeRule": "Kirbai OS defaults to confirmed Pokémon projects. Unmatched releases remain needs_review rather than being assumed non-Pokémon.",
+    "identifierRule": "UPC belongs to a release; ISRC belongs to a specific recording."
+  },
+  "vaultPolicy": {
+    "focus": "Pokémon music projects",
+    "rule": "Keep these releases in distribution history only. Do not create Vault projects for them unless Erik later changes this decision.",
+    "catalogOnlyByUser": [
+      "Looking for K",
+      "Don't Call Me Ridiculous",
+      "Sorry My Hands Are So Cold",
+      "Want to Fly Away",
+      "Pure Projection",
+      "Patch Notes",
+      "Smear Campaign",
+      "Not Your Dragon",
+      "VanSham Inc.",
+      "Never With Teeth",
+      "Still Typing...",
+      "Try Better",
+      "A Version of Events",
+      "Gameboy at the Beach",
+      "All the Gays Go to the Gym"
+    ]
+  },
+  "summary": {
+    "releases": 36,
+    "tracks": 150,
+    "pokemonConfirmed": 21,
+    "needsReview": 15,
+    "catalogOnlyByUser": 15,
+    "exactVaultMatches": 14,
+    "manualVaultMatches": 2
+  }
+}
