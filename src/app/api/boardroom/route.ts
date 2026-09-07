@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { 
+    getBrandIdentityAsync,
     getRow, 
     logApiUsageAsync, 
     getBoardroomHistoryAsync, 
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
 
         // Gather context (Two-Layer Memory)
         const [identity, finance, pulse, roadmap, history, ledger, heartScale] = await Promise.all([
-            getRow('brand_identity'),
+            getBrandIdentityAsync(mode),
             getRow('main_db').then(db => db?.financeAnalysis),
             getRow(mode === 'factory' ? 'pulse_state_factory' : 'pulse_state_kirbai'),
             getRow(mode === 'factory' ? 'roadmap_factory' : 'roadmap_kirbai'),

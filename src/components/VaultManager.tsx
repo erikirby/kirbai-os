@@ -26,6 +26,7 @@ interface Project {
     coverArt: string;
     tracklist: string[];
     externalLinks: ExternalLink[];
+    worldbuilding?: string;
     createdAt: number;
 }
 
@@ -80,6 +81,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
     const [activeProject, setActiveProject] = useState<Project | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [loadError, setLoadError] = useState(false);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     // Which track's lyrics are expanded inline
@@ -144,12 +146,17 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                     fetch('/api/vault?type=projects', { cache: 'no-store' }),
                     fetch('/api/vault?type=lyrics', { cache: 'no-store' })
                 ]);
+                if (!projRes.ok || !lyrRes.ok) throw new Error("Vault load failed");
                 const projData = await projRes.json();
                 const lyrData = await lyrRes.json();
-                if (projData && Array.isArray(projData.data)) setProjects(projData.data);
-                if (lyrData && Array.isArray(lyrData.data)) setLyrics(lyrData.data);
+                if (!Array.isArray(projData.data) || !Array.isArray(lyrData.data)) {
+                    throw new Error("Invalid vault response");
+                }
+                setProjects(projData.data);
+                setLyrics(lyrData.data);
             } catch (e) {
                 console.error("Failed to load vault");
+                setLoadError(true);
             } finally {
                 setIsLoading(false);
             }
@@ -158,116 +165,95 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
     }, []);
 
     // --- Persistence & Debouncing ---
-    const saveProjectsRef = useRef<NodeJS.Timeout | null>(null);
+    const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const pendingProjectsSave = useRef<Project[] | null>(null);
+    const pendingLyricsSave = useRef<Lyric[] | null>(null);
+    const saveInFlight = useRef<Promise<void> | null>(null);
 
-    const queueProjectsSave = (data: Project[]) => {
-        pendingProjectsSave.current = data;
-        setHasUnsavedChanges(true);
+    // Autosave and manual save share one writer. A response only acknowledges
+    // the exact array sent, so edits made during the request remain pending.
+    const flushVault = (): Promise<void> => {
+        if (saveInFlight.current) return saveInFlight.current;
         setIsSaving(true);
-        if (saveProjectsRef.current) clearTimeout(saveProjectsRef.current);
-        saveProjectsRef.current = setTimeout(async () => {
-            const rawPayload = pendingProjectsSave.current;
-            if (!rawPayload) return;
-
-            // DEFUSE PAYLOAD: Strip legacy massive Base64 strings before sending to prevent 413 error
-            const payload = rawPayload.map(p => ({
-                ...p,
-                coverArt: p.coverArt && p.coverArt.length > 500000 ? "" : p.coverArt
-            }));
-
+        saveInFlight.current = (async () => {
             try {
-                const res = await fetch('/api/vault', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'projects', payload }) // keepalive removed to prevent 64KB block on base64
-                });
-                if (!res.ok) throw new Error(`Vault API Error: ${res.status}`);
-                pendingProjectsSave.current = null;
-                if (!pendingLyricsSave.current) setHasUnsavedChanges(false);
+                while (pendingProjectsSave.current || pendingLyricsSave.current) {
+                    const projectsToSave = pendingProjectsSave.current;
+                    const lyricsToSave = pendingLyricsSave.current;
+                    if (projectsToSave) {
+                        const payload = projectsToSave.map(p => ({
+                            ...p,
+                            coverArt: p.coverArt && p.coverArt.length > 500000 ? "" : p.coverArt
+                        }));
+                        const res = await fetch('/api/vault', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ type: 'projects', payload })
+                        });
+                        if (!res.ok) throw new Error(`Vault API Error: ${res.status}`);
+                        if (pendingProjectsSave.current === projectsToSave) pendingProjectsSave.current = null;
+                    }
+                    if (lyricsToSave) {
+                        const res = await fetch('/api/vault', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ type: 'lyrics', payload: lyricsToSave })
+                        });
+                        if (!res.ok) throw new Error(`Vault API Error: ${res.status}`);
+                        if (pendingLyricsSave.current === lyricsToSave) pendingLyricsSave.current = null;
+                    }
+                }
+                setHasUnsavedChanges(false);
+                setNotice(null);
             } catch (err) {
-                console.error("AutoSave Error:", err);
+                setNotice({ message: "Save failed. Your edits are still pending. Use Pending Sync to retry.", type: "error" });
+                throw err;
             } finally {
                 setIsSaving(false);
             }
+        })().finally(() => { saveInFlight.current = null; });
+        return saveInFlight.current;
+    };
+
+    const scheduleSave = () => {
+        setHasUnsavedChanges(true);
+        if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = setTimeout(() => {
+            void flushVault().catch(console.error);
         }, 1000);
     };
 
-    const saveLyricsRef = useRef<NodeJS.Timeout | null>(null);
-    const pendingLyricsSave = useRef<Lyric[] | null>(null);
+    const queueProjectsSave = (data: Project[]) => {
+        pendingProjectsSave.current = data;
+        scheduleSave();
+    };
 
     const queueLyricsSave = (data: Lyric[]) => {
         pendingLyricsSave.current = data;
-        setHasUnsavedChanges(true);
-        setIsSaving(true);
-        if (saveLyricsRef.current) clearTimeout(saveLyricsRef.current);
-        saveLyricsRef.current = setTimeout(async () => {
-            const payload = pendingLyricsSave.current;
-            if (!payload) return;
-            try {
-                const res = await fetch('/api/vault', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'lyrics', payload })
-                });
-                if (!res.ok) throw new Error(`Vault API Error: ${res.status}`);
-                pendingLyricsSave.current = null;
-                if (!pendingProjectsSave.current) setHasUnsavedChanges(false);
-            } catch (err) {
-                console.error("AutoSave Error:", err);
-            } finally {
-                setIsSaving(false);
-            }
-        }, 1000);
+        scheduleSave();
     };
 
     const handleManualSave = async () => {
         if (!hasUnsavedChanges) return;
-        setIsSaving(true);
-        if (saveProjectsRef.current) clearTimeout(saveProjectsRef.current);
-        if (saveLyricsRef.current) clearTimeout(saveLyricsRef.current);
-
+        if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
         try {
-            const promises = [];
-            if (pendingProjectsSave.current) {
-                // DEFUSE PAYLOAD: Strip legacy massive Base64 strings before sending to prevent 413 error
-                const safeProjectPayload = pendingProjectsSave.current.map(p => ({
-                    ...p,
-                    coverArt: p.coverArt && p.coverArt.length > 500000 ? "" : p.coverArt
-                }));
-
-                promises.push(
-                    fetch('/api/vault', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ type: 'projects', payload: safeProjectPayload })
-                    }).then((res) => {
-                        if (!res.ok) throw new Error("Payload limit exceeded");
-                        pendingProjectsSave.current = null;
-                    })
-                );
-            }
-            if (pendingLyricsSave.current) {
-                promises.push(
-                    fetch('/api/vault', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ type: 'lyrics', payload: pendingLyricsSave.current })
-                    }).then((res) => {
-                        if (!res.ok) throw new Error("Payload limit exceeded");
-                        pendingLyricsSave.current = null;
-                    })
-                );
-            }
-            await Promise.all(promises);
-            setHasUnsavedChanges(false);
+            await flushVault();
             setNotice({ message: "Vault safely locked. All changes synced.", type: "success" });
         } catch (e) {
-            setNotice({ message: "Failed to force save data. Payload may be too large.", type: "error" });
-        } finally {
-            setIsSaving(false);
+            console.error("Manual save failed:", e);
         }
     };
+
+    useEffect(() => {
+        const warnUnsaved = (event: BeforeUnloadEvent) => {
+            if (pendingProjectsSave.current || pendingLyricsSave.current) {
+                event.preventDefault();
+                event.returnValue = '';
+            }
+        };
+        window.addEventListener('beforeunload', warnUnsaved);
+        return () => { window.removeEventListener('beforeunload', warnUnsaved); };
+    }, []);
 
     // --- Project Actions ---
     const createProject = () => {
@@ -605,6 +591,15 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
         return (
             <div className="p-10 flex items-center gap-4 text-foreground/50 font-mono text-xs uppercase tracking-widest">
                 <Loader2 className="animate-spin w-4 h-4" /> Syncing Neural Net...
+            </div>
+        );
+    }
+
+    if (loadError) {
+        return (
+            <div className="card p-6 flex flex-col gap-4" role="alert">
+                <p>Could not load the Vault. Reload before editing to protect your saved projects and lyrics.</p>
+                <button className="btn-secondary" onClick={() => window.location.reload()}>Reload Vault</button>
             </div>
         );
     }
@@ -1028,6 +1023,16 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                         value={activeProject.lore || ''}
                                         onChange={(e) => updateActiveProject('lore', e.target.value)}
                                         placeholder="Define the overarching narrative. Character motives, hidden truths, thematic arcs — all goes here. AI will reference this when helping you with this project."
+                                        className={`w-full mt-2 p-4 font-mono text-sm border rounded-xl focus:outline-none focus:border-accent resize-y min-h-[140px] leading-relaxed border-border ${inputBase}`}
+                                    />
+                                </Section>
+
+                                {/* SECTION 2.5: WORLD BUILDING */}
+                                <Section title="World Building" icon={<Sparkles className="w-3 h-3 text-pink-400" />} defaultOpen={!!activeProject.worldbuilding}>
+                                    <textarea
+                                        value={activeProject.worldbuilding || ''}
+                                        onChange={(e) => updateActiveProject('worldbuilding', e.target.value)}
+                                        placeholder="Rollout brainstorm: video concepts, casting, character posses, romance arcs — deep-dive notes beyond the core lore."
                                         className={`w-full mt-2 p-4 font-mono text-sm border rounded-xl focus:outline-none focus:border-accent resize-y min-h-[140px] leading-relaxed border-border ${inputBase}`}
                                     />
                                 </Section>

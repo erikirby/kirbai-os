@@ -1,7 +1,161 @@
 {
+  "profileVersion": 2,
+  "lastReviewed": "2026-07-21",
   "brandIdentity": "Kirbai = Erik's Pokémon hyperpop artist project (Minneapolis; handle kirbaimusic everywhere). Gaymer millennial aesthetic. Deep-cut nerdy lines and dark psychological themes without R-rated gore. Character psychological profiles with problematic tendencies/fatal flaws (selfishness, delusion, jealousy). 'Diva' drag-pop elements appealing to Drag Race fans; sounds like Lady Gaga. Lyrics are sharp, clever, focused on character development — never cliche or sappy. Pop culture references woven into visuals/videos. Sister projects kept separate: AELOW (English synthpop) and KURAO (Japanese) live under Music Factory — quantity/SEO plays. Kirbai is the opposite: quality, authenticity, world-building.",
   "aestheticRules": "Shiny = pink when applicable. Realistic textures paired faithfully with original Pokémon silhouettes, shapes, and proportions (NOT Detective Pikachu-style proportions). The real world around them is rendered hyper-realistically. Ken Sugimori watercolor art is the reference base for classic/illustrated looks (folder icons, carousels). Character consistency across shots is non-negotiable — no morphing, no off-model drift.",
   "narrativeRules": "Fan-fiction / alternate-reality metaphors. Complex emotions that elicit viewer responses. Understand a character's psychological motivations before building any art. THE ERA SYSTEM (core structure of the whole discography): releases are organized into Eras — overarching stories told through videos, not just albums. An Era ends when its story is done being told, not when the album ships. Timeline: Pre-Era (random singles; Jigglypuff multi-version song was the big draw) → Banned Badge Era (first real Era: Jynx, Hatterene, Gothitelle, Gardevoir, Tsareena — 'Baddie 4'; Pixilate = same-roster remix album) → Heart Scales Era (Meowscarada, Pheromosa, Gholdengo, Meloetta, Lopunny, Ditto; Battle Ready = bridge remix album fusing both Eras' casts) → Pink Bois Era (Swampert, Voltorb, Heracross, Electabuzz, Quagsire, Nidoking, Rhyhorn, Kyogre, Dratini; Pheromone Edition remix added Butterfree + Salazzle; Dream Eater single [Hypno/Drowzee] = mid-Era bridge content) → Pretty Rare Candies Era (current, in development) → possible future horror Era (Misdreavus, Gengar, Hypno, Malamar — undecided). Remix albums either close out an Era's roster or bridge two Eras. Bridge singles keep content flowing between big albums. Going forward Erik is moving AWAY from putting the Pokémon's name in track titles — the Pokémon-to-song mapping lives in lyrics, lore, and this OS instead.",
   "workflowTools": "Music: Suno (generation) → Ozone (mastering) → DistroKid (distribution). Video edit: CapCut. Photos: Gemini Pro (base) → LM Arena (upscale). Videos: Grok first (start-frame animation, handles >1 character, free + upscale), Kling as fallback, Veo 3 conservative use (3D transformations), LM Arena when Grok fails. LTX-2/Meta/Hunyuan/Runway/Luma ruled out. Watermark removal + 2x AI upscale: local Video Pipeline app (localhost:5001, drag-drop). Narration: ElevenLabs 'Theo Silk' voice + sox reverb (90/22 mix). Research: check local stats folder (~/Desktop/KIRBAI POKEMON/stats — FB retention curves, IG per-post, DistroKid royalties) FIRST, vidIQ second (keyword research, live channel stats). Hook-first ideation via the Hook Engine — every video concept starts with the hook. Consults: Claude (Grok prompts, execution), Gemini (brand knowledge).",
-  "ultimateGoal": "Make Kirbai profitable (drive streaming traffic) while maintaining artistic integrity — creatively fulfilling, achieving viral videos. Kirbai's creative time is protected: automated/monetization side-hustles (Music Factory etc.) must never compete with it. Quality over quantity, always."
+  "ultimateGoal": "Make Kirbai profitable (drive streaming traffic) while maintaining artistic integrity — creatively fulfilling, achieving viral videos. Kirbai's creative time is protected: automated/monetization side-hustles (Music Factory etc.) must never compete with it. Quality over quantity, always.",
+  "canonicalArtist": {
+    "artistName": "Kirbai",
+    "creator": "Erik Henry",
+    "homeBase": "Minneapolis, Minnesota",
+    "oneLineDescription": "Pokémon hyperpop told through character-driven songs, psychological fan-fiction, and high-fidelity AI visuals.",
+    "canonicalHandle": "kirbaimusic",
+    "separateProjects": {
+      "AELOW": "English synthpop Music Factory alias; quantity and SEO focused.",
+      "KURAO": "Japanese Music Factory alias; quantity and SEO focused."
+    },
+    "separationRule": "Never blend AELOW or KURAO strategy, catalog, voice, analytics, or release metadata into Kirbai unless Erik explicitly asks for a comparison."
+  },
+  "audience": {
+    "coreCommunities": [
+      "Pokémon fans who understand character, move, game, and anime references",
+      "Queer and gaymer millennials",
+      "Drag-pop, diva-pop, Lady Gaga, and Drag Race fans",
+      "Viewers who like beautiful visuals with darkly funny psychological storytelling"
+    ],
+    "audiencePromise": "A familiar Pokémon becomes a specific, flawed pop character with an original song and a story worth following.",
+    "avoid": [
+      "Generic fandom content with no Kirbai point of view",
+      "Childish or overly wholesome Pokémon treatment",
+      "Cliche motivational language, empty camp, or random edginess",
+      "Growth tactics that weaken character consistency or artistic quality"
+    ]
+  },
+  "voice": {
+    "traits": [
+      "Sharp",
+      "Character-specific",
+      "Darkly funny",
+      "Queer and diva-literate",
+      "Emotionally perceptive",
+      "Nerdy without explaining every reference"
+    ],
+    "captionPattern": "Lead with a decisive character take, conflict, confession, or absurd premise; reveal the psychological story; identify the Kirbai track; finish with one natural invitation to react or listen.",
+    "do": [
+      "Treat Pokémon as adults with motives, flaws, status, desire, and consequences",
+      "Use deep-cut references only when they sharpen the joke, plot, or character",
+      "Let Erik's personal opinion and affection for the character show",
+      "Make the song part of the story rather than an unrelated promotional add-on"
+    ],
+    "dont": [
+      "Write generic AI-marketing copy",
+      "Stack several calls to action",
+      "Explain the entire lore before giving the viewer a reason to care",
+      "Use sentimental, sappy, or interchangeable pop phrasing"
+    ]
+  },
+  "socialPresence": {
+    "instagram": {
+      "handle": "kirbaimusic",
+      "url": "https://www.instagram.com/kirbaimusic/"
+    },
+    "facebook": {
+      "handle": "kirbaimusic",
+      "url": "https://www.facebook.com/kirbaimusic/"
+    },
+    "tiktok": {
+      "handle": "kirbaimusic",
+      "url": "https://www.tiktok.com/@kirbaimusic"
+    },
+    "youtube": {
+      "handle": "@KirbaiMusic",
+      "channelId": "UCciaqiM7vAzYN4Paaoffi0Q",
+      "url": "https://www.youtube.com/@KirbaiMusic"
+    },
+    "linkInBio": "https://linktr.ee/kirbai",
+    "platformRoles": {
+      "tiktok": "Primary discovery and fast validation of character hooks, humor, conflict, and new-song concepts.",
+      "instagram": "Polished visual identity, Reels, and shareable character/world-building moments.",
+      "youtube": "Shorts for discovery; full songs, lyric videos, and longer story videos for depth, search, and monetization.",
+      "facebook": "Native distribution and monetization for accessible story-led video; adapt the opening and caption for Facebook rather than blindly copying."
+    },
+    "contentPillars": [
+      "Character indictment: a bold psychological read on one Pokémon",
+      "Era chapters: serialized conflict, transformation, alliances, and consequences",
+      "Original-song reveal: the track is evidence of the character story",
+      "Deep-cut fan recognition: moves, anime moments, game lore, cameos, and visual Easter eggs",
+      "Timely Pokémon reaction: only when Erik has a distinct point of view or Kirbai tie-in",
+      "Process and release updates delivered in-world when possible"
+    ],
+    "observedPerformancePattern": "The dated native-platform baseline shows the clearest wins when a caption opens with a provocative, funny character thesis and the video dramatizes it with a Kirbai song. Machoke/Your Boyfriend Is So Shady, Gothitelle/Mean Look, Tsareena/Power Whip, Jynx/Lovely Kiss, and Nidoking/Poison Pink are strong examples across social or royalties. Treat this as evidence to test against fresh Pulse and Revenue Engine data, not a permanent algorithm rule."
+  },
+  "musicProject": {
+    "genreAndSound": [
+      "Hyperpop",
+      "Dance-pop and diva/drag-pop",
+      "Character-led theatrical pop",
+      "Lady Gaga is a useful broad sonic/cultural reference, not a template to imitate"
+    ],
+    "releaseArchitecture": {
+      "eras": "The primary canon. Each Era is an overarching video story and ends when that story is finished, not merely when an album is released.",
+      "albums": "Organize a cast and establish the main Era conflict.",
+      "remixAlbums": "Close an Era roster or stage battles/fusions between casts; they are meaningful story architecture, not filler.",
+      "bridgeSingles": "Maintain momentum or connect major projects without forcing a premature Era launch.",
+      "titleRule": "Move away from putting the Pokémon name in the track title. Preserve the Pokémon-to-song mapping in lyrics, lore, project metadata, and Kirbai OS."
+    },
+    "creationPipeline": [
+      "Develop the character psychology, hook, and lore role",
+      "Generate and refine the song in Suno",
+      "Master in Ozone",
+      "Verify the release package against the Vault",
+      "Distribute through DistroKid",
+      "Build hook-first social and video assets around the same character thesis",
+      "Feed current social and royalty results back into Pulse and Revenue Engine"
+    ],
+    "qualityGate": [
+      "The song works as a song, not only as a Pokémon reference",
+      "Lyrics sound specific to the character and contain no cliche filler",
+      "The visual character remains on-model across every shot",
+      "The release has a clear role in an Era, remix closure, or bridge strategy",
+      "Promotion has a story hook stronger than 'new song out now'"
+    ]
+  },
+  "distribution": {
+    "distributor": "DistroKid",
+    "artistPages": {
+      "spotify": "https://open.spotify.com/artist/14SIOrTa0Z1StuxvxycRTb",
+      "appleMusic": "https://music.apple.com/us/artist/kirbai/1765938461"
+    },
+    "hyperfollow": {
+      "Dream Eater": "https://distrokid.com/hyperfollow/kirbai/dream-eater",
+      "Lovely Kiss (Shiny Versions)": "https://distrokid.com/hyperfollow/kirbai/lovely-kiss-shiny-versions",
+      "Pink Bois (Pheromone Edition)": "https://distrokid.com/hyperfollow/kirbai/pink-bois-pheromone-edition",
+      "Pink Bois": "https://distrokid.com/hyperfollow/kirbai/pink-bois",
+      "Heart Scales": "https://distrokid.com/hyperfollow/kirbai/heart-scales-3",
+      "Banned Badge": "https://distrokid.com/hyperfollow/kirbai/banned-badge"
+    },
+    "metadataRules": [
+      "Use the Vault project and tracklist as the release-package source of truth; do not reconstruct titles from memory.",
+      "Verify artist alias, exact title punctuation, version labels, track order, artwork, language, lyrics, date, and existing ISRC/UPC status before submission.",
+      "Choose the actual lyric language. Region Locked being submitted as English to avoid alienating the English audience is documented as a mistake and must not be repeated.",
+      "Do not mix Kirbai metadata or assets with AELOW, KURAO, or legacy Kirby Henry releases.",
+      "Never invent an artist URL, HyperFollow URL, ISRC, UPC, royalty figure, or release status.",
+      "DistroKid reporting is delayed. Label every revenue analysis with its reporting date and sale-month coverage; do not treat the newest sale month as complete."
+    ],
+    "performancePrinciple": "Use royalties to identify songs and stores that deserve more creative support, not to replace artistic judgment. The dated stats baseline is historical evidence; current Revenue Engine data overrides it whenever a newer DistroKid export has been imported."
+  },
+  "sourceOfTruth": {
+    "identityAndPermanentRules": "data/vault/brand/identity.json",
+    "projectsTracklistsAndStatus": "Vault / vault_projects",
+    "characterCanonAndRelationships": "Lore Matrix / lore_kirbai",
+    "currentPriorities": "Kirbai roadmap",
+    "historicalPerformanceBaseline": "data/vault/analytics/kirbai_stats_baseline.json (generated from /Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/)",
+    "distributionCatalog": "data/vault/releases/distrokid_catalog.json (exact DistroKid release dates, UPCs, track titles, ISRCs, delivery status, and store links)",
+    "socialMetrics": "Pulse state and newly imported native platform exports; fall back to the dated historical baseline when Pulse is absent",
+    "royaltiesAndStorePerformance": "Revenue Engine using the latest DistroKid earnings export; fall back to the dated historical baseline when Revenue Engine is absent",
+    "links": "Verified URLs in this identity profile; browse or ask Erik rather than guessing missing links",
+    "freshnessRule": "Permanent brand rules may be reused. Metrics, platform tactics, release status, and links must be checked against the newest dated source before making a factual claim."
+  }
 }

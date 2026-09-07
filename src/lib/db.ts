@@ -306,13 +306,18 @@ export async function saveCompetitorsAsync(mode: string, competitors: Competitor
     await setRow(key, competitors);
 }
 
-export async function setFinanceAnalysisAsync(analysis: any) {
+export async function setFinanceAnalysisAsync(analysis: any, mode: string = 'kirbai') {
+    if (mode === 'factory') {
+        await setRow('finance_analysis_factory', { ...analysis, persistedAt: new Date().toISOString() });
+        return;
+    }
     const db = await getDbAsync();
     db.financeAnalysis = { ...analysis, persistedAt: new Date().toISOString() };
     await saveDbAsync(db);
 }
 
-export async function getFinanceAnalysisAsync() {
+export async function getFinanceAnalysisAsync(mode: string = 'kirbai') {
+    if (mode === 'factory') return await getRow('finance_analysis_factory');
     const db = await getDbAsync();
     if (db?.financeAnalysis && db.financeAnalysis.totals) {
         return db.financeAnalysis;

@@ -1,17 +1,22 @@
 import { NextResponse } from 'next/server';
-import { getRow, setRow } from '@/lib/db';
+import { getKirbaiDistroKidCatalog, getRow, setRow } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-const VALID_TYPES = ['projects', 'lyrics'];
+const VALID_READ_TYPES = ['projects', 'lyrics', 'distrokid'];
+const VALID_WRITE_TYPES = ['projects', 'lyrics'];
 
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const type = searchParams.get('type');
 
-        if (!type || !VALID_TYPES.includes(type)) {
+        if (!type || !VALID_READ_TYPES.includes(type)) {
             return NextResponse.json({ error: "Invalid type" }, { status: 400 });
+        }
+
+        if (type === 'distrokid') {
+            return NextResponse.json({ data: getKirbaiDistroKidCatalog() });
         }
 
         const data = await getRow(`vault_${type}`) ?? [];
@@ -28,7 +33,7 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { type, payload } = body;
 
-        if (!type || !VALID_TYPES.includes(type)) {
+        if (!type || !VALID_WRITE_TYPES.includes(type)) {
             return NextResponse.json({ error: "Invalid type" }, { status: 400 });
         }
 

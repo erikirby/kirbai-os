@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { getRoadmapAsync, getRow, getMissionsAsync, getPulseStateAsync } from '@/lib/db';
+import { getBrandIdentityAsync, getRoadmapAsync, getMissionsAsync, getPulseStateAsync } from '@/lib/db';
 import fs from 'fs';
 import path from 'path';
 
@@ -18,19 +18,15 @@ export async function GET() {
         // --- Brand Identity & Goals ---
         try {
             lines.push('--- BRAND DNA & GUIDELINES ---');
-            const [kirbaiBrand, factoryBrand] = await Promise.all([
-                getRow('brand_identity'),
-                getRow('brand_identity_factory') // Just in case it exists separately
-            ]);
+            const kirbaiBrand = await getBrandIdentityAsync('kirbai');
             
             if (kirbaiBrand) {
                 lines.push('--- KIRBAI ALIAS ---');
                 for (const [key, val] of Object.entries(kirbaiBrand)) {
-                    if (val && typeof val === 'string') {
-                        lines.push(`[${key.toUpperCase()}]`);
-                        lines.push(val as string);
-                        lines.push('');
-                    }
+                    if (!val) continue;
+                    lines.push(`[${key.toUpperCase()}]`);
+                    lines.push(typeof val === 'string' ? val : JSON.stringify(val, null, 2));
+                    lines.push('');
                 }
             }
         } catch (e) {}

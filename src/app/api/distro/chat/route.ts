@@ -1,16 +1,13 @@
 import { NextResponse } from 'next/server';
-import { Type } from '@google/genai';
 import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from '@/lib/intel';
-import { logApiUsageAsync, getCompetitorsAsync, saveDistroSessionAsync } from '@/lib/db';
-import { supabase } from '@/lib/supabase';
+import { getBrandIdentityAsync, logApiUsageAsync, getCompetitorsAsync, getDistroSessionAsync, saveDistroSessionAsync } from '@/lib/db';
 
 export async function GET(req: Request) {
     try {
         const url = new URL(req.url);
         const mode = url.searchParams.get('mode') || 'kirbai';
-        const key = mode === 'factory' ? 'distro_session_factory' : 'distro_session_kirbai';
-        const { data } = await supabase.from('persistence').select('value').eq('key', key).maybeSingle();
-        return NextResponse.json(data?.value || { messages: [], platforms: null });
+        const session = await getDistroSessionAsync(mode);
+        return NextResponse.json(session || { messages: [], platforms: null });
     } catch (e: any) {
         return NextResponse.json({ error: "Failed to load session" }, { status: 500 });
     }
@@ -25,15 +22,17 @@ export async function POST(req: Request) {
         }
 
         // 1. Context Gathering (Self-Intelligence)
-        const competitors = await getCompetitorsAsync(mode);
-        const { data: brandIdentity } = await supabase.from('brand_identity').select('value').eq('key', 'brand_identity').maybeSingle();
+        const [competitors, brandIdentity] = await Promise.all([
+            getCompetitorsAsync(mode),
+            getBrandIdentityAsync(mode),
+        ]);
         
         const compContext = competitors.length > 0 
             ? `COMPETITOR RADAR DATA:\n${competitors.map(c => `- ${c.name} (${c.platform}): ${c.handleUrl} | Notes: ${c.notes}`).join('\n')}`
             : "No specific competitors tracked yet.";
 
-        const identityContext = brandIdentity?.value 
-            ? `BRAND DNA:\nObjective: ${brandIdentity.value.ultimateGoal}\nAesthetic Rules: ${brandIdentity.value.aestheticRules}\nNarrative Style: ${brandIdentity.value.narrativeRules}`
+        const identityContext = brandIdentity
+            ? `BRAND, SOCIAL, MUSIC & DISTRIBUTION GROUND TRUTH:\n${JSON.stringify(brandIdentity)}`
             : "No specific brand identity saved.";
 
         const systemInstruction = `

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { getRow, logApiUsageAsync } from "@/lib/db";
+import { getBrandIdentityAsync, getRow, logApiUsageAsync } from "@/lib/db";
 import { aiTools, save_to_vault, save_to_lore, save_to_concepts } from "@/lib/ai-actions";
 import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 
@@ -8,6 +8,11 @@ import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 // Helper to pull context from Supabase persistence
 const getSupabaseContext = async (key: string, mode?: string) => {
     try {
+        if (key === 'brand_identity') {
+            const identity = await getBrandIdentityAsync(mode);
+            return identity ? JSON.stringify(identity) : null;
+        }
+
         // Handle partitioning for keys that need it
         let effectiveKey = key;
         if (key === 'concepts' && mode === 'factory') effectiveKey = 'concepts_factory';

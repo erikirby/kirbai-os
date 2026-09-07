@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI } from "@google/genai";
-import { setFinanceAnalysisAsync, getFinanceAnalysisAsync, logApiUsageAsync } from "@/lib/db";
+import { getRow, setFinanceAnalysisAsync, getFinanceAnalysisAsync, logApiUsageAsync } from "@/lib/db";
+import { revenueToFinance } from "@/lib/finance-sync";
 import { safeCallGemini, callOpenRouter, callGroq } from "@/lib/intel";
 
 
@@ -9,36 +10,17 @@ export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const mode = searchParams.get("mode") || "kirbai";
-        let stored = await getFinanceAnalysisAsync();
+        let stored = await getFinanceAnalysisAsync(mode);
 
         // Cross-sync with Revenue Engine's latest DistroKid dataset
         const revData: any = await getRow(`revenue_engine_${mode === "factory" ? "factory" : "kirbai"}`);
-        if (revData && revData.bySong && revData.byStore) {
-            const revTimestamp = revData.savedAt ? new Date(revData.savedAt).getTime() : 0;
+        const synced = revData?.kpis ? revenueToFinance(revData) : null;
+        if (synced) {
+            const revTimestamp = synced.persistedAt ? new Date(synced.persistedAt).getTime() : 0;
             const financeTimestamp = stored?.persistedAt ? new Date(stored.persistedAt).getTime() : 0;
 
             if (!stored || revTimestamp > financeTimestamp) {
-                stored = {
-                    totals: { revenue: revData.kpis.totalRevenue, streams: revData.kpis.totalStreams },
-                    platforms: revData.byStore.map((s: any) => ({
-                        store: s.store,
-                        revenue: s.earnings,
-                        streams: s.streams,
-                        rate: s.rate,
-                        reportingLatency: s.lastReportDate && s.lastSaleMonth ? {
-                            reportDate: s.lastReportDate,
-                            saleMonth: s.lastSaleMonth
-                        } : null
-                    })),
-                    tracks: revData.bySong.map((t: any) => ({
-                        title: t.title,
-                        revenue: t.earnings,
-                        streams: t.streams
-                    })),
-                    advice: stored?.advice || `<p>Synced from latest Revenue Engine DistroKid dataset. Total Earnings: $${(revData.kpis.totalRevenue || 0).toFixed(2)} across ${(revData.kpis.totalStreams || 0).toLocaleString()} streams.</p>`,
-                    persistedAt: revData.savedAt || new Date().toISOString()
-                };
-                await setFinanceAnalysisAsync(stored);
+                stored = synced;
             }
         }
 
@@ -51,7 +33,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { tsv, rawData } = body;
+        const { tsv, rawData, mode = 'kirbai' } = body;
         const fileContent = rawData || tsv;
 
         if (!fileContent) {
@@ -246,7 +228,7 @@ CRITICAL FORMATTING INSTRUCTIONS:
             };
 
             // PERSIST result for dashboard longevity
-            await setFinanceAnalysisAsync(analysisWithAdvice);
+            await setFinanceAnalysisAsync(analysisWithAdvice, mode);
 
             return NextResponse.json({
                 analysis: analysisWithAdvice
@@ -255,7 +237,7 @@ CRITICAL FORMATTING INSTRUCTIONS:
             console.error("LLM Analysis Failed:", llmErr);
             // Even if AI fails, return the raw data and persist what we have
             const fallback = { ...analysisData, advice: "<p>Strategic narrative generation failed. Raw metrics aggregated successfully.</p>" };
-            await setFinanceAnalysisAsync(fallback);
+            await setFinanceAnalysisAsync(fallback, mode);
             return NextResponse.json({
                 analysis: fallback
             });

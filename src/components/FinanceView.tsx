@@ -14,11 +14,13 @@ export default function FinanceView({ mode }: FinanceViewProps) {
     const [analysisResults, setAnalysisResults] = useState<any>(null);
 
     useEffect(() => {
+        let cancelled = false;
+        setAnalysisResults(null);
         const loadStoredData = async () => {
             try {
                 const res = await fetch(`/api/analyze-finance?mode=${mode}`);
                 const data = await res.json();
-                if (data.analysis) {
+                if (!cancelled && data.analysis) {
                     setAnalysisResults(data.analysis);
                 }
             } catch (err) {
@@ -26,6 +28,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
             }
         };
         loadStoredData();
+        return () => { cancelled = true; };
     }, [mode]);
 
     const handleDrop = (e: React.DragEvent) => {
@@ -61,7 +64,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
             const res = await fetch("/api/analyze-finance", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ rawData: text }),
+                body: JSON.stringify({ rawData: text, mode }),
             });
             const data = await res.json();
 

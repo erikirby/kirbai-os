@@ -66,3 +66,14 @@ If you are taking over this project:
 2. **Persistence First**: Before adding any new persistent feature, add a helper to `src/lib/db.ts`.
 3. **Keep it Clean**: Do not introduce UI libraries. Keep components focused on performance and minimalism.
 4. **Data Gravity**: All intelligence scales through `generate-content`. Keep the System Instructions in that route updated with the latest Brand DNA.
+
+---
+
+## 8. Kirbai Knowledge Contract
+- **Read first for any Kirbai task**: `data/vault/brand/identity.json`. It is the durable source for artist identity, audience, voice, social presence, content pillars, music/release architecture, DistroKid rules, verified artist links, and source-of-truth policy.
+- **Historical performance baseline**: `data/vault/analytics/kirbai_stats_baseline.json` contains a deduplicated, dated summary of Erik's Instagram, Facebook, and DistroKid exports. Refresh it from `/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/` with `npm run stats:baseline`.
+- **Distribution catalog**: `data/vault/releases/distrokid_catalog.json` is authoritative for exact distributed titles, release/upload dates, UPCs, track ISRCs, delivery status, and store links. `needs_review` means scope is unknown—not non-Pokémon. Releases listed in `vaultPolicy.catalogOnlyByUser` remain distribution history only and must not be made into Vault projects unless Erik changes that decision.
+- **Current state is separate from permanent identity**: Vault owns projects/tracklists/status, Lore Matrix owns canon, Pulse owns fresh social performance, and Revenue Engine owns fresh DistroKid/store performance.
+- **Runtime context**: `/api/context/kirbai` assembles the identity baseline plus current projects, roadmap, lore, social analytics, and compact distribution performance.
+- **Freshness rule**: Never present a metric, release status, platform tactic, or link as current without checking its newest dated source. Never invent missing URLs, IDs, royalties, or metadata.
+- **Alias boundary**: Kirbai is the high-fidelity artist brand. AELOW and KURAO are Music Factory aliases and must remain separate unless Erik explicitly requests comparison.

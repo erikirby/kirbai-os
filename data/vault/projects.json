@@ -7,14 +7,16 @@
     "lore": "",
     "visualVibe": "",
     "coverArt": "",
-    "tracklist": [
-      "Pink Bois (Heracross)",
-      "Wrap Me in Pink (Dratini)",
-      "Paint Me Pink (Voltorb)",
-      "Untitled Swampert Song",
-      "Untitled Pachirisu Song",
-      "Untitled Rhyhorn Song"
-    ],
+ "tracklist": [
+  "Pink Bois (Heracross)",
+  "Wrap Me in Pink (Dratini)",
+  "Paint Me Pink (Voltorb)",
+  "Untitled Swampert Song",
+  "Untitled Rhyhorn Song"
+ ],
+ "abandonedTracks": [
+  "Untitled Pachirisu Song"
+ ],
     "externalLinks": [],
     "createdAt": 1773204969131,
     "targetTrackCount": 6
