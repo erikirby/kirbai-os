@@ -11,6 +11,7 @@ import APIHealth from "@/components/APIHealth";
 import AIHub from "@/components/AIHub";
 import ConsultantSettings from "@/components/ConsultantSettings";
 import LoreMatrix from "@/components/LoreMatrix";
+import StoryRoom from "@/components/StoryRoom";
 import PromptBank from "@/components/PromptBank";
 import CreativeHub from "@/components/CreativeHub";
 import DirectorSuite from "@/components/DirectorSuite";
@@ -24,13 +25,13 @@ import CampaignBoard from "@/components/CampaignBoard";
 import { MessageSquare, Settings2, ChevronDown, Sparkles, Home as HomeIcon, Menu, X } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
-type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks" | "studio";
+type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "storyroom" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks" | "studio";
 type Theme = "dark" | "snes" | "calm";
 
 const NAV_GROUPS = [
   { id: "command", label: "Command", items: [{ id: "roadmap", label: "Home" }, { id: "intel", label: "Intel" }, { id: "competitors", label: "Competitors" }, { id: "muse", label: "Muse" }, { id: "boardroom", label: "Boardroom" }] },
   { id: "pipeline", label: "Pipeline", items: [{ id: "hooks", label: "Hook Engine" }, { id: "creative", label: "Brainstorm" }, { id: "director", label: "Director's Suite" }, { id: "distro", label: "Description Gen" }] },
-  { id: "archive", label: "Archive", items: [{ id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "prompts", label: "Prompts" }, { id: "core", label: "Core" }] },
+  { id: "archive", label: "Archive", items: [{ id: "storyroom", label: "Story Room" }, { id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "prompts", label: "Prompts" }, { id: "core", label: "Core" }] },
   { id: "performance", label: "Performance", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "revenue", label: "Revenue Engine" }, { id: "api-health", label: "API" }] },
 ] as const;
 
@@ -307,6 +308,7 @@ export default function Home() {
                 {activeModule === "chat" && <AIHub theme={theme} />}
                 {activeModule === "core" && <ConsultantSettings theme={theme} />}
                 {activeModule === "lore" && <LoreMatrix theme={theme} mode={activeTab} />}
+                {activeModule === "storyroom" && <StoryRoom theme={theme} mode={activeTab} />}
                 {activeModule === "creative" && <CreativeHub theme={theme} mode={activeTab} />}
                 {activeModule === "prompts" && <PromptBank mode={activeTab} />}
                 {activeModule === "muse" && <MuseDeck mode={activeTab} />}
