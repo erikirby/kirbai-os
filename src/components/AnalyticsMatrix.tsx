@@ -71,7 +71,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                 await fetch('/api/parse-tiktok', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ files: filesData })
+                    body: JSON.stringify({ files: filesData, mode })
                 });
             } else {
                 const file = files[0];
@@ -80,7 +80,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                 await fetch('/api/parse-csv', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ platform, csvText: text })
+                    body: JSON.stringify({ platform, csvText: text, mode })
                 });
             }
 

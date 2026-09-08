@@ -95,6 +95,10 @@ export async function GET(req: Request) {
         const igTotals = baseline.instagram.totals;
         const fbTotals = baseline.facebook.totals;
         const fbFollowers = parseInt(pulseState?.facebook?.followers || baseline.facebook?.totals?.follows || '3890', 10);
+        // Prefer freshly parsed CSV overlays (persisted into Pulse state) over the static baseline
+        const igFollowers = parseInt(pulseState?.instagram?.followers || igTotals.follows || '0', 10);
+        const igReach = parseInt(pulseState?.instagram?.reach || igTotals.reach || '0', 10);
+        const fbReach = parseInt(pulseState?.facebook?.reach || fbTotals.reach || '0', 10);
 
         const dkTotals = revenueEngine?.kpis ? {
             quantity: revenueEngine.kpis.totalStreams,
@@ -108,8 +112,8 @@ export async function GET(req: Request) {
 
         const grandTotals = {
             crossPlatformViews: igTotals.views + fbTotals.views + kirbaiYt.views + ttViews,
-            crossPlatformReach: igTotals.reach + fbTotals.reach + ttViews,
-            totalFollowers: igTotals.follows + fbFollowers + ttFollowers + kirbaiYt.subscribers,
+            crossPlatformReach: igReach + fbReach + ttViews,
+            totalFollowers: igFollowers + fbFollowers + ttFollowers + kirbaiYt.subscribers,
             totalEarningsUsd: dkTotals.earningsUsd + fbTotals.earningsUsd,
             distroKidRevenue: dkTotals.earningsUsd,
             metaBonusEarnings: fbTotals.earningsUsd,
@@ -122,11 +126,11 @@ export async function GET(req: Request) {
                 platform: 'Instagram',
                 icon: 'instagram',
                 views: igTotals.views,
-                reach: igTotals.reach,
+                reach: igReach,
                 reactions: igTotals.reactions,
                 shares: igTotals.shares,
                 saves: igTotals.saves,
-                followers: igTotals.follows,
+                followers: igFollowers,
                 earningsUsd: 0,
                 color: '#EC4899', // Pink
             },
@@ -134,7 +138,7 @@ export async function GET(req: Request) {
                 platform: 'Facebook',
                 icon: 'facebook',
                 views: fbTotals.views,
-                reach: fbTotals.reach,
+                reach: fbReach,
                 reactions: fbTotals.reactions,
                 shares: fbTotals.shares,
                 saves: 0,

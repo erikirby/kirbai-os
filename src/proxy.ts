@@ -30,10 +30,41 @@ function isRateLimited(ip: string): boolean {
     return false;
 }
 
-export function proxy(req: NextRequest) {
-    const { pathname } = req.nextUrl;
+const AUTH_COOKIE = 'kos';
+// Endpoints that authenticate themselves (cron/manual ?secret=) stay open.
+const AUTH_EXEMPT = ['/api/admin/backup', '/api/admin/restore'];
 
-    // Password protection removed for open access
+export function proxy(req: NextRequest) {
+    const { pathname, searchParams, origin } = req.nextUrl;
+
+    // Access gate. Inert until KIRBAI_OS_SECRET is set, so it never locks
+    // anyone out unexpectedly. Once set, every page and API route requires the
+    // `kos` cookie. Authenticate once by visiting any URL with ?kos=<secret>.
+    const secret = process.env.KIRBAI_OS_SECRET;
+    if (secret && !AUTH_EXEMPT.some(p => pathname.startsWith(p))) {
+        if (searchParams.get(AUTH_COOKIE) === secret) {
+            const clean = req.nextUrl.clone();
+            clean.searchParams.delete(AUTH_COOKIE);
+            const res = NextResponse.redirect(clean);
+            res.cookies.set(AUTH_COOKIE, secret, {
+                httpOnly: true,
+                secure: origin.startsWith('https'),
+                sameSite: 'lax',
+                path: '/',
+                maxAge: 60 * 60 * 24 * 180,
+            });
+            return res;
+        }
+        if (req.cookies.get(AUTH_COOKIE)?.value !== secret) {
+            if (pathname.startsWith('/api/')) {
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            }
+            return new NextResponse('Unauthorized. Append ?kos=<secret> to sign in.', {
+                status: 401,
+                headers: { 'content-type': 'text/plain' },
+            });
+        }
+    }
 
     // Rate limit AI endpoints
     if (AI_ROUTES.some(r => pathname.startsWith(r))) {

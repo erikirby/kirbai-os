@@ -8,7 +8,7 @@ import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from "@
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { platform, csvText } = body;
+        const { platform, csvText, mode = 'kirbai' } = body;
 
         if (!csvText) {
             return NextResponse.json({ error: "No CSV text provided" }, { status: 400 });
@@ -91,14 +91,28 @@ export async function POST(req: Request) {
             await setRow('instagram_style_base', newDescriptions);
         }
 
-        return NextResponse.json({ 
+        // --- Persist parsed totals into Pulse state so the dashboard keeps them ---
+        const pulseKey = mode === 'factory' ? 'pulse_state_factory' : 'pulse_state_kirbai';
+        const platformKey = platform === 'facebook' ? 'facebook' : 'instagram';
+        const pulseState = (await getRow(pulseKey)) || {};
+        pulseState[platformKey] = {
+            ...pulseState[platformKey],
+            followers: String(parsed.totals.followers ?? pulseState[platformKey]?.followers ?? ''),
+            reach: String(parsed.totals.reach ?? pulseState[platformKey]?.reach ?? ''),
+            trends: parsed.trends,
+            narrative: parsed.narrative,
+            lastUpdated: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        };
+        await setRow(pulseKey, pulseState);
+
+        return NextResponse.json({
             data: {
                 followers: parsed.totals.followers,
                 reach: parsed.totals.reach,
                 trends: parsed.trends,
                 narrative: parsed.narrative
-            }, 
-            success: true 
+            },
+            success: true
         });
     } catch (e: any) {
         console.error("AI CSV Parse Error:", e);

@@ -26,42 +26,50 @@ export async function POST(req: Request) {
         const { tables } = snapshot;
 
         // 2. Perform restore (Wipe + Insert)
-        // We do this table by table to ensure consistency
+        // We do this table by table to ensure consistency. Every delete and
+        // insert is checked — a failed write must abort with an error, not
+        // report success on a half-restored database.
+        const restoreTable = async (
+            table: string,
+            rows: any[],
+            wipe: () => any
+        ) => {
+            const del = await wipe();
+            if (del.error) throw new Error(`${table} wipe failed: ${del.error.message}`);
+            if (rows.length === 0) return 0;
+            const ins = await supabase.from(table).insert(rows);
+            if (ins.error) throw new Error(`${table} insert failed: ${ins.error.message}`);
+            return rows.length;
+        };
 
-        // --- PERSISTENCE ---
+        const restored: Record<string, number> = {};
+
         if (tables.persistence) {
-            await supabase.from('persistence').delete().neq('key', 'INTERNAL_SYSTEM_PROTECT'); // Generic delete
-            await supabase.from('persistence').insert(tables.persistence);
+            restored.persistence = await restoreTable('persistence', tables.persistence, () =>
+                supabase.from('persistence').delete().neq('key', 'INTERNAL_SYSTEM_PROTECT'));
         }
-
-        // --- LORE NODES ---
         if (tables.lore_nodes) {
-            await supabase.from('lore_nodes').delete().neq('id', 'WIPE_ALL');
-            await supabase.from('lore_nodes').insert(tables.lore_nodes);
+            restored.lore_nodes = await restoreTable('lore_nodes', tables.lore_nodes, () =>
+                supabase.from('lore_nodes').delete().neq('id', 'WIPE_ALL'));
         }
-
-        // --- LORE EDGES ---
         if (tables.lore_edges) {
-            await supabase.from('lore_edges').delete().neq('id', 0);
-            await supabase.from('lore_edges').insert(tables.lore_edges);
+            restored.lore_edges = await restoreTable('lore_edges', tables.lore_edges, () =>
+                supabase.from('lore_edges').delete().neq('id', 0));
         }
-
-        // --- PROMPTS ---
         if (tables.prompts) {
-            await supabase.from('prompts').delete().neq('id', 'WIPE');
-            await supabase.from('prompts').insert(tables.prompts);
+            restored.prompts = await restoreTable('prompts', tables.prompts, () =>
+                supabase.from('prompts').delete().neq('id', 'WIPE'));
         }
-
-        // --- PROMPT RULES ---
         if (tables.prompt_rules) {
-            await supabase.from('prompt_rules').delete().neq('id', 'WIPE');
-            await supabase.from('prompt_rules').insert(tables.prompt_rules);
+            restored.prompt_rules = await restoreTable('prompt_rules', tables.prompt_rules, () =>
+                supabase.from('prompt_rules').delete().neq('id', 'WIPE'));
         }
 
-        return NextResponse.json({ 
-            success: true, 
+        return NextResponse.json({
+            success: true,
             restoredFrom: snapshotKey,
-            timestamp: snapshot.timestamp 
+            timestamp: snapshot.timestamp,
+            restored
         });
     } catch (e: any) {
         console.error('Restore fail:', e);

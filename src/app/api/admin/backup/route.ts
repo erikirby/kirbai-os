@@ -37,10 +37,17 @@ export async function GET(req: Request) {
         if (rulesRes.error) throw rulesRes.error;
 
         // 2. Bundle into snapshot
+        // Exclude prior snapshots and their index so backups don't nest
+        // earlier backups recursively and balloon in size.
+        const persistenceRows = (persistenceRes.data ?? []).filter(
+            (row: { key?: string }) =>
+                row.key !== 'snapshots_index' && !row.key?.startsWith('snapshot_')
+        );
+
         const snapshot = {
             timestamp: new Date().toISOString(),
             tables: {
-                persistence: persistenceRes.data,
+                persistence: persistenceRows,
                 lore_nodes: nodesRes.data,
                 lore_edges: edgesRes.data,
                 prompts: promptsRes.data,

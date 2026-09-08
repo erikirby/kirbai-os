@@ -5,7 +5,7 @@ import { safeCallGemini, callOpenRouter, callGroq, extractJsonFromText } from "@
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { files } = body; // Array of { name, content }
+        const { files, mode = 'kirbai' } = body; // Array of { name, content }
 
         if (!files || files.length === 0) {
             return NextResponse.json({ error: "No files provided" }, { status: 400 });
@@ -94,7 +94,21 @@ export async function POST(req: Request) {
             await setRow('tiktok_style_base', newDescriptions);
         }
 
-        return NextResponse.json({ 
+        // --- Persist parsed totals into Pulse state so the dashboard keeps them ---
+        const pulseKey = mode === 'factory' ? 'pulse_state_factory' : 'pulse_state_kirbai';
+        const pulseState = (await getRow(pulseKey)) || {};
+        pulseState.tiktok = {
+            ...pulseState.tiktok,
+            followers: String(parsed.totals.followers ?? pulseState.tiktok?.followers ?? ''),
+            reach: String(parsed.totals.reach ?? pulseState.tiktok?.reach ?? ''),
+            trends: parsed.trends,
+            demographics: parsed.demographics,
+            narrative: parsed.narrative,
+            lastUpdated: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        };
+        await setRow(pulseKey, pulseState);
+
+        return NextResponse.json({
             data: {
                 followers: parsed.totals.followers,
                 reach: parsed.totals.reach,

@@ -35,6 +35,7 @@
     "scripts",
     "tmp",
     "_archive",
-    "tmp_check_db.ts"
+    "tmp_check_db.ts",
+    "test_script.ts"
   ]
 }
