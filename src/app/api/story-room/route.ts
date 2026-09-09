@@ -17,6 +17,18 @@ export async function GET(req: Request) {
             await setRow('story_room_kirbai', data);
         }
 
+        // Back-fill the Skit Roadmap / Music Videos / Final Battle sheets onto boards saved
+        // before those tabs existed (Phase 1 only shipped the relationship board).
+        if (data && mode === 'kirbai' && (!data.skitRoadmap || !data.musicVideos || !data.finalBattle)) {
+            data = {
+                ...data,
+                skitRoadmap: data.skitRoadmap ?? PRC_STORY_ROOM_SEED.skitRoadmap,
+                musicVideos: data.musicVideos ?? PRC_STORY_ROOM_SEED.musicVideos,
+                finalBattle: data.finalBattle ?? PRC_STORY_ROOM_SEED.finalBattle,
+            };
+            await setRow('story_room_kirbai', data);
+        }
+
         return NextResponse.json(data ?? { era: '', characters: [] });
     } catch (e: any) {
         console.error('Story Room GET error:', e);

@@ -16,9 +16,73 @@ export interface StoryCharacter {
   related: string[];
 }
 
+export interface RoadmapField {
+  label: string;
+  value: string;
+}
+
+export interface RoadmapCard {
+  step: number;
+  status: "done" | "next" | "optional" | "event";
+  statusLabel: string;
+  title: string;
+  cast: string;
+  fields: RoadmapField[];
+}
+
+export interface SkitRoadmap {
+  intro: string;
+  kirbaiFit: string;
+  greenlightTests: { name: string; description: string }[];
+  greenlightRule: string;
+  cards: RoadmapCard[];
+  howToChoose: string[];
+  hookAuditFields: string[];
+  tarotWarning: string;
+  coldViewerRule: string;
+}
+
+export interface MusicVideoBeat {
+  label: string;
+  title: string;
+  description: string;
+}
+
+export interface MusicVideoPerformer {
+  tier: string;
+  name: string;
+  role: string;
+  action: string;
+}
+
+export interface MusicVideoSheet {
+  kicker: string;
+  title: string;
+  summary: string;
+  locks: string[];
+  storyEngine: RoadmapField[];
+  storyNote: string;
+  locationPlan: RoadmapField[];
+  locationNote: string;
+  timeline: MusicVideoBeat[];
+  performers: MusicVideoPerformer[];
+  hookRules: string[];
+  productionNotes: string[];
+}
+
+export interface BattleBeat {
+  number: number;
+  title: string;
+  description: string;
+  finisher?: boolean;
+}
+
 export interface StoryRoomState {
   era: string;
   characters: StoryCharacter[];
+  skitRoadmap?: SkitRoadmap;
+  musicVideos?: MusicVideoSheet[];
+  finalBattle?: BattleBeat[];
 }
 
 export const PRC_STORY_ROOM_SEED: StoryRoomState = {
@@ -803,4 +867,139 @@ export const PRC_STORY_ROOM_SEED: StoryRoomState = {
     ]
   }
 ],
+  skitRoadmap: {
+    intro: "Start with the image or situation a cold viewer would instantly understand, laugh at, fear, or send to a friend. Then map the relationship that belongs inside it. Continuity deepens the payoff; it is not the reason the skit exists.",
+    kirbaiFit: "Pokémon doing something they absolutely should not be doing — but it somehow fits them perfectly.",
+    greenlightTests: [
+      { name: "Camp / Meme", description: "Is the image absurd, glamorous, gay, quotable, or instantly shareable?" },
+      { name: "Danger / Energy", description: "Is something escalating, moving, breaking, chasing, transforming, or about to go wrong?" },
+      { name: "Curiosity", description: "Does frame one create a visual question a cold viewer needs answered?" },
+      { name: "Character Heat", description: "Is there lust, jealousy, humiliation, rivalry, betrayal, or diva behavior that reads without context?" },
+    ],
+    greenlightRule: "No strong 2-of-4 pass = do not produce yet. Reframe the premise, not the lore explanation.",
+    cards: [
+      {
+        step: 1, status: "done", statusLabel: "Bankable anchor",
+        title: "Luxury shopping returns", cast: "Jynx · Gholdengo · rotating guest",
+        fields: [
+          { label: "Premise", value: "Periodically return to Jynx and Gholdengo treating luxury shopping like a competitive sport, social ritual, or financial emergency." },
+          { label: "Why it works", value: "The characters, setting, fashion, and consumption are readable before any plot begins. Their established chemistry can buy a little setup time." },
+          { label: "Story use", value: "Bring one new character into the shopping machine so the proven premise introduces a relationship without feeling like homework." },
+          { label: "Keep it fresh", value: "Vary the objective and guest. It is a recurring anchor, not the whole channel." },
+        ],
+      },
+      {
+        step: 2, status: "next", statusLabel: "Strong reframe",
+        title: "Glam session exposes the past", cast: "Froslass · Alolan Ninetales · makeover · tarot",
+        fields: [
+          { label: "Visual premise", value: "Froslass is already giving Ninetales an excessive icy glam transformation: tails posed, crystals flying, dramatic mirror reveal." },
+          { label: "Frame 1", value: "Ninetales sits under a ridiculous constellation of styling tools while Froslass directs the makeover with unnerving precision." },
+          { label: "0–3s action", value: "Froslass snaps her fan shut; the styling rig activates and turns Ninetales's tails into an impossible ice-couture silhouette." },
+          { label: "Second-5 change", value: "A tarot card used as a styling reference flips by accident and reveals the secret neither of them planned to discuss." },
+          { label: "Open loop", value: "Why does one card instantly turn a glamorous reunion into a frozen standoff?" },
+          { label: "Rehook", value: "The makeover freezes mid-reveal. Their old intimacy becomes obvious before either admits what happened." },
+          { label: "Tarot function", value: "The card complicates a strong action premise; it is not the opening proposition or an exposition device." },
+          { label: "Final gag", value: "Ninetales storms out wearing only half the finished look; Froslass quietly straightens the abandoned final accessory." },
+          { label: "Share emotion", value: "Camp transformation collides with betrayal, wounded pride, and the unmistakable ache of former best friends." },
+          { label: "Relationship established", value: "Froslass and Ninetales were once deeply close and are now ruptured; the exact betrayal remains a future reward." },
+          { label: "Guardrail", value: "Do not begin with a quiet reading. The fashion transformation must be legible, funny, and in motion before the lore arrives." },
+          { label: "Green-light read", value: "Camp / Meme + Character Heat, with Curiosity added by the accidental card reveal." },
+        ],
+      },
+      {
+        step: 3, status: "optional", statusLabel: "Premise candidate",
+        title: "Absurd staged seduction", cast: "Primarina · Krabby · Gallade",
+        fields: [
+          { label: "Visual premise", value: "Primarina mounts a ludicrously overproduced seduction number while Krabby runs the set like a furious stage manager." },
+          { label: "Escalation", value: "Fans, bubbles, lighting cues, costume pieces, and emergency resets grow more theatrical while Gallade believes every cue is a sincere confession." },
+          { label: "Payoff", value: "Gallade prepares a romantic answer just as Primarina calls cut, checks the footage, and treats him like a prop." },
+          { label: "Relationship established", value: "Gallade's earnest misreading and Primarina's seduction-as-performance become clear without explanation." },
+          { label: "Green-light read", value: "Camp / Meme + Character Heat + Danger / Energy through escalating production chaos." },
+        ],
+      },
+      {
+        step: 4, status: "event", statusLabel: "Creative weapon",
+        title: "Fashion transformations — selectively", cast: "Outfits · accessories · glam reveals · status objects",
+        fields: [
+          { label: "Use", value: "Treat clothes, handbags, nails, jewelry, shopping bags, uniforms, and makeover reveals as recurring shorthand for status and personality." },
+          { label: "Restraint", value: "Do not give every Pokémon the full Regirock diva treatment. Reserve major transformations for a fresh character fit and a strong before/after proposition." },
+          { label: "Rule", value: "An accessory should create the premise, sharpen the joke, or reveal character — not decorate an otherwise weak setup." },
+          { label: "Why", value: "Selective repetition builds a recognizable KIRBAI language while keeping the next handbag-level surprise special." },
+        ],
+      },
+    ],
+    howToChoose: [
+      "Collect premises first: meme-worthy behavior, danger, motion, mystery, public humiliation, absurd jobs, fashion, or transformation.",
+      "Score the hook: require two strong green-light passes before spending a day animating it.",
+      "Map in the cast: choose the relationship whose personalities make that premise feel inevitable.",
+      "Leave one relationship clear: several characters may appear, but a cold viewer should understand one central bond by the end.",
+      "Reward returning viewers: plant continuity, clues, and future conflict after the standalone entertainment is working.",
+      "Do not sequence by missing bonds: Froslass/Ninetales, Primarina/Froslass, Roserade's past, Mismagius, and Aipom's dependency remain useful story inventory — not a mandatory release order.",
+    ],
+    hookAuditFields: ["Premise in one image", "2+ strong tests", "Frame 1", "0–3s action", "Second-5 change", "Open loop / rehook", "Central relationship", "Production risk"],
+    tarotWarning: "Do not prioritize the Froslass/Ninetales reading as-is. “A card reveals their history” is lore-first and visually weak unless tarot interrupts a stronger action premise — such as Froslass's excessive Ninetales glam session.",
+    coldViewerRule: "The skit must be satisfying with zero lore homework. By the end, one central relationship should still be understandable. Story is the extra reward for viewers who return.",
+  },
+  musicVideos: [
+    {
+      kicker: "Active event video · locked runtime 2:04",
+      title: "Runway Regi: House of Regi Temple Runway",
+      summary: "Regirock's transformation story grows into a runway power struggle. Regice and Registeel first challenge her; when the newer Regidrago and Regieleki arrive, the original trio temporarily unites. The conflict is dangerous fashion warfare, not a lethal battle, and ends with Regirock unmistakably leading the complete House.",
+      locks: ["Lead: Regirock", "Format: 9:16 music video", "Runtime: 2:04", "Final act: Regirock-led House pose"],
+      storyEngine: [
+        { label: "Origin", value: "Centuries of being ignored turn Regirock into a diva who demands the entire room." },
+        { label: "First rivalry", value: "Regice and Registeel enter as sophisticated challengers to Regirock's authority." },
+        { label: "State change", value: "Drago and Eleki arrive as brighter, faster new kids, forcing the original trio into a temporary alliance." },
+        { label: "Payoff", value: "Nobody is killed; attacks reshape the runway, destroy poses, and determine who controls the House." },
+      ],
+      storyNote: "Regirock is never one of six equal contestants. Every reveal must ultimately affect her rise, her rivalry, or her leadership.",
+      locationPlan: [
+        { label: "Sealed dressing chamber", value: "A dark reliquary/antechamber with a cracked mirror, stone vanity, relics, and accessories. Functions as backstage without resembling a television green room." },
+        { label: "Illuminated temple runway", value: "The stone aisle becomes the arena; sealed side chambers create entrances and the architecture reacts to elemental attacks." },
+        { label: "Third visual texture", value: "Editorial body-detail close-ups create variety without adding another location." },
+      ],
+      locationNote: "Do not return to the resort. A future standalone House of Regi song belongs on the next Fusion album and must not influence this Runway Regi video.",
+      timeline: [
+        { label: "0–3s", title: "Rivalry teaser", description: "Ice facets, frost, polished steel, illuminated dots, Regirock's purple nails, then her heel cracking through the ice. Tease Ice and Steel before explaining anything." },
+        { label: "Opening chorus", title: "Fractured flash-forward", description: "Finished-diva fragments: hoops, textures, nails, heels, runway flashes, and hints of the three-way confrontation. Do not reveal Drago or Eleki yet." },
+        { label: "Verse", title: "Regirock origin", description: "Rewind to the forgotten statue in the sealed chamber. Show the emotional cause of the persona, the transformation, Lillipup's brief purse reveal if used, and Regirock breaking onto the runway." },
+        { label: "Middle chorus", title: "Solo dominance becomes rivalry", description: "Regirock commands the runway through Rock-type spectacle. Regice freezes it; Registeel enters from the opposite side with controlled Parisian contempt. End on the full original-trio standoff." },
+        { label: "Instrumental", title: "Silent character acting", description: "Ice looks Regirock over, Steel adjusts the scarf, and Regirock answers with a pose. If Lillipup appears, Regirock places the purse safely aside before the clash." },
+        { label: "Bridge", title: "New kids change the fight", description: "Drago and Eleki interrupt the original rivalry with a brighter, faster joint entrance. Rock, Ice, and Steel exchange one look and combine their powers against the newcomers." },
+        { label: "Final chorus", title: "Runway warfare and coronation", description: "Attacks freeze light, redirect energy, crack stone, and knock rivals out of formation. Regigigas arrives sparingly to halt the chaos; everyone snaps into a final House pose with Regirock front and center." },
+      ],
+      performers: [
+        { tier: "Lead", name: "Regirock", role: "Ignored relic to self-created diva to House leader.", action: "Purple nails, hoops, textured stone, heel impacts, purse detail, Rock Tomb platforms, and the decisive attack/pose. Most screen time, owns the final frame." },
+        { tier: "Original", name: "Regice", role: "Ice-cold challenger who silently judges Regirock before joining her.", action: "Freezes the runway, glides rather than walks, and converts Eleki's light into crystalline spotlights." },
+        { tier: "Original", name: "Registeel", role: "Precise Parisian rival whose contempt reads through minimal movement.", action: "Polished metal reflections, scarf adjustment, exact gestures, and redirection of Drago's energy like controlled stage lighting." },
+        { tier: "New kid", name: "Regidrago", role: "Gothic disruption arriving with Eleki during the bridge.", action: "Veil, fascinator, dragon appendages used as a funeral cape, and a theatrical energy attack that threatens the original trio's status." },
+        { tier: "New kid", name: "Regieleki", role: "Hypermodern pop threat paired with Drago.", action: "Jubilee glasses, cyan-magenta strobing, electrical rings and cables in close-up, and speed that destabilizes the older Regis' choreography." },
+        { tier: "Elder", name: "Regigigas", role: "Sparse final authority, not another equal-length runway contestant.", action: "Moss, gold bands, tiny pink stilettos, and one enormous step that cracks the runway and forces the final formation." },
+      ],
+      hookRules: [
+        "Open on close-up conflict, never a temple exterior or neutral establishing shot.",
+        "Reveal new information or change power approximately every three to five seconds.",
+        "Use faster fragment cuts in hooks and choruses; allow slightly longer shots during the origin so the pacing has shape.",
+        "Reserve full-body wide shots for entrances, confrontations, major attacks, and the final formation. Their scarcity makes them important.",
+        "Do not repeat chorus visuals. Each chorus advances Regirock from tease to dominance to coronation.",
+      ],
+      productionNotes: [
+        "Primary character models are the companion-free images in regirock / Final Regi Diva References / Base Characters.",
+        "Temple sources are in regirock / Temple References. Preserve both the game ruins and anime exterior/interior references.",
+        "The dogs are not an ensemble dance act. Use only Lillipup if the lyric or Regirock's emotional identity needs it; one purse reveal, one reaction, and the final pose are enough.",
+        "Preserve each definitive body shape, coloring, texture, accessory placement, and appendage design. Close-ups should make those details feel expensive, not distort them.",
+        "Judges are optional. If retained, use one reaction insert totaling no more than about five seconds; they receive no entrances or subplot.",
+      ],
+    },
+  ],
+  finalBattle: [
+    { number: 1, title: "The beautiful warning", description: "Froslass's Star and Tower cards pay off. Diancie's romantic cake beacon reaches space — secretly amplified by Gholdengo." },
+    { number: 2, title: "Shooting stars become fires", description: "The cute Minior shower turns dangerous. Milotic fights fires on the ground while Lillipup helps trapped islanders." },
+    { number: 3, title: "Sub-boss: Diamond Aria", description: "Diamond Storm and Sparkling Aria fire simultaneously, twisting into a double helix. The attack cracks and cools the giant Minior while healing burns across the island." },
+    { number: 4, title: "False victory — Deoxys arrives", description: "Deoxys appears behind the defeated Minior. Former friends Ninetales and Froslass combine snow and ice into the island-wide Aurora Veil." },
+    { number: 5, title: "The toxic rescue", description: "Bandaged Roserade intentionally poisons Milotic, activating Marvel Scale. Milotic uses Mirror Coat on Deoxys's blast; Roserade then shields her from a falling Minior." },
+    { number: 6, title: "The veil breaks", description: "A blast knocks Froslass down. Ninetales holds the failing veil alone, protects her friend, then reshapes its last light into an aurora launch path." },
+    { number: 7, title: "Finale: Regi planet power", description: "Alcremie chooses to Decorate Regirock despite their feud. Regirock leads the diva Regi family up the aurora path; they join hands in space and unleash the Sailor Moon–coded finishing attack.", finisher: true },
+    { number: 8, title: "Post-credit sting: record ratings", description: "Gholdengo watches the ratings spike in a hidden control room. The replaced beacon topper reveals his sabotage. He presses: SEASON 2: GREENLIT.", finisher: true },
+  ],
 };

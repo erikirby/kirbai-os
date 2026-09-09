@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { Loader2, Plus, Trash2, Pencil, Check, X } from "lucide-react";
-import type { StoryCharacter, StoryRoomState } from "@/lib/story-room-seed";
+import type { StoryCharacter, StoryRoomState, RoadmapCard } from "@/lib/story-room-seed";
 
 interface StoryRoomProps {
     theme?: string;
@@ -16,6 +16,21 @@ const ROLE_STYLES: Record<StoryCharacter["role"], string> = {
     mystery: "border-purple-400/70 border-dashed",
 };
 
+const SHEETS = [
+    { id: "board", label: "Season build-up" },
+    { id: "roadmap", label: "Skit roadmap" },
+    { id: "music", label: "Music videos" },
+    { id: "battle", label: "Final battle" },
+] as const;
+type Sheet = (typeof SHEETS)[number]["id"];
+
+const ROADMAP_STATUS: Record<RoadmapCard["status"], { badge: string; next: RoadmapCard["status"] }> = {
+    done: { badge: "text-emerald-500 bg-emerald-400/10 border-emerald-400/20", next: "optional" },
+    next: { badge: "text-accent bg-accent/10 border-accent/20", next: "done" },
+    optional: { badge: "text-foreground/50 bg-foreground/5 border-foreground/10", next: "next" },
+    event: { badge: "text-purple-400 bg-purple-400/10 border-purple-400/20", next: "event" },
+};
+
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
 const slugify = (s: string) =>
     s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `character-${Date.now()}`;
@@ -26,6 +41,7 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
     const [loadError, setLoadError] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [editing, setEditing] = useState(false);
+    const [sheet, setSheet] = useState<Sheet>("board");
     const [isSaving, setIsSaving] = useState(false);
     const [hasUnsaved, setHasUnsaved] = useState(false);
 
@@ -44,7 +60,13 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
                 if (!res.ok) throw new Error("Story Room load failed");
                 const data = (await res.json()) as StoryRoomState;
                 if (cancelled) return;
-                setState({ era: data.era ?? "", characters: Array.isArray(data.characters) ? data.characters : [] });
+                setState({
+                    era: data.era ?? "",
+                    characters: Array.isArray(data.characters) ? data.characters : [],
+                    skitRoadmap: data.skitRoadmap,
+                    musicVideos: data.musicVideos,
+                    finalBattle: data.finalBattle,
+                });
                 setSelectedId(data.characters?.[0]?.id ?? null);
             } catch {
                 if (!cancelled) setLoadError(true);
@@ -80,6 +102,18 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
     const mutate = useCallback((updater: (chars: StoryCharacter[]) => StoryCharacter[]) => {
         setState(prev => {
             const next = { ...prev, characters: updater(prev.characters) };
+            persist(next);
+            return next;
+        });
+    }, [persist]);
+
+    const cycleRoadmapStatus = useCallback((step: number) => {
+        setState(prev => {
+            if (!prev.skitRoadmap) return prev;
+            const cards = prev.skitRoadmap.cards.map(c =>
+                c.step === step ? { ...c, status: ROADMAP_STATUS[c.status].next } : c
+            );
+            const next = { ...prev, skitRoadmap: { ...prev.skitRoadmap, cards } };
             persist(next);
             return next;
         });
@@ -200,24 +234,41 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
+                    <div className="flex p-0.5 bg-surface/60 rounded-xl border border-border/50 mr-1">
+                        {SHEETS.map(s => (
+                            <button
+                                key={s.id}
+                                onClick={() => setSheet(s.id)}
+                                className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${sheet === s.id ? "bg-accent text-white shadow-md" : "text-foreground/40 hover:text-foreground/70"}`}
+                            >
+                                {s.label}
+                            </button>
+                        ))}
+                    </div>
                     <span className="text-[10px] font-mono uppercase tracking-wider text-foreground/40">
                         {isSaving ? "Saving…" : hasUnsaved ? "Unsaved" : "Synced"}
                     </span>
-                    {editing && (
+                    {sheet === "board" && editing && (
                         <button onClick={addCharacter} className="btn-secondary text-[10px] uppercase font-bold px-3 py-1.5 flex items-center gap-1.5">
                             <Plus className="w-3.5 h-3.5" /> Character
                         </button>
                     )}
-                    <button
-                        onClick={() => setEditing(v => !v)}
-                        className={`text-[10px] uppercase font-bold px-3 py-1.5 flex items-center gap-1.5 ${editing ? "btn-primary" : "btn-secondary"}`}
-                    >
-                        {editing ? <><Check className="w-3.5 h-3.5" /> Done</> : <><Pencil className="w-3.5 h-3.5" /> Edit</>}
-                    </button>
+                    {sheet === "board" && (
+                        <button
+                            onClick={() => setEditing(v => !v)}
+                            className={`text-[10px] uppercase font-bold px-3 py-1.5 flex items-center gap-1.5 ${editing ? "btn-primary" : "btn-secondary"}`}
+                        >
+                            {editing ? <><Check className="w-3.5 h-3.5" /> Done</> : <><Pencil className="w-3.5 h-3.5" /> Edit</>}
+                        </button>
+                    )}
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-[1.6fr_1fr] gap-6">
+            {sheet === "roadmap" && <SkitRoadmapSheet roadmap={state.skitRoadmap} onCycleStatus={cycleRoadmapStatus} />}
+            {sheet === "music" && <MusicVideoSheetView sheets={state.musicVideos} />}
+            {sheet === "battle" && <FinalBattleSheetView beats={state.finalBattle} />}
+
+            {sheet === "board" && <div className="grid grid-cols-1 xl:grid-cols-[1.6fr_1fr] gap-6">
                 {/* Board */}
                 <div
                     ref={boardRef}
@@ -397,7 +448,7 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
                         </>
                     )}
                 </div>
-            </div>
+            </div>}
         </div>
     );
 }
@@ -410,6 +461,179 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
         <div className="flex flex-col gap-1.5">
             <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/40">{label}</span>
             {children}
+        </div>
+    );
+}
+
+function SkitRoadmapSheet({ roadmap, onCycleStatus }: {
+    roadmap: import("@/lib/story-room-seed").SkitRoadmap | undefined;
+    onCycleStatus: (step: number) => void;
+}) {
+    if (!roadmap) return <div className="card p-10 text-center text-foreground/30 text-sm">No skit roadmap loaded yet.</div>;
+    return (
+        <div className="flex flex-col gap-6">
+            <div className="card p-6 flex flex-col gap-3">
+                <span className="section-eyebrow">Premise first · story as the reward</span>
+                <h3 className="text-lg font-extrabold text-foreground">What to make next</h3>
+                <p className="text-sm text-foreground/60 leading-relaxed">{roadmap.intro}</p>
+                <div className="mt-2 p-4 rounded-xl bg-accent/10 border border-accent/20">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-accent">The KIRBAI fit</span>
+                    <p className="text-sm text-foreground/70 mt-1">{roadmap.kirbaiFit}</p>
+                </div>
+            </div>
+
+            <div className="card p-6 flex flex-col gap-4">
+                <h3 className="section-subtitle">Green-light framework — needs 2 of 4 before production</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {roadmap.greenlightTests.map(t => (
+                        <div key={t.name} className="p-3 rounded-xl bg-surface/40 border border-border/40">
+                            <strong className="text-xs font-bold text-foreground">{t.name}</strong>
+                            <p className="text-[11px] text-foreground/50 mt-1 leading-relaxed">{t.description}</p>
+                        </div>
+                    ))}
+                </div>
+                <p className="text-xs text-foreground/50 italic">{roadmap.greenlightRule}</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {roadmap.cards.map(card => {
+                    const style = ROADMAP_STATUS[card.status];
+                    return (
+                        <div key={card.step} className="card p-5 flex flex-col gap-3">
+                            <div className="flex items-start justify-between gap-2">
+                                <div>
+                                    <span className="text-[10px] font-mono text-foreground/30">STEP {card.step}</span>
+                                    <h4 className="text-base font-bold text-foreground leading-snug">{card.title}</h4>
+                                    <p className="text-xs text-foreground/40 mt-0.5">{card.cast}</p>
+                                </div>
+                                <button onClick={() => onCycleStatus(card.step)} className={`badge shrink-0 ${style.badge}`} title="Click to advance status">
+                                    {card.statusLabel}
+                                </button>
+                            </div>
+                            <div className="flex flex-col gap-2 pt-2 border-t border-border/40">
+                                {card.fields.map(f => (
+                                    <div key={f.label}>
+                                        <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/35">{f.label}</span>
+                                        <p className="text-xs text-foreground/65 leading-relaxed">{f.value}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="card p-5 flex flex-col gap-2">
+                    <h4 className="section-subtitle">How to choose the next skit</h4>
+                    <ol className="flex flex-col gap-2 list-decimal list-inside">
+                        {roadmap.howToChoose.map((l, i) => <li key={i} className="text-xs text-foreground/60 leading-relaxed">{l}</li>)}
+                    </ol>
+                </div>
+                <div className="card p-5 flex flex-col gap-3">
+                    <h4 className="section-subtitle">Hook audit — lock before production</h4>
+                    <div className="flex flex-wrap gap-1.5">
+                        {roadmap.hookAuditFields.map(f => <span key={f} className="text-[10px] px-2 py-1 rounded-full bg-surface/60 text-foreground/60 border border-border/40">{f}</span>)}
+                    </div>
+                    <p className="text-xs text-foreground/50 leading-relaxed"><strong className="text-foreground/70">Tarot warning:</strong> {roadmap.tarotWarning}</p>
+                    <p className="text-xs text-foreground/50 leading-relaxed"><strong className="text-foreground/70">Cold-viewer rule:</strong> {roadmap.coldViewerRule}</p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function MusicVideoSheetView({ sheets }: { sheets: import("@/lib/story-room-seed").MusicVideoSheet[] | undefined }) {
+    if (!sheets || sheets.length === 0) return <div className="card p-10 text-center text-foreground/30 text-sm">No music video sheet loaded yet.</div>;
+    return (
+        <div className="flex flex-col gap-6">
+            {sheets.map(mv => (
+                <div key={mv.title} className="flex flex-col gap-4">
+                    <div className="card p-6 flex flex-col gap-2">
+                        <span className="section-eyebrow">{mv.kicker}</span>
+                        <h3 className="text-lg font-extrabold text-foreground">{mv.title}</h3>
+                        <p className="text-sm text-foreground/60 leading-relaxed">{mv.summary}</p>
+                        <div className="flex flex-wrap gap-1.5 mt-1">
+                            {mv.locks.map(l => <span key={l} className="text-[10px] px-2 py-1 rounded-full bg-accent/10 text-accent border border-accent/20">{l}</span>)}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div className="card p-5 flex flex-col gap-2">
+                            <h4 className="section-subtitle">Locked story engine</h4>
+                            {mv.storyEngine.map(f => (
+                                <div key={f.label}><span className="text-[9px] font-bold uppercase tracking-wider text-foreground/35">{f.label}</span><p className="text-xs text-foreground/65 leading-relaxed">{f.value}</p></div>
+                            ))}
+                            <p className="text-xs text-foreground/50 italic pt-1 border-t border-border/40 mt-1">{mv.storyNote}</p>
+                        </div>
+                        <div className="card p-5 flex flex-col gap-2">
+                            <h4 className="section-subtitle">Locked location plan</h4>
+                            {mv.locationPlan.map(f => (
+                                <div key={f.label}><span className="text-[9px] font-bold uppercase tracking-wider text-foreground/35">{f.label}</span><p className="text-xs text-foreground/65 leading-relaxed">{f.value}</p></div>
+                            ))}
+                            <p className="text-xs text-foreground/50 italic pt-1 border-t border-border/40 mt-1">{mv.locationNote}</p>
+                        </div>
+                    </div>
+
+                    <div className="card p-5 flex flex-col gap-3">
+                        <h4 className="section-subtitle">Story map — sync exact cuts to final master</h4>
+                        <div className="flex flex-col divide-y divide-border/40">
+                            {mv.timeline.map(beat => (
+                                <div key={beat.label} className="py-2.5 flex flex-col sm:flex-row sm:items-start gap-2">
+                                    <span className="text-[10px] font-mono uppercase text-accent/70 w-28 shrink-0">{beat.label}</span>
+                                    <div>
+                                        <strong className="text-xs font-bold text-foreground">{beat.title}</strong>
+                                        <p className="text-xs text-foreground/55 leading-relaxed">{beat.description}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {mv.performers.map(p => (
+                            <div key={p.name} className="card p-4 flex flex-col gap-1.5">
+                                <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/35">{p.tier}</span>
+                                <h5 className="text-sm font-bold text-foreground">{p.name}</h5>
+                                <p className="text-[11px] text-foreground/55 leading-relaxed">{p.role}</p>
+                                <p className="text-[11px] text-foreground/45 leading-relaxed">{p.action}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div className="card p-5 flex flex-col gap-2">
+                            <h4 className="section-subtitle">Hook + retention rules</h4>
+                            <ul className="flex flex-col gap-1.5 list-disc list-inside">
+                                {mv.hookRules.map((r, i) => <li key={i} className="text-xs text-foreground/60 leading-relaxed">{r}</li>)}
+                            </ul>
+                        </div>
+                        <div className="card p-5 flex flex-col gap-2">
+                            <h4 className="section-subtitle">Production + asset locks</h4>
+                            <ul className="flex flex-col gap-1.5 list-disc list-inside">
+                                {mv.productionNotes.map((r, i) => <li key={i} className="text-xs text-foreground/60 leading-relaxed">{r}</li>)}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+function FinalBattleSheetView({ beats }: { beats: import("@/lib/story-room-seed").BattleBeat[] | undefined }) {
+    if (!beats || beats.length === 0) return <div className="card p-10 text-center text-foreground/30 text-sm">No final battle beat sheet loaded yet.</div>;
+    return (
+        <div className="flex flex-col gap-3">
+            {beats.map(b => (
+                <div key={b.number} className={`card p-5 flex items-start gap-4 ${b.finisher ? "border-accent/40 bg-accent/5" : ""}`}>
+                    <span className="w-8 h-8 rounded-full bg-surface/60 border border-border/50 flex items-center justify-center text-xs font-black text-foreground/60 shrink-0">{b.number}</span>
+                    <div>
+                        <h4 className="text-sm font-bold text-foreground">{b.title}</h4>
+                        <p className="text-xs text-foreground/60 leading-relaxed mt-0.5">{b.description}</p>
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }
