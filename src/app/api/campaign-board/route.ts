@@ -120,7 +120,6 @@ function seed(): CampaignBoard {
             card({ stream: 'video', title: 'Rivalry Duet', subtitle: 'Structure idea', status: 'idea', notes: 'Two characters with tension share a video.' }),
 
             // Post-release calendar — dated, data-driven (see cadence.findings)
-            card({ stream: 'carousel', title: 'Milotic hero-card redo', subtitle: 'Post-release backlog', status: 'idea', notes: 'Redo to match the current hero-card template (locked pose/text conventions used by the other 7 cast members). Outstanding since pre-release per docs/pretty-rare-candies-characters.md.', scheduledDate: '2026-09-15', platforms: ['instagram'] }),
             card({ stream: 'video', title: 'Poké Island: Episode 3', subtitle: 'Narrative series — proven format', status: 'idea', notes: 'Highest engagement-rate format post-release (see cadence.findings). Keep building the episodic cast dynamic rather than one-off character bits.', scheduledDate: '2026-09-19', platforms: ['instagram', 'facebook'] }),
             card({ stream: 'comedy', title: 'Runway Regi follow-up bit', subtitle: 'Culture-reference format', status: 'idea', notes: 'Sept 2 Runway Regi (referencing @regirocktok) is the single best performer of the whole rollout — 214K reach, ~25% engagement rate. Do a same-format follow-up (different Regis/legendaries, same drag-runway bit) while it\'s still hot.', scheduledDate: '2026-09-12', platforms: ['instagram'] }),
             card({ stream: 'carousel', title: 'Cast lyric-card catch-up', subtitle: 'Format: lyric cards', status: 'idea', notes: 'Lower-lift carousel slot for characters that never got a lyric-card writeup (Milotic + Ninetales already done).', scheduledDate: '2026-09-22', platforms: ['instagram'] }),
@@ -173,6 +172,14 @@ function migrate(board: CampaignBoard): CampaignBoard {
                 notes: 'Redo Alcremie\'s payoff to the single-looping-effect format used for the ice-type payoffs (currently a shopping-bags/notification-icon concept flagged in docs/pretty-rare-candies-characters.md as not yet updated). Confirmed as the next release after Runway Regi (Erik, 2026-09-08).',
                 scheduledDate: '2026-09-11',
             }
+            : c),
+    };
+    // Erik corrected 2026-09-09: Milotic's hero-card redo was already done, along with every other
+    // track, as a full slate of <1min hero-card previews shipped in PRC's release week. Not outstanding.
+    next = {
+        ...next,
+        cards: next.cards.map(c => c.id === 'card_cal_seed_0' && c.title === 'Milotic hero-card redo'
+            ? { ...c, status: 'posted' as CardStatus, scheduledDate: undefined, notes: 'Shipped in PRC release week as part of the full-cast <1min hero-card preview slate (Erik, 2026-09-09) — not a post-release backlog item.' }
             : c),
     };
     return next;
