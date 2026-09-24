@@ -9,6 +9,7 @@ Examples:
   kirbai_youtube.py update "love island" --description-file desc.txt --tags "KIRBAI,Pokemon"
   kirbai_youtube.py schedule "love island" --publish-at 2026-08-20T22:00:00Z
   kirbai_youtube.py publish-now "love island"
+  kirbai_youtube.py thumbnail "love island" thumb.jpg
   kirbai_youtube.py upload video.mp4 --title "..." --description-file desc.txt --tags "KIRBAI,Pokemon"
 
 Note: uploads from an API project that hasn't passed Google's audit are
@@ -197,6 +198,15 @@ def cmd_publish_now(youtube, channel, args):
     print(f"Published {video_id} now: https://youtu.be/{video_id}")
 
 
+def cmd_thumbnail(youtube, channel, args):
+    video = resolve_video(youtube, channel, args.query)
+    size = Path(args.image).stat().st_size
+    if size > 2 * 1024 * 1024:
+        raise RuntimeError(f"Thumbnail is {size / 1024 / 1024:.1f} MB; YouTube's limit is 2 MB. Export a JPG first.")
+    youtube.thumbnails().set(videoId=video["id"], media_body=MediaFileUpload(args.image)).execute()
+    print(f"Thumbnail set for {video['id']}: https://youtu.be/{video['id']}")
+
+
 def cmd_upload(youtube, channel, args):
     description = Path(args.description_file).read_text(encoding="utf-8") if args.description_file else (args.description or "")
     tags = [t.strip() for t in (args.tags or "").split(",") if t.strip()]
@@ -258,6 +268,11 @@ def main():
     p_publish = sub.add_parser("publish-now", help="Set privacy=public immediately")
     p_publish.add_argument("query", help="Video ID or title substring")
     p_publish.set_defaults(func=cmd_publish_now)
+
+    p_thumb = sub.add_parser("thumbnail", help="Set a custom thumbnail (JPG/PNG, max 2 MB)")
+    p_thumb.add_argument("query", help="Video ID or title substring")
+    p_thumb.add_argument("image", help="Path to the thumbnail image")
+    p_thumb.set_defaults(func=cmd_thumbnail)
 
     p_upload = sub.add_parser("upload", help="Upload a video as private (Music, not made for kids)")
     p_upload.add_argument("file", help="Path to the video file")
