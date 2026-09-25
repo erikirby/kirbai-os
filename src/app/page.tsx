@@ -22,29 +22,40 @@ import CompetitorTracker from "@/components/CompetitorTracker";
 import RevenueEngine from "@/components/RevenueEngine";
 import HookEngine from "@/components/HookEngine";
 import CampaignBoard from "@/components/CampaignBoard";
+import HomeView from "@/components/Home";
 import { MessageSquare, Settings2, ChevronDown, Sparkles, Home as HomeIcon, Menu, X } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
-type Module = "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "storyroom" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks" | "studio";
+type Module = "home" | "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "storyroom" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks" | "studio";
 type Theme = "dark" | "snes" | "calm";
 
 const NAV_GROUPS = [
-  { id: "command", label: "Command", items: [{ id: "roadmap", label: "Home" }, { id: "intel", label: "Intel" }, { id: "competitors", label: "Competitors" }, { id: "muse", label: "Muse" }, { id: "boardroom", label: "Boardroom" }] },
-  { id: "pipeline", label: "Pipeline", items: [{ id: "hooks", label: "Hook Engine" }, { id: "creative", label: "Brainstorm" }, { id: "director", label: "Director's Suite" }, { id: "distro", label: "Description Gen" }] },
-  { id: "archive", label: "Archive", items: [{ id: "storyroom", label: "Story Room" }, { id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "prompts", label: "Prompts" }, { id: "core", label: "Core" }] },
-  { id: "performance", label: "Performance", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "revenue", label: "Revenue Engine" }, { id: "api-health", label: "API" }] },
+  { id: "plan", label: "Story & Plan", items: [{ id: "storyroom", label: "Story Room" }, { id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "roadmap", label: "Roadmap" }] },
+  { id: "create", label: "Create", items: [{ id: "hooks", label: "Hook Engine" }, { id: "distro", label: "Description Gen" }, { id: "prompts", label: "Prompts" }, { id: "creative", label: "Brainstorm" }] },
+  { id: "numbers", label: "Numbers", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "revenue", label: "Revenue Engine" }] },
+  { id: "labs", label: "Labs", items: [{ id: "intel", label: "Intel" }, { id: "competitors", label: "Competitors" }, { id: "muse", label: "Muse" }, { id: "director", label: "Director's Suite" }, { id: "boardroom", label: "Boardroom" }, { id: "core", label: "Core" }, { id: "api-health", label: "API" }] },
 ] as const;
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("kirbai");
-  const [activeModule, setActiveModule] = useState<Module>("roadmap");
+  const [activeModule, setActiveModule] = useState<Module>("home");
   const [theme, setTheme] = useState<Theme>("dark");
   const [showLauncher, setShowLauncher] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
+  // Remember the theme across reloads.
+  useEffect(() => {
+    try {
+      const t = localStorage.getItem("kos_theme") as Theme | null;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage isn't readable during SSR
+      if (t) setTheme(t);
+    } catch {}
+  }, []);
+
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
+    try { localStorage.setItem("kos_theme", theme); } catch {}
   }, [theme]);
 
   // Find which group the active module belongs to
@@ -193,33 +204,19 @@ export default function Home() {
         )}
       </header>
 
-      {/* ─── HERO BANNER ─── */}
-      <section className="w-full px-6 pt-4">
-        <div className="relative w-full h-[160px] card overflow-hidden group">
-          <Image src="/assets/banner.jpg" alt="Kirbai Banner" fill className="object-cover group-hover:scale-[1.02] transition-transform duration-[2000ms]" priority />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
-          <div className="absolute bottom-6 left-8 flex flex-col gap-0.5">
-            <span className="section-eyebrow">Operational Context</span>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-foreground uppercase drop-shadow-2xl">
-              {activeTab === "kirbai" ? "Brand: Kirbai" : "Factory: SEO Matrix"}
-            </h2>
-          </div>
-        </div>
-      </section>
-
       {/* ─── NAVIGATION ─── */}
-      <nav className="hide-on-mobile w-full px-6 flex items-center gap-1.5 mt-3 relative z-40">
-        {/* Chat Button */}
+      <nav className="hide-on-mobile w-full px-6 flex items-center gap-1.5 mt-4 relative z-40">
+        {/* Home */}
         <button
-          onClick={() => setActiveModule("chat")}
+          onClick={() => setActiveModule("home")}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all border ${
-            activeModule === "chat"
+            activeModule === "home"
               ? "bg-accent border-accent/40 text-white shadow-lg shadow-accent/10"
               : "bg-surface/40 border-border/50 text-foreground/50 hover:text-foreground hover:border-foreground/20"
           }`}
         >
-          <MessageSquare className="w-3.5 h-3.5" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Chat</span>
+          <HomeIcon className="w-3.5 h-3.5" />
+          <span className="text-[10px] font-bold uppercase tracking-wider">Home</span>
         </button>
 
         {/* Studio — Pretty Rare Candies campaign board */}
@@ -233,6 +230,19 @@ export default function Home() {
         >
           <Sparkles className="w-3.5 h-3.5" />
           <span className="text-[10px] font-bold uppercase tracking-wider">Studio</span>
+        </button>
+
+        {/* Chat Button */}
+        <button
+          onClick={() => setActiveModule("chat")}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all border ${
+            activeModule === "chat"
+              ? "bg-accent border-accent/40 text-white shadow-lg shadow-accent/10"
+              : "bg-surface/40 border-border/50 text-foreground/50 hover:text-foreground hover:border-foreground/20"
+          }`}
+        >
+          <MessageSquare className="w-3.5 h-3.5" />
+          <span className="text-[10px] font-bold uppercase tracking-wider">Chat</span>
         </button>
 
         {/* Module Group Dropdowns */}
@@ -282,20 +292,15 @@ export default function Home() {
             );
           })}
         </div>
-
-        {/* Ecosystem Indicator */}
-        <div className="ml-auto hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border/50 bg-surface/20">
-          <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-emerald-500" />
-          <span className="text-[9px] font-semibold uppercase tracking-wider text-foreground/30">{activeTab} Ecosystem</span>
-        </div>
       </nav>
 
       {/* ─── MAIN CONTENT ─── */}
       <section className="flex-1 w-full">
         <div className="mx-auto w-full px-6 py-6 pb-28 lg:pb-6 flex flex-col gap-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div className={activeModule === "roadmap" ? "lg:col-span-3 flex flex-col gap-8" : "lg:col-span-4 flex flex-col gap-8"}>
+          <div className="grid grid-cols-1 gap-6">
+            <div className="flex flex-col gap-8">
               <div key={`${activeTab}-${activeModule}`} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {activeModule === "home" && <HomeView go={m => { setActiveModule(m); if (m === "studio") setTheme("calm"); }} />}
                 {activeModule === "roadmap" && <Roadmap mode={activeTab} />}
                 {activeModule === "vault" && <VaultManager theme={theme} mode={activeTab} />}
                 {activeModule === "intel" && <IntelInbox mode="full" theme={theme} activeTab={activeTab} />}
@@ -318,24 +323,13 @@ export default function Home() {
                 {activeModule === "studio" && <CampaignBoard />}
               </div>
             </div>
-
-            {/* Sidebar Command Center — Only on Home */}
-            {activeModule === "roadmap" && (
-              <div className="lg:col-span-1 flex flex-col gap-6 sticky top-28 self-start">
-                <div className="card p-6 relative">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 blur-[40px] rounded-full -mr-12 -mt-12" />
-                  <h3 className="section-subtitle mb-6 pb-3 border-b border-border">Command Center</h3>
-                  <IntelInbox mode="compact" theme={theme} />
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </section>
 
       {/* ─── MOBILE BOTTOM DOCK ─── */}
       <div className="mobile-bottom-dock show-on-mobile-only">
-        <button onClick={() => setActiveModule("roadmap")} className={`mobile-dock-item ${activeModule === "roadmap" ? "active" : ""}`}>
+        <button onClick={() => setActiveModule("home")} className={`mobile-dock-item ${activeModule === "home" ? "active" : ""}`}>
           <HomeIcon className="w-5 h-5" />
           <span>Home</span>
         </button>
