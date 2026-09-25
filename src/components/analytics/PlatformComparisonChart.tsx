@@ -49,7 +49,7 @@ export default function PlatformComparisonChart({ data }: ChartProps) {
                 </div>
 
                 {/* Metric Selector Buttons */}
-                <div className="flex items-center gap-1.5 bg-surface/80 p-1 rounded-xl border border-border/60">
+                <div className="flex items-center gap-1.5 bg-surface/80 p-1 rounded-xl border border-border/60 overflow-x-auto max-w-full">
                     <button
                         onClick={() => setSelectedMetric('views')}
                         className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${ selectedMetric === 'views' ? 'bg-accent text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}

@@ -122,30 +122,30 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
 
                 <div className="flex flex-wrap items-center gap-3">
                     {/* View Switcher Sub-Tabs */}
-                    <div className="flex p-1 bg-surface/80 rounded-xl border border-border/60">
+                    <div className="flex p-0.5 bg-foreground/5 rounded-full overflow-x-auto max-w-full">
                         <button
                             onClick={() => setActiveSubTab('overview')}
-                            className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${ activeSubTab === 'overview' ? 'bg-accent text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
+                            className={`px-3.5 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-all ${ activeSubTab === 'overview' ? 'bg-surface text-foreground shadow' : 'text-foreground/50 hover:text-foreground' }`}
                         >
                             Overview
                         </button>
                         <button
                             onClick={() => setActiveSubTab('social')}
-                            className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${ activeSubTab === 'social' ? 'bg-pink-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
+                            className={`px-3.5 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-all ${ activeSubTab === 'social' ? 'bg-surface text-foreground shadow' : 'text-foreground/50 hover:text-foreground' }`}
                         >
-                            Social Reels (IG, FB, TikTok)
+                            Social
                         </button>
                         <button
                             onClick={() => setActiveSubTab('youtube')}
-                            className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${ activeSubTab === 'youtube' ? 'bg-red-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
+                            className={`px-3.5 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-all ${ activeSubTab === 'youtube' ? 'bg-surface text-foreground shadow' : 'text-foreground/50 hover:text-foreground' }`}
                         >
-                            YouTube Intel
+                            YouTube
                         </button>
                         <button
                             onClick={() => setActiveSubTab('distrokid')}
-                            className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${ activeSubTab === 'distrokid' ? 'bg-emerald-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
+                            className={`px-3.5 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-all ${ activeSubTab === 'distrokid' ? 'bg-surface text-foreground shadow' : 'text-foreground/50 hover:text-foreground' }`}
                         >
-                            DistroKid Music
+                            DistroKid
                         </button>
                     </div>
 

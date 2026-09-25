@@ -224,16 +224,16 @@ export default function AIHub({ theme }: { theme?: string }) {
             <div className="card w-full p-8 flex flex-col relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px] -z-10 group-hover:bg-accent/10 transition-colors duration-1000 translate-x-1/4 -translate-y-1/4"></div>
                 
-                <div className="flex items-center justify-between mb-8 pb-6 border-b border-border">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-5 border-b border-border">
                     <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-[var(--btn-radius)] bg-accent/20 flex items-center justify-center border border-accent/20 shadow-inner">
-                            <Bot className="w-7 h-7 text-accent" />
+                        <div className="w-11 h-11 rounded-[var(--btn-radius)] bg-accent/15 flex items-center justify-center">
+                            <Bot className="w-5 h-5 text-accent" />
                         </div>
                         <div>
-                            <h2 className="section-title">Kirbai Intelligence Matrix</h2>
+                            <h2 className="section-title">Chat</h2>
                             <p className="section-subtitle mt-1 flex items-center gap-2">
                                 <span className={isListening ? "w-2 h-2 rounded-full bg-red-500 animate-pulse" : "w-2 h-2 rounded-full bg-accent/50 pulse-dot"}></span>
-                                {isListening ? "Audio Input Active..." : "Progressive Memory Active"}
+                                {isListening ? "Listening…" : "Remembers this conversation"}
                             </p>
                         </div>
                     </div>
@@ -251,7 +251,7 @@ export default function AIHub({ theme }: { theme?: string }) {
                             }}
                             className="btn-ghost text-xs px-4 py-2 border border-cyan-500/20 text-cyan-400 hover:bg-cyan-500/10 flex items-center gap-2 h-fit rounded-full"
                         >
-                            <Download className="w-3 h-3" /> Export .txt
+                            <Download className="w-3 h-3" /> Export
                         </button>
                         {messages.length > 0 && (
                             <button 

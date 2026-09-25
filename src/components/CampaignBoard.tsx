@@ -47,6 +47,11 @@ function tiltFor(id: string): number {
 export default function CampaignBoard({ initialView = "board" }: { initialView?: "board" | "calendar" }) {
     const [board, setBoard] = useState<Board | null>(null);
     const [view, setView] = useState<"board" | "calendar">(initialView);
+    // On a phone the calendar is the useful view; the corkboard is a desktop thing.
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- window width isn't known during SSR
+        if (window.innerWidth < 768) setView("calendar");
+    }, []);
     const [expanded, setExpanded] = useState<string | null>(null);
     const [threadsOpen, setThreadsOpen] = useState(false);
     const [addingIn, setAddingIn] = useState<Stream | null>(null);
@@ -592,7 +597,7 @@ function CardTile({ card, accent, tilt, expanded, onToggleExpand, onUpdate, onDe
                     <h4 className="text-sm font-bold text-foreground leading-snug">{card.title}</h4>
                     {card.subtitle && <p className="text-xs text-foreground/35 mt-0.5">{card.subtitle}</p>}
                 </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                <div className="flex items-center gap-2 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity shrink-0">
                     <button onClick={() => onUpdate({ pinned: !card.pinned })} className={card.pinned ? "text-accent" : "text-foreground/20 hover:text-foreground/50"}>
                         <Pin className="w-3.5 h-3.5" />
                     </button>

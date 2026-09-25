@@ -68,6 +68,7 @@ export default function Home({ go }: { go: Go }) {
 
     const [brief, setBrief] = useState<DailyBrief | null>(null);
     const [briefBusy, setBriefBusy] = useState(false);
+    const [briefOpen, setBriefOpen] = useState(false);
     const [livePosts, setLivePosts] = useState<LivePost[]>([]);
     const [notes, setNotes] = useState<AiNote[]>([]);
     const [changes, setChanges] = useState<AiLogEntry[]>([]);
@@ -188,12 +189,15 @@ export default function Home({ go }: { go: Go }) {
                     </div>
                     <ul className="flex flex-col gap-1.5">
                         {brief.text.split("\n").map(l => l.replace(/^\s*[-*•]+\s*/, "").replace(/\*\*?/g, "").trim()).filter(l => l && !/^here'?s your/i.test(l)).map((l, i) => (
-                            <li key={i} className="flex gap-2.5 text-sm text-foreground/75 leading-relaxed">
+                            <li key={i} className={`gap-2.5 text-sm text-foreground/75 leading-relaxed ${i >= 2 && !briefOpen ? "hidden md:flex" : "flex"}`}>
                                 <span className="w-1 h-1 rounded-full bg-accent mt-2.5 shrink-0" />
                                 <span>{l}</span>
                             </li>
                         ))}
                     </ul>
+                    <button onClick={() => setBriefOpen(v => !v)} className="md:hidden self-start text-sm font-medium text-accent">
+                        {briefOpen ? "Show less" : "Show all"}
+                    </button>
                 </div>
             )}
 

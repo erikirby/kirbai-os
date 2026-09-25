@@ -31,7 +31,6 @@ const ROADMAP_STATUS: Record<RoadmapCard["status"], { badge: string; next: Roadm
     event: { badge: "text-purple-400 bg-purple-400/10 border-purple-400/20", next: "event" },
 };
 
-const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
 const slugify = (s: string) =>
     s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `character-${Date.now()}`;
 
@@ -45,9 +44,7 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
     const [isSaving, setIsSaving] = useState(false);
     const [hasUnsaved, setHasUnsaved] = useState(false);
 
-    const boardRef = useRef<HTMLDivElement | null>(null);
     const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const dragRef = useRef<{ id: string; moved: boolean } | null>(null);
 
     // --- Load ---
     useEffect(() => {
@@ -132,31 +129,35 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
         [state.characters, selectedId]
     );
 
+    // Each lead gets a group; side characters join the first lead they're tied to.
+    const detailRef = useRef<HTMLDivElement | null>(null);
+    const groups = useMemo(() => {
+        const leads = state.characters.filter(c => c.role === "lead");
+        const leadIds = new Set(leads.map(l => l.id));
+        const byLead = new Map<string, StoryCharacter[]>(leads.map(l => [l.id, [l]]));
+        const mysteries: StoryCharacter[] = [];
+        const others: StoryCharacter[] = [];
+        for (const c of state.characters) {
+            if (c.role === "lead") continue;
+            if (c.role === "mystery") { mysteries.push(c); continue; }
+            const home = c.related.find(r => leadIds.has(r));
+            if (home) byLead.get(home)!.push(c); else others.push(c);
+        }
+        const out = leads.map(l => ({ key: l.id, label: byLead.get(l.id)!.length > 1 ? `${l.name}'s circle` : l.name, members: byLead.get(l.id)! }));
+        // Solo leads share one row instead of each taking a whole group.
+        const solo = out.filter(g => g.members.length === 1).flatMap(g => g.members);
+        const grouped = out.filter(g => g.members.length > 1);
+        return [
+            ...grouped,
+            ...(solo.length ? [{ key: "solo", label: "Other leads", members: solo }] : []),
+            ...(mysteries.length ? [{ key: "mystery", label: "Mysteries", members: mysteries }] : []),
+            ...(others.length ? [{ key: "others", label: "Everyone else", members: others }] : []),
+        ];
+    }, [state.characters]);
+
     const patchSelected = (patch: Partial<StoryCharacter>) => {
         if (!selected) return;
         mutate(chars => chars.map(c => (c.id === selected.id ? { ...c, ...patch } : c)));
-    };
-
-    // --- Drag to reposition ---
-    const onPointerDown = (e: React.PointerEvent, id: string) => {
-        if (!editing) return;
-        (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-        dragRef.current = { id, moved: false };
-    };
-    const onPointerMove = (e: React.PointerEvent) => {
-        const drag = dragRef.current;
-        const board = boardRef.current;
-        if (!drag || !board) return;
-        const rect = board.getBoundingClientRect();
-        const x = clamp(((e.clientX - rect.left) / rect.width) * 100, 2, 97);
-        const y = clamp(((e.clientY - rect.top) / rect.height) * 100, 3, 94);
-        drag.moved = true;
-        mutate(chars => chars.map(c => (c.id === drag.id ? { ...c, x, y } : c)));
-    };
-    const onPointerUp = (e: React.PointerEvent, id: string) => {
-        const drag = dragRef.current;
-        dragRef.current = null;
-        if (!drag || !drag.moved) setSelectedId(id); // treat as click
     };
 
     // --- Character add / remove ---
@@ -226,26 +227,26 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
     return (
         <div className="flex flex-col gap-6">
             {/* Header */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-4">
+            <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
-                    <h2 className="text-2xl font-black tracking-tight text-gradient">STORY ROOM</h2>
-                    <p className="text-xs text-foreground/50 mt-1">
-                        {state.era ? `${state.era} · ` : ""}Relationship board — the wound, the seeds to plant, and the finale payoff for each character.
+                    <h2 className="section-title">Story Room</h2>
+                    <p className="text-sm text-foreground/50 mt-0.5">
+                        {state.era ? `${state.era} · ` : ""}Tap anyone to see their wound, the seeds to plant, and their finale payoff.
                     </p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="flex p-0.5 bg-surface/60 rounded-xl border border-border/50 mr-1">
+                <div className="flex flex-wrap items-center gap-2 max-w-full">
+                    <div className="flex p-0.5 bg-foreground/5 rounded-full mr-1 overflow-x-auto max-w-full">
                         {SHEETS.map(s => (
                             <button
                                 key={s.id}
                                 onClick={() => setSheet(s.id)}
-                                className={`px-3 py-1.5 text-xs font-bold rounded-[10px] transition-all ${sheet === s.id ?"bg-accent text-white shadow-md" : "text-foreground/40 hover:text-foreground/70"}`}
+                                className={`px-3.5 py-1.5 text-sm font-medium rounded-full whitespace-nowrap transition-all ${sheet === s.id ? "bg-surface text-foreground shadow" : "text-foreground/50 hover:text-foreground/80"}`}
                             >
                                 {s.label}
                             </button>
                         ))}
                     </div>
-                    <span className="text-xs font-mono text-foreground/40">
+                    <span className="text-xs text-foreground/40">
                         {isSaving ? "Saving…" : hasUnsaved ? "Unsaved" : "Synced"}
                     </span>
                     {sheet === "board" && editing && (
@@ -268,66 +269,48 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
             {sheet === "music" && <MusicVideoSheetView sheets={state.musicVideos} />}
             {sheet === "battle" && <FinalBattleSheetView beats={state.finalBattle} />}
 
-            {sheet === "board" && <div className="grid grid-cols-1 xl:grid-cols-[1.6fr_1fr] gap-6">
-                {/* Board */}
-                <div
-                    ref={boardRef}
-                    onPointerMove={onPointerMove}
-                    className="relative w-full rounded-2xl border border-border overflow-hidden select-none"
-                    style={{
-                        aspectRatio: "16 / 13",
-                        background:
-                            "repeating-linear-gradient(45deg, color-mix(in srgb, var(--accent-color) 4%, transparent) 0 2px, transparent 2px 22px), color-mix(in srgb, var(--surface-color) 70%, transparent)",
-                    }}
-                >
-                    {state.characters.map(c => {
-                        const isSel = c.id === selectedId;
-                        return (
-                            <button
-                                key={c.id}
-                                type="button"
-                                onPointerDown={e => onPointerDown(e, c.id)}
-                                onPointerUp={e => onPointerUp(e, c.id)}
-                                onClick={() => { if (!editing) setSelectedId(c.id); }}
-                                title={`${c.name} — ${c.tag}`}
-                                className={`absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1 p-2 rounded-xl bg-background/80 backdrop-blur border ${ROLE_STYLES[c.role]} ${isSel ? "ring-2 ring-accent shadow-lg z-20 scale-105" : "z-10 hover:z-20 hover:scale-105"} ${editing ? "cursor-grab active:cursor-grabbing" : "cursor-pointer"} transition-transform`}
-                                style={{ left: `${clamp(c.x, 4, 96)}%`, top: `${clamp(c.y, 5, 94)}%`, width: 96 }}
-                            >
-                                <span className="w-11 h-11 rounded-lg overflow-hidden bg-surface/60 flex items-center justify-center">
-                                    {c.icon
-                                        ? <Image src={c.icon} alt="" width={44} height={44} className="object-contain" />
-                                        : <span className="text-lg font-black text-foreground/40">{c.name.charAt(0)}</span>}
-                                </span>
-                                <strong className="text-[10px] leading-tight text-center text-foreground line-clamp-1 w-full">{c.name}</strong>
-                                <small className="text-[8px] leading-tight text-center text-foreground/45 line-clamp-2 w-full">{c.tag}</small>
-                            </button>
-                        );
-                    })}
-
-                    {/* connectors for the selected character */}
-                    {selected && (
-                        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" aria-hidden="true">
-                            {selected.related.map(rid => {
-                                const other = state.characters.find(c => c.id === rid);
-                                if (!other) return null;
-                                return (
-                                    <line
-                                        key={rid}
-                                        x1={`${clamp(selected.x, 4, 96)}%`} y1={`${clamp(selected.y, 5, 94)}%`}
-                                        x2={`${clamp(other.x, 4, 96)}%`} y2={`${clamp(other.y, 5, 94)}%`}
-                                        stroke="var(--accent-color)" strokeWidth={1.5} strokeOpacity={0.5}
-                                        strokeDasharray="4 4"
-                                    />
-                                );
-                            })}
-                        </svg>
-                    )}
+            {sheet === "board" && <div className="grid grid-cols-1 xl:grid-cols-[1.6fr_1fr] gap-6 items-start">
+                {/* Board: one group per lead, side characters with them, so nobody overlaps */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
+                    {groups.map(g => (
+                        <div key={g.key} className="rounded-2xl border border-border bg-surface/40 p-3">
+                            <div className="text-xs font-medium text-foreground/45 px-1 pb-2">{g.label}</div>
+                            <div className="grid grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-2">
+                                {g.members.map(c => {
+                                    const isSel = c.id === selectedId;
+                                    const linked = !!selected && selected.related.includes(c.id);
+                                    const dim = !!selected && !isSel && !linked;
+                                    return (
+                                        <button
+                                            key={c.id}
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedId(isSel ? null : c.id);
+                                                // On narrow screens the story panel sits below the board; bring it into view.
+                                                if (!isSel && window.innerWidth < 1280) setTimeout(() => detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+                                            }}
+                                            title={`${c.name}: ${c.tag}`}
+                                            className={`flex flex-col items-center gap-1 p-2 rounded-xl bg-background/70 border transition-all ${ROLE_STYLES[c.role]} ${isSel ? "ring-2 ring-accent" : linked ? "ring-1 ring-accent/60" : ""} ${dim ? "opacity-35" : ""}`}
+                                        >
+                                            <span className="w-11 h-11 rounded-lg overflow-hidden bg-surface/60 flex items-center justify-center">
+                                                {c.icon
+                                                    ? <Image src={c.icon} alt="" width={44} height={44} className="object-contain" />
+                                                    : <span className="text-lg font-bold text-foreground/40">{c.name.charAt(0)}</span>}
+                                            </span>
+                                            <strong className="text-[11px] leading-tight text-center text-foreground line-clamp-1 w-full">{c.name}</strong>
+                                            <small className="text-[10px] leading-tight text-center text-foreground/45 line-clamp-2 w-full">{c.tag}</small>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
                 </div>
 
                 {/* Detail */}
-                <div className="card p-5 flex flex-col gap-4 min-h-[300px]">
+                <div ref={detailRef} className="card p-5 flex flex-col gap-4 min-h-[300px] xl:!sticky xl:top-20 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto scroll-mt-20">
                     {!selected ? (
-                        <p className="text-sm text-foreground/50 m-auto">Pick a character on the board to open its thread.</p>
+                        <p className="text-sm text-foreground/50 m-auto">Tap a character to open their story. Everyone tied to them lights up.</p>
                     ) : (
                         <>
                             <div className="flex items-start justify-between gap-3">

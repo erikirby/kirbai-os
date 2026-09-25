@@ -653,8 +653,22 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
             {/* Main Layout: Project List + Detail */}
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
 
+                {/* PHONE: project picker */}
+                <div className="xl:hidden flex items-center gap-2">
+                    <select
+                        value={activeProject?.id ?? ''}
+                        onChange={e => { const p = projects.find(x => x.id === e.target.value); if (p) { setActiveProject(p); setExpandedTrack(null); } }}
+                        className="input-field text-sm py-2.5 px-3 flex-1"
+                    >
+                        {projects
+                            .filter(p => mode === "kirbai" ? p.alias === "Kirbai" : (p.alias === "AELOW" || p.alias === "KURAO"))
+                            .map(p => <option key={p.id} value={p.id}>{p.title}{p.status === 'Primary' ? ' (current)' : ''}</option>)}
+                    </select>
+                    <button onClick={createProject} className="btn-secondary py-2.5 px-3.5 shrink-0"><Plus className="w-4 h-4" /> New</button>
+                </div>
+
                 {/* LEFT: Project Directory */}
-                <div className={`xl:col-span-3 rounded-[20px] border border-border bg-surface/80 p-2 flex flex-col xl:sticky xl:top-24 xl:self-start xl:max-h-[calc(100vh-8rem)] ${snes ? 'border-b-4 border-r-4' : ''}`}>
+                <div className={`hidden xl:flex xl:col-span-3 rounded-[20px] border border-border bg-surface/80 p-2 flex-col xl:sticky xl:top-24 xl:self-start xl:max-h-[calc(100vh-8rem)] ${snes ? 'border-b-4 border-r-4' : ''}`}>
                     <div className="flex items-center justify-between px-3 pt-2 pb-2">
                         <span className="section-subtitle">Projects</span>
                         <button onClick={createProject} className="flex items-center gap-1 text-sm font-medium text-accent hover:opacity-80">
@@ -730,7 +744,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                         <div className="flex flex-col animate-in fade-in duration-300">
 
                             {/* --- STICKY PROJECT HEADER --- */}
-                            <div className="p-6 flex gap-5 items-center border-b border-border">
+                            <div className="p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-5 sm:items-center border-b border-border">
                                 {/* Cover Art */}
                                 <div
                                     className="w-20 h-20 rounded-xl shrink-0 bg-surface/60 border border-border overflow-hidden relative group cursor-pointer flex items-center justify-center"
@@ -748,12 +762,12 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
 
                                 {/* Title + Meta */}
                                 <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex flex-wrap items-center gap-3">
                                         <input
                                             type="text"
                                             value={activeProject.title}
                                             onChange={(e) => updateActiveProject('title', e.target.value)}
-                                            className="section-title bg-transparent border-none outline-none w-full text-foreground focus:text-foreground"
+                                            className="section-title bg-transparent border-none outline-none flex-1 min-w-[12rem] text-foreground focus:text-foreground"
                                             placeholder="Project Title"
                                         />
 
@@ -831,7 +845,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                             className={`p-1.5 px-3 text-[11px] border rounded-full focus:outline-none focus:border-accent w-32 ${inputBase}`}
                                         />
                                         {/* Sync Master Sheet pill */}
-                                        <div className="flex items-center gap-1.5 flex-1 min-w-[280px] border border-foreground/10 rounded-full bg-foreground/5 pl-3 pr-1 focus-within:border-accent focus-within:bg-accent/5 transition-all">
+                                        <div className="flex items-center gap-1.5 flex-1 min-w-full sm:min-w-[280px] border border-foreground/10 rounded-full bg-foreground/5 pl-3 pr-1 focus-within:border-accent focus-within:bg-accent/5 transition-all">
                                             <Sparkles className="w-3 h-3 text-accent shrink-0" />
                                             <input
                                                 type="url"
@@ -881,7 +895,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                             </div>
 
                             {/* --- ACCORDION SECTIONS --- */}
-                            <div className="p-4 flex flex-col gap-3">
+                            <div className="p-3 sm:p-4 flex flex-col gap-3">
 
                                 {/* SECTION 1: TRACKLIST + LYRICS */}
                                 <Section title={`Tracklist & lyrics (${(activeProject.tracklist || []).length})`} icon={<Mic2 className="w-3 h-3 text-accent" />} defaultOpen={true}>
@@ -892,15 +906,15 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                             return (
                                                 <div key={i} className="rounded-xl border border-border overflow-hidden">
                                                     {/* Track Row */}
-                                                    <div className="flex items-center gap-3 px-4 py-3 group hover:bg-surface/60 transition-colors">
+                                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3 group hover:bg-surface/60 transition-colors">
                                                         <span className="text-[9px] text-foreground/30 w-5 text-right shrink-0">{i + 1}.</span>
                                                         <input
                                                             type="text"
                                                             value={track}
                                                             onChange={(e) => updateTrackName(i, e.target.value)}
-                                                            className={`flex-1 bg-transparent text-sm font-black tracking-tight focus:outline-none min-w-0 ${theme === 'snes' ? 'text-black' : 'text-foreground'}`}
+                                                            className={`flex-1 min-w-[9rem] bg-transparent text-sm font-semibold tracking-tight focus:outline-none ${theme === 'snes' ? 'text-black' : 'text-foreground'}`}
                                                         />
-                                                        <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <div className="flex items-center gap-2 shrink-0 ml-auto lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                                             {lyric
                                                                 ? <span className="text-[11px] px-2 py-0.5 rounded-full bg-accent/10 text-accent/70 font-semibold">Lyrics ✓</span>
                                                                 : <span className="text-[11px] px-2 py-0.5 rounded-full bg-foreground/5 text-foreground/30 font-semibold">No Lyrics</span>
