@@ -58,10 +58,11 @@ export async function GET(req: Request) {
         };
 
         // Extract YouTube channel totals with resilient fallback
-        let ytStats = youtubeData?.stats || [];
-        
-        // If YouTube stats cache is empty, attempt a direct fetch from official API endpoint logic
-        if (!ytStats.length) {
+        // Cached numbers are only a fallback; a cached row of zeros (from an old failed lookup) is ignored.
+        let ytStats: any[] = (youtubeData?.stats || []).filter((s: any) => s.subscribers > 0 || s.views > 0);
+
+        // Always try the live API first so Pulse shows today's subscriber count.
+        {
             try {
                 const apiKey = process.env.YOUTUBE_API_KEY;
                 if (apiKey) {
@@ -69,7 +70,7 @@ export async function GET(req: Request) {
                     const data = await res.json();
                     if (data.items && data.items.length > 0) {
                         const item = data.items[0];
-                        ytStats = [{
+                        const live = [{
                             id: 'kirbai',
                             name: 'Kirbai',
                             handle: '@KirbaiMusic',
@@ -78,6 +79,7 @@ export async function GET(req: Request) {
                             videoCount: parseInt(item.statistics?.videoCount) || 0,
                             avatarUrl: item.snippet?.thumbnails?.default?.url || ""
                         }];
+                        ytStats = [...live, ...ytStats.filter((s: any) => s.id !== 'kirbai')];
                     }
                 }
             } catch (err) {

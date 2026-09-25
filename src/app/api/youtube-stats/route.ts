@@ -56,16 +56,8 @@ export async function GET(req: Request) {
                     };
                 }
 
-                // Fallback if handle doesn't return data
-                return {
-                    id: channel.id,
-                    name: channel.name,
-                    handle: channel.handle,
-                    subscribers: 0,
-                    views: 0,
-                    videoCount: 0,
-                    avatarUrl: ""
-                };
+                // No data: treat as a failure so zeros never overwrite the good cached numbers.
+                return null;
             } catch (err) {
                 console.error(`Failed to fetch official API stats for ${channel.handle}`, err);
                 return null; // Signals failure for this channel
