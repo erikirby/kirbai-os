@@ -111,24 +111,24 @@ export default function PlatformComparisonChart({ data }: ChartProps) {
                 })}
             </div>
 
-            {/* Metric Insights Footer */}
+            {/* Metric Insights Footer (computed from the same data as the bars) */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-border/50 pt-4 text-center">
-                <div className="p-3 rounded-lg bg-surface/40 border border-border/40">
-                    <span className="text-[11px] font-mono text-foreground/40 block">Top Views</span>
-                    <span className="text-xs font-extrabold text-pink-400">Instagram (5.1M)</span>
-                </div>
-                <div className="p-3 rounded-lg bg-surface/40 border border-border/40">
-                    <span className="text-[11px] font-mono text-foreground/40 block">Top Direct Monetization</span>
-                    <span className="text-xs font-extrabold text-blue-400">Facebook ($114.17)</span>
-                </div>
-                <div className="p-3 rounded-lg bg-surface/40 border border-border/40">
-                    <span className="text-[11px] font-mono text-foreground/40 block">Top Follower Magnet</span>
-                    <span className="text-xs font-extrabold text-emerald-400">Instagram (+15.1k)</span>
-                </div>
-                <div className="p-3 rounded-lg bg-surface/40 border border-border/40">
-                    <span className="text-[11px] font-mono text-foreground/40 block">Live Video Count</span>
-                    <span className="text-xs font-extrabold text-purple-400">FB (81) / IG (91)</span>
-                </div>
+                {([
+                    ['Top views', 'views', false],
+                    ['Top reach', 'reach', false],
+                    ['Most followers', 'followers', false],
+                    ['Top earnings', 'earningsUsd', true],
+                ] as const).map(([label, key, money]) => {
+                    const top = [...data].sort((x, y) => (y[key] || 0) - (x[key] || 0))[0];
+                    const v = top?.[key] || 0;
+                    const shown = money ? `$${v.toFixed(2)}` : v >= 1e6 ? `${(v / 1e6).toFixed(2)}M` : v >= 1e3 ? `${(v / 1e3).toFixed(1)}K` : v.toLocaleString();
+                    return (
+                        <div key={label} className="p-3 rounded-lg bg-surface/40 border border-border/40">
+                            <span className="text-[11px] text-foreground/40 block">{label}</span>
+                            <span className="text-xs font-bold" style={{ color: top?.color }}>{top ? `${top.platform} (${shown})` : '-'}</span>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

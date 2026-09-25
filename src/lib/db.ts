@@ -191,6 +191,7 @@ export function getKirbaiStatsBaseline() {
             saleMonths: kirbaiStatsBaseline.distroKid.saleMonths || [],
             reportingCaveat: kirbaiStatsBaseline.distroKid.reportingCaveat,
         },
+        followers: kirbaiStatsBaseline.followers ?? null,
         dataQuality: kirbaiStatsBaseline.dataQuality,
         baselineSignals: kirbaiStatsBaseline.baselineSignals,
         usageRules: kirbaiStatsBaseline.usageRules,

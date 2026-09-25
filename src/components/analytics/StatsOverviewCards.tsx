@@ -12,6 +12,8 @@ interface OverviewProps {
         distroKidRevenue: number;
         metaBonusEarnings: number;
         totalStreamsOrUnits: number;
+        distributedTracks?: number;
+        followersAsOf?: string | null;
     };
     freshness: any;
 }
@@ -31,7 +33,7 @@ export default function StatsOverviewCards({ totals, freshness }: OverviewProps)
                 <div className="flex items-center gap-3">
                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
                     <span className="text-xs font-mono text-foreground/70 font-semibold">
-                        Master Baseline Connected & Synchronized
+                        Data coverage
                     </span>
                 </div>
                 
@@ -90,7 +92,7 @@ export default function StatsOverviewCards({ totals, freshness }: OverviewProps)
                 {/* Total Streams & Units */}
                 <div className="card p-5 relative overflow-hidden group border border-border/60 hover:border-purple-500/40 transition-all">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-mono text-foreground/40 font-bold">Total Music Streams / Units</span>
+                        <span className="text-xs font-mono text-foreground/40 font-bold">DistroKid units</span>
                         <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
                             <Music className="w-4 h-4" />
                         </div>
@@ -100,7 +102,7 @@ export default function StatsOverviewCards({ totals, freshness }: OverviewProps)
                     </div>
                     <div className="flex items-center gap-2 mt-2 text-[11px] font-medium text-foreground/50">
                         <Award className="w-3.5 h-3.5 text-purple-400" />
-                        <span>Across 162 distributed tracks</span>
+                        <span>Across {totals.distributedTracks ?? '?'} tracks (streams + other uses)</span>
                     </div>
                 </div>
 
@@ -117,7 +119,7 @@ export default function StatsOverviewCards({ totals, freshness }: OverviewProps)
                     </div>
                     <div className="flex items-center gap-2 mt-2 text-[11px] font-medium text-foreground/50">
                         <Activity className="w-3.5 h-3.5 text-pink-400" />
-                        <span>Instagram + TikTok + YouTube</span>
+                        <span>IG + FB + TikTok + YouTube{totals.followersAsOf ? ` · IG/FB as of ${totals.followersAsOf.slice(0, 10)}` : ''}</span>
                     </div>
                 </div>
             </div>

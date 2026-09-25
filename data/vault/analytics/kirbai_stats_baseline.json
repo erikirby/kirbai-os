@@ -1,12 +1,36 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-17T16:51:38.443785Z",
+  "generatedAt": "2026-09-25T05:05:02.024Z",
   "status": "Historical baseline; refresh from the source folder before claiming metrics are current.",
   "sourceDirectory": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats",
   "sources": [
     {
+      "fileName": "Kirbai-audience-timeline.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Kirbai-audience-timeline.csv",
+      "checksumSha256": "16b803f49b8415d4e00455a502fa81a60d0ddc03c2e68d0898f7b9932adf8c08",
+      "rows": 989,
+      "columns": 9,
+      "detectedType": "unknown"
+    },
+    {
+      "fileName": "Kirbai-playlists-1year.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Kirbai-playlists-1year.csv",
+      "checksumSha256": "d04e376a0264ad6f9b68f5dea20cb76bbff739677fade9bc83d8356498cbc8ec",
+      "rows": 78,
+      "columns": 5,
+      "detectedType": "unknown"
+    },
+    {
+      "fileName": "Kirbai-songs-1year.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Kirbai-songs-1year.csv",
+      "checksumSha256": "1c8a45300b25b457fb77a90a0d36830dd2d72587e165cb98803612e98d2b0769",
+      "rows": 152,
+      "columns": 5,
+      "detectedType": "unknown"
+    },
+    {
       "fileName": "distrokid_sales.csv",
-      "absolutePath": "/sessions/rcw-01qdwoxctb9wptfxhx2b8pzu/mnt/stats/distrokid_sales.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/distrokid_sales.csv",
       "checksumSha256": "693929e288239125b0b5155f741e58cf9c1c9f445e9ed249b60d3756f1935a05",
       "rows": 36283,
       "columns": 15,
@@ -14,7 +38,7 @@
     },
     {
       "fileName": "facebook_2026-01-01_to_2026-09-03.csv",
-      "absolutePath": "/sessions/rcw-01qdwoxctb9wptfxhx2b8pzu/mnt/stats/facebook_2026-01-01_to_2026-09-03.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/facebook_2026-01-01_to_2026-09-03.csv",
       "checksumSha256": "218727ec19154b5e4d1670f6c20eff0e9033ce609ebc291d7f46040a49a27fa2",
       "rows": 84,
       "columns": 31,
@@ -22,7 +46,7 @@
     },
     {
       "fileName": "instagram_2025-08-01_to_2026-07-17.csv",
-      "absolutePath": "/sessions/rcw-01qdwoxctb9wptfxhx2b8pzu/mnt/stats/instagram_2025-08-01_to_2026-07-17.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/instagram_2025-08-01_to_2026-07-17.csv",
       "checksumSha256": "fe5e9fc5d62162e715d4a5d6eb1ae05165e858fb896b679dc44e4ce89527dc83",
       "rows": 91,
       "columns": 18,
@@ -30,7 +54,7 @@
     },
     {
       "fileName": "instagram_2026-01-01_to_2026-09-03.csv",
-      "absolutePath": "/sessions/rcw-01qdwoxctb9wptfxhx2b8pzu/mnt/stats/instagram_2026-01-01_to_2026-09-03.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/instagram_2026-01-01_to_2026-09-03.csv",
       "checksumSha256": "8d4624a89a3f261b763fe179d538fee9bcdaa7ce167e5ae47b24103f7b4cb637",
       "rows": 88,
       "columns": 18,
@@ -38,32 +62,11 @@
     },
     {
       "fileName": "tiktok_2026_overview.csv",
-      "absolutePath": "/sessions/rcw-01qdwoxctb9wptfxhx2b8pzu/mnt/stats/tiktok_2026_overview.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/tiktok_2026_overview.csv",
       "checksumSha256": "f07b3dd262a7b9a2b94349ec49cf2786eb42f580aa1f165ccd9eb22e6bce2a19",
       "rows": 365,
       "columns": 6,
       "detectedType": "unknown"
-    },
-    {
-      "fileName": "Kirbai-audience-timeline.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Kirbai-audience-timeline.csv",
-      "checksumSha256": "16b803f49b8415d4e00455a502fa81a60d0ddc03c2e68d0898f7b9932adf8c08",
-      "rows": 989,
-      "detectedType": "spotify-for-artists"
-    },
-    {
-      "fileName": "Kirbai-playlists-1year.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Kirbai-playlists-1year.csv",
-      "checksumSha256": "d04e376a0264ad6f9b68f5dea20cb76bbff739677fade9bc83d8356498cbc8ec",
-      "rows": 78,
-      "detectedType": "spotify-for-artists"
-    },
-    {
-      "fileName": "Kirbai-songs-1year.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Kirbai-songs-1year.csv",
-      "checksumSha256": "1c8a45300b25b457fb77a90a0d36830dd2d72587e165cb98803612e98d2b0769",
-      "rows": 152,
-      "detectedType": "spotify-for-artists"
     }
   ],
   "instagram": {
@@ -1058,49 +1061,11 @@
     ],
     "reportingCaveat": "DistroKid data arrives late. The newest sale month is likely incomplete and should not be compared directly with mature months."
   },
-  "baselineSignals": [
-    "The top Instagram post in this export is “Machoke looking for trade again... 👀 u free tonight tho? 🎵 “Your Boyfriend is so Shady” – Kirbai #pokemon #gay #pokemonlegendsza” with 892,296 views and 47,263 shares.",
-    "The top Facebook post in this export is “Pokopia is cute until you realize Ditto is in crisis 💔 Ditto built an entire world for people who never came back. 🎧 I'm Just a Ditto – Kirbai | full song on Spotify & YouTube #Pokopia #Ditto #Pokemon #PokemonMusic #PokemonCommunity #Kir…” with 113,561 views and $10.86 in native earnings.",
-    "DistroKid reports $4,326.73 across 2,339,207 reported units for Kirbai through sale month 2026-07; the newest month may be incomplete.",
-    "The leading DistroKid stores by earnings are Spotify ($1,840.79), Apple Music ($1,008.37), YouTube (Red) ($961.64).",
-    "The leading tracks by DistroKid earnings are Power Whip (Tsareena Step) ($539.63), Mean Look (Gothitelle Cut) ($484.07), Lovely Kiss (Jynx Anthem) ($423.76), Poison Pink (Nidoking) ($221.46), Scrappy Klutz (Lopunny Crash) ($157.34).",
-    "SPOTIFY, RENTED VS OWNED (2026-09-17): monthly listeners fell 78% from the 2026-03-19 peak (26,217 to 5,859), but every owned-audience metric rose over the same period. Followers 504 to 1,238 with no down month ever; streams per listener 4.2 to 11.0; super listeners 3.7% to 11.0% of audience; save rate by era 3.61% to 5.36%. What collapsed was algorithmic subsidy, not the fanbase. Do not read monthly listeners as project health.",
-    "SPOTIFY, RELEASE LIFT IS DEAD: Banned Badge (Jan 2026) drove +1014% in 28-day streams. Every release since decayed: +45, +31, -22, -11, +13, +2, -25, -20, +15%. The last five are noise. Releasing is no longer a Spotify growth lever; releases now function as raw material for the video engine, not as stream drivers.",
-    "SPOTIFY, PER-SONG DECAY: average streams per song by era. Banned Badge 26,245 (13 songs), Heart Scales 10,470 (15), Pink Bois 5,239 (25), Pretty Rare Candies 3,409 (14). Down 87% while save rate rose 48%. More releases into a flat audience splits the same listeners; 25 Pink Bois songs earned fewer total streams than 13 Banned Badge songs.",
-    "SPOTIFY, THE FLOOR IS THE REAL METRIC: minimum daily streams (passive catalog demand with no push) ran ~2,300/day Feb-Jun 2026, then dropped to ~1,500/day Jul-Sep. That 35% floor decline is the genuine structural loss. Track the floor and follower count; ignore monthly listeners.",
-    "SPOTIFY, DISTRIBUTION IS 91% ALGORITHMIC: 129,449 playlist streams from Spotify-owned surfaces vs 12,709 from everything else. Of that 12,709, Erik's own Kirbai Pokedex is 5,857 and unprompted fan-built Kirbai playlists are 3,614 across 9 separate playlists with only 3-8 listeners each. No cushion under the algorithm.",
-    "CONVERSION GAP IS THE TOP OPPORTUNITY: the Runway Regi Reel reached 214,000 on Instagram; total Spotify followers are 1,238. A single video touched ~170x the entire follower base with near-zero conversion. This is a plumbing problem (CTA, link friction), not a reach or quality problem, and it is the highest-leverage fixable item in the dataset."
-  ],
-  "dataQuality": {
-    "instagram": {
-      "severity": "low",
-      "rawRowsAcrossExports": 179,
-      "uniquePostIds": 110,
-      "overlappingRowsNotDoubleCounted": 69,
-      "finding": "The July 17 Instagram export fully supersedes the overlapping July 6 export. Baseline totals use one row per post ID."
-    },
-    "facebook": {
-      "severity": "low",
-      "rows": 84,
-      "uniquePostIds": 84,
-      "finding": "The export mixes videos and photo posts. Totals include both; the coverage block separates video count."
-    },
-    "distroKid": {
-      "severity": "medium",
-      "selectedFile": "distrokid_sales.csv",
-      "ignoredOlderCumulativeExports": [],
-      "finding": "Only the newest cumulative DistroKid export is summarized. The selected ledger contains a small number of exact duplicate-looking rows, but there is no transaction ID proving they are accidental duplicates. Official totals therefore retain them and expose a deduplicated sensitivity check."
-    }
+  "followers": {
+    "asOf": "2026-09-21T20:21:08Z",
+    "instagram": 16376,
+    "facebook": 5496
   },
-  "usageRules": [
-    "Treat this file as a dated baseline, not live analytics.",
-    "Use Pulse and Revenue Engine when they contain a newer import.",
-    "Do not add overlapping Instagram exports together; deduplicate by Post ID.",
-    "Keep Kirbai separate from Kirby Henry, AELOW, and KURAO when discussing artist performance.",
-    "Label royalty figures with reporting coverage and warn that the newest sale month may be incomplete.",
-    "DistroKid Quantity means reported units and can include social-media uses, downloads, or other source types; do not relabel the total as streams.",
-    "Never infer causation from a high-performing post or track without a controlled comparison."
-  ],
   "spotify": {
     "grain": "Three Spotify for Artists exports: daily audience timeline, 1-year per-song totals, 1-year per-playlist totals.",
     "coverage": {
@@ -1208,7 +1173,7 @@
         "monthlyListenersEnd": 2,
         "followersEnd": 0,
         "superListenersEnd": 1,
-        "streamsPerListener": 23.0,
+        "streamsPerListener": 23,
         "saveRatePct": 23.91
       },
       "2024-10": {
@@ -1239,7 +1204,7 @@
         "followersEnd": 5,
         "superListenersEnd": 1,
         "streamsPerListener": 8.3,
-        "saveRatePct": 0.0
+        "saveRatePct": 0
       },
       "2025-01": {
         "streams": 39,
@@ -1259,7 +1224,7 @@
         "followersEnd": 5,
         "superListenersEnd": 0,
         "streamsPerListener": 3.3,
-        "saveRatePct": 0.0
+        "saveRatePct": 0
       },
       "2025-03": {
         "streams": 50,
@@ -1268,8 +1233,8 @@
         "monthlyListenersEnd": 10,
         "followersEnd": 7,
         "superListenersEnd": 0,
-        "streamsPerListener": 5.0,
-        "saveRatePct": 80.0
+        "streamsPerListener": 5,
+        "saveRatePct": 80
       },
       "2025-04": {
         "streams": 49,
@@ -1438,7 +1403,7 @@
         "monthlyListenersEnd": 7059,
         "followersEnd": 1175,
         "superListenersEnd": 612,
-        "streamsPerListener": 11.0,
+        "streamsPerListener": 11,
         "saveRatePct": 3.16
       },
       "2026-09": {
@@ -1512,14 +1477,14 @@
         "date": "2026-02-04",
         "streams28dBefore": 73725,
         "streams28dAfter": 106875,
-        "liftPct": 45.0
+        "liftPct": 45
       },
       {
         "release": "Heart Scales",
         "date": "2026-02-12",
         "streams28dBefore": 84090,
         "streams28dAfter": 110145,
-        "liftPct": 31.0
+        "liftPct": 31
       },
       {
         "release": "Pink Hierarchy",
@@ -1843,5 +1808,42 @@
       "The 2026-03-19 peak of 26,217 monthly listeners was an algorithmic batch, not a release. Daily streams held flat at ~3,000/day straight through the subsequent crash.",
       "Song and playlist exports cover a trailing year only, so pre-Sept-2025 catalog is undercounted there."
     ]
-  }
+  },
+  "baselineSignals": [
+    "The top Instagram post in this export is “Machoke looking for trade again... 👀 u free tonight tho? 🎵 “Your Boyfriend is so Shady” – Kirbai #pokemon #gay #pokemonlegendsza” with 892,296 views and 47,263 shares.",
+    "The top Facebook post in this export is “Pokopia is cute until you realize Ditto is in crisis 💔 Ditto built an entire world for people who never came back. 🎧 I'm Just a Ditto – Kirbai | full song on Spotify & YouTube #Pokopia #Ditto #Pokemon #PokemonMusic #PokemonCommunity #Kir…” with 113,561 views and $10.86 in native earnings.",
+    "DistroKid reports $4,326.73 across 2,339,207 reported units for Kirbai through sale month 2026-07; the newest month may be incomplete.",
+    "The leading DistroKid stores by earnings are Spotify ($1,840.79), Apple Music ($1,008.37), YouTube (Red) ($961.64).",
+    "The leading tracks by DistroKid earnings are Power Whip (Tsareena Step) ($539.63), Mean Look (Gothitelle Cut) ($484.07), Lovely Kiss (Jynx Anthem) ($423.76), Poison Pink (Nidoking) ($221.46), Scrappy Klutz (Lopunny Crash) ($157.34)."
+  ],
+  "dataQuality": {
+    "instagram": {
+      "severity": "low",
+      "rawRowsAcrossExports": 179,
+      "uniquePostIds": 110,
+      "overlappingRowsNotDoubleCounted": 69,
+      "finding": "The July 17 Instagram export fully supersedes the overlapping July 6 export. Baseline totals use one row per post ID."
+    },
+    "facebook": {
+      "severity": "low",
+      "rows": 84,
+      "uniquePostIds": 84,
+      "finding": "The export mixes videos and photo posts. Totals include both; the coverage block separates video count."
+    },
+    "distroKid": {
+      "severity": "medium",
+      "selectedFile": "distrokid_sales.csv",
+      "ignoredOlderCumulativeExports": [],
+      "finding": "Only the newest cumulative DistroKid export is summarized. The selected ledger contains a small number of exact duplicate-looking rows, but there is no transaction ID proving they are accidental duplicates. Official totals therefore retain them and expose a deduplicated sensitivity check."
+    }
+  },
+  "usageRules": [
+    "Treat this file as a dated baseline, not live analytics.",
+    "Use Pulse and Revenue Engine when they contain a newer import.",
+    "Do not add overlapping Instagram exports together; deduplicate by Post ID.",
+    "Keep Kirbai separate from Kirby Henry, AELOW, and KURAO when discussing artist performance.",
+    "Label royalty figures with reporting coverage and warn that the newest sale month may be incomplete.",
+    "DistroKid Quantity means reported units and can include social-media uses, downloads, or other source types; do not relabel the total as streams.",
+    "Never infer causation from a high-performing post or track without a controlled comparison."
+  ]
 }

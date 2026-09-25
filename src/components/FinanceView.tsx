@@ -182,7 +182,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                         </div>
                         <div className="card p-6 bg-accent/[0.04] border-accent/20 group overflow-hidden relative">
                             <div className="absolute top-0 left-0 w-full h-1 bg-accent/40" />
-                            <span className="stat-label text-accent">Total Streams</span>
+                            <span className="stat-label text-accent">Total units</span>
                             <p className="stat-value text-foreground mt-2">{analysisResults.totals.streams.toLocaleString()}</p>
                             <div className="mt-4 pt-4 border-t border-accent/10 flex justify-between">
                                 <span className="text-xs text-accent/50 font-semibold">Totals</span>

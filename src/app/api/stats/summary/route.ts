@@ -94,9 +94,10 @@ export async function GET(req: Request) {
         // Consolidate totals
         const igTotals = baseline.instagram.totals;
         const fbTotals = baseline.facebook.totals;
-        const fbFollowers = parseInt(pulseState?.facebook?.followers || baseline.facebook?.totals?.follows || '3890', 10);
+        // Follower counts: newest API snapshot from the stats folder wins over older manual Pulse entries.
+        const fbFollowers = parseInt(baseline.followers?.facebook || pulseState?.facebook?.followers || '0', 10);
         // Prefer freshly parsed CSV overlays (persisted into Pulse state) over the static baseline
-        const igFollowers = parseInt(pulseState?.instagram?.followers || igTotals.follows || '0', 10);
+        const igFollowers = parseInt(baseline.followers?.instagram || pulseState?.instagram?.followers || '0', 10);
         const igReach = parseInt(pulseState?.instagram?.reach || igTotals.reach || '0', 10);
         const fbReach = parseInt(pulseState?.facebook?.reach || fbTotals.reach || '0', 10);
 
@@ -112,12 +113,14 @@ export async function GET(req: Request) {
 
         const grandTotals = {
             crossPlatformViews: igTotals.views + fbTotals.views + kirbaiYt.views + ttViews,
-            crossPlatformReach: igReach + fbReach + ttViews,
+            crossPlatformReach: igReach + fbReach,
             totalFollowers: igFollowers + fbFollowers + ttFollowers + kirbaiYt.subscribers,
             totalEarningsUsd: dkTotals.earningsUsd + fbTotals.earningsUsd,
             distroKidRevenue: dkTotals.earningsUsd,
             metaBonusEarnings: fbTotals.earningsUsd,
-            totalStreamsOrUnits: dkTotals.quantity
+            totalStreamsOrUnits: dkTotals.quantity,
+            distributedTracks: baseline.distroKid.coverage.tracks,
+            followersAsOf: baseline.followers?.asOf ?? null
         };
 
         // Platform Comparisons (Social Reels + YouTube)

@@ -288,6 +288,19 @@ const distroKid = summarizeDistroKid(distroKidRows);
 const usd = (value) => `$${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const count = (value) => Number(value).toLocaleString('en-US');
 
+// This script doesn't rebuild the Spotify block (it came from the Spotify for Artists
+// exports), so carry the previous one forward instead of silently dropping it.
+const previousBaseline = fs.existsSync(outputPath) ? JSON.parse(fs.readFileSync(outputPath, 'utf8')) : null;
+
+// Live follower counts from the newest API snapshot in the stats folder, if there is one.
+const snapshotPath = path.join(sourceDir, 'current_stats_snapshot.json');
+const snapshot = fs.existsSync(snapshotPath) ? JSON.parse(fs.readFileSync(snapshotPath, 'utf8')) : null;
+const followers = snapshot?.headline ? {
+    asOf: snapshot.generated_at,
+    instagram: snapshot.headline.instagram?.followers_count ?? null,
+    facebook: snapshot.headline.facebook?.followers_count ?? null,
+} : previousBaseline?.followers ?? null;
+
 const baseline = {
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
@@ -310,6 +323,8 @@ const baseline = {
     instagram,
     facebook,
     distroKid,
+    followers,
+    ...(previousBaseline?.spotify ? { spotify: previousBaseline.spotify } : {}),
     baselineSignals: [
         `The top Instagram post in this export is “${instagram.topPosts[0]?.caption}” with ${count(instagram.topPosts[0]?.views)} views and ${count(instagram.topPosts[0]?.shares)} shares.`,
         `The top Facebook post in this export is “${facebook.topPosts[0]?.caption}” with ${count(facebook.topPosts[0]?.views)} views and ${usd(facebook.topPosts[0]?.earningsUsd)} in native earnings.`,
