@@ -2,9 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, ArrowUpRight, CalendarDays, Lightbulb, Loader2, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CalendarDays, Check, Lightbulb, Loader2, MessageCircle, Plus, RefreshCw, Sun, X } from "lucide-react";
 import type { CampaignBoard as Board, CampaignCard, CardStatus, Stream } from "@/app/api/campaign-board/route";
 import { castFor, spriteUrl, useCast } from "@/lib/cast";
+import { findPostedOnInstagram } from "@/lib/posted-match";
+import type { DailyBrief } from "@/app/api/daily/route";
+import type { LivePost } from "@/lib/meta-live";
+import type { AiNote, AiLogEntry } from "@/lib/kirbai-ops";
 
 type Go = (module: "studio" | "cast" | "storyroom" | "lore", view?: "board" | "calendar") => void;
 
@@ -62,9 +66,35 @@ export default function Home({ go }: { go: Go }) {
     const [ideaStream, setIdeaStream] = useState<Stream>("video");
     const [saved, setSaved] = useState(false);
 
+    const [brief, setBrief] = useState<DailyBrief | null>(null);
+    const [briefBusy, setBriefBusy] = useState(false);
+    const [livePosts, setLivePosts] = useState<LivePost[]>([]);
+    const [notes, setNotes] = useState<AiNote[]>([]);
+    const [changes, setChanges] = useState<AiLogEntry[]>([]);
+    const [newDecision, setNewDecision] = useState("");
+
     useEffect(() => {
         fetch("/api/campaign-board").then(r => r.json()).then(d => { if (d.success) setBoard(d.board); });
+        fetch("/api/daily").then(r => r.json()).then(d => { if (d.success) setBrief(d.brief); }).catch(() => {});
+        fetch("/api/live/social").then(r => r.json()).then(d => setLivePosts(d.live?.recent ?? [])).catch(() => {});
+        fetch("/api/ai").then(r => r.json()).then(d => { setNotes(d.notes ?? []); setChanges(d.recentChanges ?? []); }).catch(() => {});
     }, []);
+
+    const refreshBrief = () => {
+        setBriefBusy(true);
+        fetch("/api/daily?force=1").then(r => r.json()).then(d => { if (d.success) setBrief(d.brief); }).finally(() => setBriefBusy(false));
+    };
+
+    const dismissNote = (id: string) => {
+        setNotes(n => n.filter(x => x.id !== id));
+        fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ops: [{ op: "dismiss_note", id }], source: "home" }) });
+    };
+
+    const addDecision = () => {
+        if (!board || !newDecision.trim()) return;
+        persist({ ...board, threads: [...board.threads, { id: `thread_${Math.random().toString(36).slice(2, 10)}`, text: newDecision.trim() }] });
+        setNewDecision("");
+    };
 
     const persist = (next: Board) => {
         setBoard(next);
@@ -123,6 +153,7 @@ export default function Home({ go }: { go: Go }) {
     const { late, soon, milestones, nextDrop, backlog } = derived;
     const nextOut = nextDrop ? daysOut(nextDrop.scheduledDate!) : null;
     const upcoming = [...late, ...soon];
+    const alreadyPosted = findPostedOnInstagram(board.cards, livePosts);
 
     const clefairyLines = [
         nextDrop && nextOut !== null && (nextOut === 0 ? "It's drop day! ✨" : `${nextOut} days till ${shortTitle(nextDrop.title)}! ✨`),
@@ -142,6 +173,29 @@ export default function Home({ go }: { go: Go }) {
                 </div>
                 <Clefairy lines={clefairyLines} />
             </div>
+
+            {brief && (
+                <div className="card p-5 flex flex-col gap-3">
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                            <Sun className="w-4 h-4 text-amber-400" />
+                            <h3 className="section-subtitle">Today&apos;s brief</h3>
+                            <span className="text-xs text-foreground/35">{new Date(brief.generatedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</span>
+                        </div>
+                        <button onClick={refreshBrief} disabled={briefBusy} title="Rewrite the brief with the latest data" className="p-1.5 rounded-full text-foreground/40 hover:text-foreground hover:bg-foreground/5 disabled:opacity-40">
+                            <RefreshCw className={`w-4 h-4 ${briefBusy ? "animate-spin" : ""}`} />
+                        </button>
+                    </div>
+                    <ul className="flex flex-col gap-1.5">
+                        {brief.text.split("\n").map(l => l.replace(/^\s*[-*•]+\s*/, "").replace(/\*\*?/g, "").trim()).filter(l => l && !/^here'?s your/i.test(l)).map((l, i) => (
+                            <li key={i} className="flex gap-2.5 text-sm text-foreground/75 leading-relaxed">
+                                <span className="w-1 h-1 rounded-full bg-accent mt-2.5 shrink-0" />
+                                <span>{l}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
 
             {/* Hero: next drop + runway */}
             <div className="relative card overflow-hidden">
@@ -178,13 +232,29 @@ export default function Home({ go }: { go: Go }) {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Coming up */}
-                <div className="lg:col-span-2 card overflow-hidden self-start">
+                <div className="lg:col-span-2 flex flex-col gap-6 self-start">
+                <div className="card overflow-hidden">
                     <div className="flex items-center justify-between px-5 pt-5 pb-3">
                         <h3 className="section-subtitle">Coming up</h3>
                         <button onClick={() => go("studio", "calendar")} className="flex items-center gap-1.5 text-sm font-medium text-accent hover:opacity-80">
                             <CalendarDays className="w-4 h-4" /> Calendar
                         </button>
                     </div>
+                    {alreadyPosted.map(({ card, post }) => (
+                        <div key={card.id} className="mx-5 mb-3 flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-400/10 border border-emerald-400/20 text-sm">
+                            <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                            <span className="flex-1 text-foreground/75">
+                                <span className="font-semibold text-foreground">{card.title}</span> went up on Instagram {shortDate(post.timestamp.slice(0, 10))}.{" "}
+                                <a href={post.permalink} target="_blank" rel="noreferrer" className="text-accent hover:underline">See post</a>
+                            </span>
+                            <button
+                                onClick={() => updateCard(card.id, { status: "posted", scheduledDate: post.timestamp.slice(0, 10), tasks: card.tasks.map(t => ({ ...t, done: true })) })}
+                                className="btn-primary py-1.5 px-3 shrink-0"
+                            >
+                                Mark posted
+                            </button>
+                        </div>
+                    ))}
                     {upcoming.length === 0 && (
                         <p className="px-5 pb-6 text-sm text-foreground/45">Nothing dated in the next two weeks. Good time to schedule something from the backlog.</p>
                     )}
@@ -220,6 +290,37 @@ export default function Home({ go }: { go: Go }) {
                     </div>
                 </div>
 
+                {(notes.length > 0 || changes.length > 0) && (
+                    <div className="card p-5 flex flex-col gap-3">
+                        <div className="flex items-center gap-2">
+                            <MessageCircle className="w-4 h-4 text-accent" />
+                            <h3 className="section-subtitle">From your chats</h3>
+                            <span className="text-xs text-foreground/35">notes and changes made by Claude or ChatGPT</span>
+                        </div>
+                        {notes.slice(0, 6).map(n => (
+                            <div key={n.id} className="flex items-start gap-3 text-sm">
+                                <span className="text-xs text-foreground/35 w-16 shrink-0 pt-0.5">{shortDate(n.created_at.slice(0, 10)).replace(/^\w+, /, "")}</span>
+                                <span className="flex-1 text-foreground/75 leading-relaxed whitespace-pre-line">{n.text}</span>
+                                <span className="text-[11px] text-foreground/35 shrink-0 pt-0.5">{n.source}</span>
+                                <button onClick={() => dismissNote(n.id)} title="Done with this" className="text-foreground/25 hover:text-foreground/60 shrink-0 mt-0.5"><X className="w-4 h-4" /></button>
+                            </div>
+                        ))}
+                        {changes.length > 0 && (
+                            <div className="flex flex-col gap-1.5 pt-2 border-t border-border">
+                                <span className="text-xs font-medium text-foreground/40">Recent changes</span>
+                                {changes.slice(0, 5).map((c, i) => (
+                                    <div key={i} className="flex gap-3 text-xs text-foreground/55">
+                                        <span className="w-16 shrink-0 text-foreground/35">{shortDate(c.at.slice(0, 10)).replace(/^\w+, /, "")}</span>
+                                        <span className="flex-1">{c.summary}</span>
+                                        <span className="shrink-0 text-foreground/35">{c.source}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+                </div>
+
                 {/* Right rail */}
                 <div className="flex flex-col gap-6">
                     <div className="card p-5 flex flex-col gap-3">
@@ -253,9 +354,10 @@ export default function Home({ go }: { go: Go }) {
                         </p>
                     </div>
 
-                    {board.threads.length > 0 && (
+                    {(
                         <div className="card p-5 flex flex-col gap-3">
                             <h3 className="section-subtitle">Needs a decision</h3>
+                            {board.threads.length === 0 && <p className="text-sm text-foreground/40">Nothing open.</p>}
                             {board.threads.map(t => (
                                 <div key={t.id} className="flex items-start gap-2.5 text-sm text-foreground/65 leading-relaxed">
                                     <span className="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0" />
@@ -269,6 +371,18 @@ export default function Home({ go }: { go: Go }) {
                                     </button>
                                 </div>
                             ))}
+                            <div className="flex items-center gap-2 pt-1">
+                                <input
+                                    value={newDecision}
+                                    onChange={e => setNewDecision(e.target.value)}
+                                    onKeyDown={e => { if (e.key === "Enter") addDecision(); }}
+                                    placeholder="Add something to decide…"
+                                    className="input-field text-sm py-2 px-3"
+                                />
+                                <button onClick={addDecision} disabled={!newDecision.trim()} className="p-2 rounded-full text-accent hover:bg-accent/10 disabled:opacity-30" title="Add">
+                                    <Plus className="w-4 h-4" />
+                                </button>
+                            </div>
                         </div>
                     )}
 

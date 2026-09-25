@@ -1,3 +1,4 @@
+import { getMetaLive } from '@/lib/meta-live';
 import { NextResponse } from 'next/server';
 import { getKirbaiStatsBaseline, getPulseStateAsync, getRow, getYouTubeStatsAsync } from '@/lib/db';
 
@@ -12,10 +13,11 @@ export async function GET(req: Request) {
         const baseline = getKirbaiStatsBaseline();
         
         // Fetch dynamic overlays from Supabase & YouTube API
-        const [pulseState, youtubeData, revenueEngine] = await Promise.all([
+        const [pulseState, youtubeData, revenueEngine, metaLive] = await Promise.all([
             getPulseStateAsync(mode),
             getYouTubeStatsAsync(mode),
-            getRow(`revenue_engine_${mode === 'factory' ? 'factory' : 'kirbai'}`)
+            getRow(`revenue_engine_${mode === 'factory' ? 'factory' : 'kirbai'}`),
+            mode === 'kirbai' ? getMetaLive() : Promise.resolve(null)
         ]);
 
         // Platform Freshness Badges
@@ -96,10 +98,10 @@ export async function GET(req: Request) {
         // Consolidate totals
         const igTotals = baseline.instagram.totals;
         const fbTotals = baseline.facebook.totals;
-        // Follower counts: newest API snapshot from the stats folder wins over older manual Pulse entries.
-        const fbFollowers = parseInt(baseline.followers?.facebook || pulseState?.facebook?.followers || '0', 10);
+        // Follower counts: live Graph API first, then the newest stats-folder snapshot, then older manual Pulse entries.
+        const fbFollowers = parseInt(metaLive?.facebook?.followers || baseline.followers?.facebook || pulseState?.facebook?.followers || '0', 10);
         // Prefer freshly parsed CSV overlays (persisted into Pulse state) over the static baseline
-        const igFollowers = parseInt(baseline.followers?.instagram || pulseState?.instagram?.followers || '0', 10);
+        const igFollowers = parseInt(metaLive?.instagram?.followers || baseline.followers?.instagram || pulseState?.instagram?.followers || '0', 10);
         const igReach = parseInt(pulseState?.instagram?.reach || igTotals.reach || '0', 10);
         const fbReach = parseInt(pulseState?.facebook?.reach || fbTotals.reach || '0', 10);
 
@@ -122,7 +124,7 @@ export async function GET(req: Request) {
             metaBonusEarnings: fbTotals.earningsUsd,
             totalStreamsOrUnits: dkTotals.quantity,
             distributedTracks: baseline.distroKid.coverage.tracks,
-            followersAsOf: baseline.followers?.asOf ?? null
+            followersAsOf: metaLive?.instagram ? 'live' : baseline.followers?.asOf ?? null
         };
 
         // Platform Comparisons (Social Reels + YouTube)

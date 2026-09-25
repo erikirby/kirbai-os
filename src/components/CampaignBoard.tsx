@@ -77,7 +77,7 @@ export default function CampaignBoard({ initialView = "board" }: { initialView?:
         persist({ ...board, cards });
     }, [board, persist]);
 
-    const addCard = useCallback((stream: Stream, title: string) => {
+    const addCard = useCallback((stream: Stream, title: string, scheduledDate?: string) => {
         if (!board || !title.trim()) return;
         const now = new Date().toISOString();
         const card: CampaignCard = {
@@ -85,6 +85,7 @@ export default function CampaignBoard({ initialView = "board" }: { initialView?:
             stream, title: title.trim(), subtitle: "", notes: "",
             status: "idea", pinned: false, tasks: defaultTasks(),
             created_at: now, updated_at: now,
+            ...(scheduledDate ? { scheduledDate } : {}),
         };
         persist({ ...board, cards: [...board.cards, card] });
         setAddingIn(null);
@@ -183,6 +184,8 @@ export default function CampaignBoard({ initialView = "board" }: { initialView?:
                 <ContentCalendar
                     board={board}
                     onUpdateCard={updateCard}
+                    onAddCard={(stream, title, date) => addCard(stream, title, date)}
+                    onDeleteCard={deleteCard}
                 />
             )}
 
@@ -350,14 +353,25 @@ function daysOut(iso: string) {
     return Math.round((new Date(iso + "T00:00:00").getTime() - today.getTime()) / 86400000);
 }
 
-function ContentCalendar({ board, onUpdateCard }: {
+function ContentCalendar({ board, onUpdateCard, onAddCard, onDeleteCard }: {
     board: Board;
     onUpdateCard: (id: string, patch: Partial<CampaignCard>) => void;
+    onAddCard: (stream: Stream, title: string, date: string) => void;
+    onDeleteCard: (id: string) => void;
 }) {
     const cast = useCast();
     const spritesFor = (title: string) => castFor(title, cast);
     const [open, setOpen] = useState<string | null>(null);
     const [showBacklog, setShowBacklog] = useState(false);
+    const [adding, setAdding] = useState(false);
+    const [addTitle, setAddTitle] = useState("");
+    const [addDate, setAddDate] = useState(new Date().toISOString().slice(0, 10));
+    const [addStream, setAddStream] = useState<Stream>("video");
+    const submitAdd = () => {
+        if (!addTitle.trim() || !addDate) return;
+        onAddCard(addStream, addTitle.trim(), addDate);
+        setAddTitle(""); setAdding(false);
+    };
 
     const scheduled = useMemo(
         () => [...board.cards].filter(c => c.scheduledDate).sort((a, b) => (a.scheduledDate! < b.scheduledDate! ? -1 : 1)),
@@ -376,6 +390,24 @@ function ContentCalendar({ board, onUpdateCard }: {
 
     return (
         <div className="flex flex-col gap-5">
+            {/* Add a dated item straight onto the calendar */}
+            {adding ? (
+                <div className="card p-4 flex items-center gap-2 flex-wrap">
+                    <input autoFocus value={addTitle} onChange={e => setAddTitle(e.target.value)} onKeyDown={e => { if (e.key === "Enter") submitAdd(); if (e.key === "Escape") setAdding(false); }}
+                        placeholder="What's going out?" className="input-field text-sm py-2 px-3 flex-1 min-w-[200px]" />
+                    <input type="date" value={addDate} onChange={e => setAddDate(e.target.value)} className="input-field text-sm py-2 px-3 w-[150px]" />
+                    <select value={addStream} onChange={e => setAddStream(e.target.value as Stream)} className="input-field text-sm py-2 px-3 w-[130px]">
+                        <option value="video">Video</option><option value="carousel">Carousel</option><option value="comedy">Comedy</option>
+                    </select>
+                    <button onClick={submitAdd} disabled={!addTitle.trim()} className="btn-primary py-2 px-4">Add</button>
+                    <button onClick={() => setAdding(false)} className="btn-ghost py-2 px-3">Cancel</button>
+                </div>
+            ) : (
+                <button onClick={() => setAdding(true)} className="self-start flex items-center gap-1.5 text-sm font-medium text-accent hover:opacity-80">
+                    <Plus className="w-4 h-4" /> Add to calendar
+                </button>
+            )}
+
             {/* Three release goalposts — the glanceable summary */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {milestones.map((m, i) => {
@@ -458,7 +490,6 @@ function ContentCalendar({ board, onUpdateCard }: {
 
                             {isOpen && (
                                 <div className="px-5 pb-4 pl-[136px] flex flex-col gap-3">
-                                    {c.notes && <p className="text-xs text-foreground/55 leading-relaxed">{c.notes}</p>}
                                     <div className="flex items-center gap-2 flex-wrap">
                                         <input
                                             type="date"
@@ -487,6 +518,7 @@ function ContentCalendar({ board, onUpdateCard }: {
                                             })}
                                         </div>
                                     </div>
+                                    <CardEditor card={c} onUpdate={patch => onUpdateCard(c.id, patch)} onDelete={() => { onDeleteCard(c.id); setOpen(null); }} />
                                 </div>
                             )}
                         </div>
@@ -579,7 +611,7 @@ function CardTile({ card, accent, tilt, expanded, onToggleExpand, onUpdate, onDe
 
             {expanded && (
                 <div className="pt-3 border-t border-border/50 flex flex-col gap-3">
-                    {card.notes && <p className="text-xs text-foreground/50 leading-relaxed">{card.notes}</p>}
+                    <CardEditor card={card} onUpdate={onUpdate} onDelete={onDelete} showDate />
                     <div className="flex flex-col gap-1.5">
                         {card.tasks.map(t => (
                             <label key={t.id} className="flex items-center gap-2.5 cursor-pointer group/task">
@@ -595,6 +627,52 @@ function CardTile({ card, accent, tilt, expanded, onToggleExpand, onUpdate, onDe
                     </div>
                 </div>
             )}
+        </div>
+    );
+}
+
+/** Inline editor for a Studio item. Text saves when you leave the field so typing doesn't spam saves. */
+function CardEditor({ card, onUpdate, onDelete, showDate = false }: {
+    card: CampaignCard;
+    onUpdate: (patch: Partial<CampaignCard>) => void;
+    onDelete: () => void;
+    showDate?: boolean;
+}) {
+    const [title, setTitle] = useState(card.title);
+    const [subtitle, setSubtitle] = useState(card.subtitle ?? "");
+    const [notes, setNotes] = useState(card.notes ?? "");
+    const [confirm, setConfirm] = useState(false);
+    const commit = (patch: Partial<CampaignCard>) => {
+        const changed = Object.entries(patch).some(([k, v]) => (card as unknown as Record<string, unknown>)[k] !== v);
+        if (changed) onUpdate(patch);
+    };
+    const label = "text-xs text-foreground/45";
+
+    return (
+        <div className="flex flex-col gap-2 w-full" onClick={e => e.stopPropagation()}>
+            <span className={label}>Title</span>
+            <input value={title} onChange={e => setTitle(e.target.value)} onBlur={() => title.trim() && commit({ title: title.trim() })} className="input-field text-sm py-1.5 px-3" />
+            <span className={label}>Subtitle <span className="text-foreground/30">(put LOCKED or GOAL here to make it a release)</span></span>
+            <input value={subtitle} onChange={e => setSubtitle(e.target.value)} onBlur={() => commit({ subtitle })} className="input-field text-sm py-1.5 px-3" />
+            <div className="flex gap-2">
+                {showDate && (
+                    <input type="date" value={card.scheduledDate ?? ""} onChange={e => onUpdate(e.target.value ? { scheduledDate: e.target.value } : { scheduledDate: undefined })} className="input-field text-sm py-1.5 px-3 flex-1" />
+                )}
+                <select value={card.stream} onChange={e => onUpdate({ stream: e.target.value as Stream })} className="input-field text-sm py-1.5 px-3 flex-1">
+                    <option value="video">Video</option><option value="carousel">Carousel</option><option value="comedy">Comedy</option>
+                </select>
+            </div>
+            <span className={label}>Notes</span>
+            <textarea value={notes} onChange={e => setNotes(e.target.value)} onBlur={() => commit({ notes })} rows={3} className="input-field text-sm py-2 px-3 resize-y" />
+            <div className="flex items-center gap-2 pt-1">
+                {confirm ? <>
+                    <span className="text-xs text-red-400">Delete this item?</span>
+                    <button onClick={onDelete} className="text-xs font-semibold text-red-400 hover:text-red-300">Yes, delete</button>
+                    <button onClick={() => setConfirm(false)} className="text-xs text-foreground/50">Cancel</button>
+                </> : (
+                    <button onClick={() => setConfirm(true)} className="text-xs text-foreground/40 hover:text-red-400">Delete</button>
+                )}
+            </div>
         </div>
     );
 }

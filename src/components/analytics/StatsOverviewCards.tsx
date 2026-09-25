@@ -119,7 +119,7 @@ export default function StatsOverviewCards({ totals, freshness }: OverviewProps)
                     </div>
                     <div className="flex items-center gap-2 mt-2 text-[11px] font-medium text-foreground/50">
                         <Activity className="w-3.5 h-3.5 text-pink-400" />
-                        <span>IG + FB + TikTok + YouTube{totals.followersAsOf ? ` · IG/FB as of ${totals.followersAsOf.slice(0, 10)}` : ''}</span>
+                        <span>IG + FB + TikTok + YouTube{totals.followersAsOf === 'live' ? ' · IG/FB live' : totals.followersAsOf ? ` · IG/FB as of ${totals.followersAsOf.slice(0, 10)}` : ''}</span>
                     </div>
                 </div>
             </div>

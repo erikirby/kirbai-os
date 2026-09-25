@@ -36,6 +36,7 @@ export default function CastSheet() {
     const [view, setView] = useState<"songs" | "characters">("songs");
     const [q, setQ] = useState("");
     const [editing, setEditing] = useState<string | null>(null);
+    const [newEra, setNewEra] = useState("");
 
     useEffect(() => {
         fetch("/api/song-cast").then(r => r.json()).then(d => { if (d.success) setCast(d.cast); });
@@ -65,6 +66,13 @@ export default function CastSheet() {
         const song: CastSong = { id: `song_${Date.now().toString(36)}`, era, title: "New song", mains: [], cameos: [], status: "idea", note: "" };
         persist({ ...cast, songs: [...cast.songs, song] });
         setEditing(song.id);
+    };
+
+    const addEra = () => {
+        const name = newEra.trim();
+        if (!cast || !name || cast.eras.includes(name)) return;
+        persist({ ...cast, eras: [name, ...cast.eras] });
+        setNewEra("");
     };
 
     const needle = q.trim().toLowerCase();
@@ -109,6 +117,14 @@ export default function CastSheet() {
                     </div>
                 </div>
             </div>
+
+            {view === "songs" && !needle && (
+                <div className="flex items-center gap-2">
+                    <input value={newEra} onChange={e => setNewEra(e.target.value)} onKeyDown={e => { if (e.key === "Enter") addEra(); }}
+                        placeholder="New era or album name…" className="input-field text-sm py-2 px-3 max-w-xs" />
+                    <button onClick={addEra} disabled={!newEra.trim()} className="btn-secondary py-2 px-3.5"><Plus className="w-4 h-4" /> Add era</button>
+                </div>
+            )}
 
             {view === "songs" && cast.eras.map(era => {
                 const songs = cast.songs.filter(s => s.era === era && matches(s));
