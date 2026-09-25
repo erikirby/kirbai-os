@@ -104,7 +104,7 @@ const MuseClefairy: React.FC<MuseClefairyProps> = ({ emotion = 'idle', message }
             {/* Speech Bubble - Now in the stack below the avatar */}
             {displayedMessage && (
                 <div className="mt-6 w-48 md:w-56 card p-4 animate-in zoom-in slide-in-from-top-4 duration-300 z-50">
-                    <p className="text-[11px] font-black text-accent uppercase tracking-widest leading-relaxed text-center italic drop-shadow-sm">
+                    <p className="text-[11px] font-semibold text-accent leading-relaxed text-center italic drop-shadow-sm">
                         {displayedMessage}
                     </p>
                 </div>

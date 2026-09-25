@@ -50,7 +50,7 @@ export default function HookEngine({ mode }: HookEngineProps) {
             {/* Header */}
             <div className="flex flex-col gap-1">
                 <span className="section-subtitle text-accent">Pipeline</span>
-                <h2 className="section-title text-foreground uppercase">Hook Engine</h2>
+                <h2 className="section-title text-foreground">Hook Engine</h2>
                 <p className="text-[12px] font-medium text-foreground/50 max-w-2xl mt-1">
                     Attention engineering grounded in your measured retention data. The battle is seconds 3–10, not frame 1 — every concept is built around the second-5 decision point and a cold audience.
                 </p>
@@ -101,7 +101,7 @@ export default function HookEngine({ mode }: HookEngineProps) {
                         {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
                         {tab === "generate" ? "Generate 5 Concepts" : "Score It"}
                     </button>
-                    {error && <span className="text-[10px] text-red-400 font-bold uppercase tracking-widest">{error}</span>}
+                    {error && <span className="text-xs text-red-400 font-bold">{error}</span>}
                 </div>
             </div>
 
@@ -112,9 +112,9 @@ export default function HookEngine({ mode }: HookEngineProps) {
                         <div key={i} className="card p-6">
                             <div className="flex flex-wrap items-baseline gap-x-3 mb-4">
                                 <span className="text-xl font-extrabold text-accent/60">{i + 1}</span>
-                                <h3 className="text-sm font-bold text-foreground uppercase tracking-wide">{c.name}</h3>
+                                <h3 className="text-sm font-bold text-foreground tracking-wide">{c.name}</h3>
                                 <span className="badge badge-accent text-[9px]">{c.archetype}</span>
-                                <span className="text-[10px] font-mono text-foreground/50 uppercase tracking-widest">runs on {c.arousal}</span>
+                                <span className="text-xs font-mono text-foreground/50">runs on {c.arousal}</span>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-[12px]">
                                 {[
@@ -160,7 +160,7 @@ export default function HookEngine({ mode }: HookEngineProps) {
                                     </div>
                                 </div>
                                 <p className="text-[12px] font-medium text-foreground/70 mt-2 ml-9">{a.note}</p>
-                                {a.fix && a.score <= 3 && <p className="text-[12px] text-accent mt-2 ml-9"><span className="font-bold uppercase text-[10px] tracking-widest">Fix:</span> {a.fix}</p>}
+                                {a.fix && a.score <= 3 && <p className="text-[12px] text-accent mt-2 ml-9"><span className="font-bold text-xs">Fix:</span> {a.fix}</p>}
                             </div>
                         ))}
                     </div>

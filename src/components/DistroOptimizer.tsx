@@ -106,7 +106,7 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                              platform === 'instagram' ? <Users className="w-5 h-5 opacity-20" /> :
                              <LayoutGrid className="w-5 h-5 opacity-20" />}
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-20">{title} STANDBY</span>
+                        <span className="text-xs font-semibold opacity-20">{title} STANDBY</span>
                     </div>
                 ) : (
                     <>
@@ -115,7 +115,7 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                                 <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent ring-1 ring-accent/20">
                                      {platform === 'tiktok' ? 't' : platform === 'instagram' ? 'i' : platform === 'youtube' ? 'y' : 'f'}
                                 </div>
-                                <span className="text-[11px] font-black uppercase tracking-widest text-foreground/90">{title} Profile</span>
+                                <span className="text-[11px] font-semibold text-foreground/90">{title} Profile</span>
                             </div>
                             <button 
                                 onClick={() => handleCopy(content, id)}
@@ -153,7 +153,7 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                             <h2 className="text-2xl font-black tracking-tight text-foreground leading-none">Description Generator</h2>
                             <div className="flex items-center gap-2 mt-2">
                                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Context: Radar Online</span>
+                                <span className="text-xs font-semibold text-green-400">Context: Radar Online</span>
                             </div>
                         </div>
                     </div>
@@ -168,7 +168,7 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                             <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 opacity-30">
                                 <Sparkles className="w-16 h-16 animate-gentle-bounce text-accent" />
                                 <div className="space-y-2">
-                                    <p className="text-xl font-bold text-foreground uppercase tracking-tighter">Strategizing Distribution</p>
+                                    <p className="text-xl font-bold text-foreground tracking-tighter">Strategizing Distribution</p>
                                     <p className="text-sm max-w-[280px] mx-auto leading-relaxed">
                                         Drop your concept or script. I'll search current trends and match your Radar's rivals automatically.
                                     </p>
@@ -197,7 +197,7 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                              <div className="flex justify-start animate-in fade-in">
                                  <div className="bg-white/5 border border-border rounded-3xl rounded-tl-none p-5 flex items-center gap-3 w-fit text-accent shadow-xl ring-1 ring-accent/20">
                                     <Loader2 className="w-5 h-5 animate-spin" />
-                                    <span className="text-[11px] uppercase tracking-widest font-black">Cycling AI Providers...</span>
+                                    <span className="text-[11px] font-semibold">Cycling AI Providers...</span>
                                  </div>
                              </div>
                         )}
@@ -234,10 +234,10 @@ export default function DistroOptimizer({ theme, mode = 'kirbai' }: { theme?: st
                 <div className="flex items-center justify-between">
                      <div className="flex items-center gap-3">
                         <LayoutGrid className="w-6 h-6 text-accent" />
-                        <h3 className="text-[13px] font-black uppercase tracking-[0.4em] text-foreground/60">Distribution Matrix</h3>
+                        <h3 className="text-[13px] font-semibold text-foreground/60">Descriptions</h3>
                     </div>
                     {platforms && (
-                        <div className="text-[10px] font-bold text-accent uppercase tracking-widest flex items-center gap-2 px-4 py-1.5 bg-accent/10 border border-accent/20 rounded-full">
+                        <div className="text-xs font-bold text-accent flex items-center gap-2 px-4 py-1.5 bg-accent/10 border border-accent/20 rounded-full">
                             <ShieldAlert className="w-3 h-3" /> Rivals Analyzed
                         </div>
                     )}

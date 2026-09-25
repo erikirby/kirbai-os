@@ -229,12 +229,12 @@ export default function Boardroom({ mode }: { mode: string }) {
                                     <div className={`absolute -bottom-1 -left-1 w-2.5 h-2.5 rounded-full border-2 border-surface ${getDivisionColor(agent.division)}`} title={agent.division} />
                                 </div>
                                 <div className="flex flex-col flex-1">
-                                    <span className={`text-xs font-bold uppercase tracking-widest ${isActive ? 'text-accent' : 'text-foreground/60'}`}>
+                                    <span className={`text-xs font-bold ${isActive ? 'text-accent' : 'text-foreground/60'}`}>
                                         {agent.name.split(' ')[0]}
                                     </span>
                                     <div className="flex items-center gap-1">
                                         <div className={`w-1 h-1 rounded-full ${isActive ? 'bg-accent animate-pulse' : 'bg-foreground/10'}`} />
-                                        <span className="text-[9px] font-semibold uppercase opacity-50">{isActive ? 'Active' : 'Idle'}</span>
+                                        <span className="text-[11px] font-semibold opacity-50">{isActive ? 'Active' : 'Idle'}</span>
                                     </div>
                                 </div>
                                 <button 
@@ -352,7 +352,7 @@ export default function Boardroom({ mode }: { mode: string }) {
                         onClick={() => handleLaunchBoardroom()}
                         loading={isProcessing}
                         disabled={!prompt.trim()}
-                        className="btn-primary flex-1 h-14 uppercase tracking-widest text-xs font-bold"
+                        className="btn-primary flex-1 h-14 text-xs font-bold"
                     >
                         {feed.length > 0 ? 'Update Strategy' : 'Begin Audit'}
                     </StatusButton>
@@ -360,7 +360,7 @@ export default function Boardroom({ mode }: { mode: string }) {
                         <button 
                             onClick={() => handleLaunchBoardroom(undefined, true)}
                             disabled={isProcessing}
-                            className="btn-secondary px-6 uppercase tracking-widest text-xs font-bold"
+                            className="btn-secondary px-6 text-xs font-bold"
                         >
                             Force Ruling
                         </button>
@@ -402,7 +402,7 @@ export default function Boardroom({ mode }: { mode: string }) {
                                                 setConsensus(100); 
                                                 handleLaunchBoardroom(`The answer is YES. Now give me the final ruling.`);
                                             }} 
-                                            className="btn-primary !bg-red-500 uppercase tracking-widest text-xs font-bold"
+                                            className="btn-primary !bg-red-500 text-xs font-bold"
                                         >
                                             YES
                                         </button>
@@ -412,7 +412,7 @@ export default function Boardroom({ mode }: { mode: string }) {
                                                 setConsensus(80); 
                                                 handleLaunchBoardroom(`The answer is NO. Now give me the final ruling.`);
                                             }} 
-                                            className="btn-secondary uppercase tracking-widest text-xs font-bold"
+                                            className="btn-secondary text-xs font-bold"
                                         >
                                             NO
                                         </button>
@@ -441,7 +441,7 @@ export default function Boardroom({ mode }: { mode: string }) {
                                                     setRefereeInput("");
                                                 }
                                             }}
-                                            className="btn-primary px-4 py-2 uppercase tracking-widest text-xs font-bold"
+                                            className="btn-primary px-4 py-2 text-xs font-bold"
                                         >
                                             SEND
                                         </button>
@@ -460,7 +460,7 @@ export default function Boardroom({ mode }: { mode: string }) {
                 <div className="flex items-center justify-between mb-6 opacity-60">
                     <h3 className="section-eyebrow">Strategic Briefing</h3>
                     {feed.length > 0 && (
-                        <button onClick={handleClearSession} className="text-[10px] font-bold uppercase tracking-widest text-accent hover:underline">
+                        <button onClick={handleClearSession} className="text-xs font-bold text-accent hover:underline">
                             Reset
                         </button>
                     )}

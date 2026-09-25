@@ -24,26 +24,41 @@ import HookEngine from "@/components/HookEngine";
 import CampaignBoard from "@/components/CampaignBoard";
 import HomeView from "@/components/Home";
 import CastSheet from "@/components/CastSheet";
-import { MessageSquare, Settings2, ChevronDown, Sparkles, Home as HomeIcon, Menu, X } from 'lucide-react';
+import { MessageSquare, Settings2, ChevronDown, Sparkles, Home as HomeIcon, Menu, X, Users, BookOpen } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
 type Module = "home" | "cast" | "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "storyroom" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks" | "studio";
 type Theme = "dark" | "snes" | "calm";
 
 const NAV_GROUPS = [
-  { id: "plan", label: "Story & Plan", items: [{ id: "cast", label: "Cast Sheet" }, { id: "storyroom", label: "Story Room" }, { id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "roadmap", label: "Roadmap" }] },
+  { id: "plan", label: "Plan", items: [{ id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "roadmap", label: "Roadmap" }] },
   { id: "create", label: "Create", items: [{ id: "hooks", label: "Hook Engine" }, { id: "distro", label: "Description Gen" }, { id: "prompts", label: "Prompts" }, { id: "creative", label: "Brainstorm" }] },
   { id: "numbers", label: "Numbers", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "revenue", label: "Revenue Engine" }] },
   { id: "labs", label: "Labs", items: [{ id: "intel", label: "Intel" }, { id: "competitors", label: "Competitors" }, { id: "muse", label: "Muse" }, { id: "director", label: "Director's Suite" }, { id: "boardroom", label: "Boardroom" }, { id: "core", label: "Core" }, { id: "api-health", label: "API" }] },
 ] as const;
 
+const PRIMARY: { id: Module; label: string; icon: typeof HomeIcon }[] = [
+  { id: "home", label: "Home", icon: HomeIcon },
+  { id: "studio", label: "Studio", icon: Sparkles },
+  { id: "cast", label: "Cast", icon: Users },
+  { id: "storyroom", label: "Story Room", icon: BookOpen },
+  { id: "chat", label: "Chat", icon: MessageSquare },
+];
+
+const THEMES: { id: Theme; label: string }[] = [
+  { id: "dark", label: "Dark" },
+  { id: "calm", label: "Light" },
+  { id: "snes", label: "SNES" },
+];
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("kirbai");
   const [activeModule, setActiveModule] = useState<Module>("home");
+  const [studioView, setStudioView] = useState<"board" | "calendar">("board");
   const [theme, setTheme] = useState<Theme>("dark");
   const [showLauncher, setShowLauncher] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [showMore, setShowMore] = useState(false);
 
   // Remember the theme across reloads.
   useEffect(() => {
@@ -59,291 +74,127 @@ export default function Home() {
     try { localStorage.setItem("kos_theme", theme); } catch {}
   }, [theme]);
 
-  // Find which group the active module belongs to
-  const activeGroup = NAV_GROUPS.find(g => g.items.some(i => i.id === activeModule));
+  const go = (m: Module, view: "board" | "calendar" = "board") => {
+    setActiveModule(m);
+    setShowMore(false);
+    setShowLauncher(false);
+    if (m === "studio") { setStudioView(view); setTheme("calm"); }
+  };
+
+  const inMore = NAV_GROUPS.some(g => g.items.some(i => i.id === activeModule)) && !PRIMARY.some(p => p.id === activeModule);
+  const moreLabel = inMore ? NAV_GROUPS.flatMap(g => g.items).find(i => i.id === activeModule)?.label : "More";
 
   return (
-    <main className="min-h-screen flex flex-col max-w-[1440px] mx-auto relative overflow-x-hidden">
-      {/* ─── HEADER ─── */}
-      <header className="w-full px-6 py-4 flex items-center justify-between sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/50">
-        {/* Left: Logo */}
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl overflow-hidden border border-border shadow-lg">
-            <Image src="/assets/icon.jpg" alt="Kirbai Icon" width={36} height={36} className="object-cover" />
+    <main className="min-h-screen flex flex-col max-w-[1320px] mx-auto relative overflow-x-hidden">
+      {/* ─── TOP BAR ─── */}
+      <header className="w-full px-4 sm:px-6 h-16 flex items-center gap-4 sticky top-0 z-50 backdrop-blur-xl bg-background/75 border-b border-border">
+        <button onClick={() => go("home")} className="flex items-center gap-2.5 shrink-0">
+          <div className="w-8 h-8 rounded-[10px] overflow-hidden border border-border">
+            <Image src="/assets/icon.jpg" alt="Kirbai" width={32} height={32} className="object-cover" />
           </div>
-          <div className="flex flex-col">
-            <h1 className="text-base font-extrabold tracking-tight text-gradient leading-none">KIRBAI OS</h1>
-            <span className="text-[9px] text-foreground/30 font-mono tracking-widest uppercase mt-0.5">V3.2.1_EVO</span>
-          </div>
-        </div>
-
-        {/* Center: Ecosystem Toggle */}
-        <div className="hidden lg:flex items-center gap-3">
-          <div className="flex p-0.5 bg-surface/60 rounded-xl border border-border/50">
-            <button
-              onClick={() => setActiveTab("kirbai")}
-              className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
-                activeTab === "kirbai"
-                  ? "bg-accent text-white shadow-md"
-                  : "text-foreground/40 hover:text-foreground/70"
-              }`}
-            >
-              Kirbai
-            </button>
-            <button
-              onClick={() => setActiveTab("factory")}
-              className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
-                activeTab === "factory"
-                  ? "bg-accent text-white shadow-md"
-                  : "text-foreground/40 hover:text-foreground/70"
-              }`}
-            >
-              Factory
-            </button>
-          </div>
-        </div>
-
-        {/* Right: Theme Toggle + Status */}
-        <div className="hidden lg:flex items-center gap-3">
-          {/* Theme Toggle */}
-          <div className="flex p-0.5 bg-surface/60 rounded-xl border border-border/50">
-            <button
-              onClick={() => setTheme("dark")}
-              className={`px-3 py-1 text-[9px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
-                theme === "dark" ? "bg-accent text-white shadow-md" : "text-foreground/40 hover:text-foreground/60"
-              }`}
-            >
-              Dark
-            </button>
-            <button
-              onClick={() => setTheme("snes")}
-              className={`px-3 py-1 text-[9px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
-                theme === "snes" ? "snes-btn-red text-white" : "text-foreground/40 hover:text-foreground/60"
-              }`}
-            >
-              SNES
-            </button>
-            <button
-              onClick={() => setTheme("calm")}
-              className={`px-3 py-1 text-[9px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
-                theme === "calm" ? "bg-accent text-white shadow-md" : "text-foreground/40 hover:text-foreground/60"
-              }`}
-            >
-              Calm
-            </button>
-          </div>
-
-          {/* System Status */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border/50 bg-surface/30">
-            <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-emerald-500" />
-            <span className="text-[9px] font-semibold uppercase tracking-wider text-foreground/30">Online</span>
-          </div>
-        </div>
-
-        {/* Mobile Settings Trigger */}
-        <button
-          onClick={() => setShowSettings(!showSettings)}
-          className="lg:hidden p-2.5 bg-surface/60 border border-border/50 rounded-xl text-accent relative"
-        >
-          <Settings2 className="w-5 h-5" />
+          <span className="text-[15px] font-bold tracking-tight text-foreground">Kirbai OS</span>
+          {activeTab === "factory" && <span className="badge badge-accent">Factory</span>}
         </button>
 
-        {/* Mobile Settings Panel — brand + theme toggle */}
-        {showSettings && (
-          <div className="show-on-mobile-only fixed top-[68px] right-4 z-[200] card p-4 flex flex-col gap-4 w-60">
-            <div className="flex flex-col gap-2">
-              <span className="section-eyebrow">Ecosystem</span>
-              <div className="flex p-0.5 bg-surface/60 rounded-xl border border-border/50">
-                <button
-                  onClick={() => setActiveTab("kirbai")}
-                  className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
-                    activeTab === "kirbai" ? "bg-accent text-white shadow-md" : "text-foreground/40"
-                  }`}
-                >
-                  Kirbai
-                </button>
-                <button
-                  onClick={() => setActiveTab("factory")}
-                  className={`flex-1 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
-                    activeTab === "factory" ? "bg-accent text-white shadow-md" : "text-foreground/40"
-                  }`}
-                >
-                  Factory
-                </button>
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="section-eyebrow">Theme</span>
-              <div className="flex p-0.5 bg-surface/60 rounded-xl border border-border/50">
-                <button
-                  onClick={() => setTheme("dark")}
-                  className={`flex-1 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
-                    theme === "dark" ? "bg-accent text-white shadow-md" : "text-foreground/40"
-                  }`}
-                >
-                  Dark
-                </button>
-                <button
-                  onClick={() => setTheme("snes")}
-                  className={`flex-1 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
-                    theme === "snes" ? "snes-btn-red text-white" : "text-foreground/40"
-                  }`}
-                >
-                  SNES
-                </button>
-                <button
-                  onClick={() => setTheme("calm")}
-                  className={`flex-1 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${
-                    theme === "calm" ? "bg-accent text-white shadow-md" : "text-foreground/40"
-                  }`}
-                >
-                  Calm
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* ─── NAVIGATION ─── */}
-      <nav className="hide-on-mobile w-full px-6 flex items-center gap-1.5 mt-4 relative z-40">
-        {/* Home */}
-        <button
-          onClick={() => setActiveModule("home")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all border ${
-            activeModule === "home"
-              ? "bg-accent border-accent/40 text-white shadow-lg shadow-accent/10"
-              : "bg-surface/40 border-border/50 text-foreground/50 hover:text-foreground hover:border-foreground/20"
-          }`}
-        >
-          <HomeIcon className="w-3.5 h-3.5" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Home</span>
-        </button>
-
-        {/* Studio — Pretty Rare Candies campaign board */}
-        <button
-          onClick={() => { setActiveModule("studio"); setTheme("calm"); }}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all border ${
-            activeModule === "studio"
-              ? "bg-accent border-accent/40 text-white shadow-lg shadow-accent/10"
-              : "bg-surface/40 border-border/50 text-foreground/50 hover:text-foreground hover:border-foreground/20"
-          }`}
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Studio</span>
-        </button>
-
-        {/* Chat Button */}
-        <button
-          onClick={() => setActiveModule("chat")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all border ${
-            activeModule === "chat"
-              ? "bg-accent border-accent/40 text-white shadow-lg shadow-accent/10"
-              : "bg-surface/40 border-border/50 text-foreground/50 hover:text-foreground hover:border-foreground/20"
-          }`}
-        >
-          <MessageSquare className="w-3.5 h-3.5" />
-          <span className="text-[10px] font-bold uppercase tracking-wider">Chat</span>
-        </button>
-
-        {/* Module Group Dropdowns */}
-        <div className="flex items-center gap-0.5 p-0.5 bg-surface/30 rounded-xl border border-border/50 relative z-50">
-          {NAV_GROUPS.map((group) => {
-            const isGroupActive = group.items.some(i => i.id === activeModule);
-            return (
-              <div
-                key={group.id}
-                className="relative"
-                onMouseEnter={() => setOpenDropdown(group.id)}
-                onMouseLeave={() => setOpenDropdown(null)}
-              >
-                <button className={`flex items-center gap-1.5 px-3.5 py-2 rounded-[10px] transition-all ${
-                  isGroupActive
-                    ? "bg-surface/80 text-foreground"
-                    : "text-foreground/40 hover:text-foreground/70"
-                }`}>
-                  <span className="text-[10px] font-bold uppercase tracking-wider">{group.label}</span>
-                  <ChevronDown className={`w-3 h-3 transition-transform ${openDropdown === group.id ? 'rotate-180' : ''}`} />
-                </button>
-
-                {openDropdown === group.id && (
-                  <div className="absolute top-full left-0 z-[100] pt-1 min-w-[200px]">
-                    {/* Hover bridge */}
-                    <div className="absolute inset-x-0 -top-4 h-5 pointer-events-auto" />
-                    <div className="card p-1.5">
-                      <div className="flex flex-col">
-                        {group.items.map((item) => (
-                          <button
-                            key={item.id}
-                            onClick={() => { setActiveModule(item.id as Module); setOpenDropdown(null); }}
-                            className={`w-full text-left px-3.5 py-2 transition-all rounded-xl text-[11px] font-semibold ${
-                              activeModule === item.id
-                                ? "bg-accent/10 text-accent"
-                                : "text-foreground/50 hover:text-foreground hover:bg-surface/60"
-                            }`}
-                          >
-                            {item.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+        <nav className="hide-on-mobile flex items-center gap-0.5 ml-4">
+          {PRIMARY.map(({ id, label, icon: Icon }) => (
+            <button key={id} onClick={() => go(id)} className={`nav-pill ${activeModule === id ? "active" : ""}`}>
+              <Icon className="w-4 h-4" /> {label}
+            </button>
+          ))}
+          <div className="relative">
+            <button onClick={() => setShowMore(v => !v)} className={`nav-pill ${inMore || showMore ? "active" : ""}`}>
+              {moreLabel} <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showMore ? "rotate-180" : ""}`} />
+            </button>
+            {showMore && <>
+              <div className="fixed inset-0 z-[90]" onClick={() => setShowMore(false)} />
+              <div className="absolute top-full left-0 mt-2 z-[100] rounded-2xl border border-border bg-surface shadow-2xl shadow-black/20 p-3 grid grid-cols-4 gap-3 w-[640px]">
+                {NAV_GROUPS.map(group => (
+                  <div key={group.id} className="flex flex-col gap-0.5">
+                    <span className="px-2.5 pb-1 text-xs font-medium text-foreground/40">{group.label}</span>
+                    {group.items.map(item => (
+                      <button key={item.id} onClick={() => go(item.id as Module)} className={`menu-item ${activeModule === item.id ? "active" : ""}`}>
+                        {item.label}
+                      </button>
+                    ))}
                   </div>
-                )}
+                ))}
               </div>
-            );
-          })}
+            </>}
+          </div>
+        </nav>
+
+        <div className="ml-auto relative">
+          <button onClick={() => setShowSettings(v => !v)} className="p-2 rounded-full text-foreground/50 hover:text-foreground hover:bg-foreground/5 transition-colors" title="Settings">
+            <Settings2 className="w-5 h-5" />
+          </button>
+          {showSettings && <>
+            <div className="fixed inset-0 z-[190]" onClick={() => setShowSettings(false)} />
+            <div className="absolute right-0 top-full mt-2 z-[200] rounded-2xl border border-border bg-surface shadow-2xl shadow-black/20 p-4 flex flex-col gap-4 w-64">
+              <div className="flex flex-col gap-2">
+                <span className="text-xs font-medium text-foreground/50">Theme</span>
+                <div className="flex p-0.5 bg-foreground/5 rounded-full">
+                  {THEMES.map(t => (
+                    <button key={t.id} onClick={() => setTheme(t.id)} className={`flex-1 py-1.5 text-xs font-medium rounded-full transition-all ${theme === t.id ? "bg-surface text-foreground shadow" : "text-foreground/50"}`}>
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <span className="text-xs font-medium text-foreground/50">Workspace</span>
+                <div className="flex p-0.5 bg-foreground/5 rounded-full">
+                  {(["kirbai", "factory"] as const).map(t => (
+                    <button key={t} onClick={() => setActiveTab(t)} className={`flex-1 py-1.5 text-xs font-medium rounded-full transition-all ${activeTab === t ? "bg-surface text-foreground shadow" : "text-foreground/50"}`}>
+                      {t === "kirbai" ? "Kirbai" : "Factory"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>}
         </div>
-      </nav>
+      </header>
 
       {/* ─── MAIN CONTENT ─── */}
       <section className="flex-1 w-full">
-        <div className="mx-auto w-full px-6 py-6 pb-28 lg:pb-6 flex flex-col gap-8">
-          <div className="grid grid-cols-1 gap-6">
-            <div className="flex flex-col gap-8">
-              <div key={`${activeTab}-${activeModule}`} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                {activeModule === "home" && <HomeView go={m => { setActiveModule(m); if (m === "studio") setTheme("calm"); }} />}
-                {activeModule === "cast" && <CastSheet />}
-                {activeModule === "roadmap" && <Roadmap mode={activeTab} />}
-                {activeModule === "vault" && <VaultManager theme={theme} mode={activeTab} />}
-                {activeModule === "intel" && <IntelInbox mode="full" theme={theme} activeTab={activeTab} />}
-                {activeModule === "pulse" && <AnalyticsMatrix theme={theme} mode={activeTab} />}
-                {activeModule === "director" && <DirectorSuite mode={activeTab} />}
-                {activeModule === "finance" && <FinanceView mode={activeTab} />}
-                {activeModule === "revenue" && <RevenueEngine mode={activeTab} />}
-                {activeModule === "hooks" && <HookEngine mode={activeTab} />}
-                {activeModule === "api-health" && <APIHealth theme={theme} />}
-                {activeModule === "chat" && <AIHub theme={theme} />}
-                {activeModule === "core" && <ConsultantSettings theme={theme} />}
-                {activeModule === "lore" && <LoreMatrix theme={theme} mode={activeTab} />}
-                {activeModule === "storyroom" && <StoryRoom theme={theme} mode={activeTab} />}
-                {activeModule === "creative" && <CreativeHub theme={theme} mode={activeTab} />}
-                {activeModule === "prompts" && <PromptBank mode={activeTab} />}
-                {activeModule === "muse" && <MuseDeck mode={activeTab} />}
-                {activeModule === "boardroom" && <Boardroom mode={activeTab} />}
-                {activeModule === "distro" && <DistroOptimizer theme={theme} mode={activeTab} />}
-                {activeModule === "competitors" && <CompetitorTracker theme={theme} mode={activeTab} />}
-                {activeModule === "studio" && <CampaignBoard />}
-              </div>
-            </div>
+        <div className="mx-auto w-full px-4 sm:px-6 py-8 pb-28 lg:pb-10">
+          <div key={`${activeTab}-${activeModule}`} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+            {activeModule === "home" && <HomeView go={(m, view) => go(m, view)} />}
+            {activeModule === "cast" && <CastSheet />}
+            {activeModule === "roadmap" && <Roadmap mode={activeTab} />}
+            {activeModule === "vault" && <VaultManager theme={theme} mode={activeTab} />}
+            {activeModule === "intel" && <IntelInbox mode="full" theme={theme} activeTab={activeTab} />}
+            {activeModule === "pulse" && <AnalyticsMatrix theme={theme} mode={activeTab} />}
+            {activeModule === "director" && <DirectorSuite mode={activeTab} />}
+            {activeModule === "finance" && <FinanceView mode={activeTab} />}
+            {activeModule === "revenue" && <RevenueEngine mode={activeTab} />}
+            {activeModule === "hooks" && <HookEngine mode={activeTab} />}
+            {activeModule === "api-health" && <APIHealth theme={theme} />}
+            {activeModule === "chat" && <AIHub theme={theme} />}
+            {activeModule === "core" && <ConsultantSettings theme={theme} />}
+            {activeModule === "lore" && <LoreMatrix theme={theme} mode={activeTab} />}
+            {activeModule === "storyroom" && <StoryRoom theme={theme} mode={activeTab} />}
+            {activeModule === "creative" && <CreativeHub theme={theme} mode={activeTab} />}
+            {activeModule === "prompts" && <PromptBank mode={activeTab} />}
+            {activeModule === "muse" && <MuseDeck mode={activeTab} />}
+            {activeModule === "boardroom" && <Boardroom mode={activeTab} />}
+            {activeModule === "distro" && <DistroOptimizer theme={theme} mode={activeTab} />}
+            {activeModule === "competitors" && <CompetitorTracker theme={theme} mode={activeTab} />}
+            {activeModule === "studio" && <CampaignBoard initialView={studioView} />}
           </div>
         </div>
       </section>
 
       {/* ─── MOBILE BOTTOM DOCK ─── */}
       <div className="mobile-bottom-dock show-on-mobile-only">
-        <button onClick={() => setActiveModule("home")} className={`mobile-dock-item ${activeModule === "home" ? "active" : ""}`}>
-          <HomeIcon className="w-5 h-5" />
-          <span>Home</span>
-        </button>
-        <button onClick={() => setActiveModule("chat")} className={`mobile-dock-item ${activeModule === "chat" ? "active" : ""}`}>
-          <MessageSquare className="w-5 h-5" />
-          <span>Chat</span>
-        </button>
-        <button onClick={() => { setActiveModule("studio"); setTheme("calm"); }} className={`mobile-dock-item ${activeModule === "studio" ? "active" : ""}`}>
-          <Sparkles className="w-5 h-5" />
-          <span>Studio</span>
-        </button>
-        <button onClick={() => setShowLauncher(true)} className={`mobile-dock-item ${showLauncher ? "active" : ""}`}>
+        {PRIMARY.filter(p => p.id !== "storyroom").map(({ id, label, icon: Icon }) => (
+          <button key={id} onClick={() => go(id)} className={`mobile-dock-item ${activeModule === id ? "active" : ""}`}>
+            <Icon className="w-5 h-5" />
+            <span>{label}</span>
+          </button>
+        ))}
+        <button onClick={() => setShowLauncher(true)} className={`mobile-dock-item ${showLauncher || inMore ? "active" : ""}`}>
           <Menu className="w-5 h-5" />
           <span>More</span>
         </button>
@@ -353,23 +204,18 @@ export default function Home() {
       {showLauncher && (
         <div className="mobile-launcher-overlay show-on-mobile-only">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-extrabold uppercase tracking-tight text-foreground">Menu</h2>
+            <h2 className="text-xl font-bold tracking-tight text-foreground">Everything else</h2>
             <button onClick={() => setShowLauncher(false)} className="p-2 text-foreground/50">
               <X className="w-5 h-5" />
             </button>
           </div>
-
-          {NAV_GROUPS.map(group => (
+          {[{ id: "story", label: "Story", items: [{ id: "storyroom", label: "Story Room" }] }, ...NAV_GROUPS].map(group => (
             <div key={group.id} className="flex flex-col gap-2">
-              <span className="section-eyebrow">{group.label}</span>
+              <span className="text-xs font-medium text-foreground/40">{group.label}</span>
               <div className="launcher-grid">
                 {group.items.map(item => (
-                  <button
-                    key={item.id}
-                    onClick={() => { setActiveModule(item.id as Module); setShowLauncher(false); }}
-                    className={`mobile-launcher-btn ${activeModule === item.id ? "active" : ""}`}
-                  >
-                    <span className="text-xs font-bold uppercase text-center">{item.label}</span>
+                  <button key={item.id} onClick={() => go(item.id as Module)} className={`mobile-launcher-btn ${activeModule === item.id ? "active" : ""}`}>
+                    <span className="text-sm font-medium text-center">{item.label}</span>
                   </button>
                 ))}
               </div>

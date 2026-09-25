@@ -2,16 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, Lightbulb, Loader2, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CalendarDays, Lightbulb, Loader2, X } from "lucide-react";
 import type { CampaignBoard as Board, CampaignCard, CardStatus, Stream } from "@/app/api/campaign-board/route";
+import { castFor, spriteUrl, useCast } from "@/lib/cast";
 
-type Go = (module: "studio" | "cast" | "storyroom" | "lore") => void;
+type Go = (module: "studio" | "cast" | "storyroom" | "lore", view?: "board" | "calendar") => void;
 
 const STATUS: Record<CardStatus, { label: string; cls: string }> = {
-    idea: { label: "Idea", cls: "text-foreground/50 bg-foreground/5 border-foreground/10" },
-    "in-progress": { label: "In Progress", cls: "text-amber-500 bg-amber-400/10 border-amber-400/20" },
+    idea: { label: "Idea", cls: "text-foreground/55 bg-foreground/5 border-foreground/10" },
+    "in-progress": { label: "In progress", cls: "text-amber-500 bg-amber-400/10 border-amber-400/20" },
     ready: { label: "Ready", cls: "text-emerald-500 bg-emerald-400/10 border-emerald-400/20" },
-    posted: { label: "Posted", cls: "text-violet-500 bg-violet-400/10 border-violet-400/20" },
+    posted: { label: "Posted", cls: "text-violet-400 bg-violet-400/10 border-violet-400/20" },
 };
 const STATUS_ORDER: CardStatus[] = ["idea", "in-progress", "ready", "posted"];
 const nextStatus = (s: CardStatus) => STATUS_ORDER[(STATUS_ORDER.indexOf(s) + 1) % STATUS_ORDER.length];
@@ -22,21 +23,10 @@ const STREAM: Record<Stream, { label: string; color: string }> = {
     comedy: { label: "Comedy", color: "var(--stream-comedy, #7FD9C4)" },
 };
 
-// Same song -> cast mapping the Studio calendar uses.
-const CAST: { match: RegExp; sprites: string[] }[] = [
-    { match: /flash flash/i, sprites: ["primarina", "krabby"] },
-    { match: /nidoking|toxic spikes/i, sprites: ["nidoking", "roserade"] },
-    { match: /alcremie|decorate/i, sprites: ["alcremie", "heracross"] },
-    { match: /house of regi/i, sprites: ["regigigas"] },
-    { match: /psycho boost|deoxys/i, sprites: ["deoxys"] },
-    { match: /next era/i, sprites: ["malamar", "gengar", "mimikyu"] },
-    { match: /fusion album/i, sprites: ["regigigas"] },
-];
-const spritesFor = (title: string) => CAST.find(c => c.match.test(title))?.sprites ?? [];
-
 const isMilestone = (c: CampaignCard) => /LOCKED|GOAL/i.test(c.subtitle ?? "");
 // "GOAL, not locked" also contains "locked", so GOAL has to win.
 const isLocked = (c: CampaignCard) => !/GOAL/i.test(c.subtitle ?? "") && /LOCKED/i.test(c.subtitle ?? "");
+const shortTitle = (t: string) => t.replace(/ (trailer|drops).*$/i, "").replace(/^"(.*?)".*/, "$1");
 
 function daysOut(iso: string) {
     const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -49,13 +39,17 @@ function whenLabel(out: number) {
     if (out === 0) return "Today";
     if (out === 1) return "Tomorrow";
     if (out < 0) return `${-out}d late`;
-    return `in ${out}d`;
+    return `In ${out} days`;
+}
+function greeting() {
+    const h = new Date().getHours();
+    return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
 }
 
 const LINKS = [
     { label: "TikTok Studio", href: "https://www.tiktok.com/tiktokstudio/analytics/" },
     { label: "Meta Business Suite", href: "https://business.facebook.com/latest/posts/published_posts?business_id=1524540791867233&asset_id=959080893962864" },
-    { label: "DistroKid Stats", href: "https://distrokid.com/stats/?data=streams" },
+    { label: "DistroKid stats", href: "https://distrokid.com/stats/?data=streams" },
     { label: "Skool: AI Music", href: "https://www.skool.com/aimusic" },
 ];
 
@@ -63,6 +57,7 @@ const MOODS = ["happy", "excited", "singing", "starry-eyed", "cheerful", "proud"
 
 export default function Home({ go }: { go: Go }) {
     const [board, setBoard] = useState<Board | null>(null);
+    const cast = useCast();
     const [idea, setIdea] = useState("");
     const [ideaStream, setIdeaStream] = useState<Stream>("video");
     const [saved, setSaved] = useState(false);
@@ -127,83 +122,91 @@ export default function Home({ go }: { go: Go }) {
 
     const { late, soon, milestones, nextDrop, backlog } = derived;
     const nextOut = nextDrop ? daysOut(nextDrop.scheduledDate!) : null;
+    const upcoming = [...late, ...soon];
 
     const clefairyLines = [
-        nextDrop && nextOut !== null && `${nextOut === 0 ? "It's drop day" : `${nextOut} days till ${nextDrop.title.replace(/ (trailer|drops).*$/i, "")}`}! ✨`,
-        late.length > 0 && `${late.length} thing${late.length > 1 ? "s" : ""} slipped past ${late.length > 1 ? "their dates" : "its date"}. Reschedule or post?`,
+        nextDrop && nextOut !== null && (nextOut === 0 ? "It's drop day! ✨" : `${nextOut} days till ${shortTitle(nextDrop.title)}! ✨`),
+        late.length > 0 && `${late.length} post${late.length > 1 ? "s" : ""} slipped past ${late.length > 1 ? "their dates" : "its date"}. Reschedule or post?`,
         soon.length > 0 && `${soon.length} post${soon.length > 1 ? "s" : ""} lined up in the next two weeks.`,
-        backlog.length > 0 && `${backlog.length} undated ideas in the backlog. Any of them ready for a date?`,
+        backlog.length > 0 && `${backlog.length} undated ideas waiting. Any ready for a date?`,
         "Clefa! Tap me again, I have more to say.",
         "Moon Stone status: still shiny.",
     ].filter(Boolean) as string[];
 
     return (
         <div className="flex flex-col gap-6">
-            {/* Hero: next drop countdown */}
-            <div className="relative card overflow-hidden min-h-[200px]">
-                <Image src="/assets/banner.jpg" alt="" fill className="object-cover opacity-60" priority />
-                <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-background/20" />
-                <div className="relative p-6 sm:p-8 flex items-center justify-between gap-6 flex-wrap">
-                    <div className="flex flex-col gap-2 min-w-0">
-                        <span className="section-eyebrow">{greeting()} · Next drop</span>
-                        {nextDrop ? <>
-                            <div className="flex items-end gap-3">
-                                <span className="text-6xl sm:text-7xl font-extrabold leading-none text-gradient tabular-nums">{nextOut}</span>
-                                <span className="text-sm font-semibold text-foreground/50 pb-2">{nextOut === 1 ? "day" : "days"}</span>
-                            </div>
-                            <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground">{nextDrop.title}</h2>
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs text-foreground/50">{shortDate(nextDrop.scheduledDate!)}</span>
-                                <span className={`badge ${isLocked(nextDrop) ? "text-emerald-500 bg-emerald-400/10 border-emerald-400/20" : "text-accent bg-accent/10 border-accent/20"}`}>
-                                    {isLocked(nextDrop) ? "Locked" : "Goal"}
-                                </span>
-                                <Sprites names={spritesFor(nextDrop.title)} size={28} />
-                            </div>
-                        </> : (
-                            <h2 className="text-xl font-extrabold text-foreground">No release on the calendar yet.</h2>
-                        )}
-                    </div>
-                    <Clefairy lines={clefairyLines} />
+            <div className="flex items-end justify-between gap-4 flex-wrap">
+                <div>
+                    <p className="text-sm text-foreground/50">{greeting()}, Erik</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground mt-0.5">Here&apos;s your week</h1>
                 </div>
+                <Clefairy lines={clefairyLines} />
             </div>
 
-            {/* Release runway */}
-            {milestones.length > 1 && <Runway milestones={milestones} />}
+            {/* Hero: next drop + runway */}
+            <div className="relative card overflow-hidden">
+                <Image src="/assets/banner.jpg" alt="" fill className="object-cover opacity-50" priority />
+                <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30" />
+                <div className="relative p-6 sm:p-8 flex flex-col gap-8">
+                    {nextDrop ? (
+                        <div className="flex items-center gap-6 flex-wrap">
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-7xl font-bold leading-none tracking-tighter text-gradient tabular-nums">{nextOut}</span>
+                                <span className="text-base font-medium text-foreground/50">{nextOut === 1 ? "day" : "days"}</span>
+                            </div>
+                            <div className="flex flex-col gap-1.5 min-w-0">
+                                <span className="text-sm text-foreground/50">Next drop · {shortDate(nextDrop.scheduledDate!)}</span>
+                                <h2 className="text-2xl font-bold tracking-tight text-foreground">{nextDrop.title}</h2>
+                                <div className="flex items-center gap-2">
+                                    <span className={`badge ${isLocked(nextDrop) ? "text-emerald-500 bg-emerald-400/10 border-emerald-400/20" : "text-accent bg-accent/10 border-accent/20"}`}>
+                                        {isLocked(nextDrop) ? "Locked" : "Goal"}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="ml-auto hidden md:block"><Sprites names={castFor(nextDrop.title, cast)} size={72} max={3} /></div>
+                        </div>
+                    ) : (
+                        <h2 className="text-2xl font-bold text-foreground">No release on the calendar yet.</h2>
+                    )}
+                    {milestones.length > 1 && <Runway milestones={milestones} cast={cast} />}
+                </div>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Coming up */}
                 <div className="lg:col-span-2 card overflow-hidden self-start">
                     <div className="flex items-center justify-between px-5 pt-5 pb-3">
-                        <h3 className="section-subtitle">Next 2 weeks</h3>
-                        <button onClick={() => go("studio")} className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-accent/80 hover:text-accent">
-                            Open Studio <ArrowRight className="w-3 h-3" />
+                        <h3 className="section-subtitle">Coming up</h3>
+                        <button onClick={() => go("studio", "calendar")} className="flex items-center gap-1.5 text-sm font-medium text-accent hover:opacity-80">
+                            <CalendarDays className="w-4 h-4" /> Calendar
                         </button>
                     </div>
-                    {[...late, ...soon].length === 0 && (
-                        <p className="px-5 pb-6 text-sm text-foreground/40">Nothing dated in the next two weeks. Good time to schedule something from the backlog.</p>
+                    {upcoming.length === 0 && (
+                        <p className="px-5 pb-6 text-sm text-foreground/45">Nothing dated in the next two weeks. Good time to schedule something from the backlog.</p>
                     )}
                     <div className="flex flex-col">
-                        {[...late, ...soon].map(c => {
+                        {upcoming.map(c => {
                             const out = daysOut(c.scheduledDate!);
                             const overdue = out < 0;
                             return (
-                                <div key={c.id} className={`flex items-center gap-3 px-5 py-3 border-t border-border/50 ${isMilestone(c) ? "bg-accent/[0.04]" : ""}`}>
-                                    <div className="w-[70px] shrink-0">
-                                        <div className={`text-xs font-bold ${overdue ? "text-red-400" : out <= 1 ? "text-accent" : "text-foreground/80"}`}>{whenLabel(out)}</div>
-                                        <div className="text-[10px] text-foreground/30">{shortDate(c.scheduledDate!)}</div>
+                                <div key={c.id} className="flex items-center gap-4 px-5 py-3.5 border-t border-border hover:bg-foreground/[0.02] transition-colors">
+                                    <div className="w-[88px] shrink-0">
+                                        <div className={`text-sm font-semibold ${overdue ? "text-red-400" : out <= 1 ? "text-accent" : "text-foreground/85"}`}>{whenLabel(out)}</div>
+                                        <div className="text-xs text-foreground/40">{shortDate(c.scheduledDate!)}</div>
                                     </div>
-                                    <div className="w-[60px] shrink-0 hidden sm:block"><Sprites names={spritesFor(c.title)} size={24} max={2} /></div>
+                                    <div className="w-[76px] shrink-0 hidden sm:block"><Sprites names={castFor(c.title, cast)} size={34} max={2} /></div>
                                     <div className="flex-1 min-w-0">
-                                        <div className={`truncate text-sm ${isMilestone(c) ? "font-bold text-foreground" : "font-medium text-foreground/85"}`}>{c.title}</div>
+                                        <div className={`truncate text-[15px] ${isMilestone(c) ? "font-semibold text-foreground" : "text-foreground/85"}`}>{c.title}</div>
                                         <div className="flex items-center gap-1.5 mt-0.5">
                                             <span className="w-1.5 h-1.5 rounded-full" style={{ background: STREAM[c.stream].color }} />
-                                            <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/30">{STREAM[c.stream].label}</span>
+                                            <span className="text-xs text-foreground/45">{STREAM[c.stream].label}</span>
+                                            {isMilestone(c) && <span className="text-xs text-accent">· Release</span>}
                                         </div>
                                     </div>
                                     <button
                                         onClick={() => updateCard(c.id, { status: nextStatus(c.status) })}
                                         title="Click to advance status"
-                                        className={`badge shrink-0 cursor-pointer ${STATUS[c.status].cls}`}
+                                        className={`badge shrink-0 cursor-pointer hover:brightness-110 ${STATUS[c.status].cls}`}
                                     >
                                         {STATUS[c.status].label}
                                     </button>
@@ -228,59 +231,55 @@ export default function Home({ go }: { go: Go }) {
                             className="input-field text-sm p-3 h-20 resize-none"
                         />
                         <div className="flex items-center gap-2">
-                            <div className="flex p-0.5 bg-surface/60 rounded-xl border border-border/50 flex-1">
+                            <div className="flex p-0.5 bg-foreground/5 rounded-full flex-1">
                                 {(Object.keys(STREAM) as Stream[]).map(s => (
                                     <button
                                         key={s}
                                         onClick={() => setIdeaStream(s)}
-                                        className={`flex-1 px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${ideaStream === s ? "bg-accent text-white" : "text-foreground/40 hover:text-foreground/70"}`}
+                                        className={`flex-1 px-2 py-1 text-xs font-medium rounded-full transition-all ${ideaStream === s ? "bg-surface text-foreground shadow" : "text-foreground/45 hover:text-foreground/70"}`}
                                     >
                                         {STREAM[s].label}
                                     </button>
                                 ))}
                             </div>
-                            <button onClick={dropIdea} disabled={!idea.trim()} className="btn-primary text-[10px] py-1.5 px-3">Save</button>
+                            <button onClick={dropIdea} disabled={!idea.trim()} className="btn-primary py-1.5 px-3.5">Save</button>
                         </div>
-                        <p className="text-[10px] text-foreground/35">
-                            {saved ? "Saved to the Studio backlog ✓" : `Goes to the Studio backlog (${backlog.length} waiting).`}
+                        <p className="text-xs text-foreground/40">
+                            {saved ? "Saved to the Studio backlog ✓" : `Goes to the Studio backlog (${backlog.length} waiting)`}
                         </p>
                     </div>
 
                     {board.threads.length > 0 && (
-                        <div className="card p-5 flex flex-col gap-2">
+                        <div className="card p-5 flex flex-col gap-3">
                             <h3 className="section-subtitle">Needs a decision</h3>
                             {board.threads.map(t => (
-                                <div key={t.id} className="flex items-start gap-2 text-xs text-foreground/60 leading-relaxed">
-                                    <span className="text-accent mt-0.5">•</span>
+                                <div key={t.id} className="flex items-start gap-2.5 text-sm text-foreground/65 leading-relaxed">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0" />
                                     <span className="flex-1">{t.text}</span>
                                     <button
                                         onClick={() => persist({ ...board, threads: board.threads.filter(x => x.id !== t.id) })}
-                                        title="Resolved"
-                                        className="text-foreground/20 hover:text-foreground/60 shrink-0"
+                                        title="Mark resolved"
+                                        className="text-foreground/25 hover:text-foreground/60 shrink-0 mt-1"
                                     >
-                                        <X className="w-3.5 h-3.5" />
+                                        <X className="w-4 h-4" />
                                     </button>
                                 </div>
                             ))}
                         </div>
                     )}
 
-                    <div className="card p-5 flex flex-col gap-3">
-                        <h3 className="section-subtitle">Jump to</h3>
-                        <div className="grid grid-cols-2 gap-2">
-                            {([["studio", "Studio"], ["cast", "Cast Sheet"], ["storyroom", "Story Room"], ["lore", "Lore"]] as const).map(([id, label]) => (
-                                <button key={id} onClick={() => go(id)} className="px-3 py-2.5 rounded-xl border border-border bg-surface/40 hover:border-accent/40 hover:text-accent text-[11px] font-semibold text-foreground/70 transition-all">
-                                    {label}
-                                </button>
-                            ))}
-                        </div>
-                        <div className="flex flex-col gap-1 pt-1">
-                            {LINKS.map(l => (
-                                <a key={l.href} href={l.href} target="_blank" rel="noreferrer" className="flex items-center justify-between px-1 py-1 text-[11px] text-foreground/45 hover:text-accent transition-colors">
-                                    {l.label} <ArrowRight className="w-3 h-3" />
-                                </a>
-                            ))}
-                        </div>
+                    <div className="card p-2 flex flex-col">
+                        {([["cast", "Cast Sheet"], ["storyroom", "Story Room"], ["lore", "Lore"]] as const).map(([id, label]) => (
+                            <button key={id} onClick={() => go(id)} className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-foreground/80 hover:bg-foreground/5 transition-colors">
+                                {label} <ArrowRight className="w-4 h-4 text-foreground/30" />
+                            </button>
+                        ))}
+                        <div className="h-px bg-border mx-3 my-1" />
+                        {LINKS.map(l => (
+                            <a key={l.href} href={l.href} target="_blank" rel="noreferrer" className="flex items-center justify-between px-3 py-2 rounded-xl text-sm text-foreground/55 hover:text-foreground hover:bg-foreground/5 transition-colors">
+                                {l.label} <ArrowUpRight className="w-4 h-4 text-foreground/30" />
+                            </a>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -288,56 +287,42 @@ export default function Home({ go }: { go: Go }) {
     );
 }
 
-function greeting() {
-    const h = new Date().getHours();
-    return h < 12 ? "Morning, Erik" : h < 18 ? "Afternoon, Erik" : "Evening, Erik";
-}
-
 function Sprites({ names, size, max = 3 }: { names: string[]; size: number; max?: number }) {
     return (
-        <div className="flex gap-0.5">
+        <div className="flex -space-x-2">
             {names.slice(0, max).map(s => (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img key={s} src={`/sprites/${s}.png`} alt={s} title={s} width={size} height={size} className="object-contain" style={{ imageRendering: "pixelated" }} />
+                <img key={s} src={spriteUrl(s)} alt={s} title={s} width={size} height={size} loading="lazy" className="object-contain drop-shadow-md" />
             ))}
         </div>
     );
 }
 
 /** Every locked/goal release on one line, from today to the last one, so the season reads at a glance. */
-function Runway({ milestones }: { milestones: CampaignCard[] }) {
+function Runway({ milestones, cast }: { milestones: CampaignCard[]; cast: ReturnType<typeof useCast> }) {
     const outs = milestones.map(m => daysOut(m.scheduledDate!));
     const start = Math.min(0, ...outs);
     const end = Math.max(...outs);
     const span = Math.max(1, end - start);
     const pct = (d: number) => ((d - start) / span) * 100;
+    const nudge = (p: number) => (p < 8 ? 15 : p > 92 ? 85 : 50);
 
     return (
-        <div className="card px-6 pt-5 pb-4">
-            <div className="flex items-center justify-between mb-8">
-                <h3 className="section-subtitle">Release runway</h3>
-                <span className="text-[10px] text-foreground/35">{end}d to the last goal</span>
-            </div>
-            <div className="relative h-1.5 rounded-full bg-foreground/10 mx-4 mb-2 sm:mb-0">
+        <div className="pt-10">
+            <div className="relative h-1 rounded-full bg-foreground/10 mx-6">
                 <div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-accent to-accent-sunset" style={{ width: `${pct(0)}%` }} />
-                <div className="absolute -top-1.5 w-4 h-4 rounded-full border-2 border-background bg-foreground" style={{ left: `calc(${pct(0)}% - 8px)` }} title="Today" />
-                {milestones.map((m, i) => {
-                    const o = outs[i];
-                    const done = o < 0;
-                    return (
-                        <div key={m.id} className="absolute -translate-x-1/2 flex flex-col items-center" style={{ left: `${pct(o)}%`, top: -30 }}>
-                            <Sprites names={spritesFor(m.title)} size={22} max={1} />
-                            <div className={`mt-1 w-3 h-3 rounded-full border-2 border-background ${done ? "bg-foreground/30" : isLocked(m) ? "bg-emerald-400" : "bg-accent"}`} />
-                        </div>
-                    );
-                })}
-            </div>
-            <div className="relative h-10 mx-4 mt-2 hidden sm:block">
                 {milestones.map((m, i) => (
-                    // Keep the first/last labels inside the card instead of hanging off the edge.
-                    <div key={m.id} className="absolute text-center w-28" style={{ left: `${pct(outs[i])}%`, transform: `translateX(-${pct(outs[i]) < 8 ? 15 : pct(outs[i]) > 92 ? 85 : 50}%)` }}>
-                        <div className="text-[10px] font-bold text-foreground/70 truncate">{m.title.replace(/ (trailer|drops).*$/i, "").replace(/^"(.*)"/, "$1")}</div>
-                        <div className="text-[9px] text-foreground/35">{shortDate(m.scheduledDate!)}</div>
+                    <div key={m.id} className="absolute -translate-x-1/2 flex flex-col items-center" style={{ left: `${pct(outs[i])}%`, top: -38 }}>
+                        <Sprites names={castFor(m.title, cast)} size={30} max={1} />
+                        <div className={`mt-1 w-3 h-3 rounded-full ring-4 ring-background ${outs[i] < 0 ? "bg-foreground/30" : isLocked(m) ? "bg-emerald-400" : "bg-accent"}`} />
+                    </div>
+                ))}
+            </div>
+            <div className="relative h-10 mx-6 mt-3 hidden sm:block">
+                {milestones.map((m, i) => (
+                    <div key={m.id} className="absolute text-center w-32" style={{ left: `${pct(outs[i])}%`, transform: `translateX(-${nudge(pct(outs[i]))}%)` }}>
+                        <div className="text-xs font-semibold text-foreground/80 truncate">{shortTitle(m.title)}</div>
+                        <div className="text-[11px] text-foreground/40">{shortDate(m.scheduledDate!)}</div>
                     </div>
                 ))}
             </div>
@@ -366,14 +351,14 @@ function Clefairy({ lines }: { lines: string[] }) {
     };
 
     return (
-        <div className="flex items-center gap-3 max-w-[340px]">
-            <div className="card px-4 py-3 text-xs font-semibold text-foreground/80 leading-relaxed relative">
+        <div className="flex items-center gap-3 max-w-[380px]">
+            <div className="relative px-4 py-2.5 rounded-2xl rounded-br-md bg-surface border border-border text-sm text-foreground/80 leading-snug shadow-sm">
                 {lines[i % lines.length]}
             </div>
             <button
                 onClick={tap}
-                title="Clefairy"
-                className={`relative w-20 h-20 shrink-0 rounded-full overflow-hidden border-2 border-white/20 bg-surface/60 backdrop-blur ${bounce ? "animate-wounce" : ""}`}
+                title="Tap Clefairy"
+                className={`relative w-16 h-16 shrink-0 rounded-full overflow-hidden border border-border bg-gradient-to-br from-pink-300/30 to-violet-300/20 hover:scale-105 transition-transform ${bounce ? "animate-wounce" : ""}`}
             >
                 <Image src={`/assets/muse/${mood}.png`} alt="Clefairy" fill className="object-contain scale-[1.4]" unoptimized />
             </button>

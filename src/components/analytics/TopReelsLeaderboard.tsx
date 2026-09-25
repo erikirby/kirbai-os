@@ -110,9 +110,7 @@ export default function TopReelsLeaderboard({ posts }: LeaderboardProps) {
                             <button
                                 key={platform}
                                 onClick={() => setPlatformFilter(platform)}
-                                className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${
-                                    platformFilter === platform ? 'bg-accent text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
-                                }`}
+                                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all ${ platformFilter === platform ? 'bg-accent text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
                             >
                                 {platform}
                             </button>
@@ -125,7 +123,7 @@ export default function TopReelsLeaderboard({ posts }: LeaderboardProps) {
                         <select
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value as any)}
-                            className="bg-transparent text-[10px] font-bold uppercase tracking-wider text-foreground focus:outline-none cursor-pointer"
+                            className="bg-transparent text-xs font-bold text-foreground focus:outline-none cursor-pointer"
                         >
                             <option value="views">Sort: Views</option>
                             <option value="reach">Sort: Reach</option>
@@ -143,7 +141,7 @@ export default function TopReelsLeaderboard({ posts }: LeaderboardProps) {
                 <div className="overflow-x-auto custom-scrollbar border border-border/40 rounded-xl bg-surface/30">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-border/60 bg-surface/80 text-[10px] font-mono font-bold uppercase text-foreground/50 tracking-wider">
+                            <tr className="border-b border-border/60 bg-surface/80 text-xs font-mono font-bold text-foreground/50">
                                 <th className="py-3 px-4 w-12 text-center">Rank</th>
                                 <th className="py-3 px-4 w-28">Platform</th>
                                 <th className="py-3 px-4">Caption / Track Info</th>
@@ -172,7 +170,7 @@ export default function TopReelsLeaderboard({ posts }: LeaderboardProps) {
                                             <div className="flex justify-center">{getRankBadge(rank)}</div>
                                         </td>
                                         <td className="py-3 px-4">
-                                            <span className={`text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-md border ${platformBadge}`}>
+                                            <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded-md border ${platformBadge}`}>
                                                 {post.platform}
                                             </span>
                                         </td>
@@ -259,7 +257,7 @@ export default function TopReelsLeaderboard({ posts }: LeaderboardProps) {
                                 <div className="flex items-start justify-between gap-2">
                                     <div className="flex items-center gap-2">
                                         {getRankBadge(idx + 1)}
-                                        <span className={`text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-md border ${platformBadge}`}>
+                                        <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded-md border ${platformBadge}`}>
                                             {post.platform}
                                         </span>
                                     </div>
@@ -281,15 +279,15 @@ export default function TopReelsLeaderboard({ posts }: LeaderboardProps) {
 
                                 <div className="grid grid-cols-3 gap-2 pt-2 border-t border-border/40 text-center font-mono">
                                     <div>
-                                        <span className="text-[9px] text-foreground/40 uppercase block">Views</span>
+                                        <span className="text-[11px] text-foreground/40 block">Views</span>
                                         <span className="text-xs font-bold text-pink-400">{formatNumber(post.views)}</span>
                                     </div>
                                     <div>
-                                        <span className="text-[9px] text-foreground/40 uppercase block">Likes</span>
+                                        <span className="text-[11px] text-foreground/40 block">Likes</span>
                                         <span className="text-xs font-bold text-rose-400">{formatNumber(post.reactions)}</span>
                                     </div>
                                     <div>
-                                        <span className="text-[9px] text-foreground/40 uppercase block">Impact</span>
+                                        <span className="text-[11px] text-foreground/40 block">Impact</span>
                                         <span className="text-xs font-bold text-emerald-400">
                                             {post.earningsUsd > 0 ? `$${post.earningsUsd.toFixed(2)}` : `+${formatNumber(post.follows)}`}
                                         </span>

@@ -30,7 +30,7 @@ export default function StatsOverviewCards({ totals, freshness }: OverviewProps)
             <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-surface/60 border border-border/80 backdrop-blur-md">
                 <div className="flex items-center gap-3">
                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
-                    <span className="text-xs font-mono uppercase tracking-widest text-foreground/70 font-semibold">
+                    <span className="text-xs font-mono text-foreground/70 font-semibold">
                         Master Baseline Connected & Synchronized
                     </span>
                 </div>
@@ -56,7 +56,7 @@ export default function StatsOverviewCards({ totals, freshness }: OverviewProps)
                 {/* Total Views / Reach */}
                 <div className="card p-5 relative overflow-hidden group border border-border/60 hover:border-accent/40 transition-all">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-[10px] uppercase font-mono tracking-widest text-foreground/40 font-bold">Cross-Platform Views</span>
+                        <span className="text-xs font-mono text-foreground/40 font-bold">Cross-Platform Views</span>
                         <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
                             <Eye className="w-4 h-4" />
                         </div>
@@ -73,7 +73,7 @@ export default function StatsOverviewCards({ totals, freshness }: OverviewProps)
                 {/* Combined Earnings */}
                 <div className="card p-5 relative overflow-hidden group border border-border/60 hover:border-emerald-500/40 transition-all">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-[10px] uppercase font-mono tracking-widest text-foreground/40 font-bold">Total Earnings</span>
+                        <span className="text-xs font-mono text-foreground/40 font-bold">Total Earnings</span>
                         <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
                             <DollarSign className="w-4 h-4" />
                         </div>
@@ -90,7 +90,7 @@ export default function StatsOverviewCards({ totals, freshness }: OverviewProps)
                 {/* Total Streams & Units */}
                 <div className="card p-5 relative overflow-hidden group border border-border/60 hover:border-purple-500/40 transition-all">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-[10px] uppercase font-mono tracking-widest text-foreground/40 font-bold">Total Music Streams / Units</span>
+                        <span className="text-xs font-mono text-foreground/40 font-bold">Total Music Streams / Units</span>
                         <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
                             <Music className="w-4 h-4" />
                         </div>
@@ -107,7 +107,7 @@ export default function StatsOverviewCards({ totals, freshness }: OverviewProps)
                 {/* Total Social Followers */}
                 <div className="card p-5 relative overflow-hidden group border border-border/60 hover:border-pink-500/40 transition-all">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-[10px] uppercase font-mono tracking-widest text-foreground/40 font-bold">Total Followers & Subs</span>
+                        <span className="text-xs font-mono text-foreground/40 font-bold">Total Followers & Subs</span>
                         <div className="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center text-pink-400">
                             <Users className="w-4 h-4" />
                         </div>

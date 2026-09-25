@@ -189,7 +189,7 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                         {loading ? (
                             <div className="flex flex-col items-center gap-6 p-20 card animate-pulse">
                                 <Loader2 className="w-16 h-16 text-accent animate-spin" />
-                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-accent">Inhaling the Muse...</p>
+                                <p className="text-xs font-semibold text-accent">Inhaling the Muse...</p>
                             </div>
                         ) : cards.length > 0 && currentCard ? (
                             <div className="relative">
@@ -223,9 +223,9 @@ const MuseDeck = ({ mode }: { mode: string }) => {
 
                                     {currentCard.hook && (currentCard.hook.frame1 || currentCard.hook.second5) && (
                                         <div className={`p-5 card p-5 flex flex-col gap-1.5 bg-surface border-border`}>
-                                            {currentCard.lens && <span className={`text-[9px] font-black uppercase tracking-widest text-foreground/50`}>Lens: {currentCard.lens}</span>}
-                                            {currentCard.hook.frame1 && <p className={`text-sm font-bold text-foreground/80`}><span className="uppercase text-[9px] font-black tracking-widest opacity-60">Frame 1: </span>{currentCard.hook.frame1}</p>}
-                                            {currentCard.hook.second5 && <p className={`text-sm font-bold text-foreground/80`}><span className="uppercase text-[9px] font-black tracking-widest opacity-60">Second 5: </span>{currentCard.hook.second5}</p>}
+                                            {currentCard.lens && <span className={`text-[11px] font-semibold text-foreground/50`}>Lens: {currentCard.lens}</span>}
+                                            {currentCard.hook.frame1 && <p className={`text-sm font-bold text-foreground/80`}><span className="text-[11px] font-semibold opacity-60">Frame 1: </span>{currentCard.hook.frame1}</p>}
+                                            {currentCard.hook.second5 && <p className={`text-sm font-bold text-foreground/80`}><span className="text-[11px] font-semibold opacity-60">Second 5: </span>{currentCard.hook.second5}</p>}
                                         </div>
                                     )}
 
@@ -239,8 +239,8 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                                     <div className="grid grid-cols-3 gap-3">
                                         {Object.entries(currentCard.actionMatrix).map(([key, val]) => (
                                             <div key={key} className={`card p-4 flex flex-col items-center gap-1.5 transition-transform hover:scale-[1.02]`}>
-                                                <span className={`text-[9px] font-black uppercase tracking-widest text-foreground/40`}>{key}</span>
-                                                <span className={`text-[11px] font-black uppercase ${val === 'high' ? 'text-foreground' : val === 'med' ? 'text-orange-600' : 'text-green-700'}`}>{val}</span>
+                                                <span className={`text-[11px] font-semibold text-foreground/40`}>{key}</span>
+                                                <span className={`text-[11px] font-semibold ${val === 'high' ? 'text-foreground' : val === 'med' ? 'text-orange-600' : 'text-green-700'}`}>{val}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -276,8 +276,8 @@ const MuseDeck = ({ mode }: { mode: string }) => {
                                     <Sparkles className="w-12 h-12 text-accent" />
                                 </div>
                                 <div className="flex flex-col gap-3">
-                                    <h3 className="text-2xl font-black uppercase tracking-[0.2em] text-foreground">Sanctuary Empty</h3>
-                                    <p className="text-[11px] text-accent uppercase tracking-widest leading-relaxed">The Symposium is awaiting your signal to begin the session.</p>
+                                    <h3 className="text-2xl font-semibold text-foreground">Sanctuary Empty</h3>
+                                    <p className="text-[11px] text-accent leading-relaxed">The Symposium is awaiting your signal to begin the session.</p>
                                 </div>
                                 <div className="flex flex-col gap-4">
                                     <button 
@@ -368,23 +368,23 @@ const MuseDeck = ({ mode }: { mode: string }) => {
 
                         <div className="flex flex-col gap-8 text-accent">
                             <div className="flex flex-col gap-2">
-                                <span className="text-[12px] font-black uppercase tracking-[0.3em] text-accent">{selectedDetail.type}</span>
-                                <h3 className="text-4xl font-black uppercase tracking-tighter leading-none">{selectedDetail.title}</h3>
+                                <span className="text-[12px] font-semibold text-accent">{selectedDetail.type}</span>
+                                <h3 className="text-4xl font-semibold tracking-tighter leading-none">{selectedDetail.title}</h3>
                             </div>
 
                             <div className="flex flex-col gap-6">
                                 <div className="p-8 card p-6 bg-surface-elevated">
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-accent mb-3">Proposal Detail</h4>
+                                    <h4 className="text-xs font-semibold text-accent mb-3">Proposal Detail</h4>
                                     <p className="text-lg font-semibold leading-relaxed text-foreground">{selectedDetail.description}</p>
                                 </div>
 
                                 <div className="p-8 card p-6 bg-surface-elevated">
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-accent mb-3">The Symposium Debate</h4>
+                                    <h4 className="text-xs font-semibold text-accent mb-3">The Symposium Debate</h4>
                                     <p className="text-sm font-bold leading-relaxed text-foreground/70 italic">{selectedDetail.debateLog}</p>
                                 </div>
                             </div>
                             
-                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-accent/30 italic">
+                            <div className="flex justify-between items-center text-xs font-semibold text-accent/30 italic">
                                 <span>Status: {selectedDetail.status}</span>
                                 <span>ID: {selectedDetail.id.slice(0, 8)}</span>
                             </div>

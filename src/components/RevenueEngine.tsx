@@ -142,7 +142,7 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
                     </p>
                 </div>
                 {analysis && (
-                    <span className="text-[10px] font-mono text-foreground/50 uppercase tracking-widest">
+                    <span className="text-xs font-mono text-foreground/50">
                         Computed {new Date(analysis.computedAt).toLocaleString()}
                     </span>
                 )}
@@ -158,7 +158,7 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
                 <div className="flex flex-wrap items-center gap-5">
                     <UploadCloud className="w-8 h-8 text-accent shrink-0" />
                     <div className="flex-1 min-w-[220px]">
-                        <p className="text-sm font-bold uppercase tracking-wider text-foreground/90">Drop exports here (.csv / .tsv)</p>
+                        <p className="text-sm font-bold text-foreground/90">Drop exports here (.csv / .tsv)</p>
                         <p className="text-[11px] font-medium text-foreground/50 mt-1">DistroKid bank details export (required) · Meta Business Suite post exports for FB + IG (recommended)</p>
                     </div>
                     <label className="btn-secondary cursor-pointer">
@@ -186,12 +186,12 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
                     </div>
                 )}
                 {error && (
-                    <p className="flex items-center gap-2 mt-4 text-[11px] text-red-400 font-bold uppercase tracking-widest"><AlertTriangle className="w-4 h-4" /> {error}</p>
+                    <p className="flex items-center gap-2 mt-4 text-[11px] text-red-400 font-bold"><AlertTriangle className="w-4 h-4" /> {error}</p>
                 )}
             </div>
 
             {!analysis && (
-                <div className="card p-10 text-center text-sm font-semibold text-foreground/40 uppercase tracking-widest bg-surface/20 border-dashed border-border/20">
+                <div className="card p-10 text-center text-sm font-semibold text-foreground/40 bg-surface/20 border-dashed border-border/20">
                     No analysis stored yet. Drop your exports and hit Compute.
                 </div>
             )}
@@ -212,12 +212,12 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
                                     <span className="stat-label">{c.label}</span>
                                 </div>
                                 <span className="stat-value text-foreground">{c.value}</span>
-                                <span className="text-[10px] text-foreground/40 uppercase font-semibold tracking-widest mt-1">{c.sub}</span>
+                                <span className="text-xs text-foreground/40 font-semibold mt-1">{c.sub}</span>
                             </div>
                         ))}
                     </div>
                     {k.partialMonth && (
-                        <p className="text-[11px] font-medium text-foreground/50 uppercase tracking-widest px-1">
+                        <p className="text-[11px] font-medium text-foreground/50 px-1">
                             ⚠ {k.partialMonth} is the newest sale month — DistroKid reporting lags ~2 months, treat it as incomplete.
                         </p>
                     )}
@@ -241,7 +241,7 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
                                 );
                             })}
                         </div>
-                        <div className="flex justify-between mt-3 text-[10px] font-mono font-medium text-foreground/40 uppercase">
+                        <div className="flex justify-between mt-3 text-xs font-mono font-medium text-foreground/40">
                             <span>{analysis.monthlyTrend[0]?.month}</span>
                             <span>{analysis.monthlyTrend[analysis.monthlyTrend.length - 1]?.month}</span>
                         </div>
@@ -258,7 +258,7 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
                                             <span className="text-base font-bold text-foreground">{o.title}</span>
-                                            <span className="text-[10px] font-mono text-foreground/50 uppercase">
+                                            <span className="text-xs font-mono text-foreground/50">
                                                 {fmtUSD(o.lifetimeEarnings)} lifetime · {fmtUSD(o.recentEarnings)} last quarter · {o.daysSinceLastVideo === null ? "no video ever" : `${o.daysSinceLastVideo}d since video`}
                                             </span>
                                         </div>
@@ -275,7 +275,7 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
                         <h3 className="section-eyebrow text-foreground/70 mb-5">Song Economics</h3>
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="text-[10px] font-semibold uppercase tracking-wider text-foreground/40 border-b border-border/50">
+                                <tr className="text-xs font-semibold text-foreground/40 border-b border-border/50">
                                     <th className="py-3 pr-4">Song</th>
                                     <th className="py-3 pr-4 text-right">Streams</th>
                                     <th className="py-3 pr-4 text-right">Earnings</th>
@@ -302,7 +302,7 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
                             </tbody>
                         </table>
                         {analysis.songs.length > 12 && (
-                            <button onClick={() => setShowAllSongs(!showAllSongs)} className="mt-4 text-[10px] font-bold uppercase tracking-widest text-accent hover:text-foreground transition-colors">
+                            <button onClick={() => setShowAllSongs(!showAllSongs)} className="mt-4 text-xs font-bold text-accent hover:text-foreground transition-colors">
                                 {showAllSongs ? "Show top 12" : `Show all ${analysis.songs.length} songs`}
                             </button>
                         )}
@@ -338,7 +338,7 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
                                     );
                                 })}
                             </div>
-                            <p className="text-[10px] font-semibold text-foreground/40 uppercase tracking-widest mt-4">Longer videos earn more per post — length is the revenue lever.</p>
+                            <p className="text-xs font-semibold text-foreground/40 mt-4">Longer videos earn more per post — length is the revenue lever.</p>
                         </div>
                     </div>
 
@@ -350,7 +350,7 @@ export default function RevenueEngine({ mode }: RevenueEngineProps) {
                             <div className="flex flex-col gap-2">
                                 {analysis.unmatchedVideos.slice(0, 8).map((v, i) => (
                                     <div key={i} className="flex items-center gap-3 text-[11px] font-medium text-foreground/50">
-                                        <span className="font-mono font-bold uppercase w-8 shrink-0">{v.platform === "facebook" ? "FB" : "IG"}</span>
+                                        <span className="font-mono font-bold w-8 shrink-0">{v.platform === "facebook" ? "FB" : "IG"}</span>
                                         <span className="font-mono shrink-0">{fmtNum(v.views)} views</span>
                                         <span className="truncate">{v.caption || "(no caption)"}</span>
                                     </div>

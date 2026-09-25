@@ -68,7 +68,7 @@ export default function APIHealth({ theme = "dark" }: APIHealthProps) {
         return (
             <div className="flex flex-col items-center justify-center py-40 gap-6">
                 <Loader2 className="w-12 h-12 animate-spin text-accent" />
-                <span className="text-[11px] font-black text-accent uppercase tracking-[0.6em] animate-pulse">Syncing Telemetry Array</span>
+                <span className="text-[11px] font-semibold text-accent animate-pulse">Loading usage…</span>
             </div>
         );
     }
@@ -81,20 +81,20 @@ export default function APIHealth({ theme = "dark" }: APIHealthProps) {
         <div className="flex flex-col gap-10">
             <div className="flex justify-between items-end ml-1">
                 <div className="flex flex-col gap-1">
-                    <h2 className="section-title uppercase">API Health Matrix</h2>
-                    <p className="section-subtitle text-foreground/50">Local Telemetry & Budget Caps</p>
+                    <h2 className="section-title">API usage</h2>
+                    <p className="section-subtitle text-foreground/50">Calls and budget caps</p>
                 </div>
                 <div className="flex gap-4">
                     <button
                         onClick={handleReset}
                         disabled={isResetting}
-                        className="px-6 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500 text-red-500 text-[10px] font-black uppercase tracking-[0.4em] squircle transition-all shadow-2xl active:scale-95 flex items-center gap-2"
+                        className="px-6 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500 text-red-500 text-xs font-semibold squircle transition-all shadow-2xl active:scale-95 flex items-center gap-2"
                     >
                         {isResetting ? <Loader2 className="w-3 h-3 animate-spin" /> : "Reset Cycle"}
                     </button>
                     <button
                         onClick={fetchTelemetry}
-                        className="px-6 py-2.5 bg-accent/10 hover:bg-accent border border-accent/20 hover:border-accent text-accent hover:text-foreground text-[10px] font-black uppercase tracking-[0.4em] squircle transition-all shadow-2xl shadow-accent/5 active:scale-95 flex items-center gap-2"
+                        className="px-6 py-2.5 bg-accent/10 hover:bg-accent border border-accent/20 hover:border-accent text-accent hover:text-foreground text-xs font-semibold squircle transition-all shadow-2xl shadow-accent/5 active:scale-95 flex items-center gap-2"
                     >
                         Refresh Network
                     </button>
@@ -106,7 +106,7 @@ export default function APIHealth({ theme = "dark" }: APIHealthProps) {
                 <div className="absolute top-0 right-0 w-80 h-80 bg-accent/5 blur-[100px] rounded-full -mr-40 -mt-40 group-hover:scale-125 transition-transform duration-2000" />
                 <div className="flex flex-col gap-6 relative z-10">
                     <div className="flex justify-between items-end">
-                        <span className="text-[10px] font-black tracking-[0.4em] uppercase text-accent">Monthly Safety Cap</span>
+                        <span className="text-xs font-semibold text-accent">Monthly Safety Cap</span>
                         <div className="flex flex-col items-end">
                             <span className="stat-value">${telemetry.lifetimeCost.toFixed(4)} / ${BUDGET_LIMIT.toFixed(2)}</span>
                             <span className="text-[10px] font-mono text-foreground/50">ESTIMATED SPEND</span>
@@ -153,7 +153,7 @@ export default function APIHealth({ theme = "dark" }: APIHealthProps) {
                             <thead>
                                 <tr className="border-b border-border/10">
                                     <th className="py-3 px-4 stat-label">Timestamp</th>
-                                    <th className="py-3 px-4 stat-label">Neural Route</th>
+                                    <th className="py-3 px-4 stat-label">Model</th>
                                     <th className="py-3 px-4 stat-label text-right">Input TKN</th>
                                     <th className="py-3 px-4 stat-label text-right">Output TKN</th>
                                     <th className="py-3 px-4 stat-label text-right">Est. Cost</th>
@@ -168,7 +168,7 @@ export default function APIHealth({ theme = "dark" }: APIHealthProps) {
                                             })}
                                         </td>
                                         <td className="py-3 px-4">
-                                            <span className="px-2 py-1 bg-accent/10 text-accent rounded-md text-[9px] font-black uppercase tracking-wider">{log.route}</span>
+                                            <span className="px-2 py-1 bg-accent/10 text-accent rounded-md text-[11px] font-semibold">{log.route}</span>
                                         </td>
                                         <td className="py-3 px-4 text-[10px] font-mono text-foreground/80 text-right">{log.inputTokens.toLocaleString()}</td>
                                         <td className="py-3 px-4 text-[10px] font-mono text-foreground/80 text-right">{log.outputTokens.toLocaleString()}</td>

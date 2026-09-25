@@ -207,7 +207,7 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
         return (
             <div className="w-full h-96 flex flex-col items-center justify-center gap-3 text-foreground/50">
                 <Loader2 className="w-7 h-7 animate-spin text-accent" />
-                <span className="text-xs font-mono uppercase tracking-widest">Opening the Story Room…</span>
+                <span className="text-xs font-mono">Opening the Story Room…</span>
             </div>
         );
     }
@@ -239,24 +239,24 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
                             <button
                                 key={s.id}
                                 onClick={() => setSheet(s.id)}
-                                className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${sheet === s.id ? "bg-accent text-white shadow-md" : "text-foreground/40 hover:text-foreground/70"}`}
+                                className={`px-3 py-1.5 text-xs font-bold rounded-[10px] transition-all ${sheet === s.id ?"bg-accent text-white shadow-md" : "text-foreground/40 hover:text-foreground/70"}`}
                             >
                                 {s.label}
                             </button>
                         ))}
                     </div>
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-foreground/40">
+                    <span className="text-xs font-mono text-foreground/40">
                         {isSaving ? "Saving…" : hasUnsaved ? "Unsaved" : "Synced"}
                     </span>
                     {sheet === "board" && editing && (
-                        <button onClick={addCharacter} className="btn-secondary text-[10px] uppercase font-bold px-3 py-1.5 flex items-center gap-1.5">
+                        <button onClick={addCharacter} className="btn-secondary text-xs font-bold px-3 py-1.5 flex items-center gap-1.5">
                             <Plus className="w-3.5 h-3.5" /> Character
                         </button>
                     )}
                     {sheet === "board" && (
                         <button
                             onClick={() => setEditing(v => !v)}
-                            className={`text-[10px] uppercase font-bold px-3 py-1.5 flex items-center gap-1.5 ${editing ? "btn-primary" : "btn-secondary"}`}
+                            className={`text-xs font-bold px-3 py-1.5 flex items-center gap-1.5 ${editing ?"btn-primary" : "btn-secondary"}`}
                         >
                             {editing ? <><Check className="w-3.5 h-3.5" /> Done</> : <><Pencil className="w-3.5 h-3.5" /> Edit</>}
                         </button>
@@ -348,7 +348,7 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
                                             className="mt-1 w-full bg-transparent border-b border-border/60 text-xs text-foreground/60 focus:outline-none focus:border-accent"
                                         />
                                     ) : (
-                                        <span className="text-[11px] font-mono uppercase tracking-wide text-accent/80">{selected.tag}</span>
+                                        <span className="text-[11px] font-mono tracking-wide text-accent/80">{selected.tag}</span>
                                     )}
                                 </div>
                                 {editing && (
@@ -395,7 +395,7 @@ export default function StoryRoom({ mode = "kirbai" }: StoryRoomProps) {
                                     {selected.seeds.length === 0 && !editing && <span className="text-foreground/30 text-sm">—</span>}
                                 </ul>
                                 {editing && (
-                                    <button onClick={addSeed} className="mt-2 text-[10px] uppercase font-bold text-accent/80 flex items-center gap-1"><Plus className="w-3 h-3" /> Seed</button>
+                                    <button onClick={addSeed} className="mt-2 text-xs font-bold text-accent/80 flex items-center gap-1"><Plus className="w-3 h-3" /> Seed</button>
                                 )}
                             </Field>
 
@@ -459,7 +459,7 @@ const pClass = "text-sm text-foreground/80 leading-relaxed";
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/40">{label}</span>
+            <span className="text-xs font-bold text-foreground/40">{label}</span>
             {children}
         </div>
     );
@@ -477,7 +477,7 @@ function SkitRoadmapSheet({ roadmap, onCycleStatus }: {
                 <h3 className="text-lg font-extrabold text-foreground">What to make next</h3>
                 <p className="text-sm text-foreground/60 leading-relaxed">{roadmap.intro}</p>
                 <div className="mt-2 p-4 rounded-xl bg-accent/10 border border-accent/20">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-accent">The KIRBAI fit</span>
+                    <span className="text-xs font-bold text-accent">The KIRBAI fit</span>
                     <p className="text-sm text-foreground/70 mt-1">{roadmap.kirbaiFit}</p>
                 </div>
             </div>
@@ -513,7 +513,7 @@ function SkitRoadmapSheet({ roadmap, onCycleStatus }: {
                             <div className="flex flex-col gap-2 pt-2 border-t border-border/40">
                                 {card.fields.map(f => (
                                     <div key={f.label}>
-                                        <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/35">{f.label}</span>
+                                        <span className="text-[11px] font-bold text-foreground/35">{f.label}</span>
                                         <p className="text-xs text-foreground/65 leading-relaxed">{f.value}</p>
                                     </div>
                                 ))}
@@ -562,14 +562,14 @@ function MusicVideoSheetView({ sheets }: { sheets: import("@/lib/story-room-seed
                         <div className="card p-5 flex flex-col gap-2">
                             <h4 className="section-subtitle">Locked story engine</h4>
                             {mv.storyEngine.map(f => (
-                                <div key={f.label}><span className="text-[9px] font-bold uppercase tracking-wider text-foreground/35">{f.label}</span><p className="text-xs text-foreground/65 leading-relaxed">{f.value}</p></div>
+                                <div key={f.label}><span className="text-[11px] font-bold text-foreground/35">{f.label}</span><p className="text-xs text-foreground/65 leading-relaxed">{f.value}</p></div>
                             ))}
                             <p className="text-xs text-foreground/50 italic pt-1 border-t border-border/40 mt-1">{mv.storyNote}</p>
                         </div>
                         <div className="card p-5 flex flex-col gap-2">
                             <h4 className="section-subtitle">Locked location plan</h4>
                             {mv.locationPlan.map(f => (
-                                <div key={f.label}><span className="text-[9px] font-bold uppercase tracking-wider text-foreground/35">{f.label}</span><p className="text-xs text-foreground/65 leading-relaxed">{f.value}</p></div>
+                                <div key={f.label}><span className="text-[11px] font-bold text-foreground/35">{f.label}</span><p className="text-xs text-foreground/65 leading-relaxed">{f.value}</p></div>
                             ))}
                             <p className="text-xs text-foreground/50 italic pt-1 border-t border-border/40 mt-1">{mv.locationNote}</p>
                         </div>
@@ -580,7 +580,7 @@ function MusicVideoSheetView({ sheets }: { sheets: import("@/lib/story-room-seed
                         <div className="flex flex-col divide-y divide-border/40">
                             {mv.timeline.map(beat => (
                                 <div key={beat.label} className="py-2.5 flex flex-col sm:flex-row sm:items-start gap-2">
-                                    <span className="text-[10px] font-mono uppercase text-accent/70 w-28 shrink-0">{beat.label}</span>
+                                    <span className="text-xs font-mono text-accent/70 w-28 shrink-0">{beat.label}</span>
                                     <div>
                                         <strong className="text-xs font-bold text-foreground">{beat.title}</strong>
                                         <p className="text-xs text-foreground/55 leading-relaxed">{beat.description}</p>
@@ -593,7 +593,7 @@ function MusicVideoSheetView({ sheets }: { sheets: import("@/lib/story-room-seed
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {mv.performers.map(p => (
                             <div key={p.name} className="card p-4 flex flex-col gap-1.5">
-                                <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/35">{p.tier}</span>
+                                <span className="text-[11px] font-bold text-foreground/35">{p.tier}</span>
                                 <h5 className="text-sm font-bold text-foreground">{p.name}</h5>
                                 <p className="text-[11px] text-foreground/55 leading-relaxed">{p.role}</p>
                                 <p className="text-[11px] text-foreground/45 leading-relaxed">{p.action}</p>

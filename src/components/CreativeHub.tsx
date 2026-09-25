@@ -206,7 +206,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                 </div>
                 <button
                     onClick={() => { setShowNew(v => !v); setForm(BLANK_FORM); }}
-                    className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm uppercase tracking-wider"
+                    className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm"
                 >
                     {showNew ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                     {showNew ? 'Cancel' : 'New Concept'}
@@ -225,7 +225,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                     />
                     <div className="flex gap-3 flex-wrap">
                         <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
-                            <label className="text-[10px] font-semibold uppercase tracking-widest text-foreground/40">Type</label>
+                            <label className="text-xs font-semibold text-foreground/40">Type</label>
                             <select
                                 value={form.type}
                                 onChange={e => setForm(f => ({ ...f, type: e.target.value as ConceptType }))}
@@ -238,7 +238,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                             </select>
                         </div>
                         <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
-                            <label className="text-[10px] font-semibold uppercase tracking-widest text-foreground/40">Status</label>
+                            <label className="text-xs font-semibold text-foreground/40">Status</label>
                             <select
                                 value={form.status}
                                 onChange={e => setForm(f => ({ ...f, status: e.target.value as ConceptStatus }))}
@@ -251,7 +251,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                             </select>
                         </div>
                         <div className="flex flex-col gap-1 flex-1 min-w-[140px]">
-                            <label className="text-[10px] font-semibold uppercase tracking-widest text-foreground/40">Character (optional)</label>
+                            <label className="text-xs font-semibold text-foreground/40">Character (optional)</label>
                             <input
                                 value={form.character}
                                 onChange={e => setForm(f => ({ ...f, character: e.target.value }))}
@@ -271,7 +271,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                         onClick={handleNew}
                         loading={isSaving}
                         disabled={!form.title.trim() || !form.body.trim()}
-                        className="btn-primary self-end px-6 py-2.5 text-sm uppercase tracking-wider disabled:opacity-50"
+                        className="btn-primary self-end px-6 py-2.5 text-sm disabled:opacity-50"
                         icon={<Check className="w-4 h-4" />}
                     >
                         Save Concept
@@ -281,7 +281,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
 
             {/* Filters */}
             <div className="flex gap-3 items-center flex-wrap">
-                <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-foreground/30">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground/30">
                     <Filter className="w-3 h-3" /> Filter
                 </div>
                 {(['all', 'reel', 'post', 'music', 'general'] as const).map(t => (
@@ -455,7 +455,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                             {promotingId === concept.id ? (
                                                 <div className="bg-accent/5 border border-accent/20 rounded-[var(--card-radius)] p-4 flex flex-col gap-4 animate-in slide-in-from-top-2">
                                                     <div className="flex items-center justify-between">
-                                                        <span className="text-[10px] font-semibold uppercase tracking-widest text-accent flex items-center gap-2">
+                                                        <span className="text-xs font-semibold text-accent flex items-center gap-2">
                                                             <Clapperboard className="w-3 h-3" /> Initializing Mission Data
                                                         </span>
                                                         <button onClick={() => setPromotingId(null)} className="text-foreground/40 hover:text-foreground transition-colors">
@@ -464,7 +464,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                                     </div>
                                                     <div className="flex gap-4">
                                                         <div className="flex-1 flex flex-col gap-1">
-                                                            <label className="text-[9px] font-semibold uppercase tracking-widest text-foreground/40">Lyrics / Script</label>
+                                                            <label className="text-[11px] font-semibold text-foreground/40">Lyrics / Script</label>
                                                             <textarea 
                                                                 value={lyrics}
                                                                 onChange={e => setLyrics(e.target.value)}
@@ -473,7 +473,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                                             />
                                                         </div>
                                                         <div className="w-32 flex flex-col gap-1">
-                                                            <label className="text-[9px] font-semibold uppercase tracking-widest text-foreground/40">Runtime (sec)</label>
+                                                            <label className="text-[11px] font-semibold text-foreground/40">Runtime (sec)</label>
                                                             <input 
                                                                 type="number"
                                                                 value={targetRuntime}
@@ -489,7 +489,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                                         loading={isPlanning}
                                                         disabled={!lyrics.trim()}
                                                         loadingText="Planning..."
-                                                        className="btn-primary px-6 py-2.5 text-[10px] font-semibold uppercase tracking-widest flex items-center justify-center gap-2"
+                                                        className="btn-primary px-6 py-2.5 text-xs font-semibold flex items-center justify-center gap-2"
                                                         icon={<Send className="w-3 h-3" />}
                                                     >
                                                         Launch Multi-Agent Planning
@@ -498,7 +498,7 @@ export default function CreativeHub({ theme, mode = 'kirbai' }: { theme?: string
                                             ) : (
                                                 <button 
                                                     onClick={() => setPromotingId(concept.id)}
-                                                    className="w-fit flex items-center gap-2 px-4 py-2 border border-border rounded-[var(--btn-radius)] text-[10px] font-semibold uppercase tracking-widest text-foreground/40 hover:text-foreground hover:border-accent transition-all group/btn"
+                                                    className="w-fit flex items-center gap-2 px-4 py-2 border border-border rounded-[var(--btn-radius)] text-xs font-semibold text-foreground/40 hover:text-foreground hover:border-accent transition-all group/btn"
                                                 >
                                                     <Clapperboard className="w-4 h-4 text-accent/50 group-hover/btn:text-accent" /> Promote to Director's Suite
                                                 </button>

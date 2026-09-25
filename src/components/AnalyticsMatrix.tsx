@@ -98,7 +98,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
         return (
             <div className="w-full h-96 flex flex-col items-center justify-center gap-3 text-foreground/50">
                 <Loader2 className="w-8 h-8 animate-spin text-accent" />
-                <span className="text-xs font-mono uppercase tracking-widest">Loading Master Analytics Hub...</span>
+                <span className="text-xs font-mono">Loading Master Analytics Hub...</span>
             </div>
         );
     }
@@ -131,40 +131,32 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                     <div className="flex p-1 bg-surface/80 rounded-xl border border-border/60">
                         <button
                             onClick={() => setActiveSubTab('overview')}
-                            className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${
-                                activeSubTab === 'overview' ? 'bg-accent text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
-                            }`}
+                            className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${ activeSubTab === 'overview' ? 'bg-accent text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
                         >
                             Overview
                         </button>
                         <button
                             onClick={() => setActiveSubTab('social')}
-                            className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${
-                                activeSubTab === 'social' ? 'bg-pink-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
-                            }`}
+                            className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${ activeSubTab === 'social' ? 'bg-pink-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
                         >
                             Social Reels (IG, FB, TikTok)
                         </button>
                         <button
                             onClick={() => setActiveSubTab('youtube')}
-                            className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${
-                                activeSubTab === 'youtube' ? 'bg-red-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
-                            }`}
+                            className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${ activeSubTab === 'youtube' ? 'bg-red-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
                         >
                             YouTube Intel
                         </button>
                         <button
                             onClick={() => setActiveSubTab('distrokid')}
-                            className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all ${
-                                activeSubTab === 'distrokid' ? 'bg-emerald-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
-                            }`}
+                            className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${ activeSubTab === 'distrokid' ? 'bg-emerald-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
                         >
                             DistroKid Music
                         </button>
                     </div>
 
                     {/* Manual CSV Upload Button */}
-                    <label className="btn-secondary text-[10px] uppercase font-bold tracking-wider px-3 py-1.5 cursor-pointer flex items-center gap-1.5">
+                    <label className="btn-secondary text-xs font-bold px-3 py-1.5 cursor-pointer flex items-center gap-1.5">
                         <Upload className="w-3.5 h-3.5" />
                         {isUploadingCSV ? 'Processing...' : 'Upload CSV'}
                         <input
@@ -222,7 +214,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
                                     <Music className="w-4 h-4 text-emerald-400" />
                                     <h3 className="text-base font-extrabold text-foreground tracking-tight">Top Earning Tracks</h3>
                                 </div>
-                                <span className="text-[10px] font-mono text-foreground/40 uppercase">Ranked by Royalties</span>
+                                <span className="text-xs font-mono text-foreground/40">Ranked by Royalties</span>
                             </div>
 
                             <div className="flex flex-col gap-2 max-h-[420px] overflow-y-auto custom-scrollbar pr-1">
@@ -283,15 +275,15 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
 
                                 <div className="grid grid-cols-3 gap-2 pt-3 border-t border-border/40 text-center">
                                     <div className="flex flex-col">
-                                        <span className="text-[9px] uppercase font-mono text-foreground/40">Subscribers</span>
+                                        <span className="text-[11px] font-mono text-foreground/40">Subscribers</span>
                                         <span className="text-sm font-extrabold text-foreground">{ch.subscribers.toLocaleString()}</span>
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-[9px] uppercase font-mono text-foreground/40">Views</span>
+                                        <span className="text-[11px] font-mono text-foreground/40">Views</span>
                                         <span className="text-sm font-extrabold text-red-400">{ch.views.toLocaleString()}</span>
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-[9px] uppercase font-mono text-foreground/40">Videos</span>
+                                        <span className="text-[11px] font-mono text-foreground/40">Videos</span>
                                         <span className="text-sm font-extrabold text-foreground">{ch.videoCount.toLocaleString()}</span>
                                     </div>
                                 </div>

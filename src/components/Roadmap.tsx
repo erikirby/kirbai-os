@@ -63,13 +63,13 @@ export default function Roadmap({ mode = 'kirbai' }: { mode?: 'kirbai' | 'factor
             if (json.success && json.data) {
                 setPhases(json.data.phases || []);
                 setTasks(json.data.tasks || []);
-                setNotice({ message: "Strategic directive accepted and structured.", type: 'success' });
+                setNotice({ message: "Roadmap updated.", type: 'success' });
                 setRawInput("");
             } else {
-                setNotice({ message: json.error || "Failed to parse strategy.", type: 'error' });
+                setNotice({ message: json.error || "Couldn't organize that. Try again.", type: 'error' });
             }
         } catch (e) {
-            setNotice({ message: "Neural Uplink Interrupted.", type: 'error' });
+            setNotice({ message: "Couldn't reach the AI. Try again.", type: 'error' });
         } finally {
             setIsParsing(false);
         }
@@ -78,7 +78,7 @@ export default function Roadmap({ mode = 'kirbai' }: { mode?: 'kirbai' | 'factor
     if (isLoading) {
         return (
             <div className="p-10 flex items-center gap-4 text-foreground/50 font-medium text-sm">
-                <Loader2 className="animate-spin w-4 h-4" /> Synchronizing Roadmap...
+                <Loader2 className="animate-spin w-4 h-4" /> Loading roadmap…
             </div>
         );
     }
@@ -102,11 +102,11 @@ export default function Roadmap({ mode = 'kirbai' }: { mode?: 'kirbai' | 'factor
             {/* Header */}
             <div className="flex justify-between items-center ml-1">
                 <div className="flex flex-col gap-1">
-                    <p className="section-eyebrow">Strategic Trajectory</p>
-                    <h2 className="section-title">Master Roadmap</h2>
+                    <p className="section-eyebrow">Big picture</p>
+                    <h2 className="section-title">Roadmap</h2>
                 </div>
                 <span className="badge hidden md:block">
-                    {phases.length} Active Phases
+                    {phases.length} phases
                 </span>
             </div>
 
@@ -114,12 +114,12 @@ export default function Roadmap({ mode = 'kirbai' }: { mode?: 'kirbai' | 'factor
             <div className="card p-6 flex flex-col gap-4">
                 <div className="flex items-center gap-3 mb-2">
                     <Sparkles className="w-5 h-5 text-accent" />
-                    <h3 className="section-subtitle">Strategic Injection</h3>
+                    <h3 className="section-subtitle">Paste a plan</h3>
                 </div>
                 <textarea
                     value={rawInput}
                     onChange={(e) => setRawInput(e.target.value)}
-                    placeholder="Paste raw AI strategic advice here. The system will mathematically distill it into actionable phases and tasks..."
+                    placeholder="Paste a plan or advice from a chat. It gets turned into phases and tasks."
                     className="input-field w-full h-32 p-4 text-sm resize-y"
                 />
                 <div className="flex justify-end">
@@ -129,7 +129,7 @@ export default function Roadmap({ mode = 'kirbai' }: { mode?: 'kirbai' | 'factor
                         className={`flex items-center gap-2 px-6 py-3 transition-all ${isParsing ? 'btn-secondary animate-pulse' : !rawInput.trim() ? 'btn-secondary opacity-50 cursor-not-allowed' : 'btn-primary'}`}
                     >
                         {isParsing ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronRight className="w-4 h-4" />}
-                        {isParsing ? "Distilling Schema..." : "Execute AI Structuring"}
+                        {isParsing ? "Organizing…" : "Organize it"}
                     </button>
                 </div>
             </div>
@@ -141,7 +141,7 @@ export default function Roadmap({ mode = 'kirbai' }: { mode?: 'kirbai' | 'factor
                         
                         {phases.length === 0 ? (
                             <div className="p-10 text-center text-foreground/50 italic text-sm">
-                                Awaiting Strategic Injection...
+                                No phases yet. Paste a plan above to get started.
                             </div>
                         ) : (
                             phases.map((phase, idx) => {
@@ -170,11 +170,11 @@ export default function Roadmap({ mode = 'kirbai' }: { mode?: 'kirbai' | 'factor
                     </div>
 
                     <div className="flex flex-col gap-4 mt-6 relative z-10">
-                        <h3 className="section-subtitle ml-1">Strategic Command Log</h3>
+                        <h3 className="section-subtitle ml-1">Tasks</h3>
                         <div className="grid grid-cols-1 gap-3">
                             {tasks.length === 0 ? (
                                 <div className="card p-6 text-center text-foreground/50 italic text-sm">
-                                    No active tasks detected.
+                                    No tasks yet.
                                 </div>
                             ) : (
                                 tasks.map((task) => {
@@ -207,11 +207,7 @@ export default function Roadmap({ mode = 'kirbai' }: { mode?: 'kirbai' | 'factor
                                             <span className={`text-sm font-medium leading-snug flex-1 ${
                                                 task.status === 'done' ? 'line-through text-foreground/30' : 'text-foreground/80 group-hover:text-foreground'
                                             } transition-colors`}>{task.text}</span>
-                                            <span className={`text-[10px] font-semibold uppercase tracking-wider shrink-0 ${
-                                                task.status === 'todo' ? 'text-foreground/40' :
-                                                task.status === 'wip'  ? 'text-amber-400' :
-                                                'text-emerald-400'
-                                            }`}>{task.status === 'todo' ? '—' : task.status === 'wip' ? 'WIP' : 'Done'}</span>
+                                            <span className={`text-xs font-semibold shrink-0 ${ task.status === 'todo' ? 'text-foreground/40' : task.status === 'wip' ? 'text-amber-400' : 'text-emerald-400' }`}>{task.status === 'todo' ? '—' : task.status === 'wip' ? 'WIP' : 'Done'}</span>
                                         </div>
                                     );
                                 })

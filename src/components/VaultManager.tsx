@@ -107,23 +107,23 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
 
     // --- Notice Formatting ---
     const formatErrorMessage = (err: string) => {
-        if (!err) return "Inscrutable Neural Error";
+        if (!err) return "Something went wrong";
         const cleanErr = err.toUpperCase();
 
         // Check for specific Quota labels to avoid "arbitrary" wait messages
         if (cleanErr.includes("429") || cleanErr.includes("QUOTA")) {
             if (cleanErr.includes("DAY") || cleanErr.includes("DAILY")) {
-                return "AI Neural Daily Allowance Exhausted. Access restores at Midnight PST (or switch API Key).";
+                return "Out of AI calls for today. Resets at midnight PST.";
             }
             if (cleanErr.includes("MINUTE") || cleanErr.includes("REQUESTS PER MINUTE")) {
-                return "AI Neural Minute Limit Reached. Please wait 60s for the next burst window.";
+                return "Too many AI calls. Wait a minute and try again.";
             }
             // Generic quota error
-            return "AI Neural Quota Restricted. Try again in 60s; if failure persists, Daily limit may be reached.";
+            return "AI limit hit. Try again in a minute.";
         }
 
         if (cleanErr.includes("503") || cleanErr.includes("UNAVAILABLE")) {
-            return "AI Neural Core Overloaded. Attempting reconnection in 5s...";
+            return "The AI is busy. Retrying in 5s…";
         }
 
         // If it looks like a JSON dump from Google AI SDK, try to extract the actual message
@@ -589,7 +589,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
 
     if (isLoading) {
         return (
-            <div className="p-10 flex items-center gap-4 text-foreground/50 font-mono text-xs uppercase tracking-widest">
+            <div className="p-10 flex items-center gap-4 text-foreground/50 font-mono text-xs">
                 <Loader2 className="animate-spin w-4 h-4" /> Syncing Neural Net...
             </div>
         );
@@ -613,7 +613,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                     : 'bg-green-500/10 border-green-500/20 text-green-500'
                     }`}>
                     {notice.type === 'error' ? <AlertCircle className="w-5 h-5 shrink-0" /> : <CheckCircle2 className="w-5 h-5 shrink-0" />}
-                    <p className="flex-1 text-[11px] font-semibold uppercase tracking-wider leading-relaxed">{notice.message}</p>
+                    <p className="flex-1 text-[11px] font-semibold leading-relaxed">{notice.message}</p>
                     <button onClick={() => setNotice(null)} className="p-1 hover:bg-surface/60 rounded-full transition-colors">
                         <X className="w-4 h-4" />
                     </button>
@@ -641,7 +641,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                         {hasUnsavedChanges ? "Pending Sync" : "Synced"}
                     </button>
                     {isSaving && (
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-accent animate-pulse flex items-center gap-2 shrink-0">
+                        <span className="text-[11px] font-semibold text-accent animate-pulse flex items-center gap-2 shrink-0">
                             <Loader2 className="w-3 h-3 animate-spin" /> Writing...
                         </span>
                     )}
@@ -687,19 +687,13 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                             <span className="text-sm font-semibold tracking-tight text-foreground truncate pr-6">{p.title}</span>
                                         </div>
                                         <div className="flex gap-1.5 flex-wrap">
-                                            <span className={`text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${
-                                                p.status === 'Primary' ? 'bg-amber-400/20 text-amber-400 border border-amber-400/40' :
-                                                p.status === 'Released' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
-                                                p.status === 'WIP' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' :
-                                                p.status === 'Active' ? 'bg-accent/10 text-accent border border-accent/20' :
-                                                'bg-foreground/10 text-foreground/40 border border-foreground/10'
-                                            }`}>
+                                            <span className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${ p.status === 'Primary' ? 'bg-amber-400/20 text-amber-400 border border-amber-400/40' : p.status === 'Released' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : p.status === 'WIP' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : p.status === 'Active' ? 'bg-accent/10 text-accent border border-accent/20' : 'bg-foreground/10 text-foreground/40 border border-foreground/10' }`}>
                                                 {p.status || 'Draft'}
                                             </span>
-                                            <span className={`text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${p.alias === 'KURAO' ? 'bg-indigo-500/20 text-indigo-400' : p.alias === 'AELOW' ? 'bg-green-500/20 text-green-400' : 'bg-foreground/10 text-foreground/60'}`}>
+                                            <span className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${p.alias === 'KURAO' ? 'bg-indigo-500/20 text-indigo-400' : p.alias === 'AELOW' ? 'bg-green-500/20 text-green-400' : 'bg-foreground/10 text-foreground/60'}`}>
                                                 {p.alias}
                                             </span>
-                                            <span className="text-[8px] px-2 py-0.5 rounded-full bg-accent/10 text-accent/70 font-black uppercase tracking-widest">
+                                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-accent/10 text-accent/70 font-semibold">
                                                 {trackCount}T · {lyricCount}L
                                             </span>
                                             {p.releaseDate && (
@@ -738,7 +732,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                     {!activeProject ? (
                         <div className="h-64 flex flex-col items-center justify-center text-center gap-4 opacity-30 p-8">
                             <Save className="w-10 h-10 text-accent" />
-                            <h3 className="text-sm font-black uppercase tracking-[0.3em]">Access Restricted</h3>
+                            <h3 className="text-sm font-semibold">Access Restricted</h3>
                             <p className="text-xs font-mono max-w-xs">Select or initialize a project from the directory to access its memory block.</p>
                         </div>
                     ) : (
@@ -755,7 +749,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                         ? <img src={activeProject.coverArt} className="w-full h-full object-cover group-hover:opacity-50 transition-opacity" alt="Cover Art" />
                                         : <div className="flex flex-col items-center gap-1 opacity-30 group-hover:opacity-70 transition-opacity">
                                             <Plus className="w-5 h-5" />
-                                            <span className="text-[8px] uppercase tracking-widest font-black">Art</span>
+                                            <span className="text-[11px] font-semibold">Art</span>
                                         </div>
                                     }
                                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
@@ -768,27 +762,27 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                             type="text"
                                             value={activeProject.title}
                                             onChange={(e) => updateActiveProject('title', e.target.value)}
-                                            className="section-title uppercase italic bg-transparent border-none outline-none w-full text-foreground focus:text-foreground"
+                                            className="section-title italic bg-transparent border-none outline-none w-full text-foreground focus:text-foreground"
                                             placeholder="Project Title"
                                         />
 
                                         {/* Readiness Row */}
                                         <div className="flex gap-2">
-                                            <span className="text-[9px] px-2 py-0.5 rounded flex items-center gap-1 font-black uppercase tracking-widest bg-accent/20 text-accent">
+                                            <span className="text-[11px] px-2 py-0.5 rounded flex items-center gap-1 font-semibold bg-accent/20 text-accent">
                                                 [{formatBadge}]
                                             </span>
                                             {activeProject.status !== 'Released' && missingArt && (
-                                                <span className="text-[9px] px-2 py-0.5 rounded flex items-center gap-1 font-black uppercase tracking-widest bg-red-500/20 text-red-500 shadow-md">
+                                                <span className="text-[11px] px-2 py-0.5 rounded flex items-center gap-1 font-semibold bg-red-500/20 text-red-500 shadow-md">
                                                     <AlertCircle className="w-3 h-3" /> Missing Art
                                                 </span>
                                             )}
                                             {activeProject.status !== 'Released' && activeLyricsCount < expectedLyrics && (
-                                                <span className="text-[9px] px-2 py-0.5 rounded flex items-center gap-1 font-black uppercase tracking-widest bg-orange-500/20 text-orange-400 shadow-md">
+                                                <span className="text-[11px] px-2 py-0.5 rounded flex items-center gap-1 font-semibold bg-orange-500/20 text-orange-400 shadow-md">
                                                     <AlertCircle className="w-3 h-3" /> Lyrics: {activeLyricsCount}/{expectedLyrics}
                                                 </span>
                                             )}
                                             {activeProject.status !== 'Released' && !missingArt && activeLyricsCount >= expectedLyrics && expectedLyrics > 0 && (
-                                                <span className="text-[9px] px-2 py-0.5 rounded flex items-center gap-1 font-black uppercase tracking-widest bg-green-500/20 text-green-500">
+                                                <span className="text-[11px] px-2 py-0.5 rounded flex items-center gap-1 font-semibold bg-green-500/20 text-green-500">
                                                     <CheckCircle2 className="w-3 h-3" /> Ready
                                                 </span>
                                             )}
@@ -799,13 +793,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                         <select
                                             value={activeProject.status || 'Draft'}
                                             onChange={(e) => updateActiveProject('status', e.target.value)}
-                                            className={`p-1.5 px-3 font-black text-[9px] uppercase tracking-widest border rounded-full focus:outline-none appearance-none cursor-pointer ${
-                                                activeProject.status === 'Primary' ? 'bg-amber-400/20 text-amber-400 border-amber-400/40' :
-                                                activeProject.status === 'Released' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                                                activeProject.status === 'WIP' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
-                                                activeProject.status === 'Active' ? 'bg-accent/10 text-accent border-accent/20' :
-                                                'bg-surface text-foreground border-transparent'
-                                            }`}
+                                            className={`p-1.5 px-3 font-semibold text-[11px] border rounded-full focus:outline-none appearance-none cursor-pointer ${ activeProject.status === 'Primary' ? 'bg-amber-400/20 text-amber-400 border-amber-400/40' : activeProject.status === 'Released' ? 'bg-green-500/10 text-green-500 border-green-500/20' : activeProject.status === 'WIP' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : activeProject.status === 'Active' ? 'bg-accent/10 text-accent border-accent/20' : 'bg-surface text-foreground border-transparent' }`}
                                         >
                                             <option value="Draft">Draft</option>
                                             <option value="Active">Active</option>
@@ -816,7 +804,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                         <select
                                             value={activeProject.alias}
                                             onChange={(e) => updateActiveProject('alias', e.target.value)}
-                                            className="p-1.5 px-3 font-black text-[9px] uppercase tracking-widest border rounded-full focus:outline-none appearance-none cursor-pointer bg-surface text-foreground border-transparent"
+                                            className="p-1.5 px-3 font-semibold text-[11px] border rounded-full focus:outline-none appearance-none cursor-pointer bg-surface text-foreground border-transparent"
                                         >
                                             <option value="Kirbai">Kirbai</option>
                                             <option value="AELOW">AELOW</option>
@@ -824,7 +812,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                         </select>
                                         <label className="flex items-center gap-1.5 px-3 py-1.5 border border-foreground/10 rounded-full bg-foreground/5">
                                             <CalendarDays className="w-3 h-3 text-accent" />
-                                            <span className="text-[11px] font-semibold uppercase tracking-wider text-foreground/40">Released:</span>
+                                            <span className="text-[11px] font-semibold text-foreground/40">Released:</span>
                                             <input
                                                 type="date"
                                                 value={activeProject.releaseDate || ''}
@@ -833,7 +821,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                             />
                                         </label>
                                         <div className="flex items-center gap-1.5">
-                                            <span className="text-[11px] font-semibold uppercase tracking-wider text-foreground/40">Target Tracks:</span>
+                                            <span className="text-[11px] font-semibold text-foreground/40">Target Tracks:</span>
                                             <input
                                                 type="number"
                                                 min="1"
@@ -842,7 +830,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                                     const val = parseInt(e.target.value);
                                                     updateActiveProject('targetTrackCount', isNaN(val) ? undefined : val);
                                                 }}
-                                                className={`w-12 p-1 px-2 text-center font-mono text-[9px] uppercase tracking-widest border rounded-lg focus:outline-none focus:border-accent ${inputBase}`}
+                                                className={`w-12 p-1 px-2 text-center font-mono text-[11px] border rounded-lg focus:outline-none focus:border-accent ${inputBase}`}
                                                 placeholder={activeTrackCount.toString()}
                                             />
                                         </div>
@@ -851,7 +839,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                             value={activeProject.visualVibe}
                                             onChange={(e) => updateActiveProject('visualVibe', e.target.value)}
                                             placeholder="Visual Vibe..."
-                                            className={`p-1.5 px-3 font-mono text-[9px] uppercase tracking-widest border rounded-full focus:outline-none focus:border-accent w-32 ${inputBase}`}
+                                            className={`p-1.5 px-3 font-mono text-[11px] border rounded-full focus:outline-none focus:border-accent w-32 ${inputBase}`}
                                         />
                                         {/* Sync Master Sheet pill */}
                                         <div className="flex items-center gap-1.5 flex-1 min-w-0 border border-foreground/10 rounded-full bg-foreground/5 pl-3 pr-1 focus-within:border-accent focus-within:bg-accent/5 transition-all">
@@ -868,7 +856,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                                 loading={isSyncingSheet}
                                                 disabled={!sheetUrl.trim()}
                                                 loadingText="..."
-                                                className={`p-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider rounded-full transition-all shrink-0 ${isSyncingSheet ? 'bg-accent/20 text-accent' : sheetUrl.trim() ? 'bg-accent text-black hover:scale-105' : 'bg-foreground/10 text-foreground/30'}`}
+                                                className={`p-1.5 px-3 text-[11px] font-semibold rounded-full transition-all shrink-0 ${isSyncingSheet ? 'bg-accent/20 text-accent' : sheetUrl.trim() ? 'bg-accent text-black hover:scale-105' : 'bg-foreground/10 text-foreground/30'}`}
                                             >
                                                 Sync
                                             </StatusButton>
@@ -877,16 +865,16 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                         {/* Delete / Confirm */}
                                         {confirmingDeleteId === activeProject.id ? (
                                             <div className="flex items-center gap-2 shrink-0">
-                                                <span className="text-[11px] font-semibold uppercase tracking-wider text-red-400">Purge project?</span>
+                                                <span className="text-[11px] font-semibold text-red-400">Purge project?</span>
                                                 <button
                                                     onClick={() => deleteProject(activeProject.id)}
-                                                    className="px-3 py-1.5 bg-red-500 text-foreground text-[11px] font-semibold uppercase tracking-wider rounded-full hover:bg-red-600 transition-colors"
+                                                    className="px-3 py-1.5 bg-red-500 text-foreground text-[11px] font-semibold rounded-full hover:bg-red-600 transition-colors"
                                                 >
                                                     Yes, Delete
                                                 </button>
                                                 <button
                                                     onClick={() => setConfirmingDeleteId(null)}
-                                                    className="px-3 py-1.5 bg-foreground/10 text-foreground/60 text-[11px] font-semibold uppercase tracking-wider rounded-full hover:bg-foreground/20 transition-colors"
+                                                    className="px-3 py-1.5 bg-foreground/10 text-foreground/60 text-[11px] font-semibold rounded-full hover:bg-foreground/20 transition-colors"
                                                 >
                                                     Cancel
                                                 </button>
@@ -894,7 +882,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                         ) : (
                                             <button
                                                 onClick={() => setConfirmingDeleteId(activeProject.id)}
-                                                className="p-1.5 px-3 border border-red-500/20 text-red-400/70 hover:bg-red-500 hover:text-foreground rounded-full transition-colors text-[9px] tracking-widest uppercase font-black shrink-0"
+                                                className="p-1.5 px-3 border border-red-500/20 text-red-400/70 hover:bg-red-500 hover:text-foreground rounded-full transition-colors text-[11px] font-semibold shrink-0"
                                             >
                                                 Purge
                                             </button>
@@ -925,12 +913,12 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                                         />
                                                         <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                                                             {lyric
-                                                                ? <span className="text-[8px] px-2 py-0.5 rounded-full bg-accent/10 text-accent/70 font-black uppercase tracking-widest">Lyrics ✓</span>
-                                                                : <span className="text-[8px] px-2 py-0.5 rounded-full bg-foreground/5 text-foreground/30 font-black uppercase tracking-widest">No Lyrics</span>
+                                                                ? <span className="text-[11px] px-2 py-0.5 rounded-full bg-accent/10 text-accent/70 font-semibold">Lyrics ✓</span>
+                                                                : <span className="text-[11px] px-2 py-0.5 rounded-full bg-foreground/5 text-foreground/30 font-semibold">No Lyrics</span>
                                                             }
                                                             <button
                                                                 onClick={() => setExpandedTrack(isExpanded ? null : track)}
-                                                                className="text-[10px] font-semibold uppercase tracking-wider text-accent hover:text-accent px-3 py-1 rounded-full border border-accent/20 hover:border-accent/40 transition-all"
+                                                                className="text-xs font-semibold text-accent hover:text-accent px-3 py-1 rounded-full border border-accent/20 hover:border-accent/40 transition-all"
                                                             >
                                                                 {isExpanded ? 'Collapse' : lyric ? 'View / Edit' : '+ Add Lyrics'}
                                                             </button>
@@ -962,7 +950,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                                         <div className="border-t border-border animate-in fade-in slide-in-from-top-1 duration-200">
                                                             {/* Lyric Action Bar */}
                                                             <div className="px-4 py-2 border-b flex items-center gap-3 bg-surface border-border">
-                                                                <label className="text-[11px] font-semibold uppercase tracking-wider text-foreground/50 hover:text-accent cursor-pointer flex items-center gap-1.5 transition-colors">
+                                                                <label className="text-[11px] font-semibold text-foreground/50 hover:text-accent cursor-pointer flex items-center gap-1.5 transition-colors">
                                                                     <FileText className="w-3 h-3" /> Upload .rtf / .txt
                                                                     <input
                                                                         type="file"
@@ -977,9 +965,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                                                     loading={isFormattingTrack === track}
                                                                     disabled={!lyric?.content}
                                                                     loadingText="Formatting..."
-                                                                    className={`text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-all
-                                                                        ${isFormattingTrack === track ? 'text-accent' :
-                                                                            !lyric?.content ? 'text-foreground/20 cursor-not-allowed' : 'text-accent hover:text-accent'}`}
+                                                                    className={`text-[11px] font-semibold flex items-center gap-1.5 transition-all ${isFormattingTrack === track ? 'text-accent' : !lyric?.content ? 'text-foreground/20 cursor-not-allowed' : 'text-accent hover:text-accent'}`}
                                                                     icon={<Wand2 className="w-3 h-3" />}
                                                                 >
                                                                     AI Format & Clean
@@ -996,11 +982,11 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                                             <div className="px-4 pb-3 flex justify-between items-center">
                                                                 <button
                                                                     onClick={() => clearLyric(track)}
-                                                                    className="text-[11px] font-semibold uppercase tracking-wider text-red-400 hover:text-foreground hover:bg-red-500 px-3 py-1 rounded-full transition-colors flex items-center gap-1"
+                                                                    className="text-[11px] font-semibold text-red-400 hover:text-foreground hover:bg-red-500 px-3 py-1 rounded-full transition-colors flex items-center gap-1"
                                                                 >
                                                                     <Trash2 className="w-3 h-3" /> Clear
                                                                 </button>
-                                                                <span className="text-[8px] uppercase tracking-widest text-foreground/30 font-mono">Saves automatically</span>
+                                                                <span className="text-[11px] text-foreground/30 font-mono">Saves automatically</span>
                                                             </div>
                                                         </div>
                                                     )}
@@ -1010,7 +996,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
 
                                         <button
                                             onClick={addTrack}
-                                            className="mt-2 py-2.5 border border-dashed border-foreground/10 rounded-xl text-[11px] font-semibold uppercase tracking-wider text-foreground/30 hover:text-accent hover:border-accent/30 transition-colors flex items-center justify-center gap-2"
+                                            className="mt-2 py-2.5 border border-dashed border-foreground/10 rounded-xl text-[11px] font-semibold text-foreground/30 hover:text-accent hover:border-accent/30 transition-colors flex items-center justify-center gap-2"
                                         >
                                             <Plus className="w-3 h-3" /> Add Track
                                         </button>
@@ -1063,11 +1049,11 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                             </div>
                                         ))}
                                         {(activeProject.externalLinks || []).length === 0 && (
-                                            <span className="text-[9px] uppercase tracking-widest font-mono text-foreground/30 italic pb-1">No resources linked yet.</span>
+                                            <span className="text-[11px] font-mono text-foreground/30 italic pb-1">No resources linked yet.</span>
                                         )}
                                         <button
                                             onClick={addLink}
-                                            className="mt-1 py-2 border border-dashed border-foreground/10 rounded-xl text-[11px] font-semibold uppercase tracking-wider text-foreground/30 hover:text-green-400 hover:border-green-400/30 transition-colors flex items-center justify-center gap-2"
+                                            className="mt-1 py-2 border border-dashed border-foreground/10 rounded-xl text-[11px] font-semibold text-foreground/30 hover:text-green-400 hover:border-green-400/30 transition-colors flex items-center justify-center gap-2"
                                         >
                                             <Plus className="w-3 h-3" /> Add Link
                                         </button>
@@ -1077,7 +1063,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                 {/* SECTION 3.5: DISTROKID IMPORT */}
                                 <Section title="DistroKid Tracklist Import" icon={<ClipboardList className="w-3 h-3 text-amber-400" />} defaultOpen={false}>
                                     <div className="flex flex-col gap-3 mt-2">
-                                        <p className="text-[9px] font-mono uppercase tracking-widest text-foreground/40">
+                                        <p className="text-[11px] font-mono text-foreground/40">
                                             Copy the full track list from your DistroKid album page and paste it below. The parser will extract all track titles automatically.
                                         </p>
                                         <textarea
@@ -1089,10 +1075,7 @@ export default function VaultManager({ theme = "dark", mode = "kirbai" }: VaultM
                                         <button
                                             onClick={parseDistrokid}
                                             disabled={!distrokidText.trim()}
-                                            className={`self-end px-6 py-2 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all flex items-center gap-2 ${distrokidText.trim()
-                                                ? 'bg-amber-400 text-black hover:scale-105 shadow-lg'
-                                                : 'bg-foreground/10 text-foreground/30'
-                                                }`}
+                                            className={`self-end px-6 py-2 rounded-full text-[11px] font-semibold transition-all flex items-center gap-2 ${distrokidText.trim() ? 'bg-amber-400 text-black hover:scale-105 shadow-lg' : 'bg-foreground/10 text-foreground/30' }`}
                                         >
                                             <ClipboardList className="w-3 h-3" /> Parse Tracklist
                                         </button>

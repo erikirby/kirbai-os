@@ -237,7 +237,7 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                     className="flex items-center gap-2 px-4 py-2 bg-surface/40 border border-border hover:bg-white/10 text-foreground rounded-xl shadow-lg backdrop-blur-md transition-all disabled:opacity-50"
                 >
                     <Undo2 className="w-4 h-4" />
-                    <span className="text-sm font-bold uppercase tracking-wider">Undo</span>
+                    <span className="text-sm font-bold">Undo</span>
                     {state.history.length > 0 && <span className="bg-white/20 px-2 py-0.5 rounded text-xs">{state.history.length}</span>}
                 </button>
             </div>
@@ -296,7 +296,7 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                                         </div>
 
                                         <div>
-                                            <div className={`text-[9px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-full inline-block border mb-1 ${styleClass}`}>
+                                            <div className={`text-[11px] font-semibold px-2 py-0.5 rounded-full inline-block border mb-1 ${styleClass}`}>
                                                 {node.type}
                                             </div>
                                             <h3 className="text-xl font-bold text-foreground leading-tight">{node.data.label}</h3>
@@ -349,7 +349,7 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
                                             {/* Traits */}
                                             {node.data.traits && (
                                                 <div className="mb-4 p-3 bg-purple-400/5 border border-purple-400/10 rounded-xl">
-                                                    <p className="text-[9px] font-black uppercase tracking-widest text-purple-400/60 mb-1">Profile</p>
+                                                    <p className="text-[11px] font-semibold text-purple-400/60 mb-1">Profile</p>
                                                     <p className="text-xs text-purple-200/70 leading-relaxed font-mono">{node.data.traits}</p>
                                                 </div>
                                             )}
@@ -391,11 +391,7 @@ export default function LoreMatrix({ theme, mode = 'kirbai' }: { theme?: string;
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-3xl px-6 z-50">
                 {/* AI Status Feedback */}
                 {aiStatus && (
-                    <div className={`mb-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-center border ${
-                        aiStatus.type === 'success'
-                            ? 'bg-green-500/10 border-green-500/20 text-green-400'
-                            : 'bg-red-500/10 border-red-500/20 text-red-400'
-                    }`}>
+                    <div className={`mb-2 px-4 py-2 rounded-xl text-xs font-semibold text-center border ${ aiStatus.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-400' }`}>
                         {aiStatus.message}
                     </div>
                 )}

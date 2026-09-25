@@ -72,17 +72,13 @@ export default function RevenueTimelineChart({ data }: TimelineProps) {
                 <div className="flex items-center gap-1.5 bg-surface/80 p-1 rounded-xl border border-border/60">
                     <button
                         onClick={() => setViewType('earnings')}
-                        className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 ${
-                            viewType === 'earnings' ? 'bg-emerald-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
-                        }`}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${ viewType === 'earnings' ? 'bg-emerald-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
                     >
                         <DollarSign className="w-3 h-3" /> Royalties ($)
                     </button>
                     <button
                         onClick={() => setViewType('quantity')}
-                        className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 ${
-                            viewType === 'quantity' ? 'bg-purple-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
-                        }`}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${ viewType === 'quantity' ? 'bg-purple-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
                     >
                         <Music className="w-3 h-3" /> Streams / Quantity
                     </button>

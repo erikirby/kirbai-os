@@ -1094,7 +1094,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
     if (isLoading) return (
         <div className="flex flex-col items-center justify-center py-40 gap-6">
             <Loader2 className="w-12 h-12 animate-spin text-accent" />
-            <span className="text-[11px] font-black text-accent uppercase tracking-[0.6em] animate-pulse">Initializing Studio</span>
+            <span className="text-[11px] font-semibold text-accent animate-pulse">Initializing Studio</span>
         </div>
     );
 
@@ -1104,14 +1104,14 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             <div className="mb-4 flex flex-col md:flex-row gap-4 items-center justify-between p-4 bg-surface/60 border border-border rounded-3xl backdrop-blur-xl">
                 <div className="flex items-center gap-6">
                     <div className="flex flex-col gap-0.5">
-                        <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Monthly Spend</span>
+                        <span className="text-[11px] font-semibold text-accent">Monthly Spend</span>
                         <span className={`text-sm font-mono font-black ${isOverBudget ? 'text-red-400 animate-pulse' : 'text-foreground'}`}>
                             ${monthlySpend.toFixed(2)}
                         </span>
                     </div>
                     <div className="w-px h-8 bg-foreground/5" />
                     <div className="flex flex-col gap-0.5">
-                        <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Session Logic</span>
+                        <span className="text-[11px] font-semibold text-accent">Session Logic</span>
                         <span className="text-xs font-bold text-green-400 flex items-center gap-1.5">
                             <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                             Nano Banana Online
@@ -1121,7 +1121,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                         <>
                             <div className="w-px h-8 bg-foreground/5" />
                             <div className="flex flex-col gap-0.5">
-                                <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Est. Trial Used</span>
+                                <span className="text-[11px] font-semibold text-accent">Est. Trial Used</span>
                                 <span className="text-xs font-bold text-foreground/60">
                                     ${(telemetry.lifetimeCost || 0).toFixed(2)} / $300
                                 </span>
@@ -1133,7 +1133,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                             <div className="w-px h-8 bg-foreground/5" />
                             <div className="flex items-center gap-2 animate-pulse">
                                 <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_8px_#FF3366]" />
-                                <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Vault Syncing...</span>
+                                <span className="text-[11px] font-semibold text-accent">Vault Syncing...</span>
                             </div>
                         </>
                     )}
@@ -1142,7 +1142,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                 {isOverBudget && (
                     <div className="flex items-center gap-3 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-2xl animate-in fade-in zoom-in">
                         <AlertCircle className="w-4 h-4 text-red-500" />
-                        <span className="text-[11px] font-semibold text-red-500 uppercase tracking-tight">Monthly Limit Reached</span>
+                        <span className="text-[11px] font-semibold text-red-500 tracking-tight">Monthly Limit Reached</span>
                         <label className="flex items-center gap-2 cursor-pointer group">
                             <input 
                                 type="checkbox" 
@@ -1150,7 +1150,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                 onChange={e => setCostShieldOverridden(e.target.checked)}
                                 className="w-4 h-4 rounded border-red-500/40 bg-surface/60 text-red-500 focus:ring-red-500 focus:ring-offset-0 transition-all cursor-pointer"
                             />
-                            <span className="text-[9px] font-bold text-foreground/40 group-hover:text-foreground transition-colors uppercase">Unlock Over-Budget</span>
+                            <span className="text-[11px] font-bold text-foreground/40 group-hover:text-foreground transition-colors">Unlock Over-Budget</span>
                         </label>
                     </div>
                 )}
@@ -1190,10 +1190,10 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 {/* Missions Sidebar */}
                 <div className="lg:col-span-1 flex flex-col gap-4">
-                    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-foreground/40 mb-2">Live Missions</h3>
+                    <h3 className="text-[11px] font-semibold text-foreground/40 mb-2">Live Missions</h3>
                     {missions.length === 0 ? (
                         <div className="p-8 border border-dashed border-border/20 rounded-3xl text-center">
-                            <p className="text-[10px] uppercase font-black text-foreground/20 leading-loose">No active missions.<br/>Promote a concept from the Creative Hub to begin.</p>
+                            <p className="text-xs font-semibold text-foreground/20 leading-loose">No active missions.<br/>Promote a concept from the Creative Hub to begin.</p>
                         </div>
                     ) : (
                         missions.map(m => (
@@ -1204,11 +1204,11 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                     className={`card w-full p-4 text-left flex flex-col gap-2 relative transition-all ${activeMission?.id === m.id ? 'border-accent/40' : 'hover:border-accent/20'}`}
                                 >
                                     <div className="flex items-center justify-between">
-                                        <span className={`text-[11px] font-semibold uppercase tracking-wider ${activeMission?.id === m.id ? 'text-accent' : 'text-foreground/40'}`}>{m.alias}</span>
+                                        <span className={`text-[11px] font-semibold ${activeMission?.id === m.id ? 'text-accent' : 'text-foreground/40'}`}>{m.alias}</span>
                                         {isFullMissionLoading === m.id ? <Loader2 className="w-3 h-3 animate-spin text-accent" /> : null}
                                     </div>
                                     <span className="text-xs font-bold truncate pr-6">{m.title}</span>
-                                    <span className="text-[9px] font-mono text-foreground/30 uppercase">
+                                    <span className="text-[11px] font-mono text-foreground/30">
                                         {m.shotCount !== undefined ? m.shotCount : (m.shots?.length || 0)} SHOTS
                                     </span>
                                 </button>
@@ -1249,7 +1249,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                     {!activeMission ? (
                         <div className="flex-1 bg-surface/20 border border-border/5 rounded-[var(--card-radius)] p-20 flex flex-col items-center justify-center text-center gap-6">
                             <Clapperboard className="w-16 h-16 text-foreground/5 opacity-20" />
-                            <p className="text-[11px] font-semibold uppercase tracking-wider tracking-[0.4em] text-foreground/20">Select a mission to view the matrix</p>
+                            <p className="text-[11px] font-semibold text-foreground/20">Select a mission to view the matrix</p>
                         </div>
                     ) : (
                         <div className="flex flex-col gap-2">
@@ -1263,7 +1263,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                         </div>
                                         <div className="flex flex-col gap-0.5 sm:gap-1">
                                             <h3 className="section-title">{activeMission.title}</h3>
-                                            <div className="flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[11px] font-semibold uppercase tracking-wider text-foreground/40">
+                                            <div className="flex items-center gap-2 sm:gap-3 text-[11px] sm:text-[11px] font-semibold text-foreground/40">
                                                 <span className="text-accent underline shrink-0">Active Mission</span>
                                                 <span className="shrink-0">•</span>
                                                 <span className="font-mono truncate">{activeMission.id}</span>
@@ -1302,31 +1302,31 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                     <div className="flex items-center bg-surface/40 p-1 rounded-full border border-border w-fit">
                                         <button 
                                             onClick={() => setActiveTab("outline")}
-                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0 ${activeTab === 'outline' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
+                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold transition-all flex items-center gap-2 shrink-0 ${activeTab === 'outline' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
                                         >
                                             <Sparkles className="w-3 h-3" /> Outline
                                         </button>
                                         <button 
                                             onClick={() => setActiveTab("references")}
-                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0 ${activeTab === 'references' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
+                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold transition-all flex items-center gap-2 shrink-0 ${activeTab === 'references' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
                                         >
                                             <Camera className="w-3 h-3" /> Refs
                                         </button>
                                         <button 
                                             onClick={() => setActiveTab("cameos")}
-                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0 ${activeTab === 'cameos' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
+                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold transition-all flex items-center gap-2 shrink-0 ${activeTab === 'cameos' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
                                         >
                                             <Users className="w-3 h-3" /> Cameos
                                         </button>
                                         <button 
                                             onClick={() => setActiveTab("blocking")}
-                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0 ${activeTab === 'blocking' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
+                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold transition-all flex items-center gap-2 shrink-0 ${activeTab === 'blocking' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
                                         >
                                             <Layout className="w-3 h-3" /> Blocking
                                         </button>
                                         <button 
                                             onClick={() => setActiveTab("frames")}
-                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shrink-0 ${activeTab === 'frames' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
+                                            className={`px-4 py-2 rounded-full text-[11px] font-semibold transition-all flex items-center gap-2 shrink-0 ${activeTab === 'frames' ? 'bg-accent text-foreground shadow-lg' : 'text-foreground/40 hover:text-foreground hover:bg-foreground/5'}`}
                                         >
                                             <ImageIcon className="w-3 h-3" /> Frames
                                         </button>
@@ -1340,8 +1340,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                     <div className="flex flex-col gap-8 animate-in fade-in duration-300">
                                         <div className="flex justify-between items-center">
                                             <div className="flex flex-col gap-1">
-                                                <h4 className="text-sm font-semibold uppercase tracking-wider tracking-wider">Mission Outline</h4>
-                                                <p className="text-[10px] text-foreground/40 uppercase">Broad strokes vision exported from the Brainstorm phase</p>
+                                                <h4 className="text-sm font-semibold">Mission Outline</h4>
+                                                <p className="text-xs text-foreground/40">Broad strokes vision exported from the Brainstorm phase</p>
                                             </div>
                                             {!isEditingOutline ? (
                                                 <button 
@@ -1395,8 +1395,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                         <div key={category} className="flex flex-col gap-4">
                                                                  <div className="flex items-center justify-between border-l-2 border-accent/20 pl-4">
                                                                     <div>
-                                                                        <h4 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent/60">{category} Sources</h4>
-                                                                        <p className="text-[8px] text-foreground/30 uppercase font-bold tracking-wider">Mandatory visual data for {category.toLowerCase()} consistency</p>
+                                                                        <h4 className="text-[11px] font-semibold text-accent/60">{category} Sources</h4>
+                                                                        <p className="text-[11px] text-foreground/30 font-bold">Mandatory visual data for {category.toLowerCase()} consistency</p>
                                                                     </div>
                                                                     <button 
                                                                         onClick={() => setAddingRefCategory(category)}
@@ -1418,7 +1418,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                          />
                                                                          <button 
                                                                              onClick={() => handleAddCustomReference(category)}
-                                                                             className="px-4 py-2 bg-accent text-foreground rounded-xl text-[11px] font-semibold uppercase"
+                                                                             className="px-4 py-2 bg-accent text-foreground rounded-xl text-[11px] font-semibold"
                                                                          >
                                                                              Add
                                                                          </button>
@@ -1445,7 +1445,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                     >
                                                                                         {req.manualCheck && <Check className="w-3 h-3" />}
                                                                                     </button>
-                                                                                    <span className="text-[11px] font-semibold uppercase tracking-tighter text-accent">{req.label}</span>
+                                                                                    <span className="text-[11px] font-semibold tracking-tighter text-accent">{req.label}</span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
                                                                                     {editingRefLabel !== req.label && (
@@ -1465,7 +1465,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                          <div className="w-8 h-8 rounded-lg border border-green-500/30 overflow-hidden shadow-lg shadow-green-500/10 shrink-0">
                                                                                              <img src={activeMission.references?.[req.uploadedIndex]} className="w-full h-full object-cover" alt="" />
                                                                                          </div>
-                                                                                         <div className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[11px] font-semibold uppercase rounded-md border border-green-500/20 whitespace-nowrap">Linked</div>
+                                                                                         <div className="px-2 py-0.5 bg-green-500/20 text-green-400 text-[11px] font-semibold rounded-md border border-green-500/20 whitespace-nowrap">Linked</div>
                                                                                          <button 
                                                                                             onClick={() => clearReferenceImage(originalIdx)}
                                                                                             className="p-1.5 hover:bg-foreground/5 rounded-lg text-foreground/20 hover:text-accent transition-all"
@@ -1481,7 +1481,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                              fileInputRef.current?.click();
                                                                                          }}
                                                                                          loading={isUploadingRef && targetingReqIdx === originalIdx}
-                                                                                         className="px-2 py-0.5 bg-accent/20 text-accent text-[11px] font-semibold uppercase rounded-md border border-accent/20 hover:bg-accent hover:text-foreground transition-all shadow-lg"
+                                                                                         className="px-2 py-0.5 bg-accent/20 text-accent text-[11px] font-semibold rounded-md border border-accent/20 hover:bg-accent hover:text-foreground transition-all shadow-lg"
                                                                                      >
                                                                                          Upload
                                                                                      </StatusButton>
@@ -1513,7 +1513,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                         </button>
                                                                                         <button 
                                                                                             onClick={() => setEditingRefLabel(null)}
-                                                                                            className="px-3 py-1.5 bg-foreground/5 text-foreground/40 rounded-lg text-[11px] font-semibold uppercase tracking-wider hover:bg-foreground/10 transition-all"
+                                                                                            className="px-3 py-1.5 bg-foreground/5 text-foreground/40 rounded-lg text-[11px] font-semibold hover:bg-foreground/10 transition-all"
                                                                                         >
                                                                                             Cancel
                                                                                         </button>
@@ -1528,7 +1528,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                       onClick={() => getAssetPrompt(req)}
                                                                                       loading={isAssetPromptLoading === req.label}
                                                                                       loadingText="Forging..."
-                                                                                      className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[11px] font-semibold uppercase tracking-wider transition-all active:scale-95 ${copiedId === req.label ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-surface/60 border border-border text-foreground/40 hover:text-accent hover:border-accent/20'}`}
+                                                                                      className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-[11px] font-semibold transition-all active:scale-95 ${copiedId === req.label ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-surface/60 border border-border text-foreground/40 hover:text-accent hover:border-accent/20'}`}
                                                                                       icon={copiedId === req.label ? <Check className="w-3 h-3" /> : <Sparkles className="w-3 h-3 text-accent" />}
                                                                                   >
                                                                                       {copiedId === req.label ? "Copied" : "Get Prompt help"}
@@ -1555,8 +1555,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
 
                                         <div className="flex justify-between items-center bg-surface/60 border border-border p-6 rounded-3xl">
                                             <div className="flex flex-col gap-1">
-                                                <h4 className="text-sm font-semibold uppercase tracking-wider tracking-wider text-foreground/80">Reference Library</h4>
-                                                <p className="text-[10px] text-foreground/40 uppercase">Assets linked to requirements above</p>
+                                                <h4 className="text-sm font-semibold text-foreground/80">Reference Library</h4>
+                                                <p className="text-xs text-foreground/40">Assets linked to requirements above</p>
                                             </div>
                                             <input type="file" ref={fileInputRef} onChange={handleUploadReference} className="hidden" accept="image/*" />
                                         </div>
@@ -1566,7 +1566,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                 <div key={i} className="relative group aspect-[3/4] rounded-2xl overflow-hidden border border-border bg-surface/40 shadow-2xl">
                                                     <img src={ref} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                                                     <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-center">
-                                                        <span className="text-[11px] font-semibold uppercase text-foreground/60">Source #{i+1}</span>
+                                                        <span className="text-[11px] font-semibold text-foreground/60">Source #{i+1}</span>
                                                         <button 
                                                             onClick={() => removeReference(i)}
                                                             className="p-1.5 bg-red-500 text-foreground rounded-lg shadow-xl hover:bg-red-600"
@@ -1585,7 +1585,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                  className="aspect-[3/4] rounded-2xl border border-dashed border-border flex flex-col items-center justify-center gap-3 text-foreground/20 hover:text-accent hover:border-accent/40 transition-all bg-foreground/5 hover:bg-accent/5"
                                                  icon={<Plus className="w-6 h-6" />}
                                              >
-                                                 <span className="text-[11px] font-semibold uppercase tracking-wider">New Reference</span>
+                                                 <span className="text-[11px] font-semibold">New Reference</span>
                                              </StatusButton>
                                         </div>
                                     </div>
@@ -1594,8 +1594,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                 {activeTab === "cameos" && (
                                     <div className="flex flex-col gap-8 animate-in fade-in duration-300">
                                         <div className="flex flex-col gap-1">
-                                            <h4 className="text-sm font-semibold uppercase tracking-wider tracking-wider">Secondary Cast (Cameos)</h4>
-                                            <p className="text-[10px] text-foreground/40 uppercase">Supporting Pokemon appearing in the background or specific shots</p>
+                                            <h4 className="text-sm font-semibold">Secondary Cast (Cameos)</h4>
+                                            <p className="text-xs text-foreground/40">Supporting Pokemon appearing in the background or specific shots</p>
                                         </div>
 
                                         <div className="flex flex-col gap-4 max-w-md">
@@ -1618,7 +1618,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                             <div className="flex flex-wrap gap-2">
                                                 {(activeMission.cameos || []).length === 0 ? (
                                                     <div className="flex flex-col gap-3 p-4 bg-accent/5 border border-dashed border-accent/20 rounded-2xl w-full">
-                                                        <p className="text-[10px] uppercase font-black text-accent/60">Suggested Defaults</p>
+                                                        <p className="text-xs font-semibold text-accent/60">Suggested Defaults</p>
                                                         <div className="flex gap-2">
                                                             {["Munchlax", "Trubbish"].map(suggested => (
                                                                 <button 
@@ -1659,10 +1659,10 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                             <table className="w-full text-left border-collapse responsive-table">
                                                 <thead>
                                                     <tr className="border-b border-border/10 bg-surface/40">
-                                                        <th className="p-6 text-[11px] font-semibold uppercase tracking-wider text-foreground/40">Time</th>
-                                                        <th className="p-6 text-[11px] font-semibold uppercase tracking-wider text-foreground/40">Lyric Sync</th>
-                                                        <th className="p-6 text-[11px] font-semibold uppercase tracking-wider text-foreground/40">Director's vision</th>
-                                                        <th className="p-6 text-[11px] font-semibold uppercase tracking-wider text-foreground/40">Round Table critiques</th>
+                                                        <th className="p-6 text-[11px] font-semibold text-foreground/40">Time</th>
+                                                        <th className="p-6 text-[11px] font-semibold text-foreground/40">Lyric Sync</th>
+                                                        <th className="p-6 text-[11px] font-semibold text-foreground/40">Director's vision</th>
+                                                        <th className="p-6 text-[11px] font-semibold text-foreground/40">Round Table critiques</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-border/5">
@@ -1670,7 +1670,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                         <tr key={shot.id} className="group hover:bg-foreground/5 transition-colors">
                                                             <td className="p-6 align-top">
                                                                 <div className="flex flex-col gap-1">
-                                                                    <span className="lg:hidden text-[11px] font-semibold uppercase tracking-wider text-accent mb-1 opacity-50">Timestamp</span>
+                                                                    <span className="lg:hidden text-[11px] font-semibold text-accent mb-1 opacity-50">Timestamp</span>
                                                                     <span className="text-[11px] font-mono font-black text-accent bg-accent/5 px-2 py-1 rounded-md w-fit">
                                                                         {shot.timestamp}
                                                                     </span>
@@ -1678,35 +1678,35 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                             </td>
                                                             <td className="p-6 lg:p-6 align-top max-w-none lg:max-w-[150px]">
                                                                 <div className="flex flex-col gap-1">
-                                                                    <span className="lg:hidden text-[11px] font-semibold uppercase tracking-wider text-accent mb-1 opacity-50">Lyric Sync</span>
+                                                                    <span className="lg:hidden text-[11px] font-semibold text-accent mb-1 opacity-50">Lyric Sync</span>
                                                                     <p className="text-[10px] font-mono text-pink-400 leading-relaxed italic m-0">{shot.lyric || "—"}</p>
                                                                 </div>
                                                             </td>
                                                             <td className="p-6 lg:p-6 align-top max-w-none lg:max-w-sm">
                                                                 <div className="flex flex-col gap-1">
-                                                                    <span className="lg:hidden text-[11px] font-semibold uppercase tracking-wider text-accent mb-1 opacity-50">Director's Vision</span>
+                                                                    <span className="lg:hidden text-[11px] font-semibold text-accent mb-1 opacity-50">Director's Vision</span>
                                                                     <p className="text-sm leading-relaxed font-medium text-foreground/80 m-0">{shot.visualDescription}</p>
                                                                 </div>
                                                             </td>
                                                             <td className="p-6 lg:p-6 align-top max-w-none lg:max-w-sm">
                                                                 <div className="flex flex-col gap-3">
-                                                                    <span className="lg:hidden text-[11px] font-semibold uppercase tracking-wider text-accent mb-1 opacity-50">Critiques</span>
+                                                                    <span className="lg:hidden text-[11px] font-semibold text-accent mb-1 opacity-50">Critiques</span>
                                                                     {shot.personaCritiques?.director && (
                                                                         <div className="flex gap-2">
                                                                             <Sparkles className="w-2.5 h-2.5 text-purple-400 mt-1 shrink-0" />
-                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-purple-400 font-semibold uppercase tracking-wider tracking-tighter">Director:</span> {shot.personaCritiques.director}</p>
+                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-purple-400 font-semibold tracking-tighter">Director:</span> {shot.personaCritiques.director}</p>
                                                                         </div>
                                                                     )}
                                                                     {shot.personaCritiques?.strategist && (
                                                                         <div className="flex gap-2">
                                                                             <Sparkles className="w-2.5 h-2.5 text-emerald-400 mt-1 shrink-0" />
-                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-emerald-400 font-semibold uppercase tracking-wider tracking-tighter">Strategist:</span> {shot.personaCritiques.strategist}</p>
+                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-emerald-400 font-semibold tracking-tighter">Strategist:</span> {shot.personaCritiques.strategist}</p>
                                                                         </div>
                                                                     )}
                                                                     {shot.personaCritiques?.audience && (
                                                                         <div className="flex gap-2">
                                                                             <Sparkles className="w-2.5 h-2.5 text-pink-400 mt-1 shrink-0" />
-                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-pink-400 font-semibold uppercase tracking-wider tracking-tighter">Audience:</span> {shot.personaCritiques.audience}</p>
+                                                                            <p className="text-[10px] leading-relaxed text-foreground/50 m-0"><span className="text-pink-400 font-semibold tracking-tighter">Audience:</span> {shot.personaCritiques.audience}</p>
                                                                         </div>
                                                                     )}
                                                                 </div>
@@ -1725,8 +1725,8 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                         <div className="p-6 bg-accent/5 border border-accent/20 rounded-3xl flex flex-col gap-3">
                                             <div className="flex justify-between items-end">
                                                 <div className="flex flex-col gap-1">
-                                                    <h4 className="text-xs font-semibold uppercase tracking-wider tracking-wider text-accent">Production Progress</h4>
-                                                    <p className="text-[10px] text-foreground/40 uppercase">Tracking finished assets for this mission</p>
+                                                    <h4 className="text-xs font-semibold text-accent">Production Progress</h4>
+                                                    <p className="text-xs text-foreground/40">Tracking finished assets for this mission</p>
                                                 </div>
                                                 <span className="text-xl font-black text-accent">
                                                     {Math.round(((activeMission.shots.filter(s => s.isProduced).length) / activeMission.shots.length) * 100)}%
@@ -1760,7 +1760,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                             </div>
                                                             <button 
                                                                 onClick={() => toggleShotProduced(shot.id)}
-                                                                className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-[11px] font-semibold uppercase tracking-wider transition-all ${shot.isProduced ? 'bg-accent text-foreground shadow-lg shadow-accent/20' : 'bg-foreground/5 text-foreground/40 hover:bg-foreground/10'}`}
+                                                                className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-[11px] font-semibold transition-all ${shot.isProduced ? 'bg-accent text-foreground shadow-lg shadow-accent/20' : 'bg-foreground/5 text-foreground/40 hover:bg-foreground/10'}`}
                                                             >
                                                                 {shot.isProduced ? <Check className="w-3 h-3" /> : <div className="w-3 h-3 rounded-full border-2 border-current opacity-30" />}
                                                                 {shot.isProduced ? "Produced" : "Mark Finished"}
@@ -1771,7 +1771,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                 onClick={() => handleGenerateImage(shot)}
                                                                 loading={generatingShotId === shot.id && generatingType === "new"}
                                                                 loadingText="Forging..."
-                                                                className="px-4 py-2 rounded-2xl text-[11px] font-semibold uppercase tracking-wider bg-yellow-400 text-black hover:bg-yellow-300 shadow-[0_0_20px_rgba(250,204,21,0.2)] active:scale-95"
+                                                                className="px-4 py-2 rounded-2xl text-[11px] font-semibold bg-yellow-400 text-black hover:bg-yellow-300 shadow-[0_0_20px_rgba(250,204,21,0.2)] active:scale-95"
                                                                 icon={<span className="text-sm">🍌</span>}
                                                             >
                                                                 Generate
@@ -1782,7 +1782,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                     onClick={() => handleForgeVideoPrompt(shot)}
                                                                     loading={forgingVideoShotId === shot.id}
                                                                     loadingText="Forging..."
-                                                                    className="px-3 py-1.5 rounded-xl text-[11px] font-semibold uppercase tracking-wider bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20 shadow-lg active:scale-95"
+                                                                    className="px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500/20 shadow-lg active:scale-95"
                                                                     icon={<Video className="w-3 h-3" />}
                                                                 >
                                                                     📽️ Prompt
@@ -1796,7 +1796,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                     onClick={() => handleGenerateImage(shot, true)}
                                                                     loading={generatingShotId === shot.id && generatingType === "edit"}
                                                                     loadingText="Refining..."
-                                                                    className="px-3 py-1.5 rounded-xl text-[11px] font-semibold uppercase tracking-wider bg-foreground/5 border border-border text-foreground/60 hover:text-foreground hover:bg-foreground/10 shadow-lg active:scale-95"
+                                                                    className="px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-foreground/5 border border-border text-foreground/60 hover:text-foreground hover:bg-foreground/10 shadow-lg active:scale-95"
                                                                     icon={<ImageIcon className="w-3 h-3" />}
                                                                 >
                                                                     🖼️ Edit
@@ -1815,11 +1815,11 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                             {editingShotId === shot.id ? (
                                                                 <div className="flex flex-col gap-2">
                                                                        <div className="flex justify-between items-center mb-1">
-                                                                            <span className="text-[11px] font-semibold uppercase tracking-wider text-accent/60">Banana Image Prompt</span>
+                                                                            <span className="text-[11px] font-semibold text-accent/60">Banana Image Prompt</span>
                                                                             <div className="flex items-center gap-2">
                                                                                 <button 
                                                                                     onClick={() => copyPrompt(shot.bananaPromptV2 || shot.bananaPrompt || "", `${shot.id}-banana`)}
-                                                                                    className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[11px] font-semibold uppercase tracking-wider transition-all ${copiedId === `${shot.id}-banana` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-foreground/5 border-border text-accent/40 hover:text-accent hover:border-accent'}`}
+                                                                                    className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[11px] font-semibold transition-all ${copiedId ===`${shot.id}-banana` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-foreground/5 border-border text-accent/40 hover:text-accent hover:border-accent'}`}
                                                                                 >
                                                                                     <Copy className={`w-2.5 h-2.5 ${copiedId === `${shot.id}-banana` ? 'hidden' : 'block'}`} />
                                                                                     {copiedId === `${shot.id}-banana` ? 'Copied' : 'Copy Banana'}
@@ -1877,11 +1877,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                          }
                                                                                  }}
                                                                                  loading={isSavingPrompt === shot.id}
-                                                                                 className={`px-3 py-1 rounded-lg text-[11px] font-semibold uppercase transition-all ${
-                                                                                     isSavingPrompt === 'success' 
-                                                                                     ? 'bg-green-500 text-foreground' 
-                                                                                     : 'bg-accent text-black hover:bg-accent/80'
-                                                                                 }`}
+                                                                                 className={`px-3 py-1 rounded-lg text-[11px] font-semibold transition-all ${ isSavingPrompt === 'success' ? 'bg-green-500 text-foreground' : 'bg-accent text-black hover:bg-accent/80' }`}
                                                                              >
                                                                                  {isSavingPrompt === 'success' ? 'Saved!' : 'Save'}
                                                                              </StatusButton>
@@ -1897,11 +1893,11 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                             ) : (
                                                                 <div className="flex flex-col gap-2">
                                                                     <div className="flex justify-between items-center mb-1">
-                                                                        <span className="text-[11px] font-semibold uppercase tracking-wider text-accent/60">Banana Image Prompt</span>
+                                                                        <span className="text-[11px] font-semibold text-accent/60">Banana Image Prompt</span>
                                                                         <div className="flex items-center gap-2">
                                                                             <button 
                                                                                 onClick={() => copyPrompt(shot.bananaPromptV2 || shot.bananaPrompt || "", `${shot.id}-banana`)}
-                                                                                className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[11px] font-semibold uppercase tracking-wider transition-all ${copiedId === `${shot.id}-banana` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-foreground/5 border-border text-accent/40 hover:text-accent hover:border-accent'}`}
+                                                                                className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[11px] font-semibold transition-all ${copiedId ===`${shot.id}-banana` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-foreground/5 border-border text-accent/40 hover:text-accent hover:border-accent'}`}
                                                                             >
                                                                                 <Copy className={`w-2.5 h-2.5 ${copiedId === `${shot.id}-banana` ? 'hidden' : 'block'}`} />
                                                                                 {copiedId === `${shot.id}-banana` ? 'Copied' : 'Copy Banana'}
@@ -1930,12 +1926,12 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                             {shot.grokPromptV2 && (
                                                                 <div className="flex flex-col gap-2 mt-4">
                                                                     <div className="flex justify-between items-center mb-1">
-                                                                        <span className={`text-[11px] font-semibold uppercase tracking-wider ${shot.grokPromptV2?.startsWith("models stay consistent") ? 'text-purple-400' : 'text-purple-400/50'}`}>
+                                                                        <span className={`text-[11px] font-semibold ${shot.grokPromptV2?.startsWith("models stay consistent") ? 'text-purple-400' : 'text-purple-400/50'}`}>
                                                                             {shot.grokPromptV2?.startsWith("models stay consistent") ? "Grok Anti-Morph Forge (Vision-Aware)" : "Grok Movement (Initial Draft)"}
                                                                         </span>
                                                                         <button 
                                                                             onClick={() => copyPrompt(shot.grokPromptV2!, `${shot.id}-grok`)}
-                                                                            className={`px-3 py-1 rounded-lg border text-[11px] font-semibold uppercase tracking-wider transition-all ${copiedId === `${shot.id}-grok` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-surface/40 border-border/10 hover:border-accent'}`}
+                                                                            className={`px-3 py-1 rounded-lg border text-[11px] font-semibold transition-all ${copiedId ===`${shot.id}-grok` ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-surface/40 border-border/10 hover:border-accent'}`}
                                                                         >
                                                                             {copiedId === `${shot.id}-grok` ? 'Copied' : 'Copy Command'}
                                                                         </button>
@@ -1971,13 +1967,13 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                 </div>
                                                              )}
                                                             {shot.lyric && (
-                                                                <p className="px-1 text-[11px] font-semibold uppercase tracking-wider text-accent/80 italic">
+                                                                <p className="px-1 text-[11px] font-semibold text-accent/80 italic">
                                                                     "{shot.lyric}"
                                                                 </p>
                                                             )}
                                                             <div className="flex flex-col gap-4 mt-2">
                                                                 <div className="flex items-center justify-between">
-                                                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-accent/40">Visual References</span>
+                                                                    <span className="text-[11px] font-semibold text-accent/40">Visual References</span>
                                                                     <button 
                                                                         onClick={() => setManagingRefsShotId(managingRefsShotId === shot.id ? null : shot.id)}
                                                                         className="btn-secondary"
@@ -1992,7 +1988,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                             <button 
                                                                                 key={ri}
                                                                                 onClick={() => toggleRefForShot(shot.id, req.label)}
-                                                                                className={`px-3 py-1.5 rounded-xl border text-[11px] font-semibold uppercase tracking-wider transition-all ${shot.refLabels?.includes(req.label) ? 'bg-accent text-foreground border-accent' : 'bg-surface/60 border-border text-foreground/40 hover:border-accent/30'}`}
+                                                                                className={`px-3 py-1.5 rounded-xl border text-[11px] font-semibold transition-all ${shot.refLabels?.includes(req.label) ? 'bg-accent text-foreground border-accent' : 'bg-surface/60 border-border text-foreground/40 hover:border-accent/30'}`}
                                                                             >
                                                                                 {req.label}
                                                                             </button>
@@ -2008,7 +2004,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                         <div key={li} className="flex flex-col gap-2">
                                                                             <div className="px-3 py-1 bg-accent/5 border border-accent/20 rounded-lg flex items-center gap-2 w-fit">
                                                                                 <Camera className="w-3 h-3 text-accent" />
-                                                                                <span className="text-[11px] font-semibold uppercase tracking-wider text-accent/60">USE: {lbl}</span>
+                                                                                <span className="text-[11px] font-semibold text-accent/60">USE: {lbl}</span>
                                                                             </div>
                                                                             {hasImage && (
                                                                                 <div className="w-16 h-16 rounded-xl border border-border overflow-hidden shadow-2xl ml-1">
@@ -2033,13 +2029,13 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                                  link.download = `frame-${shot.timestamp}.jpg`;
                                                                                  link.click();
                                                                              }}
-                                                                             className="w-full flex items-center justify-center gap-2 py-2 bg-accent text-foreground rounded-xl text-[11px] font-semibold uppercase tracking-wider"
+                                                                             className="w-full flex items-center justify-center gap-2 py-2 bg-accent text-foreground rounded-xl text-[11px] font-semibold"
                                                                          >
                                                                              <Download className="w-3 h-3" /> Download High-Fi
                                                                          </button>
                                                                          
                                                                          <div className="grid grid-cols-2 gap-2 w-full">
-                                                                             <label className={`flex items-center justify-center gap-2 py-2 bg-foreground/10 hover:bg-foreground/20 text-foreground rounded-xl text-[11px] font-semibold uppercase tracking-wider cursor-pointer transition-all ${isUploadingShotId === shot.id ? 'opacity-50 pointer-events-none' : ''}`}>
+                                                                             <label className={`flex items-center justify-center gap-2 py-2 bg-foreground/10 hover:bg-foreground/20 text-foreground rounded-xl text-[11px] font-semibold cursor-pointer transition-all ${isUploadingShotId === shot.id ? 'opacity-50 pointer-events-none' : ''}`}>
                                                                                  {isUploadingShotId === shot.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
                                                                                  {isUploadingShotId === shot.id ? "Uploading..." : "Swap"}
                                                                                  <input 
@@ -2052,7 +2048,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                              </label>
                                                                              <button 
                                                                                  onClick={() => handleClearShot(shot.id)}
-                                                                                 className="flex items-center justify-center gap-2 py-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-foreground rounded-xl text-[11px] font-semibold uppercase tracking-wider transition-all"
+                                                                                 className="flex items-center justify-center gap-2 py-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-foreground rounded-xl text-[11px] font-semibold transition-all"
                                                                              >
                                                                                  <Trash2 className="w-3 h-3" /> Clear
                                                                              </button>
@@ -2064,7 +2060,7 @@ export default function DirectorSuite({ mode }: { mode: "kirbai" | "factory" }) 
                                                                     <div className="w-12 h-12 rounded-full border border-current flex items-center justify-center animate-pulse">
                                                                         <ImageIcon className="w-6 h-6" />
                                                                     </div>
-                                                                    <span className="text-[11px] font-semibold uppercase tracking-wider">Awaiting Vision</span>
+                                                                    <span className="text-[11px] font-semibold">Awaiting Vision</span>
                                                                 </div>
                                                             )}
                                                         </div>

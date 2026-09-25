@@ -247,11 +247,12 @@ body {
   border: 1px solid var(--border-color);
   border-radius: var(--card-radius);
   box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.03) inset,
-    0 8px 40px -12px rgba(0, 0, 0, 0.3);
+    0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    0 12px 32px -20px rgba(0, 0, 0, 0.35);
   position: relative;
   overflow: hidden;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 /* Specular top-edge highlight */
@@ -268,7 +269,7 @@ body {
 }
 
 .card:hover {
-  border-color: color-mix(in srgb, var(--accent-color) 15%, transparent);
+  border-color: color-mix(in srgb, var(--fg-color) 12%, transparent);
 }
 
 /* Card without padding — for banner/media containers */
@@ -331,23 +332,22 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.625rem 1.5rem;
+  padding: 0.5625rem 1.125rem;
   background: var(--accent-color);
   color: #fff;
   border: none;
   border-radius: var(--btn-radius);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 20px color-mix(in srgb, var(--accent-color) 25%, transparent);
+  box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--accent-color) 45%, transparent);
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 28px color-mix(in srgb, var(--accent-color) 35%, transparent);
+  box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--accent-color) 55%, transparent);
 }
 
 .btn-primary:active {
@@ -371,10 +371,9 @@ body {
   color: var(--fg-color);
   border: 1px solid var(--border-color);
   border-radius: var(--btn-radius);
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: -0.005em;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -400,10 +399,9 @@ body {
   color: var(--fg-muted);
   border: none;
   border-radius: var(--btn-radius);
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: -0.005em;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -422,11 +420,10 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.25rem 0.625rem;
-  font-size: 0.5625rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  padding: 0.1875rem 0.5625rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0;
   border-radius: 999px;
   border: 1px solid var(--border-color);
   background: color-mix(in srgb, var(--surface-color) 60%, transparent);
@@ -453,7 +450,7 @@ body {
   border-radius: var(--btn-radius);
   color: var(--fg-color);
   font-size: 0.875rem;
-  font-family: var(--font-geist-mono), monospace;
+  font-family: inherit;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   outline: none;
   resize: vertical;
@@ -484,10 +481,8 @@ body {
 }
 
 .stat-label {
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: var(--fg-muted);
 }
 
@@ -504,28 +499,24 @@ body {
 }
 
 .section-title {
-  font-size: 1.375rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-size: 1.625rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
   color: var(--fg-color);
   line-height: 1.2;
 }
 
 .section-subtitle {
-  font-size: 0.6875rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--fg-muted);
+  letter-spacing: -0.005em;
+  color: var(--fg-color);
 }
 
 .section-eyebrow {
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+  font-size: 0.8125rem;
+  font-weight: 500;
   color: var(--accent-color);
-  opacity: 0.8;
 }
 
 
@@ -639,10 +630,8 @@ body {
   }
 
   .mobile-dock-item span {
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-size: 11px;
+    font-weight: 600;
   }
 
   /* Strategic Launcher Overlay */
@@ -693,3 +682,41 @@ body {
     display: none !important;
   }
 }
+
+/* ═══════════════════════════════════════════════
+   TOP BAR NAV
+   ═══════════════════════════════════════════════ */
+
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4375rem 0.875rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+.nav-pill:hover {
+  color: var(--fg-color);
+  background: color-mix(in srgb, var(--fg-color) 6%, transparent);
+}
+.nav-pill.active {
+  color: var(--fg-color);
+  background: color-mix(in srgb, var(--fg-color) 10%, transparent);
+  font-weight: 600;
+}
+.menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.4375rem 0.625rem;
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, var(--fg-color) 75%, transparent);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.menu-item:hover { background: color-mix(in srgb, var(--fg-color) 6%, transparent); color: var(--fg-color); }
+.menu-item.active { color: var(--accent-color); font-weight: 600; }

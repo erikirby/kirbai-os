@@ -59,7 +59,7 @@ export default function ConsultantSettings({ theme }: { theme?: string }) {
                     </div>
                     <div>
                         <h2 className="text-3xl font-black tracking-tight text-foreground drop-shadow-md">The Core: Identity Matrix</h2>
-                        <p className="text-xs font-black uppercase tracking-widest text-accent/80 mt-1">Ground Truth Payload for Kirbai OS Intelligence</p>
+                        <p className="text-xs font-semibold text-accent/80 mt-1">Ground Truth Payload for Kirbai OS Intelligence</p>
                     </div>
                 </div>
 
@@ -67,7 +67,7 @@ export default function ConsultantSettings({ theme }: { theme?: string }) {
                     
                     {/* Brand Identity */}
                     <div className="space-y-3 lg:col-span-2">
-                        <label className="text-xs font-black uppercase tracking-widest text-foreground/60 flex items-center gap-2">
+                        <label className="text-xs font-semibold text-foreground/60 flex items-center gap-2">
                             <Brain className="w-4 h-4 text-accent" /> Brand Identity & Vibe
                         </label>
                         <textarea 
@@ -76,14 +76,14 @@ export default function ConsultantSettings({ theme }: { theme?: string }) {
                             placeholder="e.g., Gaymer millennial aesthetic, psychological profiles, Diva pop... "
                             className="input-field h-44 font-mono"
                         />
-                        <p className="text-[10px] text-foreground/40 leading-relaxed uppercase tracking-wider font-bold">
+                        <p className="text-xs text-foreground/40 leading-relaxed font-bold">
                             Defines the ultimate tone, psychological depth, and musical "drag-pop" anchor for the AI's copywriting and ideation.
                         </p>
                     </div>
 
                     {/* Aesthetic Rules */}
                     <div className="space-y-3">
-                        <label className="text-xs font-black uppercase tracking-widest text-foreground/60 flex items-center gap-2">
+                        <label className="text-xs font-semibold text-foreground/60 flex items-center gap-2">
                             <Sparkles className="w-4 h-4 text-accent" /> Aesthetic Rules
                         </label>
                         <textarea 
@@ -92,14 +92,14 @@ export default function ConsultantSettings({ theme }: { theme?: string }) {
                             placeholder="e.g., Pink shinies, realistic textures but faithful silhouettes..."
                             className="input-field h-44 font-mono"
                         />
-                         <p className="text-[10px] text-foreground/40 leading-relaxed uppercase tracking-wider font-bold">
+                         <p className="text-xs text-foreground/40 leading-relaxed font-bold">
                             Strict visual boundaries (Do's and Don'ts) the AI must obey when generating image prompts or describing art design.
                         </p>
                     </div>
                     
                     {/* Narrative Rules */}
                     <div className="space-y-3">
-                        <label className="text-xs font-black uppercase tracking-widest text-foreground/60 flex items-center gap-2">
+                        <label className="text-xs font-semibold text-foreground/60 flex items-center gap-2">
                             <Database className="w-4 h-4 text-accent" /> Narrative & Lore
                         </label>
                         <textarea 
@@ -108,14 +108,14 @@ export default function ConsultantSettings({ theme }: { theme?: string }) {
                             placeholder="e.g., Alternate reality metaphors, emotional complexity..."
                             className="input-field h-44 font-mono"
                         />
-                         <p className="text-[10px] text-foreground/40 leading-relaxed uppercase tracking-wider font-bold">
+                         <p className="text-xs text-foreground/40 leading-relaxed font-bold">
                             Guides the storytelling layers, emphasizing character motivations and fan-fiction style plotlines over generic text.
                         </p>
                     </div>
 
                     {/* Workflow & Tools */}
                     <div className="space-y-3">
-                        <label className="text-xs font-black uppercase tracking-widest text-foreground/60 flex items-center gap-2">
+                        <label className="text-xs font-semibold text-foreground/60 flex items-center gap-2">
                             <PenTool className="w-4 h-4 text-accent" /> Workflows & Tools
                         </label>
                         <textarea 
@@ -124,14 +124,14 @@ export default function ConsultantSettings({ theme }: { theme?: string }) {
                             placeholder="e.g., Gemini -> LM Arena. Grok for single characters. Veo 3..."
                             className="input-field h-44 font-mono"
                         />
-                        <p className="text-[10px] text-foreground/40 leading-relaxed uppercase tracking-wider font-bold">
+                        <p className="text-xs text-foreground/40 leading-relaxed font-bold">
                             Tells the AI exactly what software pipelines (LM Arena, Grok, Claude) you use so it gives actionable technical advice instead of guessing.
                         </p>
                     </div>
 
                     {/* Ultimate Goal */}
                     <div className="space-y-3">
-                        <label className="text-xs font-black uppercase tracking-widest text-foreground/60 flex items-center gap-2">
+                        <label className="text-xs font-semibold text-foreground/60 flex items-center gap-2">
                             <Target className="w-4 h-4 text-accent" /> The Ultimate Goal
                         </label>
                         <textarea 
@@ -140,7 +140,7 @@ export default function ConsultantSettings({ theme }: { theme?: string }) {
                             placeholder="e.g., Profitable artistry, viral videos, fulfilling art..."
                             className="input-field h-44 font-mono"
                         />
-                        <p className="text-[10px] text-foreground/40 leading-relaxed uppercase tracking-wider font-bold">
+                        <p className="text-xs text-foreground/40 leading-relaxed font-bold">
                             The primary metric for success. Keeps the AI's strategic advice focused on profitability without sacrificing creative integrity.
                         </p>
                     </div>
@@ -151,7 +151,7 @@ export default function ConsultantSettings({ theme }: { theme?: string }) {
                     <button 
                         onClick={saveIdentity}
                         disabled={isSaving}
-                        className="px-8 py-4 rounded-xl bg-accent text-foreground text-xs font-black uppercase tracking-widest hover:bg-accent/80 transition-all flex items-center justify-center gap-2 shadow-lg shadow-accent/20 cursor-pointer"
+                        className="px-8 py-4 rounded-xl bg-accent text-foreground text-xs font-semibold hover:bg-accent/80 transition-all flex items-center justify-center gap-2 shadow-lg shadow-accent/20 cursor-pointer"
                     >
                         {isSaving ? <><Loader2 className="w-4 h-4 animate-spin"/> Syncing Matrix</> : 'Update Identity Pipeline'}
                     </button>

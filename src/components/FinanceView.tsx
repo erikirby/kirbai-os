@@ -87,13 +87,13 @@ export default function FinanceView({ mode }: FinanceViewProps) {
         <div className="flex flex-col gap-8">
             <div className="flex justify-between items-end relative ml-1">
                 <div className="flex flex-col gap-1">
-                    <p className="section-eyebrow">Performance Matrix_V4.1</p>
+                    <p className="section-eyebrow">Royalties</p>
                     <h2 className="section-title">Financial Analytics</h2>
                 </div>
                 {analysisResults?.persistedAt && (
                     <div className="flex flex-col items-end gap-1">
-                        <span className="text-[10px] text-foreground/40 font-semibold uppercase tracking-wider">Data Current As Of:</span>
-                        <span className="text-xs text-accent font-semibold uppercase tracking-wider">
+                        <span className="text-xs text-foreground/40 font-semibold">Data Current As Of:</span>
+                        <span className="text-xs text-accent font-semibold">
                             {new Date(analysisResults.persistedAt).toLocaleDateString('en-US', { 
                                 month: 'short', 
                                 day: 'numeric', 
@@ -122,7 +122,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                                 </div>
                                 <div className="flex flex-col gap-1">
                                     <span className="text-base font-extrabold text-foreground tracking-tight">{attachedFile.name}</span>
-                                    <span className="text-xs text-accent font-semibold uppercase tracking-wider">Awaiting_Synthesis_Command</span>
+                                    <span className="text-xs text-accent font-semibold">Drop in a DistroKid export to see your numbers</span>
                                 </div>
                             </div>
 
@@ -149,7 +149,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                             </div>
                             <div className="flex flex-col items-center gap-2">
                                 <p className="text-xl font-extrabold text-foreground tracking-tight">Ingest Intelligence Feed</p>
-                                <p className="text-xs text-foreground/40 font-semibold uppercase tracking-wider">Drop DistroKid .CSV/.TSV Matrix_</p>
+                                <p className="text-xs text-foreground/40 font-semibold">Drop a DistroKid .csv or .tsv</p>
                             </div>
                             <input type="file" accept=".tsv,.csv" onChange={(e) => e.target.files?.[0] && setAttachedFile(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer" />
                         </div>
@@ -159,8 +159,8 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                         <div className="absolute inset-0 bg-background/90 backdrop-blur-2xl flex flex-col items-center justify-center gap-8 z-20 animate-in fade-in duration-700">
                             <Loader2 className="w-16 h-16 text-accent animate-spin" />
                             <div className="flex flex-col items-center gap-2">
-                                <span className="text-sm font-semibold text-accent uppercase tracking-wider animate-pulse">Calculating Matrix</span>
-                                <span className="text-xs text-foreground/40 font-semibold uppercase tracking-wider">Latency_Compensation_Active</span>
+                                <span className="text-sm font-semibold text-accent animate-pulse">Crunching numbers</span>
+                                <span className="text-xs text-foreground/40 font-semibold">One sec…</span>
                             </div>
                         </div>
                     )}
@@ -174,10 +174,10 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                         <div className="card p-6 bg-accent/[0.04] border-accent/20 group overflow-hidden relative">
                             <div className="absolute top-0 left-0 w-full h-1 bg-accent/40" />
                             <span className="stat-label text-accent">Total Revenue</span>
-                            <p className="stat-value text-foreground mt-2">${analysisResults.totals.revenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                            <p className="stat-value text-foreground mt-2">${analysisResults.totals.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                             <div className="mt-4 pt-4 border-t border-accent/10 flex justify-between">
-                                <span className="text-[10px] text-accent/50 font-semibold uppercase tracking-wider">Status: Verified</span>
-                                <span className="text-[10px] text-accent/50 font-semibold uppercase tracking-wider">ANALYTICS_V4</span>
+                                <span className="text-xs text-accent/50 font-semibold">Status: Verified</span>
+                                <span className="text-xs text-accent/50 font-semibold">Overview</span>
                             </div>
                         </div>
                         <div className="card p-6 bg-accent/[0.04] border-accent/20 group overflow-hidden relative">
@@ -185,15 +185,15 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                             <span className="stat-label text-accent">Total Streams</span>
                             <p className="stat-value text-foreground mt-2">{analysisResults.totals.streams.toLocaleString()}</p>
                             <div className="mt-4 pt-4 border-t border-accent/10 flex justify-between">
-                                <span className="text-[10px] text-accent/50 font-semibold uppercase tracking-wider">Aggregation_Active</span>
+                                <span className="text-xs text-accent/50 font-semibold">Totals</span>
                             </div>
                         </div>
                         <div className="card p-6 bg-accent/[0.04] border-accent/20 group overflow-hidden relative">
                             <div className="absolute top-0 left-0 w-full h-1 bg-accent/40" />
-                            <span className="stat-label text-accent">Payout_Yield</span>
+                            <span className="stat-label text-accent">Payout</span>
                             <p className="stat-value text-foreground mt-2">${(analysisResults.totals.revenue / analysisResults.totals.streams).toFixed(5)}</p>
                             <div className="mt-4 pt-4 border-t border-accent/10 flex justify-between">
-                                <span className="text-[10px] text-accent/50 font-semibold uppercase tracking-wider">Net_Efficiency</span>
+                                <span className="text-xs text-accent/50 font-semibold">Per stream</span>
                             </div>
                         </div>
                     </div>
@@ -204,12 +204,12 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                             <div className="absolute top-0 right-0 w-80 h-80 bg-accent/5 blur-[100px] rounded-full -mr-32 -mt-32 pointer-events-none" />
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse shadow-[0_0_10px_rgba(255,51,102,0.8)]" />
-                                <h3 className="section-subtitle text-accent">Strategic Summary</h3>
+                                <h3 className="section-subtitle text-accent">Summary</h3>
                             </div>
                             {analysisResults.advice ? (
                                 <div className="text-sm text-foreground/80 font-medium leading-relaxed space-y-4 [&>ul]:list-disc [&>ul]:ml-4 [&>ul>li]:mb-2 [&_strong]:text-accent" dangerouslySetInnerHTML={{ __html: analysisResults.advice }} />
                             ) : (
-                                <div className="h-40 flex items-center justify-center text-foreground/40 italic font-medium">Narrative Synchronization...</div>
+                                <div className="h-40 flex items-center justify-center text-foreground/40 italic font-medium">Writing summary…</div>
                             )}
                         </div>
 
@@ -218,7 +218,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                             <div className="absolute top-0 right-0 w-48 h-48 bg-foreground/5 blur-[70px] rounded-full -mr-20 -mt-20 pointer-events-none" />
                             <div className="flex justify-between items-center mb-6 relative z-10">
                                 <h3 className="section-subtitle text-foreground">Platform Performance Rank</h3>
-                                <span className="text-[10px] text-foreground/40 font-semibold uppercase tracking-wider">SORT_REVENUE</span>
+                                <span className="text-xs text-foreground/40 font-semibold">By revenue</span>
                             </div>
                             <div className="flex flex-col gap-4 relative z-10">
                                 {analysisResults.platforms
@@ -231,7 +231,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                                             </div>
                                             <div className="flex justify-between text-[11px] text-foreground/50 font-medium">
                                                 <span>{p.streams.toLocaleString()} Streams</span>
-                                                <span className="text-foreground/40">${p.rate.toFixed(4)} Per_Str</span>
+                                                <span className="text-foreground/40">${p.rate.toFixed(4)} per stream</span>
                                             </div>
                                         </div>
                                     ))}
@@ -242,8 +242,8 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                         <div className="card p-6 bg-surface/20 border-border/10 overflow-hidden relative">
                             <div className="absolute bottom-0 right-0 w-48 h-48 bg-accent/5 blur-[70px] rounded-full -mr-20 -mb-20 pointer-events-none" />
                             <div className="flex justify-between items-center mb-6 relative z-10">
-                                <h3 className="section-subtitle text-foreground">Top 10 Strategic Assets</h3>
-                                <span className="text-[10px] text-foreground/40 font-semibold uppercase tracking-wider">ASSET_CLUSTERING</span>
+                                <h3 className="section-subtitle text-foreground">Top 10 tracks</h3>
+                                <span className="text-xs text-foreground/40 font-semibold">Tracks</span>
                             </div>
                             <div className="flex flex-col gap-4 relative z-10">
                                 {analysisResults.tracks.slice(0, 10).map((t: any, idx: number) => (
@@ -251,7 +251,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                                         <span className="text-sm font-extrabold text-foreground/40 group-hover/track:text-accent transition-colors transform group-hover/track:scale-110">{(idx + 1).toString().padStart(2, '0')}</span>
                                         <div className="flex-1 flex flex-col gap-1 overflow-hidden">
                                             <span className="text-sm font-semibold text-foreground tracking-tight truncate">{t.title}</span>
-                                            <span className="text-[10px] text-foreground/50 font-medium">{t.streams.toLocaleString()} RAW_STREAMS</span>
+                                            <span className="text-[10px] text-foreground/50 font-medium">{t.streams.toLocaleString()} streams</span>
                                         </div>
                                         <span className="text-base font-extrabold text-foreground tracking-tighter">${t.revenue.toFixed(2)}</span>
                                     </div>
@@ -268,7 +268,7 @@ export default function FinanceView({ mode }: FinanceViewProps) {
                         className="btn-ghost w-full py-4 mt-2 flex items-center justify-center gap-3 group text-accent hover:bg-accent/10 hover:text-accent"
                     >
                         <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-700" />
-                        <span className="text-xs font-semibold uppercase tracking-wider">Update Financial Data Matrix</span>
+                        <span className="text-xs font-semibold">Upload a new export</span>
                     </button>
                 </div>
             )

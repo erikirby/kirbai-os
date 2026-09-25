@@ -52,33 +52,25 @@ export default function PlatformComparisonChart({ data }: ChartProps) {
                 <div className="flex items-center gap-1.5 bg-surface/80 p-1 rounded-xl border border-border/60">
                     <button
                         onClick={() => setSelectedMetric('views')}
-                        className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 ${
-                            selectedMetric === 'views' ? 'bg-accent text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
-                        }`}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${ selectedMetric === 'views' ? 'bg-accent text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
                     >
                         <Eye className="w-3 h-3" /> Views
                     </button>
                     <button
                         onClick={() => setSelectedMetric('reach')}
-                        className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 ${
-                            selectedMetric === 'reach' ? 'bg-accent text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
-                        }`}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${ selectedMetric === 'reach' ? 'bg-accent text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
                     >
                         <Layers className="w-3 h-3" /> Reach
                     </button>
                     <button
                         onClick={() => setSelectedMetric('followers')}
-                        className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 ${
-                            selectedMetric === 'followers' ? 'bg-accent text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
-                        }`}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${ selectedMetric === 'followers' ? 'bg-accent text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
                     >
                         <Users className="w-3 h-3" /> Followers
                     </button>
                     <button
                         onClick={() => setSelectedMetric('earningsUsd')}
-                        className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all flex items-center gap-1.5 ${
-                            selectedMetric === 'earningsUsd' ? 'bg-emerald-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground'
-                        }`}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${ selectedMetric === 'earningsUsd' ? 'bg-emerald-500 text-white shadow-md' : 'text-foreground/50 hover:text-foreground' }`}
                     >
                         <DollarSign className="w-3 h-3" /> Earnings
                     </button>
@@ -122,19 +114,19 @@ export default function PlatformComparisonChart({ data }: ChartProps) {
             {/* Metric Insights Footer */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-border/50 pt-4 text-center">
                 <div className="p-3 rounded-lg bg-surface/40 border border-border/40">
-                    <span className="text-[9px] uppercase font-mono tracking-widest text-foreground/40 block">Top Views</span>
+                    <span className="text-[11px] font-mono text-foreground/40 block">Top Views</span>
                     <span className="text-xs font-extrabold text-pink-400">Instagram (5.1M)</span>
                 </div>
                 <div className="p-3 rounded-lg bg-surface/40 border border-border/40">
-                    <span className="text-[9px] uppercase font-mono tracking-widest text-foreground/40 block">Top Direct Monetization</span>
+                    <span className="text-[11px] font-mono text-foreground/40 block">Top Direct Monetization</span>
                     <span className="text-xs font-extrabold text-blue-400">Facebook ($114.17)</span>
                 </div>
                 <div className="p-3 rounded-lg bg-surface/40 border border-border/40">
-                    <span className="text-[9px] uppercase font-mono tracking-widest text-foreground/40 block">Top Follower Magnet</span>
+                    <span className="text-[11px] font-mono text-foreground/40 block">Top Follower Magnet</span>
                     <span className="text-xs font-extrabold text-emerald-400">Instagram (+15.1k)</span>
                 </div>
                 <div className="p-3 rounded-lg bg-surface/40 border border-border/40">
-                    <span className="text-[9px] uppercase font-mono tracking-widest text-foreground/40 block">Live Video Count</span>
+                    <span className="text-[11px] font-mono text-foreground/40 block">Live Video Count</span>
                     <span className="text-xs font-extrabold text-purple-400">FB (81) / IG (91)</span>
                 </div>
             </div>

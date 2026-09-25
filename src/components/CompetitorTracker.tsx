@@ -85,7 +85,7 @@ export default function CompetitorTracker({ theme, mode = 'kirbai' }: { theme?: 
                 </div>
                 <button
                     onClick={() => setShowNew(v => !v)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-accent text-foreground rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-accent/80 transition-all shadow-lg shadow-accent/20"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-accent text-foreground rounded-xl font-bold text-sm hover:bg-accent/80 transition-all shadow-lg shadow-accent/20"
                 >
                     {showNew ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                     {showNew ? 'Cancel' : 'Track New'}
@@ -107,7 +107,7 @@ export default function CompetitorTracker({ theme, mode = 'kirbai' }: { theme?: 
                         <select
                             value={form.platform}
                             onChange={e => setForm(f => ({ ...f, platform: e.target.value as any }))}
-                            className="w-40 px-4 py-3 bg-surface/40 border border-border rounded-xl text-foreground focus:outline-none font-black uppercase tracking-wider text-xs"
+                            className="w-40 px-4 py-3 bg-surface/40 border border-border rounded-xl text-foreground focus:outline-none font-semibold text-xs"
                         >
                             <option value="youtube">YouTube</option>
                             <option value="instagram">Instagram</option>
@@ -140,7 +140,7 @@ export default function CompetitorTracker({ theme, mode = 'kirbai' }: { theme?: 
                         onClick={handleSave}
                         loading={isSaving}
                         disabled={!form.name.trim() || !form.handleUrl.trim()}
-                        className="self-end px-6 py-2.5 bg-accent text-foreground rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-accent/80 transition-all disabled:opacity-50 shadow-lg"
+                        className="self-end px-6 py-2.5 bg-accent text-foreground rounded-xl font-bold text-sm hover:bg-accent/80 transition-all disabled:opacity-50 shadow-lg"
                         icon={<Check className="w-4 h-4" />}
                     >
                         Lock Target

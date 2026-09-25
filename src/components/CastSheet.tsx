@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Loader2, Plus, Search, X } from "lucide-react";
 import type { CastSong, SongCast, SongStatus } from "@/app/api/song-cast/route";
+import { invalidateCast, spriteUrl } from "@/lib/cast";
 
 const STATUS: Record<SongStatus, { label: string; cls: string }> = {
     released: { label: "Released", cls: "text-violet-500 bg-violet-400/10 border-violet-400/20" },
@@ -10,14 +11,6 @@ const STATUS: Record<SongStatus, { label: string; cls: string }> = {
     written: { label: "Written", cls: "text-amber-500 bg-amber-400/10 border-amber-400/20" },
     idea: { label: "Idea", cls: "text-foreground/50 bg-foreground/5 border-foreground/10" },
 };
-
-/** Pokémon HOME renders by name, e.g. "Alolan Ninetales" -> ninetales-alolan. */
-function spriteUrl(name: string) {
-    let n = name.toLowerCase().trim().replace(/[.'’]/g, "");
-    const form = n.match(/^(alolan|galarian|hisuian|paldean|mega)\s+(.+)$/);
-    if (form) n = `${form[2]}-${form[1]}`;
-    return `https://img.pokemondb.net/sprites/home/normal/${n.replace(/\s+/g, "-")}.png`;
-}
 
 function Mon({ name, size = 48, dim = false }: { name: string; size?: number; dim?: boolean }) {
     const [broken, setBroken] = useState(false);
@@ -50,6 +43,7 @@ export default function CastSheet() {
 
     const persist = (next: SongCast) => {
         setCast(next);
+        invalidateCast();
         fetch("/api/song-cast", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cast: next }) });
     };
 
@@ -97,18 +91,18 @@ export default function CastSheet() {
         <div className="flex flex-col gap-6">
             <div className="flex items-end justify-between gap-4 flex-wrap">
                 <div className="section-header">
-                    <span className="section-eyebrow">Who&apos;s in what</span>
+                    <span className="text-sm text-foreground/50">Who&apos;s in what</span>
                     <h2 className="section-title text-2xl">Cast Sheet</h2>
                 </div>
                 <div className="flex items-center gap-3 flex-wrap">
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border/50 bg-surface/40">
+                    <div className="flex items-center gap-2 px-3.5 py-2 rounded-full border border-border bg-surface/60">
                         <Search className="w-3.5 h-3.5 text-foreground/30" />
                         <input value={q} onChange={e => setQ(e.target.value)} placeholder="Song or Pokémon…" className="bg-transparent outline-none text-sm w-44 placeholder:text-foreground/30" />
                         {q && <button onClick={() => setQ("")}><X className="w-3.5 h-3.5 text-foreground/30" /></button>}
                     </div>
-                    <div className="flex p-0.5 bg-surface/60 rounded-xl border border-border/50">
+                    <div className="flex p-0.5 bg-foreground/5 rounded-full">
                         {(["songs", "characters"] as const).map(v => (
-                            <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${view === v ? "bg-accent text-white shadow-md" : "text-foreground/40 hover:text-foreground/70"}`}>
+                            <button key={v} onClick={() => setView(v)} className={`px-3.5 py-1.5 text-sm font-medium rounded-full transition-all ${view === v ? "bg-surface text-foreground shadow" : "text-foreground/50 hover:text-foreground/80"}`}>
                                 By {v === "songs" ? "song" : "character"}
                             </button>
                         ))}
@@ -122,7 +116,7 @@ export default function CastSheet() {
                 return (
                     <section key={era} className="flex flex-col gap-3">
                         <div className="flex items-center gap-3">
-                            <h3 className="text-base font-bold text-foreground">{era}</h3>
+                            <h3 className="text-lg font-semibold tracking-tight text-foreground">{era}</h3>
                             <span className="text-xs text-foreground/30">{songs.length} song{songs.length === 1 ? "" : "s"}</span>
                             <div className="flex-1 h-px bg-border" />
                         </div>
@@ -141,7 +135,7 @@ export default function CastSheet() {
                                         </div>
                                         {song.cameos.length > 0 && (
                                             <div className="flex items-center gap-1 flex-wrap pt-2 border-t border-border/50">
-                                                <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/30 mr-1">Cameos</span>
+                                                <span className="text-xs text-foreground/40 mr-1">Cameos</span>
                                                 {song.cameos.map(c => <Mon key={c} name={c} size={26} dim />)}
                                             </div>
                                         )}
@@ -150,7 +144,7 @@ export default function CastSheet() {
                                 ))}
                             {!needle && (
                                 <button onClick={() => addSong(era)} className="rounded-2xl border border-dashed border-border flex items-center justify-center gap-2 text-foreground/25 hover:text-accent hover:border-accent/40 transition-all min-h-[100px]">
-                                    <Plus className="w-4 h-4" /> <span className="text-[10px] font-semibold uppercase tracking-wider">Add song</span>
+                                    <Plus className="w-4 h-4" /> <span className="text-sm font-medium">Add song</span>
                                 </button>
                             )}
                         </div>
@@ -164,13 +158,13 @@ export default function CastSheet() {
                         <div key={name} className="card p-4 flex items-start gap-3">
                             <Mon name={name} size={52} />
                             <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-                                <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/30">
+                                <span className="text-xs text-foreground/40">
                                     {rows.length} appearance{rows.length === 1 ? "" : "s"}
                                 </span>
                                 {rows.map(({ song, role }) => (
                                     <div key={song.id + role} className="flex items-center gap-2 text-xs">
                                         <span className={`truncate ${role === "main" ? "font-semibold text-foreground/80" : "text-foreground/45"}`}>{song.title}</span>
-                                        <span className="text-[9px] text-foreground/30 shrink-0">{role === "cameo" ? "cameo · " : ""}{song.era}</span>
+                                        <span className="text-[11px] text-foreground/35 shrink-0">{role === "cameo" ? "cameo · " : ""}{song.era}</span>
                                     </div>
                                 ))}
                             </div>
@@ -193,7 +187,7 @@ function SongEditor({ song, eras, onSave, onDelete, onCancel }: {
     const [era, setEra] = useState(song.era);
     const [note, setNote] = useState(song.note ?? "");
 
-    const label = "text-[9px] font-bold uppercase tracking-wider text-foreground/35";
+    const label = "text-xs font-medium text-foreground/45";
     return (
         <div className="card p-4 flex flex-col gap-2.5 border-accent/40">
             <input autoFocus value={title} onChange={e => setTitle(e.target.value)} className="input-field text-sm font-bold py-2 px-3" />
@@ -211,9 +205,9 @@ function SongEditor({ song, eras, onSave, onDelete, onCancel }: {
             </div>
             <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Notes" className="input-field text-xs p-3 h-16 resize-none" />
             <div className="flex items-center gap-2">
-                <button onClick={() => onSave({ ...song, title: title.trim() || song.title, mains: splitNames(mains), cameos: splitNames(cameos), status, era, note })} className="btn-primary text-[10px] py-1.5 px-3">Save</button>
-                <button onClick={onCancel} className="btn-ghost text-[10px] py-1.5 px-3">Cancel</button>
-                <button onClick={onDelete} className="ml-auto text-[10px] font-semibold uppercase tracking-wider text-foreground/30 hover:text-red-400">Delete</button>
+                <button onClick={() => onSave({ ...song, title: title.trim() || song.title, mains: splitNames(mains), cameos: splitNames(cameos), status, era, note })} className="btn-primary py-1.5 px-3.5">Save</button>
+                <button onClick={onCancel} className="btn-ghost py-1.5 px-3">Cancel</button>
+                <button onClick={onDelete} className="ml-auto text-sm text-foreground/40 hover:text-red-400">Delete</button>
             </div>
         </div>
     );

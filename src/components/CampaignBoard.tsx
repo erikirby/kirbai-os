@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { Plus, Pin, ChevronDown, X, Sparkles, Wand2, Loader2, CalendarDays, LayoutGrid } from "lucide-react";
+import { castFor, spriteUrl, useCast } from "@/lib/cast";
 import type { CampaignBoard as Board, CampaignCard, Stream, CardStatus, MenialTask, Platform } from "@/app/api/campaign-board/route";
 
 const PLATFORM_LABEL: Record<Platform, string> = { instagram: "IG", facebook: "FB", tiktok: "TT" };
@@ -43,9 +44,9 @@ function tiltFor(id: string): number {
     return (h % 300) / 100 - 1.5; // -1.5deg .. 1.5deg
 }
 
-export default function CampaignBoard() {
+export default function CampaignBoard({ initialView = "board" }: { initialView?: "board" | "calendar" }) {
     const [board, setBoard] = useState<Board | null>(null);
-    const [view, setView] = useState<"board" | "calendar">("board");
+    const [view, setView] = useState<"board" | "calendar">(initialView);
     const [expanded, setExpanded] = useState<string | null>(null);
     const [threadsOpen, setThreadsOpen] = useState(false);
     const [addingIn, setAddingIn] = useState<Stream | null>(null);
@@ -164,13 +165,13 @@ export default function CampaignBoard() {
                     <div className="flex p-0.5 bg-surface/60 rounded-xl border border-border/50">
                         <button
                             onClick={() => setView("board")}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${view === "board" ? "bg-accent text-white shadow-md" : "text-foreground/40 hover:text-foreground/70"}`}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-[10px] transition-all ${view ==="board" ? "bg-accent text-white shadow-md" : "text-foreground/40 hover:text-foreground/70"}`}
                         >
                             <LayoutGrid className="w-3 h-3" /> Board
                         </button>
                         <button
                             onClick={() => setView("calendar")}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-[10px] transition-all ${view === "calendar" ? "bg-accent text-white shadow-md" : "text-foreground/40 hover:text-foreground/70"}`}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-[10px] transition-all ${view ==="calendar" ? "bg-accent text-white shadow-md" : "text-foreground/40 hover:text-foreground/70"}`}
                         >
                             <CalendarDays className="w-3 h-3" /> Calendar
                         </button>
@@ -313,7 +314,7 @@ export default function CampaignBoard() {
                                         className="w-full rounded-2xl border border-dashed border-border flex flex-col items-center justify-center gap-2 text-foreground/20 hover:text-accent hover:border-accent/40 transition-all bg-foreground/[0.02] hover:bg-accent/5 min-h-[120px]"
                                     >
                                         <Plus className="w-5 h-5" />
-                                        <span className="text-[10px] font-semibold uppercase tracking-wider">New Card</span>
+                                        <span className="text-xs font-semibold">New Card</span>
                                     </button>
                                 )}
                             </div>
@@ -324,20 +325,6 @@ export default function CampaignBoard() {
             </>}
         </div>
     );
-}
-
-const CAST: { match: RegExp; sprites: string[] }[] = [
-    { match: /flash flash/i, sprites: ["primarina", "krabby"] },
-    { match: /nidoking|toxic spikes/i, sprites: ["nidoking", "roserade"] },
-    { match: /alcremie|decorate/i, sprites: ["alcremie", "heracross"] },
-    { match: /house of regi/i, sprites: ["regigigas"] },
-    { match: /psycho boost|deoxys/i, sprites: ["deoxys"] },
-    { match: /next era/i, sprites: ["malamar", "gengar", "mimikyu"] },
-    { match: /fusion album/i, sprites: ["regigigas"] },
-];
-
-function spritesFor(title: string): string[] {
-    return CAST.find(c => c.match.test(title))?.sprites ?? [];
 }
 
 const STREAM_TAG: Record<Stream, string> = { video: "Video", carousel: "Carousel", comedy: "Comedy" };
@@ -367,6 +354,8 @@ function ContentCalendar({ board, onUpdateCard }: {
     board: Board;
     onUpdateCard: (id: string, patch: Partial<CampaignCard>) => void;
 }) {
+    const cast = useCast();
+    const spritesFor = (title: string) => castFor(title, cast);
     const [open, setOpen] = useState<string | null>(null);
     const [showBacklog, setShowBacklog] = useState(false);
 
@@ -396,7 +385,7 @@ function ContentCalendar({ board, onUpdateCard }: {
                     return (
                         <div key={m.id} className="card p-4 flex flex-col gap-2 relative overflow-hidden">
                             <div className="flex items-center justify-between">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/30">Release {i + 1}</span>
+                                <span className="text-xs font-bold text-foreground/30">Release {i + 1}</span>
                                 <span className={`badge ${locked ? "text-emerald-500 bg-emerald-400/10 border-emerald-400/20" : "text-accent bg-accent/10 border-accent/20"}`}>
                                     {locked ? "Locked" : "Goal"}
                                 </span>
@@ -409,7 +398,7 @@ function ContentCalendar({ board, onUpdateCard }: {
                             <div className="flex gap-1 mt-auto pt-1">
                                 {spritesFor(m.title).map(s => (
                                     // eslint-disable-next-line @next/next/no-img-element
-                                    <img key={s} src={`/sprites/${s}.png`} alt="" className="w-8 h-8 object-contain" style={{ imageRendering: "pixelated" }} />
+                                    <img key={s} src={spriteUrl(s)} alt={s} title={s} loading="lazy" className="w-10 h-10 object-contain" />
                                 ))}
                             </div>
                         </div>
@@ -432,7 +421,7 @@ function ContentCalendar({ board, onUpdateCard }: {
                     return (
                         <div key={c.id}>
                             {newMonth && (
-                                <div className="px-5 pt-4 pb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-foreground/25">{d.month}</div>
+                                <div className="px-5 pt-4 pb-2 text-xs font-bold text-foreground/25">{d.month}</div>
                             )}
                             <button
                                 onClick={() => setOpen(isOpen ? null : c.id)}
@@ -441,22 +430,22 @@ function ContentCalendar({ board, onUpdateCard }: {
                             >
                                 <div className="w-11 shrink-0 text-center">
                                     <div className={`text-sm font-bold leading-none ${isMilestone ? "text-accent" : "text-foreground/80"}`}>{d.day}</div>
-                                    <div className="text-[9px] uppercase tracking-wider text-foreground/30 mt-0.5">{d.dow}</div>
+                                    <div className="text-[11px] text-foreground/30 mt-0.5">{d.dow}</div>
                                 </div>
 
                                 <div className="flex gap-0.5 w-[72px] shrink-0 justify-start">
                                     {sprites.slice(0, 3).map(s => (
                                         // eslint-disable-next-line @next/next/no-img-element
-                                        <img key={s} src={`/sprites/${s}.png`} alt="" className="w-6 h-6 object-contain" style={{ imageRendering: "pixelated" }} />
+                                        <img key={s} src={spriteUrl(s)} alt={s} title={s} loading="lazy" className="w-7 h-7 object-contain" />
                                     ))}
                                 </div>
 
                                 <div className="flex-1 min-w-0">
                                     <div className={`truncate ${isMilestone ? "text-[15px] font-bold text-foreground" : "text-sm font-medium text-foreground/85"}`}>{c.title}</div>
                                     <div className="flex items-center gap-2 mt-0.5">
-                                        <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/30">{STREAM_TAG[c.stream]}</span>
+                                        <span className="text-[11px] font-bold text-foreground/30">{STREAM_TAG[c.stream]}</span>
                                         {isMilestone && (
-                                            <span className={`text-[9px] font-bold uppercase tracking-wider ${locked ? "text-emerald-500" : "text-accent"}`}>
+                                            <span className={`text-[11px] font-bold ${locked ?"text-emerald-500" : "text-accent"}`}>
                                                 {locked ? "Locked" : "Goal"}
                                             </span>
                                         )}
@@ -490,7 +479,7 @@ function ContentCalendar({ board, onUpdateCard }: {
                                                     <button
                                                         key={p}
                                                         onClick={() => togglePlatform(c, p)}
-                                                        className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${on ? "bg-accent text-white" : "bg-surface/60 text-foreground/25 hover:text-foreground/50"}`}
+                                                        className={`px-2 py-1 rounded-lg text-[11px] font-bold transition-all ${on ?"bg-accent text-white" : "bg-surface/60 text-foreground/25 hover:text-foreground/50"}`}
                                                     >
                                                         {PLATFORM_LABEL[p]}
                                                     </button>
@@ -526,7 +515,7 @@ function ContentCalendar({ board, onUpdateCard }: {
                                     <span className="flex-1 text-sm text-foreground/60 truncate">{c.title}</span>
                                     <button
                                         onClick={() => onUpdateCard(c.id, { scheduledDate: new Date().toISOString().slice(0, 10) })}
-                                        className="text-[10px] font-semibold uppercase tracking-wider text-accent/70 hover:text-accent shrink-0"
+                                        className="text-xs font-semibold text-accent/70 hover:text-accent shrink-0"
                                     >
                                         Schedule
                                     </button>

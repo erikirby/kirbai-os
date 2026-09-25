@@ -130,14 +130,14 @@ export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string;
     const allCategories = [...new Set([...CATEGORY_ORDER, ...Object.keys(data.categories)])];
 
     if (isLoading) return (
-        <div className="p-10 text-foreground/40 font-mono text-xs uppercase tracking-widest">Loading prompt bank...</div>
+        <div className="p-10 text-foreground/40 font-mono text-xs">Loading prompt bank...</div>
     );
 
     return (
         <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Notice */}
             {notice && (
-                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-green-500/10 border border-green-500/20 text-green-400 text-[11px] font-black uppercase tracking-widest px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-2">
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-green-500/10 border border-green-500/20 text-green-400 text-[11px] font-semibold px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-2">
                     <Check className="w-4 h-4" /> {notice}
                 </div>
             )}
@@ -145,8 +145,8 @@ export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string;
             {/* Header */}
             <div className="flex justify-between items-center ml-1">
                 <div className="flex flex-col gap-1">
-                    <h2 className="section-title uppercase">Prompt Bank</h2>
-                    <p className="text-[10px] text-foreground/60 uppercase tracking-[0.4em] font-black">Reusable AI Directives</p>
+                    <h2 className="section-title">Prompt Bank</h2>
+                    <p className="text-xs text-foreground/60 font-semibold">Saved prompts</p>
                 </div>
             </div>
 
@@ -155,12 +155,12 @@ export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string;
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <AlertCircle className="w-4 h-4 text-accent" />
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-accent">Universal Rules</h3>
-                        <span className="text-[9px] text-foreground/30 uppercase tracking-widest">— apply to every prompt</span>
+                        <h3 className="text-xs font-semibold text-accent">Universal Rules</h3>
+                        <span className="text-[11px] text-foreground/30">— apply to every prompt</span>
                     </div>
                     <button
                         onClick={() => { setAddingUniversal(true); setNewUniversalText(""); }}
-                        className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-accent/20 text-accent hover:bg-accent/10 transition-colors flex items-center gap-1"
+                        className="text-[11px] font-semibold px-3 py-1.5 rounded-full border border-accent/20 text-accent hover:bg-accent/10 transition-colors flex items-center gap-1"
                     >
                         <Plus className="w-3 h-3" /> Add Rule
                     </button>
@@ -230,7 +230,7 @@ export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string;
                             >
                                 <div className="flex items-center gap-3">
                                     <Sparkles className="w-4 h-4 text-accent/60" />
-                                    <span className="text-[11px] font-black uppercase tracking-[0.3em] text-foreground">{cat}</span>
+                                    <span className="text-[11px] font-semibold text-foreground">{cat}</span>
                                     <span className="text-[9px] text-foreground/30 font-mono">{prompts.length} prompts</span>
                                 </div>
                                 {isOpen ? <ChevronDown className="w-4 h-4 text-foreground/40" /> : <ChevronRight className="w-4 h-4 text-foreground/40" />}
@@ -319,7 +319,7 @@ export default function PromptBank({ theme, mode = 'kirbai' }: { theme?: string;
                                     ) : (
                                         <button
                                             onClick={() => { setAddingPrompt(cat); setAddForm({ name: "", text: "" }); }}
-                                            className="flex items-center gap-2 px-4 py-3 rounded-xl border border-dashed border-border/20 text-foreground/30 hover:text-foreground/60 hover:border-border/40 transition-all text-xs font-black uppercase tracking-widest"
+                                            className="flex items-center gap-2 px-4 py-3 rounded-xl border border-dashed border-border/20 text-foreground/30 hover:text-foreground/60 hover:border-border/40 transition-all text-xs font-semibold"
                                         >
                                             <Plus className="w-3 h-3" /> Add Prompt
                                         </button>
