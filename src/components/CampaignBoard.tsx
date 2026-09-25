@@ -326,16 +326,56 @@ export default function CampaignBoard() {
     );
 }
 
+const CAST: { match: RegExp; sprites: string[] }[] = [
+    { match: /flash flash/i, sprites: ["primarina", "krabby"] },
+    { match: /nidoking|toxic spikes/i, sprites: ["nidoking", "roserade"] },
+    { match: /alcremie|decorate/i, sprites: ["alcremie", "heracross"] },
+    { match: /house of regi/i, sprites: ["regigigas"] },
+    { match: /psycho boost|deoxys/i, sprites: ["deoxys"] },
+    { match: /next era/i, sprites: ["malamar", "gengar", "mimikyu"] },
+    { match: /fusion album/i, sprites: ["regigigas"] },
+];
+
+function spritesFor(title: string): string[] {
+    return CAST.find(c => c.match.test(title))?.sprites ?? [];
+}
+
+const STREAM_TAG: Record<Stream, string> = { video: "Video", carousel: "Carousel", comedy: "Comedy" };
+
+// "GOAL, not locked" also contains "locked", so GOAL has to win the test.
+function isLocked(subtitle?: string) {
+    const s = subtitle ?? "";
+    return !/GOAL/i.test(s) && /LOCKED/i.test(s);
+}
+
+function fmtDay(iso: string) {
+    const d = new Date(iso + "T12:00:00");
+    return {
+        mon: d.toLocaleDateString("en-US", { month: "short" }).toUpperCase(),
+        day: d.getDate(),
+        dow: d.toLocaleDateString("en-US", { weekday: "short" }),
+        month: d.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+    };
+}
+
+function daysOut(iso: string) {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return Math.round((new Date(iso + "T12:00:00").getTime() - today.getTime()) / 86400000);
+}
+
 function ContentCalendar({ board, onUpdateCard }: {
     board: Board;
     onUpdateCard: (id: string, patch: Partial<CampaignCard>) => void;
 }) {
-    const cadence = board.cadence;
+    const [open, setOpen] = useState<string | null>(null);
+    const [showBacklog, setShowBacklog] = useState(false);
+
     const scheduled = useMemo(
         () => [...board.cards].filter(c => c.scheduledDate).sort((a, b) => (a.scheduledDate! < b.scheduledDate! ? -1 : 1)),
         [board.cards]
     );
     const backlog = board.cards.filter(c => !c.scheduledDate);
+    const milestones = scheduled.filter(c => /LOCKED|GOAL/i.test(c.subtitle ?? ""));
 
     const togglePlatform = (card: CampaignCard, p: Platform) => {
         const current = card.platforms ?? [];
@@ -343,103 +383,157 @@ function ContentCalendar({ board, onUpdateCard }: {
         onUpdateCard(card.id, { platforms: next });
     };
 
+    let lastMonth = "";
+
     return (
-        <div className="flex flex-col gap-6">
-            {cadence && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {PLATFORM_ORDER.map(p => {
-                        const plan = cadence.platforms[p];
-                        return (
-                            <div key={p} className="card p-4 flex flex-col gap-1.5">
-                                <div className="flex items-center justify-between">
-                                    <span className="section-eyebrow">{p}</span>
-                                    <span className="badge text-foreground/60 bg-foreground/5 border-foreground/10">{plan.postsPerWeek}/wk</span>
-                                </div>
-                                <p className="text-xs text-foreground/45 leading-relaxed">{plan.note}</p>
+        <div className="flex flex-col gap-5">
+            {/* Three release goalposts — the glanceable summary */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {milestones.map((m, i) => {
+                    const d = fmtDay(m.scheduledDate!);
+                    const out = daysOut(m.scheduledDate!);
+                    const locked = isLocked(m.subtitle);
+                    return (
+                        <div key={m.id} className="card p-4 flex flex-col gap-2 relative overflow-hidden">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/30">Release {i + 1}</span>
+                                <span className={`badge ${locked ? "text-emerald-500 bg-emerald-400/10 border-emerald-400/20" : "text-accent bg-accent/10 border-accent/20"}`}>
+                                    {locked ? "Locked" : "Goal"}
+                                </span>
                             </div>
-                        );
-                    })}
-                </div>
-            )}
-
-            {cadence && cadence.findings.length > 0 && (
-                <div className="card p-5 flex flex-col gap-3">
-                    <span className="section-subtitle">Why this cadence (data pulled {cadence.dataAsOf})</span>
-                    <ul className="flex flex-col gap-2">
-                        {cadence.findings.map((f, i) => (
-                            <li key={i} className="text-xs text-foreground/55 leading-relaxed flex gap-2">
-                                <span className="text-accent shrink-0">—</span>
-                                <span>{f}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-
-            <div className="card overflow-hidden">
-                <div className="px-5 py-3 border-b border-border/50">
-                    <span className="section-subtitle">Scheduled ({scheduled.length})</span>
-                </div>
-                <div className="flex flex-col divide-y divide-border/40">
-                    {scheduled.map(c => {
-                        const style = STATUS_STYLE[c.status];
-                        return (
-                            <div key={c.id} className="flex items-center gap-3 px-5 py-3 flex-wrap">
-                                <input
-                                    type="date"
-                                    value={c.scheduledDate}
-                                    onChange={e => onUpdateCard(c.id, { scheduledDate: e.target.value })}
-                                    className="input-field text-xs py-1.5 px-2 w-[140px]"
-                                />
-                                <button
-                                    onClick={() => onUpdateCard(c.id, { status: nextStatus(c.status) })}
-                                    className={`badge ${style.badge} shrink-0`}
-                                >
-                                    {style.label}
-                                </button>
-                                <span className="flex-1 min-w-[160px] text-sm font-semibold text-foreground">{c.title}</span>
-                                <div className="flex items-center gap-1">
-                                    {PLATFORM_ORDER.map(p => {
-                                        const on = (c.platforms ?? []).includes(p);
-                                        return (
-                                            <button
-                                                key={p}
-                                                onClick={() => togglePlatform(c, p)}
-                                                className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${on ? "bg-accent text-white" : "bg-surface/60 text-foreground/25 hover:text-foreground/50"}`}
-                                            >
-                                                {PLATFORM_LABEL[p]}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
+                            <div className="flex items-end gap-2">
+                                <span className="text-2xl font-extrabold text-foreground leading-none">{d.mon} {d.day}</span>
+                                <span className="text-xs text-foreground/40 pb-0.5">{out}d out</span>
                             </div>
-                        );
-                    })}
-                    {scheduled.length === 0 && (
-                        <div className="px-5 py-8 text-center text-foreground/30 text-sm">Nothing scheduled yet.</div>
-                    )}
-                </div>
+                            <p className="text-xs font-semibold text-foreground/70 leading-snug">{m.title.replace(/ (trailer|drops).*$/i, "")}</p>
+                            <div className="flex gap-1 mt-auto pt-1">
+                                {spritesFor(m.title).map(s => (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img key={s} src={`/sprites/${s}.png`} alt="" className="w-8 h-8 object-contain" style={{ imageRendering: "pixelated" }} />
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
 
+            {/* One unified timeline */}
+            <div className="card overflow-hidden">
+                {scheduled.map(c => {
+                    const d = fmtDay(c.scheduledDate!);
+                    const out = daysOut(c.scheduledDate!);
+                    const isMilestone = /LOCKED|GOAL/i.test(c.subtitle ?? "");
+                    const locked = isLocked(c.subtitle);
+                    const isOpen = open === c.id;
+                    const sprites = spritesFor(c.title);
+                    const newMonth = d.month !== lastMonth;
+                    lastMonth = d.month;
+
+                    return (
+                        <div key={c.id}>
+                            {newMonth && (
+                                <div className="px-5 pt-4 pb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-foreground/25">{d.month}</div>
+                            )}
+                            <button
+                                onClick={() => setOpen(isOpen ? null : c.id)}
+                                className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-foreground/[0.03] ${isMilestone ? "bg-accent/[0.04]" : ""}`}
+                                style={isMilestone ? { boxShadow: "inset 3px 0 0 0 var(--accent)" } : undefined}
+                            >
+                                <div className="w-11 shrink-0 text-center">
+                                    <div className={`text-sm font-bold leading-none ${isMilestone ? "text-accent" : "text-foreground/80"}`}>{d.day}</div>
+                                    <div className="text-[9px] uppercase tracking-wider text-foreground/30 mt-0.5">{d.dow}</div>
+                                </div>
+
+                                <div className="flex gap-0.5 w-[72px] shrink-0 justify-start">
+                                    {sprites.slice(0, 3).map(s => (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img key={s} src={`/sprites/${s}.png`} alt="" className="w-6 h-6 object-contain" style={{ imageRendering: "pixelated" }} />
+                                    ))}
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                    <div className={`truncate ${isMilestone ? "text-[15px] font-bold text-foreground" : "text-sm font-medium text-foreground/85"}`}>{c.title}</div>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                        <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/30">{STREAM_TAG[c.stream]}</span>
+                                        {isMilestone && (
+                                            <span className={`text-[9px] font-bold uppercase tracking-wider ${locked ? "text-emerald-500" : "text-accent"}`}>
+                                                {locked ? "Locked" : "Goal"}
+                                            </span>
+                                        )}
+                                        <span className="text-[9px] text-foreground/25">{out >= 0 ? `${out}d` : `${-out}d ago`}</span>
+                                    </div>
+                                </div>
+
+                                <ChevronDown className={`w-4 h-4 shrink-0 text-foreground/20 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                            </button>
+
+                            {isOpen && (
+                                <div className="px-5 pb-4 pl-[136px] flex flex-col gap-3">
+                                    {c.notes && <p className="text-xs text-foreground/55 leading-relaxed">{c.notes}</p>}
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <input
+                                            type="date"
+                                            value={c.scheduledDate}
+                                            onChange={e => onUpdateCard(c.id, { scheduledDate: e.target.value })}
+                                            className="input-field text-xs py-1 px-2 w-[135px]"
+                                        />
+                                        <button
+                                            onClick={() => onUpdateCard(c.id, { status: nextStatus(c.status) })}
+                                            className={`badge ${STATUS_STYLE[c.status].badge}`}
+                                        >
+                                            {STATUS_STYLE[c.status].label}
+                                        </button>
+                                        <div className="flex gap-1">
+                                            {PLATFORM_ORDER.map(p => {
+                                                const on = (c.platforms ?? []).includes(p);
+                                                return (
+                                                    <button
+                                                        key={p}
+                                                        onClick={() => togglePlatform(c, p)}
+                                                        className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${on ? "bg-accent text-white" : "bg-surface/60 text-foreground/25 hover:text-foreground/50"}`}
+                                                    >
+                                                        {PLATFORM_LABEL[p]}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+                {scheduled.length === 0 && (
+                    <div className="px-5 py-8 text-center text-foreground/30 text-sm">Nothing scheduled yet.</div>
+                )}
+            </div>
+
+            {/* Backlog — collapsed by default */}
             {backlog.length > 0 && (
                 <div className="card overflow-hidden">
-                    <div className="px-5 py-3 border-b border-border/50">
-                        <span className="section-subtitle">Backlog — no date yet ({backlog.length})</span>
-                    </div>
-                    <div className="flex flex-col divide-y divide-border/40">
-                        {backlog.map(c => (
-                            <div key={c.id} className="flex items-center gap-3 px-5 py-2.5">
-                                <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS_STYLE[c.status].dot}`} />
-                                <span className="flex-1 text-sm text-foreground/60">{c.title}</span>
-                                <button
-                                    onClick={() => onUpdateCard(c.id, { scheduledDate: new Date().toISOString().slice(0, 10) })}
-                                    className="text-[10px] font-semibold uppercase tracking-wider text-accent/70 hover:text-accent"
-                                >
-                                    Schedule
-                                </button>
-                            </div>
-                        ))}
-                    </div>
+                    <button
+                        onClick={() => setShowBacklog(v => !v)}
+                        className="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-foreground/[0.03] transition-colors"
+                    >
+                        <span className="section-subtitle">Backlog — no date ({backlog.length})</span>
+                        <ChevronDown className={`w-4 h-4 text-foreground/20 transition-transform ${showBacklog ? "rotate-180" : ""}`} />
+                    </button>
+                    {showBacklog && (
+                        <div className="flex flex-col divide-y divide-border/40 border-t border-border/40">
+                            {backlog.map(c => (
+                                <div key={c.id} className="flex items-center gap-3 px-5 py-2.5">
+                                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS_STYLE[c.status].dot}`} />
+                                    <span className="flex-1 text-sm text-foreground/60 truncate">{c.title}</span>
+                                    <button
+                                        onClick={() => onUpdateCard(c.id, { scheduledDate: new Date().toISOString().slice(0, 10) })}
+                                        className="text-[10px] font-semibold uppercase tracking-wider text-accent/70 hover:text-accent shrink-0"
+                                    >
+                                        Schedule
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
         </div>

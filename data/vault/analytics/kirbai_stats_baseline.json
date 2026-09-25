@@ -1,96 +1,69 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-03T23:14:18.826Z",
+  "generatedAt": "2026-09-17T16:51:38.443785Z",
   "status": "Historical baseline; refresh from the source folder before claiming metrics are current.",
   "sourceDirectory": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats",
   "sources": [
     {
-      "fileName": "Aug-01-2025_Jul-17-2026_1289066006421050.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Aug-01-2025_Jul-17-2026_1289066006421050.csv",
-      "checksumSha256": "fe5e9fc5d62162e715d4a5d6eb1ae05165e858fb896b679dc44e4ce89527dc83",
-      "rows": 91,
-      "columns": 18,
-      "detectedType": "instagram"
-    },
-    {
-      "fileName": "Jan-01-2026_Aug-11-2026_1026821240230901.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Jan-01-2026_Aug-11-2026_1026821240230901.csv",
-      "checksumSha256": "4527824aa66ccd954c06eb81d7f9b05d0e02f453135a5e24f63d4f930f15d8d9",
-      "rows": 81,
-      "columns": 227,
-      "detectedType": "facebook"
-    },
-    {
-      "fileName": "Jan-01-2026_Jul-06-2026_1500407242104024.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Jan-01-2026_Jul-06-2026_1500407242104024.csv",
-      "checksumSha256": "359ce7b7d3fef1223a5d8b4c58ea53604c49116e9a28cdcd547bcf91a9dfe2a5",
-      "rows": 51,
-      "columns": 224,
-      "detectedType": "facebook"
-    },
-    {
-      "fileName": "Jan-01-2026_Jul-06-2026_1531984535288774.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Jan-01-2026_Jul-06-2026_1531984535288774.csv",
-      "checksumSha256": "ec91ae31811b7b4353e1818a81eef25bfb1e36d92e4d5bfde7a747eeb1930cb2",
-      "rows": 64,
-      "columns": 18,
-      "detectedType": "instagram"
-    },
-    {
-      "fileName": "Jan-01-2026_Sep-03-2026_1796667004661863 (1).csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Jan-01-2026_Sep-03-2026_1796667004661863 (1).csv",
-      "checksumSha256": "218727ec19154b5e4d1670f6c20eff0e9033ce609ebc291d7f46040a49a27fa2",
-      "rows": 84,
-      "columns": 31,
-      "detectedType": "facebook"
-    },
-    {
-      "fileName": "Jan-01-2026_Sep-03-2026_1851941875777783.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Jan-01-2026_Sep-03-2026_1851941875777783.csv",
-      "checksumSha256": "8d4624a89a3f261b763fe179d538fee9bcdaa7ce167e5ae47b24103f7b4cb637",
-      "rows": 88,
-      "columns": 18,
-      "detectedType": "instagram"
-    },
-    {
-      "fileName": "Jul-01-2026_Aug-11-2026_990670734019030.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Jul-01-2026_Aug-11-2026_990670734019030.csv",
-      "checksumSha256": "496d16cb71e43bc0e55d2993bdca4ec312cb53609db56016d018a9019211b281",
-      "rows": 22,
-      "columns": 18,
-      "detectedType": "instagram"
-    },
-    {
-      "fileName": "Jul-04-2026_Aug-02-2026_1042625275302194.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Jul-04-2026_Aug-02-2026_1042625275302194.csv",
-      "checksumSha256": "579365d22302fcb4c9862cea6cdfbe78bd97df27df6fdfaea254fab43516bb86",
-      "rows": 18,
-      "columns": 18,
-      "detectedType": "instagram"
-    },
-    {
-      "fileName": "Overview.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Overview.csv",
-      "checksumSha256": "f07b3dd262a7b9a2b94349ec49cf2786eb42f580aa1f165ccd9eb22e6bce2a19",
-      "rows": 365,
-      "columns": 6,
-      "detectedType": "unknown"
-    },
-    {
-      "fileName": "results 2 copy.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/results 2 copy.csv",
+      "fileName": "distrokid_sales.csv",
+      "absolutePath": "/sessions/rcw-01qdwoxctb9wptfxhx2b8pzu/mnt/stats/distrokid_sales.csv",
       "checksumSha256": "693929e288239125b0b5155f741e58cf9c1c9f445e9ed249b60d3756f1935a05",
       "rows": 36283,
       "columns": 15,
       "detectedType": "distrokid"
     },
     {
-      "fileName": "results 2.csv",
-      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/results 2.csv",
-      "checksumSha256": "e419f9109574e5a7e29104d83e0ffd7b8fb2fc076b9623119158f726d9420f97",
-      "rows": 32444,
-      "columns": 15,
-      "detectedType": "distrokid"
+      "fileName": "facebook_2026-01-01_to_2026-09-03.csv",
+      "absolutePath": "/sessions/rcw-01qdwoxctb9wptfxhx2b8pzu/mnt/stats/facebook_2026-01-01_to_2026-09-03.csv",
+      "checksumSha256": "218727ec19154b5e4d1670f6c20eff0e9033ce609ebc291d7f46040a49a27fa2",
+      "rows": 84,
+      "columns": 31,
+      "detectedType": "facebook"
+    },
+    {
+      "fileName": "instagram_2025-08-01_to_2026-07-17.csv",
+      "absolutePath": "/sessions/rcw-01qdwoxctb9wptfxhx2b8pzu/mnt/stats/instagram_2025-08-01_to_2026-07-17.csv",
+      "checksumSha256": "fe5e9fc5d62162e715d4a5d6eb1ae05165e858fb896b679dc44e4ce89527dc83",
+      "rows": 91,
+      "columns": 18,
+      "detectedType": "instagram"
+    },
+    {
+      "fileName": "instagram_2026-01-01_to_2026-09-03.csv",
+      "absolutePath": "/sessions/rcw-01qdwoxctb9wptfxhx2b8pzu/mnt/stats/instagram_2026-01-01_to_2026-09-03.csv",
+      "checksumSha256": "8d4624a89a3f261b763fe179d538fee9bcdaa7ce167e5ae47b24103f7b4cb637",
+      "rows": 88,
+      "columns": 18,
+      "detectedType": "instagram"
+    },
+    {
+      "fileName": "tiktok_2026_overview.csv",
+      "absolutePath": "/sessions/rcw-01qdwoxctb9wptfxhx2b8pzu/mnt/stats/tiktok_2026_overview.csv",
+      "checksumSha256": "f07b3dd262a7b9a2b94349ec49cf2786eb42f580aa1f165ccd9eb22e6bce2a19",
+      "rows": 365,
+      "columns": 6,
+      "detectedType": "unknown"
+    },
+    {
+      "fileName": "Kirbai-audience-timeline.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Kirbai-audience-timeline.csv",
+      "checksumSha256": "16b803f49b8415d4e00455a502fa81a60d0ddc03c2e68d0898f7b9932adf8c08",
+      "rows": 989,
+      "detectedType": "spotify-for-artists"
+    },
+    {
+      "fileName": "Kirbai-playlists-1year.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Kirbai-playlists-1year.csv",
+      "checksumSha256": "d04e376a0264ad6f9b68f5dea20cb76bbff739677fade9bc83d8356498cbc8ec",
+      "rows": 78,
+      "detectedType": "spotify-for-artists"
+    },
+    {
+      "fileName": "Kirbai-songs-1year.csv",
+      "absolutePath": "/Users/erikhenry2/Desktop/KIRBAI POKEMON/stats/Kirbai-songs-1year.csv",
+      "checksumSha256": "1c8a45300b25b457fb77a90a0d36830dd2d72587e165cb98803612e98d2b0769",
+      "rows": 152,
+      "detectedType": "spotify-for-artists"
     }
   ],
   "instagram": {
@@ -360,13 +333,13 @@
     "coverage": {
       "firstPublishDate": "2026-02-23",
       "lastPublishDate": "2026-09-02",
-      "posts": 86,
-      "videos": 72,
+      "posts": 84,
+      "videos": 70,
       "otherPosts": 14
     },
     "totals": {
-      "views": 1844170,
-      "reach": 1502825,
+      "views": 1843534,
+      "reach": 1502517,
       "reactions": 49399,
       "comments": 1499,
       "shares": 3762,
@@ -1090,28 +1063,32 @@
     "The top Facebook post in this export is “Pokopia is cute until you realize Ditto is in crisis 💔 Ditto built an entire world for people who never came back. 🎧 I'm Just a Ditto – Kirbai | full song on Spotify & YouTube #Pokopia #Ditto #Pokemon #PokemonMusic #PokemonCommunity #Kir…” with 113,561 views and $10.86 in native earnings.",
     "DistroKid reports $4,326.73 across 2,339,207 reported units for Kirbai through sale month 2026-07; the newest month may be incomplete.",
     "The leading DistroKid stores by earnings are Spotify ($1,840.79), Apple Music ($1,008.37), YouTube (Red) ($961.64).",
-    "The leading tracks by DistroKid earnings are Power Whip (Tsareena Step) ($539.63), Mean Look (Gothitelle Cut) ($484.07), Lovely Kiss (Jynx Anthem) ($423.76), Poison Pink (Nidoking) ($221.46), Scrappy Klutz (Lopunny Crash) ($157.34)."
+    "The leading tracks by DistroKid earnings are Power Whip (Tsareena Step) ($539.63), Mean Look (Gothitelle Cut) ($484.07), Lovely Kiss (Jynx Anthem) ($423.76), Poison Pink (Nidoking) ($221.46), Scrappy Klutz (Lopunny Crash) ($157.34).",
+    "SPOTIFY, RENTED VS OWNED (2026-09-17): monthly listeners fell 78% from the 2026-03-19 peak (26,217 to 5,859), but every owned-audience metric rose over the same period. Followers 504 to 1,238 with no down month ever; streams per listener 4.2 to 11.0; super listeners 3.7% to 11.0% of audience; save rate by era 3.61% to 5.36%. What collapsed was algorithmic subsidy, not the fanbase. Do not read monthly listeners as project health.",
+    "SPOTIFY, RELEASE LIFT IS DEAD: Banned Badge (Jan 2026) drove +1014% in 28-day streams. Every release since decayed: +45, +31, -22, -11, +13, +2, -25, -20, +15%. The last five are noise. Releasing is no longer a Spotify growth lever; releases now function as raw material for the video engine, not as stream drivers.",
+    "SPOTIFY, PER-SONG DECAY: average streams per song by era. Banned Badge 26,245 (13 songs), Heart Scales 10,470 (15), Pink Bois 5,239 (25), Pretty Rare Candies 3,409 (14). Down 87% while save rate rose 48%. More releases into a flat audience splits the same listeners; 25 Pink Bois songs earned fewer total streams than 13 Banned Badge songs.",
+    "SPOTIFY, THE FLOOR IS THE REAL METRIC: minimum daily streams (passive catalog demand with no push) ran ~2,300/day Feb-Jun 2026, then dropped to ~1,500/day Jul-Sep. That 35% floor decline is the genuine structural loss. Track the floor and follower count; ignore monthly listeners.",
+    "SPOTIFY, DISTRIBUTION IS 91% ALGORITHMIC: 129,449 playlist streams from Spotify-owned surfaces vs 12,709 from everything else. Of that 12,709, Erik's own Kirbai Pokedex is 5,857 and unprompted fan-built Kirbai playlists are 3,614 across 9 separate playlists with only 3-8 listeners each. No cushion under the algorithm.",
+    "CONVERSION GAP IS THE TOP OPPORTUNITY: the Runway Regi Reel reached 214,000 on Instagram; total Spotify followers are 1,238. A single video touched ~170x the entire follower base with near-zero conversion. This is a plumbing problem (CTA, link friction), not a reach or quality problem, and it is the highest-leverage fixable item in the dataset."
   ],
   "dataQuality": {
     "instagram": {
       "severity": "low",
-      "rawRowsAcrossExports": 283,
+      "rawRowsAcrossExports": 179,
       "uniquePostIds": 110,
-      "overlappingRowsNotDoubleCounted": 173,
+      "overlappingRowsNotDoubleCounted": 69,
       "finding": "The July 17 Instagram export fully supersedes the overlapping July 6 export. Baseline totals use one row per post ID."
     },
     "facebook": {
       "severity": "low",
-      "rows": 86,
-      "uniquePostIds": 86,
+      "rows": 84,
+      "uniquePostIds": 84,
       "finding": "The export mixes videos and photo posts. Totals include both; the coverage block separates video count."
     },
     "distroKid": {
       "severity": "medium",
-      "selectedFile": "results 2 copy.csv",
-      "ignoredOlderCumulativeExports": [
-        "results 2.csv"
-      ],
+      "selectedFile": "distrokid_sales.csv",
+      "ignoredOlderCumulativeExports": [],
       "finding": "Only the newest cumulative DistroKid export is summarized. The selected ledger contains a small number of exact duplicate-looking rows, but there is no transaction ID proving they are accidental duplicates. Official totals therefore retain them and expose a deduplicated sensitivity check."
     }
   },
@@ -1123,5 +1100,748 @@
     "Label royalty figures with reporting coverage and warn that the newest sale month may be incomplete.",
     "DistroKid Quantity means reported units and can include social-media uses, downloads, or other source types; do not relabel the total as streams.",
     "Never infer causation from a high-performing post or track without a controlled comparison."
-  ]
+  ],
+  "spotify": {
+    "grain": "Three Spotify for Artists exports: daily audience timeline, 1-year per-song totals, 1-year per-playlist totals.",
+    "coverage": {
+      "timelineStart": "2024-01-01",
+      "timelineEnd": "2026-09-15",
+      "timelineDays": 989,
+      "songsTracked": 152,
+      "playlistsTracked": 78,
+      "exportedOn": "2026-09-17",
+      "windowNote": "Song and playlist files are trailing-1-year; the timeline is full history."
+    },
+    "totals": {
+      "allTimeStreamsInSongFile": 766765,
+      "currentMonthlyListeners": 5859,
+      "currentFollowers": 1238,
+      "currentSuperListeners": 644,
+      "peakMonthlyListeners": 26217,
+      "peakMonthlyListenersDate": "2026-03-19"
+    },
+    "monthly": {
+      "2024-01": {
+        "streams": 0,
+        "saves": 0,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 0,
+        "followersEnd": 0,
+        "superListenersEnd": 0,
+        "streamsPerListener": null,
+        "saveRatePct": null
+      },
+      "2024-02": {
+        "streams": 0,
+        "saves": 0,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 0,
+        "followersEnd": 0,
+        "superListenersEnd": 0,
+        "streamsPerListener": null,
+        "saveRatePct": null
+      },
+      "2024-03": {
+        "streams": 0,
+        "saves": 0,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 0,
+        "followersEnd": 0,
+        "superListenersEnd": 0,
+        "streamsPerListener": null,
+        "saveRatePct": null
+      },
+      "2024-04": {
+        "streams": 0,
+        "saves": 0,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 0,
+        "followersEnd": 0,
+        "superListenersEnd": 0,
+        "streamsPerListener": null,
+        "saveRatePct": null
+      },
+      "2024-05": {
+        "streams": 0,
+        "saves": 0,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 0,
+        "followersEnd": 0,
+        "superListenersEnd": 0,
+        "streamsPerListener": null,
+        "saveRatePct": null
+      },
+      "2024-06": {
+        "streams": 0,
+        "saves": 0,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 0,
+        "followersEnd": 0,
+        "superListenersEnd": 0,
+        "streamsPerListener": null,
+        "saveRatePct": null
+      },
+      "2024-07": {
+        "streams": 0,
+        "saves": 0,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 0,
+        "followersEnd": 0,
+        "superListenersEnd": 0,
+        "streamsPerListener": null,
+        "saveRatePct": null
+      },
+      "2024-08": {
+        "streams": 0,
+        "saves": 0,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 0,
+        "followersEnd": 0,
+        "superListenersEnd": 0,
+        "streamsPerListener": null,
+        "saveRatePct": null
+      },
+      "2024-09": {
+        "streams": 46,
+        "saves": 11,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 2,
+        "followersEnd": 0,
+        "superListenersEnd": 1,
+        "streamsPerListener": 23.0,
+        "saveRatePct": 23.91
+      },
+      "2024-10": {
+        "streams": 62,
+        "saves": 1,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 4,
+        "followersEnd": 2,
+        "superListenersEnd": 1,
+        "streamsPerListener": 15.5,
+        "saveRatePct": 1.61
+      },
+      "2024-11": {
+        "streams": 76,
+        "saves": 3,
+        "playlistAdds": 2,
+        "monthlyListenersEnd": 5,
+        "followersEnd": 5,
+        "superListenersEnd": 0,
+        "streamsPerListener": 15.2,
+        "saveRatePct": 3.95
+      },
+      "2024-12": {
+        "streams": 25,
+        "saves": 0,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 3,
+        "followersEnd": 5,
+        "superListenersEnd": 1,
+        "streamsPerListener": 8.3,
+        "saveRatePct": 0.0
+      },
+      "2025-01": {
+        "streams": 39,
+        "saves": 15,
+        "playlistAdds": 11,
+        "monthlyListenersEnd": 4,
+        "followersEnd": 5,
+        "superListenersEnd": 0,
+        "streamsPerListener": 9.8,
+        "saveRatePct": 38.46
+      },
+      "2025-02": {
+        "streams": 10,
+        "saves": 0,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 3,
+        "followersEnd": 5,
+        "superListenersEnd": 0,
+        "streamsPerListener": 3.3,
+        "saveRatePct": 0.0
+      },
+      "2025-03": {
+        "streams": 50,
+        "saves": 40,
+        "playlistAdds": 0,
+        "monthlyListenersEnd": 10,
+        "followersEnd": 7,
+        "superListenersEnd": 0,
+        "streamsPerListener": 5.0,
+        "saveRatePct": 80.0
+      },
+      "2025-04": {
+        "streams": 49,
+        "saves": 19,
+        "playlistAdds": 1,
+        "monthlyListenersEnd": 11,
+        "followersEnd": 6,
+        "superListenersEnd": 1,
+        "streamsPerListener": 4.5,
+        "saveRatePct": 38.78
+      },
+      "2025-05": {
+        "streams": 562,
+        "saves": 40,
+        "playlistAdds": 11,
+        "monthlyListenersEnd": 35,
+        "followersEnd": 9,
+        "superListenersEnd": 4,
+        "streamsPerListener": 16.1,
+        "saveRatePct": 7.12
+      },
+      "2025-06": {
+        "streams": 371,
+        "saves": 66,
+        "playlistAdds": 17,
+        "monthlyListenersEnd": 36,
+        "followersEnd": 13,
+        "superListenersEnd": 3,
+        "streamsPerListener": 10.3,
+        "saveRatePct": 17.79
+      },
+      "2025-07": {
+        "streams": 374,
+        "saves": 37,
+        "playlistAdds": 21,
+        "monthlyListenersEnd": 24,
+        "followersEnd": 13,
+        "superListenersEnd": 3,
+        "streamsPerListener": 15.6,
+        "saveRatePct": 9.89
+      },
+      "2025-08": {
+        "streams": 99,
+        "saves": 7,
+        "playlistAdds": 7,
+        "monthlyListenersEnd": 13,
+        "followersEnd": 13,
+        "superListenersEnd": 1,
+        "streamsPerListener": 7.6,
+        "saveRatePct": 7.07
+      },
+      "2025-09": {
+        "streams": 1161,
+        "saves": 171,
+        "playlistAdds": 29,
+        "monthlyListenersEnd": 101,
+        "followersEnd": 21,
+        "superListenersEnd": 11,
+        "streamsPerListener": 11.5,
+        "saveRatePct": 14.73
+      },
+      "2025-10": {
+        "streams": 4123,
+        "saves": 160,
+        "playlistAdds": 83,
+        "monthlyListenersEnd": 423,
+        "followersEnd": 29,
+        "superListenersEnd": 26,
+        "streamsPerListener": 9.7,
+        "saveRatePct": 3.88
+      },
+      "2025-11": {
+        "streams": 4700,
+        "saves": 457,
+        "playlistAdds": 165,
+        "monthlyListenersEnd": 527,
+        "followersEnd": 41,
+        "superListenersEnd": 60,
+        "streamsPerListener": 8.9,
+        "saveRatePct": 9.72
+      },
+      "2025-12": {
+        "streams": 3948,
+        "saves": 223,
+        "playlistAdds": 183,
+        "monthlyListenersEnd": 605,
+        "followersEnd": 59,
+        "superListenersEnd": 53,
+        "streamsPerListener": 6.5,
+        "saveRatePct": 5.65
+      },
+      "2026-01": {
+        "streams": 70015,
+        "saves": 4337,
+        "playlistAdds": 2216,
+        "monthlyListenersEnd": 11098,
+        "followersEnd": 297,
+        "superListenersEnd": 811,
+        "streamsPerListener": 6.3,
+        "saveRatePct": 6.19
+      },
+      "2026-02": {
+        "streams": 103177,
+        "saves": 5005,
+        "playlistAdds": 2551,
+        "monthlyListenersEnd": 24530,
+        "followersEnd": 504,
+        "superListenersEnd": 900,
+        "streamsPerListener": 4.2,
+        "saveRatePct": 4.85
+      },
+      "2026-03": {
+        "streams": 99275,
+        "saves": 3429,
+        "playlistAdds": 2102,
+        "monthlyListenersEnd": 16013,
+        "followersEnd": 671,
+        "superListenersEnd": 815,
+        "streamsPerListener": 6.2,
+        "saveRatePct": 3.45
+      },
+      "2026-04": {
+        "streams": 89040,
+        "saves": 2904,
+        "playlistAdds": 2125,
+        "monthlyListenersEnd": 13990,
+        "followersEnd": 780,
+        "superListenersEnd": 743,
+        "streamsPerListener": 6.4,
+        "saveRatePct": 3.26
+      },
+      "2026-05": {
+        "streams": 106182,
+        "saves": 3386,
+        "playlistAdds": 2152,
+        "monthlyListenersEnd": 13746,
+        "followersEnd": 919,
+        "superListenersEnd": 835,
+        "streamsPerListener": 7.7,
+        "saveRatePct": 3.19
+      },
+      "2026-06": {
+        "streams": 101107,
+        "saves": 3142,
+        "playlistAdds": 2138,
+        "monthlyListenersEnd": 17666,
+        "followersEnd": 1027,
+        "superListenersEnd": 789,
+        "streamsPerListener": 5.7,
+        "saveRatePct": 3.11
+      },
+      "2026-07": {
+        "streams": 73100,
+        "saves": 2330,
+        "playlistAdds": 1379,
+        "monthlyListenersEnd": 8273,
+        "followersEnd": 1123,
+        "superListenersEnd": 654,
+        "streamsPerListener": 8.8,
+        "saveRatePct": 3.19
+      },
+      "2026-08": {
+        "streams": 77434,
+        "saves": 2447,
+        "playlistAdds": 2060,
+        "monthlyListenersEnd": 7059,
+        "followersEnd": 1175,
+        "superListenersEnd": 612,
+        "streamsPerListener": 11.0,
+        "saveRatePct": 3.16
+      },
+      "2026-09": {
+        "streams": 33642,
+        "saves": 1237,
+        "playlistAdds": 939,
+        "monthlyListenersEnd": 5859,
+        "followersEnd": 1238,
+        "superListenersEnd": 644,
+        "streamsPerListener": 5.7,
+        "saveRatePct": 3.68
+      }
+    },
+    "dailyStreamFloor": {
+      "2026-01": {
+        "minDaily": 304,
+        "medianDaily": 2620,
+        "maxDaily": 4300
+      },
+      "2026-02": {
+        "minDaily": 2379,
+        "medianDaily": 3356,
+        "maxDaily": 10225
+      },
+      "2026-03": {
+        "minDaily": 2243,
+        "medianDaily": 3242,
+        "maxDaily": 4018
+      },
+      "2026-04": {
+        "minDaily": 2248,
+        "medianDaily": 2959,
+        "maxDaily": 3738
+      },
+      "2026-05": {
+        "minDaily": 2394,
+        "medianDaily": 3322,
+        "maxDaily": 5024
+      },
+      "2026-06": {
+        "minDaily": 2193,
+        "medianDaily": 3127,
+        "maxDaily": 4708
+      },
+      "2026-07": {
+        "minDaily": 1464,
+        "medianDaily": 2346,
+        "maxDaily": 3384
+      },
+      "2026-08": {
+        "minDaily": 1601,
+        "medianDaily": 2490,
+        "maxDaily": 3403
+      },
+      "2026-09": {
+        "minDaily": 1495,
+        "medianDaily": 2236,
+        "maxDaily": 2899
+      }
+    },
+    "releaseLift": [
+      {
+        "release": "Banned Badge",
+        "date": "2026-01-06",
+        "streams28dBefore": 6442,
+        "streams28dAfter": 71760,
+        "liftPct": 1013.9
+      },
+      {
+        "release": "Pixilate: The Fusions",
+        "date": "2026-02-04",
+        "streams28dBefore": 73725,
+        "streams28dAfter": 106875,
+        "liftPct": 45.0
+      },
+      {
+        "release": "Heart Scales",
+        "date": "2026-02-12",
+        "streams28dBefore": 84090,
+        "streams28dAfter": 110145,
+        "liftPct": 31.0
+      },
+      {
+        "release": "Pink Hierarchy",
+        "date": "2026-03-11",
+        "streams28dBefore": 110211,
+        "streams28dAfter": 85755,
+        "liftPct": -22.2
+      },
+      {
+        "release": "Battle Ready",
+        "date": "2026-03-24",
+        "streams28dBefore": 96469,
+        "streams28dAfter": 85582,
+        "liftPct": -11.3
+      },
+      {
+        "release": "Pink Bois",
+        "date": "2026-04-17",
+        "streams28dBefore": 83048,
+        "streams28dAfter": 93646,
+        "liftPct": 12.8
+      },
+      {
+        "release": "Pink Bois: Pheromone Edition",
+        "date": "2026-05-29",
+        "streams28dBefore": 95076,
+        "streams28dAfter": 97384,
+        "liftPct": 2.4
+      },
+      {
+        "release": "Dream Eater",
+        "date": "2026-06-15",
+        "streams28dBefore": 100659,
+        "streams28dAfter": 75429,
+        "liftPct": -25.1
+      },
+      {
+        "release": "Lovely Kiss: Shiny Versions",
+        "date": "2026-07-06",
+        "streams28dBefore": 83444,
+        "streams28dAfter": 66394,
+        "liftPct": -20.4
+      },
+      {
+        "release": "Pretty Rare Candies",
+        "date": "2026-07-31",
+        "streams28dBefore": 64368,
+        "streams28dAfter": 73783,
+        "liftPct": 14.6
+      }
+    ],
+    "eraPerformance": [
+      {
+        "era": "Banned Badge",
+        "songs": 13,
+        "streams": 341187,
+        "avgStreamsPerSong": 26245,
+        "saveRatePct": 3.61
+      },
+      {
+        "era": "Heart Scales",
+        "songs": 15,
+        "streams": 157058,
+        "avgStreamsPerSong": 10470,
+        "saveRatePct": 3.24
+      },
+      {
+        "era": "Pink Bois",
+        "songs": 25,
+        "streams": 130999,
+        "avgStreamsPerSong": 5239,
+        "saveRatePct": 4.09
+      },
+      {
+        "era": "Pretty Rare Candies",
+        "songs": 14,
+        "streams": 47739,
+        "avgStreamsPerSong": 3409,
+        "saveRatePct": 5.36
+      }
+    ],
+    "topSongs": [
+      {
+        "song": "Power Whip - Tsareena Step",
+        "streams": 110125,
+        "listeners": 26725,
+        "saves": 3652,
+        "saveRatePct": 3.32,
+        "releaseDate": "2026-01-06"
+      },
+      {
+        "song": "Lovely Kiss - Jynx Anthem",
+        "streams": 77853,
+        "listeners": 18206,
+        "saves": 2659,
+        "saveRatePct": 3.42,
+        "releaseDate": "2025-12-28"
+      },
+      {
+        "song": "Mean Look - Gothitelle Cut",
+        "streams": 68845,
+        "listeners": 9206,
+        "saves": 2302,
+        "saveRatePct": 3.34,
+        "releaseDate": "2026-01-06"
+      },
+      {
+        "song": "Poison Pink - Nidoking",
+        "streams": 35373,
+        "listeners": 3033,
+        "saves": 1052,
+        "saveRatePct": 2.97,
+        "releaseDate": "2026-04-17"
+      },
+      {
+        "song": "Scrappy Klutz - Lopunny Crash",
+        "streams": 26484,
+        "listeners": 4495,
+        "saves": 869,
+        "saveRatePct": 3.28,
+        "releaseDate": "2026-02-12"
+      },
+      {
+        "song": "Magic Bounce - Hatterene Master",
+        "streams": 24248,
+        "listeners": 5354,
+        "saves": 881,
+        "saveRatePct": 3.63,
+        "releaseDate": "2026-01-06"
+      },
+      {
+        "song": "I'm the Pheromosa",
+        "streams": 23821,
+        "listeners": 9678,
+        "saves": 755,
+        "saveRatePct": 3.17,
+        "releaseDate": "2026-02-12"
+      },
+      {
+        "song": "Flower Trick - Meowscarada Mix",
+        "streams": 20308,
+        "listeners": 5226,
+        "saves": 569,
+        "saveRatePct": 2.8,
+        "releaseDate": "2026-02-12"
+      },
+      {
+        "song": "Pixilate - Gardevoir Dub",
+        "streams": 16083,
+        "listeners": 2975,
+        "saves": 791,
+        "saveRatePct": 4.92,
+        "releaseDate": "2026-01-06"
+      },
+      {
+        "song": "Pink Pheromones",
+        "streams": 15928,
+        "listeners": 4911,
+        "saves": 438,
+        "saveRatePct": 2.75,
+        "releaseDate": "2026-05-29"
+      },
+      {
+        "song": "Jigglypuff’s Song - Perish Song Version",
+        "streams": 15559,
+        "listeners": 608,
+        "saves": 110,
+        "saveRatePct": 0.71,
+        "releaseDate": "2025-08-26"
+      },
+      {
+        "song": "Make It Rain - Gholdengo Deluxe",
+        "streams": 14896,
+        "listeners": 3238,
+        "saves": 467,
+        "saveRatePct": 3.14,
+        "releaseDate": "2026-02-12"
+      },
+      {
+        "song": "Relic Song - Meloetta Aria",
+        "streams": 13442,
+        "listeners": 4041,
+        "saves": 408,
+        "saveRatePct": 3.04,
+        "releaseDate": "2026-02-12"
+      },
+      {
+        "song": "Power Klutz - Tsareena vs. Lopunny",
+        "streams": 12045,
+        "listeners": 2045,
+        "saves": 279,
+        "saveRatePct": 2.32,
+        "releaseDate": "2026-03-24"
+      },
+      {
+        "song": "Pink Buzz - Electabuzz",
+        "streams": 9596,
+        "listeners": 1940,
+        "saves": 373,
+        "saveRatePct": 3.89,
+        "releaseDate": "2026-04-17"
+      }
+    ],
+    "playlistBreakdown": {
+      "spotifyOwnedAlgorithmic": {
+        "count": 13,
+        "streams": 129449,
+        "note": "Radio, Discover Weekly, On Repeat, Release Radar, Mixes, Your DJ, This Is Kirbai."
+      },
+      "erikOwn": {
+        "count": 1,
+        "streams": 5857,
+        "titles": [
+          "The Kirbai Pokedex"
+        ],
+        "note": "Confirmed by Erik 2026-09-17: The Kirbai Pokedex is the ONLY playlist he made himself."
+      },
+      "fanBuiltKirbaiDedicated": {
+        "count": 9,
+        "streams": 3614,
+        "titles": [
+          "AI Pokemon",
+          "I'm the Pheromosa",
+          "KIRBAI FAVES",
+          "Kirbai",
+          "Mean Look - Gothitelle Cut",
+          "Meowscarada songs💚💚🖤",
+          "My Kirbai",
+          "Pokemon-kirbai",
+          "Scrappy Klutz"
+        ],
+        "note": "Unprompted fan playlists named after Kirbai or after a specific Kirbai song. 3-8 listeners each."
+      },
+      "automatedServiceAdds": {
+        "count": 12,
+        "streams": 261,
+        "note": "'SM <date> 26' playlists whose dates match Kirbai release dates. Negligible volume."
+      },
+      "otherThirdParty": {
+        "count": 43,
+        "streams": 2977,
+        "note": "Includes a notable gym/workout cluster: Gay Lifting Mixxx (78 listeners, the highest-listener outside placement), Novas Para MALHAR, Correr 15km, Gym 2026, Work 3."
+      }
+    },
+    "topPlaylists": [
+      {
+        "title": "Radio",
+        "author": "Spotify",
+        "streams": 67629,
+        "listeners": 35000
+      },
+      {
+        "title": "Discover Weekly",
+        "author": "Spotify",
+        "streams": 21910,
+        "listeners": 12967
+      },
+      {
+        "title": "This Is Kirbai",
+        "author": "Spotify",
+        "streams": 11756,
+        "listeners": 179
+      },
+      {
+        "title": "Mixes",
+        "author": "Spotify",
+        "streams": 8649,
+        "listeners": 1115
+      },
+      {
+        "title": "On Repeat",
+        "author": "Spotify",
+        "streams": 8370,
+        "listeners": 334
+      },
+      {
+        "title": "The Kirbai Pokedex",
+        "author": "-",
+        "streams": 5857,
+        "listeners": 81
+      },
+      {
+        "title": "Your DJ",
+        "author": "Spotify",
+        "streams": 4757,
+        "listeners": 1033
+      },
+      {
+        "title": "Release Radar",
+        "author": "Spotify",
+        "streams": 4079,
+        "listeners": 1726
+      },
+      {
+        "title": "AI Pokemon",
+        "author": "-",
+        "streams": 1003,
+        "listeners": 6
+      },
+      {
+        "title": "I'm the Pheromosa",
+        "author": "-",
+        "streams": 857,
+        "listeners": 5
+      },
+      {
+        "title": "gigi cunt",
+        "author": "-",
+        "streams": 831,
+        "listeners": 4
+      },
+      {
+        "title": "Daylist",
+        "author": "Spotify",
+        "streams": 811,
+        "listeners": 583
+      }
+    ],
+    "caveats": [
+      "Monthly listeners is a trailing 28-day unique count. Algorithmic batches entering and aging out of that window cause cliff-shaped moves that do NOT reflect audience loss. Verify against daily streams before concluding decline.",
+      "The 2026-03-19 peak of 26,217 monthly listeners was an algorithmic batch, not a release. Daily streams held flat at ~3,000/day straight through the subsequent crash.",
+      "Song and playlist exports cover a trailing year only, so pre-Sept-2025 catalog is undercounted there."
+    ]
+  }
 }
