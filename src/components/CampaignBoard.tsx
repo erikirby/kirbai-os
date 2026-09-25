@@ -347,7 +347,7 @@ function fmtDay(iso: string) {
 
 function daysOut(iso: string) {
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    return Math.round((new Date(iso + "T12:00:00").getTime() - today.getTime()) / 86400000);
+    return Math.round((new Date(iso + "T00:00:00").getTime() - today.getTime()) / 86400000);
 }
 
 function ContentCalendar({ board, onUpdateCard }: {

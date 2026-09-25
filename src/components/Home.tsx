@@ -30,7 +30,7 @@ const shortTitle = (t: string) => t.replace(/ (trailer|drops).*$/i, "").replace(
 
 function daysOut(iso: string) {
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    return Math.round((new Date(iso + "T12:00:00").getTime() - today.getTime()) / 86400000);
+    return Math.round((new Date(iso + "T00:00:00").getTime() - today.getTime()) / 86400000);
 }
 function shortDate(iso: string) {
     return new Date(iso + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
@@ -151,11 +151,15 @@ export default function Home({ go }: { go: Go }) {
                     {nextDrop ? (
                         <div className="flex items-center gap-6 flex-wrap">
                             <div className="flex items-baseline gap-2">
-                                <span className="text-7xl font-bold leading-none tracking-tighter text-gradient tabular-nums">{nextOut}</span>
-                                <span className="text-base font-medium text-foreground/50">{nextOut === 1 ? "day" : "days"}</span>
+                                {nextOut === 0 ? (
+                                    <span className="text-6xl font-bold leading-none tracking-tighter text-gradient">Out today</span>
+                                ) : <>
+                                    <span className="text-7xl font-bold leading-none tracking-tighter text-gradient tabular-nums">{nextOut}</span>
+                                    <span className="text-base font-medium text-foreground/50">{nextOut === 1 ? "day" : "days"}</span>
+                                </>}
                             </div>
                             <div className="flex flex-col gap-1.5 min-w-0">
-                                <span className="text-sm text-foreground/50">Next drop · {shortDate(nextDrop.scheduledDate!)}</span>
+                                <span className="text-sm text-foreground/50">{nextOut === 0 ? "Drop day" : "Next drop"} · {shortDate(nextDrop.scheduledDate!)}</span>
                                 <h2 className="text-2xl font-bold tracking-tight text-foreground">{nextDrop.title}</h2>
                                 <div className="flex items-center gap-2">
                                     <span className={`badge ${isLocked(nextDrop) ? "text-emerald-500 bg-emerald-400/10 border-emerald-400/20" : "text-accent bg-accent/10 border-accent/20"}`}>
