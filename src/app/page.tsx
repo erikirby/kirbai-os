@@ -126,7 +126,10 @@ export default function Home() {
           </div>
         </nav>
 
-        <div className="ml-auto relative">
+        <div className="ml-auto flex items-center gap-1">
+          <ThemeSlider dark={theme !== "calm"} onToggle={() => setTheme(theme === "calm" ? "dark" : "calm")} />
+        </div>
+        <div className="relative">
           <button onClick={() => setShowSettings(v => !v)} className="p-2 rounded-full text-foreground/50 hover:text-foreground hover:bg-foreground/5 transition-colors" title="Settings">
             <Settings2 className="w-5 h-5" />
           </button>
@@ -227,5 +230,27 @@ export default function Home() {
         </div>
       )}
     </main>
+  );
+}
+
+/** Light/dark slider: Solrock on the left in light mode, Lunatone on the right in dark mode. */
+function ThemeSlider({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
+  return (
+    <button
+      onClick={onToggle}
+      role="switch"
+      aria-checked={dark}
+      title={dark ? "Switch to light mode" : "Switch to dark mode"}
+      className="relative w-[76px] h-10 shrink-0 group"
+    >
+      <span className={`absolute left-3 right-3 top-1/2 -translate-y-1/2 h-3 rounded-full transition-colors duration-300 ${dark ? "bg-indigo-400/30" : "bg-amber-300/50"}`} />
+      <span
+        className={`absolute top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center transition-all duration-300 ease-out group-hover:scale-110 group-active:scale-95 ${dark ? "rotate-0" : "-rotate-12"}`}
+        style={{ left: dark ? "calc(100% - 34px)" : "2px" }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={dark ? "/sprites/lunatone-icon.png" : "/sprites/solrock-icon.png"} alt="" className="h-8 w-auto" style={{ imageRendering: "pixelated" }} />
+      </span>
+    </button>
   );
 }
