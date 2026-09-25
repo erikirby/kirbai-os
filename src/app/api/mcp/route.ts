@@ -48,7 +48,7 @@ function allowed(req: Request) {
 
 const text = (t: string) => ({ content: [{ type: 'text', text: t }] });
 
-async function handle(msg: { id?: string | number; method: string; params?: any }) {
+async function handle(msg: { id?: string | number; method: string; params?: any }, canWrite: boolean) {
     switch (msg.method) {
         case 'initialize':
             return {
@@ -68,6 +68,10 @@ async function handle(msg: { id?: string | number; method: string; params?: any 
                 const ctx = await getContext();
                 return text(ctx.markdown);
             }
+            // Reading is open to anyone; changing anything needs the x-kirbai-key header (or ?key=).
+            if ((name === 'update_kirbai' || name === 'add_note') && !canWrite) {
+                return { ...text('Kirbai OS: this connector is read-only. Add the x-kirbai-key header to make changes.'), isError: true };
+            }
             if (name === 'update_kirbai') {
                 const ops: Op[] = Array.isArray(args.ops) ? args.ops : [];
                 const { results } = await applyOps(ops, String(args.source || 'mcp').slice(0, 40));
@@ -85,14 +89,13 @@ async function handle(msg: { id?: string | number; method: string; params?: any 
 }
 
 export async function POST(req: Request) {
-    if (!allowed(req)) return NextResponse.json({ jsonrpc: '2.0', id: null, error: { code: -32001, message: 'Unauthorized' } }, { status: 401 });
     const body = await req.json();
     const batch = Array.isArray(body) ? body : [body];
     const replies = [];
     for (const msg of batch) {
         if (msg.id === undefined || msg.id === null) continue; // notifications need no reply
         try {
-            replies.push({ jsonrpc: '2.0', id: msg.id, result: await handle(msg) });
+            replies.push({ jsonrpc: '2.0', id: msg.id, result: await handle(msg, allowed(req)) });
         } catch (e: any) {
             replies.push({ jsonrpc: '2.0', id: msg.id, error: { code: e.code ?? -32603, message: e.message } });
         }

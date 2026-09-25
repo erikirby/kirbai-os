@@ -20,10 +20,12 @@ export async function GET(req: Request) {
 
 /** POST /api/ai {ops:[...], source} -> applies each op and reports what happened. */
 export async function POST(req: Request) {
-    if (!allowed(req)) return NextResponse.json({ success: false, error: 'Missing or wrong x-kirbai-key' }, { status: 401 });
     try {
         const body = await req.json();
         const ops: Op[] = Array.isArray(body) ? body : Array.isArray(body.ops) ? body.ops : body.op ? [body] : [];
+        // Dismissing a note from the Home page is harmless housekeeping; every other change needs the key.
+        const housekeepingOnly = ops.length > 0 && ops.every(o => o.op === 'dismiss_note');
+        if (!housekeepingOnly && !allowed(req)) return NextResponse.json({ success: false, error: 'Missing or wrong x-kirbai-key' }, { status: 401 });
         if (!ops.length) return NextResponse.json({ success: false, error: 'Send {"ops":[...]}', help: OPS_HELP }, { status: 400 });
         const { results } = await applyOps(ops, String(body.source || 'ai').slice(0, 40));
         return NextResponse.json({ success: results.every(r => r.ok), results });
