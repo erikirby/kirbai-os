@@ -23,14 +23,15 @@ import RevenueEngine from "@/components/RevenueEngine";
 import HookEngine from "@/components/HookEngine";
 import CampaignBoard from "@/components/CampaignBoard";
 import HomeView from "@/components/Home";
+import CastSheet from "@/components/CastSheet";
 import { MessageSquare, Settings2, ChevronDown, Sparkles, Home as HomeIcon, Menu, X } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
-type Module = "home" | "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "storyroom" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks" | "studio";
+type Module = "home" | "cast" | "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "storyroom" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks" | "studio";
 type Theme = "dark" | "snes" | "calm";
 
 const NAV_GROUPS = [
-  { id: "plan", label: "Story & Plan", items: [{ id: "storyroom", label: "Story Room" }, { id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "roadmap", label: "Roadmap" }] },
+  { id: "plan", label: "Story & Plan", items: [{ id: "cast", label: "Cast Sheet" }, { id: "storyroom", label: "Story Room" }, { id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "roadmap", label: "Roadmap" }] },
   { id: "create", label: "Create", items: [{ id: "hooks", label: "Hook Engine" }, { id: "distro", label: "Description Gen" }, { id: "prompts", label: "Prompts" }, { id: "creative", label: "Brainstorm" }] },
   { id: "numbers", label: "Numbers", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "revenue", label: "Revenue Engine" }] },
   { id: "labs", label: "Labs", items: [{ id: "intel", label: "Intel" }, { id: "competitors", label: "Competitors" }, { id: "muse", label: "Muse" }, { id: "director", label: "Director's Suite" }, { id: "boardroom", label: "Boardroom" }, { id: "core", label: "Core" }, { id: "api-health", label: "API" }] },
@@ -301,6 +302,7 @@ export default function Home() {
             <div className="flex flex-col gap-8">
               <div key={`${activeTab}-${activeModule}`} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {activeModule === "home" && <HomeView go={m => { setActiveModule(m); if (m === "studio") setTheme("calm"); }} />}
+                {activeModule === "cast" && <CastSheet />}
                 {activeModule === "roadmap" && <Roadmap mode={activeTab} />}
                 {activeModule === "vault" && <VaultManager theme={theme} mode={activeTab} />}
                 {activeModule === "intel" && <IntelInbox mode="full" theme={theme} activeTab={activeTab} />}

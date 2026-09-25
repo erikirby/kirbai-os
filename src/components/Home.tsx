@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ArrowRight, Lightbulb, Loader2, X } from "lucide-react";
 import type { CampaignBoard as Board, CampaignCard, CardStatus, Stream } from "@/app/api/campaign-board/route";
 
-type Go = (module: "studio" | "storyroom" | "lore" | "vault") => void;
+type Go = (module: "studio" | "cast" | "storyroom" | "lore") => void;
 
 const STATUS: Record<CardStatus, { label: string; cls: string }> = {
     idea: { label: "Idea", cls: "text-foreground/50 bg-foreground/5 border-foreground/10" },
@@ -268,7 +268,7 @@ export default function Home({ go }: { go: Go }) {
                     <div className="card p-5 flex flex-col gap-3">
                         <h3 className="section-subtitle">Jump to</h3>
                         <div className="grid grid-cols-2 gap-2">
-                            {([["studio", "Studio"], ["storyroom", "Story Room"], ["lore", "Lore"], ["vault", "Vault"]] as const).map(([id, label]) => (
+                            {([["studio", "Studio"], ["cast", "Cast Sheet"], ["storyroom", "Story Room"], ["lore", "Lore"]] as const).map(([id, label]) => (
                                 <button key={id} onClick={() => go(id)} className="px-3 py-2.5 rounded-xl border border-border bg-surface/40 hover:border-accent/40 hover:text-accent text-[11px] font-semibold text-foreground/70 transition-all">
                                     {label}
                                 </button>
