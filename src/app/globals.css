@@ -80,6 +80,11 @@
   --panel-blur: 24px;
   --card-radius: 20px;
   --btn-radius: 12px;
+
+  /* Studio stream accents (Light theme overrides with pastels) */
+  --stream-video: #9B7BFF;
+  --stream-carousel: #FF7FAA;
+  --stream-comedy: #4FC7AC;
 }
 
 

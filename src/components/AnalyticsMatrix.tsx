@@ -118,13 +118,7 @@ export default function AnalyticsMatrix({ theme = "dark", mode = 'kirbai' }: Ana
     return (
         <div className="w-full flex flex-col gap-8 pb-12 animate-in fade-in duration-500">
             {/* Header Navigation & Sub-Tabs */}
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-border/60 pb-6">
-                <div>
-                    <h2 className="text-2xl font-black tracking-tight text-gradient">STATISTICS & ANALYTICS HUB</h2>
-                    <p className="text-xs text-foreground/50 mt-1">
-                        Unified cross-platform intelligence engine combining DistroKid, Meta, TikTok, and YouTube API data.
-                    </p>
-                </div>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
 
                 <div className="flex flex-wrap items-center gap-3">
                     {/* View Switcher Sub-Tabs */}

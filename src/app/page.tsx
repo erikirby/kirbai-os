@@ -24,16 +24,16 @@ import HookEngine from "@/components/HookEngine";
 import CampaignBoard from "@/components/CampaignBoard";
 import HomeView from "@/components/Home";
 import CastSheet from "@/components/CastSheet";
-import { MessageSquare, Settings2, ChevronDown, Sparkles, Home as HomeIcon, Menu, X, Users, BookOpen } from 'lucide-react';
+import StatsHub from "@/components/StatsHub";
+import { MessageSquare, Settings2, ChevronDown, Sparkles, Home as HomeIcon, Menu, X, Users, BookOpen, Archive, BarChart3 } from 'lucide-react';
 
 type Tab = "kirbai" | "factory";
-type Module = "home" | "cast" | "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "storyroom" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks" | "studio";
+type Module = "home" | "cast" | "stats" | "roadmap" | "vault" | "intel" | "pulse" | "finance" | "api-health" | "chat" | "core" | "lore" | "storyroom" | "prompts" | "creative" | "director" | "muse" | "boardroom" | "distro" | "competitors" | "revenue" | "hooks" | "studio";
 type Theme = "dark" | "snes" | "calm";
 
 const NAV_GROUPS = [
-  { id: "plan", label: "Plan", items: [{ id: "lore", label: "Lore" }, { id: "vault", label: "Vault" }, { id: "roadmap", label: "Roadmap" }] },
+  { id: "plan", label: "Plan", items: [{ id: "lore", label: "Lore" }, { id: "roadmap", label: "Roadmap" }] },
   { id: "create", label: "Create", items: [{ id: "hooks", label: "Hook Engine" }, { id: "distro", label: "Description Gen" }, { id: "prompts", label: "Prompts" }, { id: "creative", label: "Brainstorm" }] },
-  { id: "numbers", label: "Numbers", items: [{ id: "pulse", label: "Pulse" }, { id: "finance", label: "Money" }, { id: "revenue", label: "Revenue Engine" }] },
   { id: "labs", label: "Labs", items: [{ id: "intel", label: "Intel" }, { id: "competitors", label: "Competitors" }, { id: "muse", label: "Muse" }, { id: "director", label: "Director's Suite" }, { id: "boardroom", label: "Boardroom" }, { id: "core", label: "Core" }, { id: "api-health", label: "API" }] },
 ] as const;
 
@@ -42,6 +42,8 @@ const PRIMARY: { id: Module; label: string; icon: typeof HomeIcon }[] = [
   { id: "studio", label: "Studio", icon: Sparkles },
   { id: "cast", label: "Cast", icon: Users },
   { id: "storyroom", label: "Story Room", icon: BookOpen },
+  { id: "vault", label: "Vault", icon: Archive },
+  { id: "stats", label: "Stats", icon: BarChart3 },
   { id: "chat", label: "Chat", icon: MessageSquare },
 ];
 
@@ -78,7 +80,7 @@ export default function Home() {
     setActiveModule(m);
     setShowMore(false);
     setShowLauncher(false);
-    if (m === "studio") { setStudioView(view); setTheme("calm"); }
+    if (m === "studio") setStudioView(view);
   };
 
   const inMore = NAV_GROUPS.some(g => g.items.some(i => i.id === activeModule)) && !PRIMARY.some(p => p.id === activeModule);
@@ -108,7 +110,7 @@ export default function Home() {
             </button>
             {showMore && <>
               <div className="fixed inset-0 z-[90]" onClick={() => setShowMore(false)} />
-              <div className="absolute top-full left-0 mt-2 z-[100] rounded-2xl border border-border bg-surface shadow-2xl shadow-black/20 p-3 grid grid-cols-4 gap-3 w-[640px]">
+              <div className="absolute top-full left-0 mt-2 z-[100] rounded-2xl border border-border bg-surface shadow-2xl shadow-black/20 p-3 grid grid-cols-3 gap-3 w-[520px]">
                 {NAV_GROUPS.map(group => (
                   <div key={group.id} className="flex flex-col gap-0.5">
                     <span className="px-2.5 pb-1 text-xs font-medium text-foreground/40">{group.label}</span>
@@ -162,6 +164,7 @@ export default function Home() {
           <div key={`${activeTab}-${activeModule}`} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {activeModule === "home" && <HomeView go={(m, view) => go(m, view)} />}
             {activeModule === "cast" && <CastSheet />}
+            {activeModule === "stats" && <StatsHub theme={theme} mode={activeTab} />}
             {activeModule === "roadmap" && <Roadmap mode={activeTab} />}
             {activeModule === "vault" && <VaultManager theme={theme} mode={activeTab} />}
             {activeModule === "intel" && <IntelInbox mode="full" theme={theme} activeTab={activeTab} />}
@@ -188,7 +191,7 @@ export default function Home() {
 
       {/* ─── MOBILE BOTTOM DOCK ─── */}
       <div className="mobile-bottom-dock show-on-mobile-only">
-        {PRIMARY.filter(p => p.id !== "storyroom").map(({ id, label, icon: Icon }) => (
+        {PRIMARY.filter(p => ["home", "studio", "cast", "stats"].includes(p.id)).map(({ id, label, icon: Icon }) => (
           <button key={id} onClick={() => go(id)} className={`mobile-dock-item ${activeModule === id ? "active" : ""}`}>
             <Icon className="w-5 h-5" />
             <span>{label}</span>
@@ -209,7 +212,7 @@ export default function Home() {
               <X className="w-5 h-5" />
             </button>
           </div>
-          {[{ id: "story", label: "Story", items: [{ id: "storyroom", label: "Story Room" }] }, ...NAV_GROUPS].map(group => (
+          {[{ id: "main", label: "Main", items: [{ id: "storyroom", label: "Story Room" }, { id: "vault", label: "Vault" }, { id: "chat", label: "Chat" }] }, ...NAV_GROUPS].map(group => (
             <div key={group.id} className="flex flex-col gap-2">
               <span className="text-xs font-medium text-foreground/40">{group.label}</span>
               <div className="launcher-grid">
